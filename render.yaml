@@ -26,25 +26,17 @@ services:
       - key: DB_CONNECTION
         value: mysql
       - key: DB_HOST
-        fromDatabase:
-          name: ticket-db
-          property: host
+        value: apps-web-extra-gsch-69b2.g.aivencloud.com
       - key: DB_PORT
-        fromDatabase:
-          name: ticket-db
-          property: port
+        value: 20606
       - key: DB_DATABASE
-        fromDatabase:
-          name: ticket-db
-          property: database
+        value: defaultdb
       - key: DB_USERNAME
-        fromDatabase:
-          name: ticket-db
-          property: user
+        value: avnadmin
       - key: DB_PASSWORD
-        fromDatabase:
-          name: ticket-db
-          property: password
+        value: AVNS_5ers-mFGmvYZyuNz9zT
+      - key: MYSQL_ATTR_SSL_VERIFY_SERVER_CERT
+        value: false
       - key: REDIS_URL
         fromService:
           type: redis
@@ -78,22 +70,3 @@ services:
     plan: starter
     region: oregon
 
-  - type: pserv
-    name: ticket-db
-    env: docker
-    dockerfilePath: ./Dockerfile
-    plan: starter
-    region: oregon
-    branch: main
-    buildCommand: |
-      echo "Database service ready"
-    startCommand: echo "Database service ready"
-    envVars:
-      - key: MYSQL_DATABASE
-        value: ticket_system
-      - key: MYSQL_USER
-        value: ticket_user
-      - key: MYSQL_PASSWORD
-        value: ticket_password
-      - key: MYSQL_ROOT_PASSWORD
-        value: root_password
