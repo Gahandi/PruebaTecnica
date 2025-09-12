@@ -26,6 +26,8 @@ services:
         value: https://prueba.gahandi.dev
       - key: APP_KEY
         value: base64:uAQv9VO52+pdwbWclbNPkdH98W7ybQbnerZHBzTubV0=
+      - key: FORCE_HTTPS
+        value: true
       - key: DB_CONNECTION
         value: mysql
       - key: DB_HOST
