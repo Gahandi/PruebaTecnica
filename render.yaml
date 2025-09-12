@@ -10,7 +10,6 @@ services:
       composer install --no-dev --optimize-autoloader --no-interaction
       npm install
       npm run build
-      php artisan key:generate --force
       php artisan config:clear
       php artisan cache:clear
       php artisan migrate --force
@@ -27,6 +26,8 @@ services:
         value: false
       - key: APP_URL
         value: https://prueba.gahandi.dev
+      - key: APP_KEY
+        value: base64:uAQv9VO52+pdwbWclbNPkdH98W7ybQbnerZHBzTubV0=
       - key: DB_CONNECTION
         value: mysql
       - key: DB_HOST
