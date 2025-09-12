@@ -33,7 +33,7 @@ class CheckRole
                 break;
             }
         }
-        redirect()->route('events.public');
+        
         if (!$hasRole) {
             abort(403, 'No tienes permisos para acceder a esta sección.');
         }
