@@ -34,11 +34,6 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
 # Install npm dependencies and build assets
 RUN npm install && npm run build
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
-
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
 
@@ -48,13 +43,18 @@ RUN rm -f /etc/nginx/sites-enabled/default
 # Copy supervisor configuration
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Create necessary directories
+# Create necessary directories FIRST
 RUN mkdir -p /var/www/html/storage/logs \
     && mkdir -p /var/www/html/storage/framework/cache \
     && mkdir -p /var/www/html/storage/framework/sessions \
     && mkdir -p /var/www/html/storage/framework/views \
     && mkdir -p /var/www/html/storage/app/public \
     && mkdir -p /var/www/html/public/qrcodes
+
+# Set permissions AFTER creating directories
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html/storage \
+    && chmod -R 755 /var/www/html/bootstrap/cache
 
 # Expose port
 EXPOSE 80
