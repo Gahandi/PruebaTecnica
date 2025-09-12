@@ -24,6 +24,11 @@ class CheckinController extends Controller
      */
     public function index(Request $request)
     {
+        // Si es staff y no admin, redirigir a la ruta de staff
+        if (auth()->user()->hasRole('staff') && !auth()->user()->hasRole('admin')) {
+            return redirect()->route('staff.checkins.index');
+        }
+        
         $query = Checkin::with(['ticket.order.user', 'ticket.ticketType.event']);
         
         // Filtrar por evento si se especifica
@@ -138,6 +143,11 @@ class CheckinController extends Controller
      */
     public function show(Checkin $checkin)
     {
+        // Si es staff y no admin, redirigir a la ruta de staff
+        if (auth()->user()->hasRole('staff') && !auth()->user()->hasRole('admin')) {
+            return redirect()->route('staff.checkins.show', $checkin);
+        }
+        
         $checkin->load(['ticket.order.user', 'ticket.ticketType.event']);
         return view('admin.checkins.show', compact('checkin'));
     }

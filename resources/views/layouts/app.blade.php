@@ -27,7 +27,7 @@
                 <div class="flex justify-between h-16">
                     <div class="flex items-center flex-row-reverse gap-6">
                                                     <!-- Admin Menu -->
-                                                    @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('staff'))
+                                                    @if(auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('staff')))
                             <div class="relative group" id="admin-dropdown">
                                 <button class="text-gray-700 hover:text-gray-900 flex items-center" onclick="toggleAdminDropdown()">
                                     Administración
@@ -36,7 +36,7 @@
                                     </svg>
                                 </button>
                                 <div class="absolute right-0 mt-2 w-52 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200" id="admin-menu" style="display: none;">
-                                    @if(auth()->user()->hasRole('admin'))
+                                    @if(auth()->check() && auth()->user()->hasRole('admin'))
                                         <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors border-b border-gray-100">
                                             <div class="flex items-center">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,13 +79,24 @@
                                         </a>
                                     @endif
                                     
-                                    @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('staff'))
+                                    @if(auth()->check() && auth()->user()->hasRole('admin'))
                                     <a href="{{ route('admin.checkins.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                         <div class="flex items-center">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
-                                            Check-ins
+                                            Check-ins (Admin)
+                                        </div>
+                                    </a>
+                                    @endif
+                                    
+                                    @if(auth()->check() && auth()->user()->hasRole('staff'))
+                                    <a href="{{ route('staff.checkins.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                        <div class="flex items-center">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            Check-ins (Staff)
                                         </div>
                                     </a>
                                     @endif

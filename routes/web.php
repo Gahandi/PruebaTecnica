@@ -5,6 +5,8 @@ use App\Http\Controllers\Admin\TicketTypeController;
 use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\CheckinController;
+use App\Http\Controllers\Staff\CheckinController as StaffCheckinController;
+use App\Http\Controllers\AdminCheckinRedirectController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\AuthController;
@@ -42,6 +44,22 @@ Route::get('/debug-cart', function() {
     ]);
 })->middleware('auth');
 
+// Ruta de prueba para verificar redirección
+Route::get('/test-redirect', function() {
+    if (!auth()->check()) {
+        return 'No autenticado';
+    }
+    
+    $user = auth()->user();
+    return response()->json([
+        'email' => $user->email,
+        'roles' => $user->roles->pluck('name')->toArray(),
+        'has_staff' => $user->hasRole('staff'),
+        'has_admin' => $user->hasRole('admin'),
+        'path' => request()->path()
+    ]);
+})->middleware('auth');
+
 
 
 // Check-in route for QR scanning (no auth required)
@@ -63,6 +81,7 @@ Route::get('/events/{event}', [PublicEventController::class, 'show'])->name('eve
 
 // Rutas del carrito (sin autenticación)
 Route::post('/cart/add', [PublicEventController::class, 'addToCart'])->name('cart.add');
+Route::get('/cart', [App\Http\Controllers\CheckoutController::class, 'cart'])->name('cart');
 
 // Rutas protegidas por roles
 Route::middleware(['auth', 'role:admin,staff'])->group(function () {
@@ -82,6 +101,24 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('admin/ticket-types', TicketTypeController::class)->names('admin.ticket-types');
     Route::resource('admin/coupons', CouponController::class)->names('admin.coupons');
     Route::resource('admin/orders', AdminOrderController::class)->names('admin.orders');
+});
+
+// Ruta de prueba sin middleware de roles
+Route::middleware(['auth'])->group(function () {
+    Route::get('/staff/checkins', [StaffCheckinController::class, 'index'])->name('staff.checkins.index');
+    Route::post('/staff/checkins', [StaffCheckinController::class, 'store'])->name('staff.checkins.store');
+    Route::get('/staff/checkins/create', [StaffCheckinController::class, 'create'])->name('staff.checkins.create');
+    Route::get('/staff/checkins/{checkin}', [StaffCheckinController::class, 'show'])->name('staff.checkins.show');
+    Route::put('/staff/checkins/{checkin}', [StaffCheckinController::class, 'update'])->name('staff.checkins.update');
+    Route::delete('/staff/checkins/{checkin}', [StaffCheckinController::class, 'destroy'])->name('staff.checkins.destroy');
+    Route::get('/staff/checkins/{checkin}/edit', [StaffCheckinController::class, 'edit'])->name('staff.checkins.edit');
+});
+
+// Ruta especial para redirección de staff a admin/checkins - DEBE IR ANTES de las rutas resource
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/checkins', [AdminCheckinRedirectController::class, 'index'])->name('admin.checkins.redirect');
+    Route::get('/admin/checkins/{checkin}', [AdminCheckinRedirectController::class, 'show']);
+    Route::get('/admin/checkins/create', [AdminCheckinRedirectController::class, 'create']);
 });
 
 Route::middleware(['auth', 'role:admin,staff'])->group(function () {

@@ -69,5 +69,6 @@ class Kernel extends HttpKernel
         'api.security' => \App\Http\Middleware\ApiSecurity::class,
         'redirect.after.login' => \App\Http\Middleware\RedirectAfterLogin::class,
         'handle.403' => \App\Http\Middleware\Handle403::class,
+        'redirect.staff' => \App\Http\Middleware\RedirectStaffToStaffRoutes::class,
     ];
 }

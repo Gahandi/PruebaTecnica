@@ -151,7 +151,7 @@
             </button>
             <button type="button" 
                     id="view_cart_button"
-                    onclick="window.location.href='{{ route('checkout.cart') }}'"
+                    onclick="window.location.href='{{ route('cart') }}'"
                     class="bg-gray-600 text-white px-8 py-3 rounded-md hover:bg-gray-700 transition-colors">
                 Ver Carrito
             </button>
@@ -317,7 +317,7 @@ async function addToCart() {
             formData.append('ticket_type_id', ticket.ticket_type_id);
             formData.append('quantity', ticket.quantity);
             
-            const response = await fetch('{{ route("checkout.add-to-cart") }}', {
+            const response = await fetch('{{ route("cart.add") }}', {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -334,7 +334,7 @@ async function addToCart() {
         }
         
         // Redirect to cart after all tickets are added
-        window.location.href = '{{ route("checkout.cart") }}';
+        window.location.href = '{{ route("cart") }}';
         
     } catch (error) {
         console.error('Error:', error);

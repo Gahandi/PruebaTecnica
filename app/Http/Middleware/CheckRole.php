@@ -23,19 +23,33 @@ class CheckRole
 
         $user = auth()->user();
         
-        // Dividir los roles por coma y verificar si el usuario tiene alguno de ellos
+        // PRIMERO: Verificar si es staff intentando acceder a rutas de admin y redirigir
+        if ($user->hasRole('staff') && !$user->hasRole('admin')) {
+            $path = $request->path();
+            
+            // Redirigir rutas de admin/checkins a staff/checkins
+            if (str_starts_with($path, 'admin/checkins')) {
+                $staffPath = str_replace('admin/checkins', 'staff/checkins', $path);
+                return redirect()->to($staffPath);
+            }
+        }
+        
+        // SEGUNDO: Verificar roles normales
         $allowedRoles = explode(',', $roles);
         $hasRole = false;
         
         foreach ($allowedRoles as $role) {
-            if ($user->hasRole(trim($role))) {
+            $role = trim($role);
+            if ($user->hasRole($role)) {
                 $hasRole = true;
                 break;
             }
         }
         
         if (!$hasRole) {
-            abort(403, 'No tienes permisos para acceder a esta sección.');
+            // Debug: mostrar información del usuario
+            $userRoles = $user->roles->pluck('name')->toArray();
+            abort(403, "No tienes permisos para acceder a esta sección. Usuario: {$user->email}, Roles: " . implode(', ', $userRoles) . ", Roles requeridos: " . $roles);
         }
 
         return $next($request);
