@@ -27,12 +27,7 @@ COPY . .
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Install Node.js and npm
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs
-
-# Install npm dependencies and build assets
-RUN npm install && npm run build
+# No build process needed with CDN
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
