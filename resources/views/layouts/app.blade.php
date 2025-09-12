@@ -96,6 +96,16 @@
                                         </div>
                                     </a>
                                     @endcan
+                                    @can('create checkins')
+                                    <a href="{{ route('admin.checkins.scan') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                        <div class="flex items-center">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                                            </svg>
+                                            Escanear QR
+                                        </div>
+                                    </a>
+                                    @endcan
                                 </div>
                             </div>
                             @endcan
@@ -149,6 +159,38 @@
 
         <!-- Page Content -->
         <main>
+            <!-- Error Messages -->
+            @if(session('error'))
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mx-4 mt-4" role="alert">
+                    <div class="flex">
+                        <div class="py-1">
+                            <svg class="fill-current h-6 w-6 text-red-500 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                <path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-bold">{{ session('error') }}</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Success Messages -->
+            @if(session('success'))
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mx-4 mt-4" role="alert">
+                    <div class="flex">
+                        <div class="py-1">
+                            <svg class="fill-current h-6 w-6 text-green-500 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                <path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM9 11V9h2v6H9v-4zm0-6h2v2H9V5z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-bold">{{ session('success') }}</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             @yield('content')
         </main>
     </div>

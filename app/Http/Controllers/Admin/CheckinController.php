@@ -152,4 +152,12 @@ class CheckinController extends Controller
         return redirect()->route('admin.checkins.index')
                          ->with('success', 'Check-in eliminado correctamente.');
     }
+
+    /**
+     * Mostrar página de escaneo QR
+     */
+    public function scan()
+    {
+        return view('admin.checkins.scan');
+    }
 }
