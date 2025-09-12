@@ -321,12 +321,15 @@ async function addToCart() {
                 method: 'POST',
                 body: formData,
                 headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 }
             });
             
             if (!response.ok) {
-                throw new Error('Error al agregar boletos al carrito');
+                const errorText = await response.text();
+                console.error('Error response:', response.status, errorText);
+                throw new Error(`Error ${response.status}: ${errorText}`);
             }
         }
         
