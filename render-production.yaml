@@ -1,0 +1,127 @@
+services:
+  - type: web
+    name: ticket-system-gahandi
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    region: oregon
+    branch: main
+    buildCommand: |
+      composer install --no-dev --optimize-autoloader --no-interaction
+      npm install
+      npm run build
+      php artisan key:generate --force
+      php artisan migrate --force
+      php artisan db:seed --force
+      php artisan storage:link
+      php artisan optimize
+    startCommand: /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_URL
+        value: https://prueba.gahandi.dev
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        value: apps-web-extra-gsch-69b2.g.aivencloud.com
+      - key: DB_PORT
+        value: 20606
+      - key: DB_DATABASE
+        value: defaultdb
+      - key: DB_USERNAME
+        value: avnadmin
+      - key: DB_PASSWORD
+        value: AVNS_5ers-mFGmvYZyuNz9zT
+      - key: MYSQL_ATTR_SSL_VERIFY_SERVER_CERT
+        value: false
+      - key: MYSQL_ATTR_SSL_CIPHER
+        value: ""
+      - key: CACHE_DRIVER
+        value: file
+      - key: SESSION_DRIVER
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: MAIL_MAILER
+        value: smtp
+      - key: MAIL_HOST
+        value: smtp.gmail.com
+      - key: MAIL_PORT
+        value: 587
+      - key: MAIL_USERNAME
+        value: your-email@gmail.com
+      - key: MAIL_PASSWORD
+        value: your-app-password
+      - key: MAIL_ENCRYPTION
+        value: tls
+      - key: MAIL_FROM_ADDRESS
+        value: your-email@gmail.com
+      - key: MAIL_FROM_NAME
+        value: "Sistema de Boletos"
+      - key: TICKET_QR_SIZE
+        value: 200
+      - key: TAX_RATE
+        value: 16
+      - key: TAX_NAME
+        value: "IVA"
+      - key: COUPON_DEFAULT_USAGE_LIMIT
+        value: 100
+      - key: COUPON_DEFAULT_MIN_ORDER_AMOUNT
+        value: 100
+      - key: TICKET_SEAT_NUMBER_PREFIX
+        value: A
+      - key: TICKET_SEAT_NUMBER_START
+        value: 001
+      - key: EVENT_DEFAULT_STATUS
+        value: active
+      - key: EVENT_DEFAULT_CAPACITY
+        value: 100
+      - key: ORDER_DEFAULT_STATUS
+        value: pending
+      - key: ORDER_AUTO_COMPLETE_AFTER_MINUTES
+        value: 30
+      - key: CHECKIN_AUTO_MARK_USED
+        value: true
+      - key: CHECKIN_ALLOW_MULTIPLE
+        value: false
+      - key: RATE_LIMIT_API
+        value: 60
+      - key: RATE_LIMIT_ORDERS
+        value: 10
+      - key: RATE_LIMIT_LOGIN
+        value: 5
+      - key: LOG_QUERIES
+        value: false
+      - key: LOG_SLOW_QUERIES
+        value: true
+      - key: SLOW_QUERY_THRESHOLD
+        value: 2000
+      - key: NOTIFICATIONS_ENABLED
+        value: true
+      - key: NOTIFICATION_EMAIL_ORDERS
+        value: true
+      - key: NOTIFICATION_EMAIL_CHECKINS
+        value: true
+      - key: FILE_UPLOAD_MAX_SIZE
+        value: 2048
+      - key: CACHE_TTL_EVENTS
+        value: 3600
+      - key: CACHE_TTL_TICKET_TYPES
+        value: 1800
+      - key: CACHE_TTL_COUPONS
+        value: 1800
+      - key: API_VERSION
+        value: v1
+      - key: API_RATE_LIMIT
+        value: 60
+      - key: API_RATE_LIMIT_WINDOW
+        value: 60
+      - key: PRODUCTION_OPTIMIZE
+        value: true
+      - key: PRODUCTION_COMPRESS_ASSETS
+        value: true
+      - key: PRODUCTION_MINIFY_HTML
+        value: true
