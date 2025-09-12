@@ -69,7 +69,7 @@ Route::middleware(['auth', 'role:admin,staff'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
-Route::middleware(['auth', 'role:admin', 'redirect.unauthorized'])->group(function () {
+Route::middleware(['auth', 'role:admin', 'handle.403'])->group(function () {
     Route::get('/admin', function () {
         $eventsCount = \App\Models\Event::count();
         $ordersCount = \App\Models\Order::count();
@@ -84,9 +84,8 @@ Route::middleware(['auth', 'role:admin', 'redirect.unauthorized'])->group(functi
     Route::resource('admin/orders', AdminOrderController::class)->names('admin.orders');
 });
 
-Route::middleware(['auth', 'role:admin,staff', 'redirect.unauthorized'])->group(function () {
+Route::middleware(['auth', 'role:admin,staff', 'handle.403'])->group(function () {
     Route::resource('admin/checkins', CheckinController::class)->names('admin.checkins');
-    Route::get('/admin/checkins/scan', [CheckinController::class, 'scan'])->name('admin.checkins.scan');
 });
 
 // Rutas para todos los usuarios autenticados

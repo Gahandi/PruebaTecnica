@@ -67,7 +67,7 @@ class Kernel extends HttpKernel
         'role' => \App\Http\Middleware\CheckRole::class,
         'permission' => \App\Http\Middleware\CheckPermission::class,
         'api.security' => \App\Http\Middleware\ApiSecurity::class,
-        'redirect.unauthorized' => \App\Http\Middleware\RedirectIfUnauthorized::class,
         'redirect.after.login' => \App\Http\Middleware\RedirectAfterLogin::class,
+        'handle.403' => \App\Http\Middleware\Handle403::class,
     ];
 }

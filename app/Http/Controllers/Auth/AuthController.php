@@ -29,7 +29,7 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
             
-            return redirect()->intended(route('dashboard'));
+            return redirect()->intended(route('events.public'));
         }
 
         throw ValidationException::withMessages([
@@ -61,7 +61,7 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('dashboard')->with('success', '¡Cuenta creada exitosamente!');
+        return redirect()->route('events.public')->with('success', '¡Cuenta creada exitosamente!');
     }
 
     public function logout(Request $request)
@@ -71,6 +71,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return redirect()->route('events.public');
     }
 }

@@ -22,8 +22,8 @@ class CheckPermission
         }
 
         $user = auth()->user();
-        
         // Verificar si el usuario tiene el permiso requerido usando Spatie Permission
+        return redirect()->route('events.public');
         if (!$user->can($permission)) {
             abort(403, 'No tienes permisos para acceder a esta sección.');
         }

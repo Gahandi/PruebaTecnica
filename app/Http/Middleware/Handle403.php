@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class RedirectIfUnauthorized
+class Handle403
 {
     /**
      * Handle an incoming request.
@@ -15,6 +15,13 @@ class RedirectIfUnauthorized
      */
     public function handle(Request $request, Closure $next): Response
     {
-        return $next($request);
+        $response = $next($request);
+        
+        // Si la respuesta es 403, redirigir a la página principal
+        if ($response->getStatusCode() === 403) {
+            return redirect('/')->with('error', 'No tienes permisos para acceder a esta sección.');
+        }
+        
+        return $response;
     }
 }

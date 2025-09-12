@@ -10,12 +10,12 @@ services:
       composer install --no-dev --optimize-autoloader --no-interaction
       php artisan config:clear
       php artisan cache:clear
-      php artisan route:clear
-      php artisan view:clear
       php artisan migrate --force
       php artisan db:seed --force
       php artisan storage:link
       php artisan optimize
+      php artisan view:clear
+      php artisan route:clear
     startCommand: /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
     envVars:
       - key: APP_ENV
