@@ -11,6 +11,8 @@ services:
       npm install
       npm run build
       php artisan key:generate --force
+      php artisan config:clear
+      php artisan cache:clear
       php artisan migrate --force
       php artisan db:seed --force
       php artisan storage:link
@@ -37,6 +39,10 @@ services:
         value: AVNS_5ers-mFGmvYZyuNz9zT
       - key: MYSQL_ATTR_SSL_VERIFY_SERVER_CERT
         value: false
+      - key: MYSQL_ATTR_SSL_CA
+        value: ""
+      - key: MYSQL_ATTR_SSL_CIPHER
+        value: ""
       - key: REDIS_URL
         fromService:
           type: redis
