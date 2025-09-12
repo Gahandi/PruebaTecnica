@@ -27,7 +27,7 @@
                 <div class="flex justify-between h-16">
                     <div class="flex items-center flex-row-reverse gap-6">
                                                     <!-- Admin Menu -->
-                                                    @can('view admin panel')
+                                                    @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('staff'))
                             <div class="relative group" id="admin-dropdown">
                                 <button class="text-gray-700 hover:text-gray-900 flex items-center" onclick="toggleAdminDropdown()">
                                     Administración
@@ -37,7 +37,6 @@
                                 </button>
                                 <div class="absolute right-0 mt-2 w-52 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200" id="admin-menu" style="display: none;">
                                     @if(auth()->user()->hasRole('admin'))
-                                        @can('view dashboard')
                                         <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors border-b border-gray-100">
                                             <div class="flex items-center">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,8 +45,6 @@
                                                 Dashboard
                                             </div>
                                         </a>
-                                        @endcan
-                                        @can('view events')
                                         <a href="{{ route('admin.events.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                             <div class="flex items-center">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,8 +53,6 @@
                                                 Eventos
                                             </div>
                                         </a>
-                                        @endcan
-                                        @can('view ticket types')
                                         <a href="{{ route('admin.ticket-types.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                             <div class="flex items-center">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,8 +61,6 @@
                                                 Tipos de Boletos
                                             </div>
                                         </a>
-                                        @endcan
-                                        @can('view coupons')
                                         <a href="{{ route('admin.coupons.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                             <div class="flex items-center">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,8 +69,6 @@
                                                 Cupones
                                             </div>
                                         </a>
-                                        @endcan
-                                        @can('view orders')
                                         <a href="{{ route('admin.orders.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                             <div class="flex items-center">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -86,10 +77,9 @@
                                                 Órdenes
                                             </div>
                                         </a>
-                                        @endcan
                                     @endif
                                     
-                                    @can('view checkins')
+                                    @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('staff'))
                                     <a href="{{ route('admin.checkins.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                         <div class="flex items-center">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,10 +88,10 @@
                                             Check-ins
                                         </div>
                                     </a>
-                                    @endcan
+                                    @endif
                                 </div>
                             </div>
-                            @endcan
+                            @endif
                         <a href="{{ route('events.public') }}" class="text-xl font-bold text-gray-900">
                             {{ config('app.name', 'Laravel') }}
                         </a>
