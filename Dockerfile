@@ -16,7 +16,6 @@ RUN apt-get update && apt-get install -y \
     unzip \
     nginx \
     supervisor \
-    redis-server \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Install Composer
@@ -41,7 +40,10 @@ RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/bootstrap/cache
 
 # Copy nginx configuration
-COPY docker/nginx.conf /etc/nginx/sites-available/default
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Remove default nginx config
+RUN rm -f /etc/nginx/sites-enabled/default
 
 # Copy supervisor configuration
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
