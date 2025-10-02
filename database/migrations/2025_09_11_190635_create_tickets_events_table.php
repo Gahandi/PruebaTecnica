@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('checkins', function (Blueprint $table) {
+        Schema::create('tickets_events', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('ticket_id')->constrained('tickets')->onDelete('cascade');
-            $table->foreign('scanned_by')->references('id')->on('users')->nullable();
-            $table->dateTime('scanned_at');
+            $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
+            $table->foreignId('ticket_types_id')->constrained('ticket_types')->onDelete('cascade');
+            $table->integer('quantity');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('checkins', function (Blueprint $table) {
+        Schema::dropIfExists('tickets_events', function (Blueprint $table) {
             $table->dropSoftDeletes(); // Removes the 'deleted_at' column
         });
     }

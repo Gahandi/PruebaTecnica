@@ -11,19 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('events', function (Blueprint $table) {
+        Schema::create('collaborators', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->dateTime('date');
-            $table->string('location');
-            $table->string('coordinates');
-            $table->boolean('active')->default(1);
+            $table->string('openpay_id');
+            $table->string('reference');
             $table->string('description');
-            $table->foreign('type_events_id')->references('id')->on('type_events');
-            $table->foreign('state_id')->references('id')->on('states');
-            $table->foreign('collaborators_id')->references('id')->on('collaborators');
-            $table->string('image');
-            $table->string('temario');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -34,8 +27,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('events', function (Blueprint $table) {
+        Schema::dropIfExists('collaborators', function (Blueprint $table) {
             $table->dropSoftDeletes(); // Removes the 'deleted_at' column
         });
     }
 };
+

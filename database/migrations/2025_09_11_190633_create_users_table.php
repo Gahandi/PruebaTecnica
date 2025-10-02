@@ -14,11 +14,16 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->timestamp('email_verified_at')->nullable();
+            $table->string('last_name');
+            $table->string('phone');
+            $table->string('image');
+            $table->datetime('email_verified_at')->nullable();
+            $table->boolean('verified')->nullable()->default(false);
             $table->string('email')->unique();
             $table->string('password');
-            $table->enum('role', ['admin', 'staff', 'viewer'])->default('viewer');
-            $table->rememberToken(); 
+            $table->enum('role', ['admin', 'staff', 'user', 'viewer'])->default('viewer');
+            $table->rememberToken();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -28,6 +33,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('users', function (Blueprint $table) {
+            $table->dropSoftDeletes(); // Removes the 'deleted_at' column
+        });
     }
 };
+
