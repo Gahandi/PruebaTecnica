@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * Class TicketType
+ * Class TypeEvent
  * 
  * @property int $id
  * @property string $name
@@ -20,27 +20,21 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * 
- * @property Collection|Ticket[] $tickets
- * @property Collection|TicketsEvent[] $tickets_events
+ * @property Collection|Event[] $events
  *
  * @package App\Models
  */
-class TicketType extends Model
+class TypeEvent extends Model
 {
 	use SoftDeletes;
-	protected $table = 'ticket_types';
+	protected $table = 'type_events';
 
 	protected $fillable = [
 		'name'
 	];
 
-	public function tickets()
+	public function events()
 	{
-		return $this->hasMany(Ticket::class, 'ticket_types_id');
-	}
-
-	public function tickets_events()
-	{
-		return $this->hasMany(TicketsEvent::class, 'ticket_types_id');
+		return $this->hasMany(Event::class, 'type_events_id');
 	}
 }

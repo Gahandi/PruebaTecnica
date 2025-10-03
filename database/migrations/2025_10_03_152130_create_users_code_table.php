@@ -11,10 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('checkins', function (Blueprint $table) {
+        Schema::create('users_code', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('ticket_id')->constrained('tickets')->onDelete('cascade');
-            $table->dateTime('scanned_at');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string("code");
+            $table->boolean("used")->default(0);
+            $table->datetime("expires_at");
+            $table->string("type");
             $table->softDeletes();
             $table->timestamps();
         });
@@ -25,7 +28,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('checkins', function (Blueprint $table) {
+        Schema::dropIfExists('users_code', function (Blueprint $table) {
             $table->dropSoftDeletes(); // Removes the 'deleted_at' column
         });
     }

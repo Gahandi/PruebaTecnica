@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('checkins', function (Blueprint $table) {
+        Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('ticket_id')->constrained('tickets')->onDelete('cascade');
-            $table->dateTime('scanned_at');
+            $table->foreignUuid('order_id')->constrained('orders')->onDelete('cascade');
+            $table->foreignId('coupon_id')->constrained('coupons')->onDelete('cascade');
+            $table->enum('status', ['pending', 'completed', 'cancelled', 'refunded'])->default('pending');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -25,7 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('checkins', function (Blueprint $table) {
+        Schema::dropIfExists('payments', function (Blueprint $table) {
             $table->dropSoftDeletes(); // Removes the 'deleted_at' column
         });
     }

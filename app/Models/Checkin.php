@@ -1,29 +1,54 @@
 <?php
 
+/**
+ * Created by Reliese Model.
+ */
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Class Checkin
+ * 
+ * @property int $id
+ * @property string $ticket_id
+ * @property Carbon $scanned_at
+ * @property string|null $deleted_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property int|null $scanned_by
+ * 
+ * @property User|null $user
+ * @property Ticket $ticket
+ *
+ * @package App\Models
+ */
 class Checkin extends Model
 {
-    use HasFactory;
-    protected $table = 'checkins';
+	use SoftDeletes;
+	protected $table = 'checkins';
 
-    protected $fillable = ['ticket_id', 'scanned_at', 'scanned_by'];
+	protected $casts = [
+		'scanned_at' => 'datetime',
+		'scanned_by' => 'int'
+	];
 
-    protected $casts = [
-        'scanned_at' => 'datetime',
-    ];
-    
-    public function ticket(): BelongsTo
-    {
-        return $this->belongsTo(Ticket::class, 'ticket_id');
-    }
+	protected $fillable = [
+		'ticket_id',
+		'scanned_at',
+		'scanned_by'
+	];
 
-    public function scannedBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'scanned_by');
-    }
+	public function user()
+	{
+		return $this->belongsTo(User::class, 'scanned_by');
+	}
+
+	public function ticket()
+	{
+		return $this->belongsTo(Ticket::class);
+	}
 }

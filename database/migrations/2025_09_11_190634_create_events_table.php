@@ -19,10 +19,13 @@ return new class extends Migration
             $table->string('coordinates');
             $table->boolean('active')->default(1);
             $table->string('description');
-            $table->foreign('type_events_id')->references('id')->on('type_events');
-            $table->foreign('state_id')->references('id')->on('states');
-            $table->foreign('collaborators_id')->references('id')->on('collaborators');
+            $table->foreignId('type_events_id')->constrained('type_events')->onDelete('cascade');
+            $table->foreignId('collaborators_id')->constrained('collaborators')->onDelete('cascade');
+            $table->foreignId('state_id')->constrained('states')->onDelete('cascade');
             $table->string('image');
+            $table->string('banner');
+            $table->string('banner_app');
+            $table->string('icon');
             $table->string('temario');
             $table->softDeletes();
             $table->timestamps();

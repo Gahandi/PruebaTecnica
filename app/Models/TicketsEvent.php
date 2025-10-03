@@ -7,59 +7,49 @@
 namespace App\Models;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * Class Ticket
+ * Class TicketsEvent
  * 
- * @property string $id
- * @property string $order_id
- * @property int $ticket_type_id
+ * @property int $id
+ * @property int $event_id
  * @property int $ticket_types_id
- * @property bool $used
+ * @property int $quantity
  * @property string|null $deleted_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * 
- * @property Order $order
+ * @property Event $event
  * @property TicketType $ticket_type
- * @property Collection|Checkin[] $checkins
  *
  * @package App\Models
  */
-class Ticket extends Model
+class TicketsEvent extends Model
 {
 	use SoftDeletes;
-	protected $table = 'tickets';
-	public $incrementing = false;
+	protected $table = 'tickets_events';
 
 	protected $casts = [
-		'ticket_type_id' => 'int',
+		'event_id' => 'int',
 		'ticket_types_id' => 'int',
-		'used' => 'bool'
+		'quantity' => 'int'
 	];
 
 	protected $fillable = [
-		'order_id',
-		'ticket_type_id',
+		'event_id',
 		'ticket_types_id',
-		'used'
+		'quantity'
 	];
 
-	public function order()
+	public function event()
 	{
-		return $this->belongsTo(Order::class);
+		return $this->belongsTo(Event::class);
 	}
 
 	public function ticket_type()
 	{
 		return $this->belongsTo(TicketType::class, 'ticket_types_id');
-	}
-
-	public function checkins()
-	{
-		return $this->hasMany(Checkin::class);
 	}
 }

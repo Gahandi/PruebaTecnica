@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('order_items', function (Blueprint $table) {
+        Schema::create('role_collaborators', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('order_id')->constrained('orders')->onDelete('cascade');
-            $table->foreignId('ticket_type_id')->constrained('ticket_types')->onDelete('cascade');
-            $table->integer('quantity');
-            $table->decimal('price', 10, 2);
+            $table->string("name");
+            $table->string("description");
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -26,6 +25,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('order_items');
+        Schema::dropIfExists('role_collaborators', function (Blueprint $table) {
+            $table->dropSoftDeletes(); // Removes the 'deleted_at' column
+        });
     }
 };

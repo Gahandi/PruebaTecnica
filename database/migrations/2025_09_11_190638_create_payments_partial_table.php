@@ -11,10 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('checkins', function (Blueprint $table) {
+        Schema::create('payments_partials', function (Blueprint $table) {
             $table->id();
-            $table->foreignUuid('ticket_id')->constrained('tickets')->onDelete('cascade');
-            $table->dateTime('scanned_at');
+            $table->foreignId('payment_id')->constrained('payments')->onDelete('cascade');
+            $table->decimal('payment');
+            $table->string('reference');
+            $table->string('path');
+            $table->string('payment_type');
+            $table->string('description');
             $table->softDeletes();
             $table->timestamps();
         });
@@ -25,7 +29,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('checkins', function (Blueprint $table) {
+        Schema::dropIfExists('payments_partials', function (Blueprint $table) {
             $table->dropSoftDeletes(); // Removes the 'deleted_at' column
         });
     }

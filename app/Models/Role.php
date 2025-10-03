@@ -12,35 +12,37 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * Class TicketType
+ * Class Role
  * 
  * @property int $id
  * @property string $name
+ * @property string $guard_name
  * @property string|null $deleted_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * 
- * @property Collection|Ticket[] $tickets
- * @property Collection|TicketsEvent[] $tickets_events
+ * @property Collection|ModelHasRole[] $model_has_roles
+ * @property Collection|Permission[] $permissions
  *
  * @package App\Models
  */
-class TicketType extends Model
+class Role extends Model
 {
 	use SoftDeletes;
-	protected $table = 'ticket_types';
+	protected $table = 'roles';
 
 	protected $fillable = [
-		'name'
+		'name',
+		'guard_name'
 	];
 
-	public function tickets()
+	public function model_has_roles()
 	{
-		return $this->hasMany(Ticket::class, 'ticket_types_id');
+		return $this->hasMany(ModelHasRole::class);
 	}
 
-	public function tickets_events()
+	public function permissions()
 	{
-		return $this->hasMany(TicketsEvent::class, 'ticket_types_id');
+		return $this->belongsToMany(Permission::class, 'role_has_permissions');
 	}
 }

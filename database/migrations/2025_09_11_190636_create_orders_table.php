@@ -15,8 +15,8 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
-            $table->foreign('created_by')->references('id')->on('users')->nullable();
-            $table->foreign('state_id')->references('id')->on('states');
+            $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
+            $table->foreignId('state_id')->constrained('states')->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
 

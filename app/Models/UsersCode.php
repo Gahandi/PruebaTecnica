@@ -7,43 +7,47 @@
 namespace App\Models;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * Class Coupon
+ * Class UsersCode
  * 
  * @property int $id
+ * @property int $user_id
  * @property string $code
- * @property int $discount_percentage
- * @property Carbon|null $expires_at
+ * @property bool $used
+ * @property Carbon $expires_at
+ * @property string $type
  * @property string|null $deleted_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * 
- * @property Collection|Payment[] $payments
+ * @property User $user
  *
  * @package App\Models
  */
-class Coupon extends Model
+class UsersCode extends Model
 {
 	use SoftDeletes;
-	protected $table = 'coupons';
+	protected $table = 'users_code';
 
 	protected $casts = [
-		'discount_percentage' => 'int',
+		'user_id' => 'int',
+		'used' => 'bool',
 		'expires_at' => 'datetime'
 	];
 
 	protected $fillable = [
+		'user_id',
 		'code',
-		'discount_percentage',
-		'expires_at'
+		'used',
+		'expires_at',
+		'type'
 	];
 
-	public function payments()
+	public function user()
 	{
-		return $this->hasMany(Payment::class);
+		return $this->belongsTo(User::class);
 	}
 }
