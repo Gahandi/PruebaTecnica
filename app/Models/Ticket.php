@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * 
  * @property string $id
  * @property string $order_id
- * @property int $ticket_type_id
  * @property int $ticket_types_id
  * @property bool $used
  * @property string|null $deleted_at
@@ -36,14 +35,12 @@ class Ticket extends Model
 	public $incrementing = false;
 
 	protected $casts = [
-		'ticket_type_id' => 'int',
 		'ticket_types_id' => 'int',
 		'used' => 'bool'
 	];
 
 	protected $fillable = [
 		'order_id',
-		'ticket_type_id',
 		'ticket_types_id',
 		'used'
 	];

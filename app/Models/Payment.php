@@ -44,9 +44,9 @@ class Payment extends Model
 	protected $fillable = [
 		'order_id',
 		'coupon_id',
+		'status',
 		'subtotal',
-		'discount_amount',
-		'status'
+		'discount_amount'
 	];
 
 	public function coupon()

@@ -12,6 +12,10 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Public\EventController as PublicEventController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\UserSpacesController;
+use App\Http\Controllers\SpaceController;
+use App\Http\Controllers\SpaceEventController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,9 +29,48 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return redirect()->route('events.public');
+// Rutas con subdomain (deben ir primero para tener prioridad)
+Route::domain('{subdomain}.boletos.com')->middleware(['subdomain.session', 'cart.context'])->group(function () {
+    Route::get('/', [SpaceController::class, 'show'])->name('spaces.profile');
+    Route::get('/edit', [SpaceController::class, 'edit'])->name('spaces.edit');
+    Route::put('/update', [SpaceController::class, 'update'])->name('spaces.update-profile');
+    Route::get('/events/create', [SpaceEventController::class, 'create'])->name('spaces.events.create')->middleware('space.member');
+    Route::post('/events', [SpaceEventController::class, 'store'])->name('spaces.events.store')->middleware('space.member');
+    Route::get('/{event:slug}', [SpaceEventController::class, 'show']);
+    
+    // Rutas del carrito para subdominios
+    Route::post('/cart/add', [App\Http\Controllers\Public\EventController::class, 'addToCart'])->name('subdomain.cart.add');
+    Route::get('/cart', [App\Http\Controllers\CheckoutController::class, 'cart'])->name('subdomain.cart');
 });
+
+Route::domain('{subdomain}.boletos.local')->middleware(['subdomain.session', 'cart.context'])->group(function () {
+    Route::get('/', [SpaceController::class, 'show'])->name('spaces.profile');
+    Route::get('/edit', [SpaceController::class, 'edit'])->name('spaces.edit');
+    Route::put('/update', [SpaceController::class, 'update'])->name('spaces.update-profile');
+    Route::get('/events/create', [SpaceEventController::class, 'create'])->name('spaces.events.create')->middleware('space.member');
+    Route::post('/events', [SpaceEventController::class, 'store'])->name('spaces.events.store')->middleware('space.member');
+    Route::get('/{event:slug}', [SpaceEventController::class, 'show']);
+    
+    // Rutas del carrito para subdominios
+    Route::post('/cart/add', [App\Http\Controllers\Public\EventController::class, 'addToCart'])->name('subdomain.cart.add');
+    Route::get('/cart', [App\Http\Controllers\CheckoutController::class, 'cart'])->name('subdomain.cart');
+    
+    // Rutas de checkout para subdominios
+    Route::prefix('checkout')->name('subdomain.checkout.')->group(function () {
+        Route::get('/cart', [App\Http\Controllers\CheckoutController::class, 'cart'])->name('cart');
+        Route::post('/add-to-cart', [App\Http\Controllers\CheckoutController::class, 'addToCart'])->name('add-to-cart');
+        Route::post('/update-cart', [App\Http\Controllers\CheckoutController::class, 'updateCart'])->name('update-cart');
+        Route::delete('/remove-from-cart/{ticketType}', [App\Http\Controllers\CheckoutController::class, 'removeFromCart'])->name('remove-from-cart');
+        Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'checkout'])->name('checkout');
+        Route::post('/process-payment', [App\Http\Controllers\CheckoutController::class, 'processPayment'])->name('process-payment');
+        Route::post('/apply-coupon', [App\Http\Controllers\CheckoutController::class, 'applyCoupon'])->name('apply-coupon');
+        Route::delete('/remove-coupon', [App\Http\Controllers\CheckoutController::class, 'removeCoupon'])->name('remove-coupon');
+        Route::get('/success/{order}', [App\Http\Controllers\CheckoutController::class, 'success'])->name('success');
+        Route::get('/order/{order}', [App\Http\Controllers\CheckoutController::class, 'showOrder'])->name('order');
+    });
+});
+
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Ruta para refrescar token CSRF
 Route::get('/refresh-csrf', function() {
@@ -80,8 +123,10 @@ Route::get('/events', [PublicEventController::class, 'index'])->name('events.pub
 Route::get('/events/{event}', [PublicEventController::class, 'show'])->name('events.show');
 
 // Rutas del carrito (sin autenticación)
-Route::post('/cart/add', [PublicEventController::class, 'addToCart'])->name('cart.add');
-Route::get('/cart', [App\Http\Controllers\CheckoutController::class, 'cart'])->name('cart');
+Route::middleware(['cart.context'])->group(function () {
+    Route::post('/cart/add', [PublicEventController::class, 'addToCart'])->name('cart.add');
+    Route::get('/cart', [App\Http\Controllers\CheckoutController::class, 'cart'])->name('cart');
+});
 
 // Rutas protegidas por roles
 Route::middleware(['auth', 'role:admin,staff'])->group(function () {
@@ -135,7 +180,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/my-tickets', [OrderController::class, 'myTickets'])->name('tickets.my');
     
     // Rutas de checkout
-    Route::prefix('checkout')->name('checkout.')->group(function () {
+    Route::prefix('checkout')->name('checkout.')->middleware(['cart.context'])->group(function () {
         Route::get('/cart', [App\Http\Controllers\CheckoutController::class, 'cart'])->name('cart');
         Route::post('/add-to-cart', [App\Http\Controllers\CheckoutController::class, 'addToCart'])->name('add-to-cart');
         Route::post('/update-cart', [App\Http\Controllers\CheckoutController::class, 'updateCart'])->name('update-cart');
@@ -154,4 +199,13 @@ Route::middleware(['auth'])->group(function () {
         \Log::info('Request data:', $request->all());
         return response()->json(['status' => 'success', 'message' => 'Test route working']);
     })->name('test.payment');
+    
+    // Rutas de espacios del usuario
+    Route::prefix('spaces')->name('user.spaces.')->group(function () {
+        Route::get('/', [UserSpacesController::class, 'index'])->name('index');
+        Route::get('/create', [UserSpacesController::class, 'create'])->name('create');
+        Route::post('/', [UserSpacesController::class, 'store'])->name('store');
+        Route::get('/join', [UserSpacesController::class, 'join'])->name('join');
+        Route::post('/join/{space}', [UserSpacesController::class, 'joinSpace'])->name('join.space');
+    });
 });

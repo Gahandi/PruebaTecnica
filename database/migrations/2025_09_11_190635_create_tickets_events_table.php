@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
             $table->foreignId('ticket_types_id')->constrained('ticket_types')->onDelete('cascade');
             $table->integer('quantity');
+            $table->decimal('price', 10, 2);
             $table->softDeletes();
             $table->timestamps();
         });

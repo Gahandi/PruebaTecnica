@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('role_collaborators', function (Blueprint $table) {
+        Schema::create('role_spaces', function (Blueprint $table) {
             $table->id();
             $table->string("name");
             $table->string("description");
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('role_collaborators', function (Blueprint $table) {
+        Schema::dropIfExists('role_spaces', function (Blueprint $table) {
             $table->dropSoftDeletes(); // Removes the 'deleted_at' column
         });
     }

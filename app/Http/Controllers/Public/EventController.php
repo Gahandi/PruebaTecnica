@@ -33,7 +33,7 @@ class EventController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $ticketType = TicketType::findOrFail($request->ticket_type_id);
+        $ticketType = TicketType::with(['event.space'])->findOrFail($request->ticket_type_id);
         $cart = session()->get('cart', []);
         
         // Verificar disponibilidad

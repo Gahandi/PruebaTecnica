@@ -26,6 +26,15 @@ class CheckoutController extends Controller
     public function cart()
     {
         $cart = session()->get('cart', []);
+        
+        // Cargar relaciones necesarias para cada item del carrito
+        foreach ($cart as $ticketTypeId => $item) {
+            if (isset($item['ticket_type'])) {
+                $item['ticket_type']->load(['event.space']);
+                $cart[$ticketTypeId] = $item;
+            }
+        }
+        
         $events = Event::with('ticketTypes')->get();
         
         return view('checkout.cart', compact('cart', 'events'));

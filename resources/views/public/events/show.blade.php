@@ -39,7 +39,10 @@
                             </svg>
                             <div>
                                 <p class="text-sm font-medium text-gray-900">Ubicación</p>
-                                <p class="text-sm text-gray-600">{{ $event->location }}</p>
+                                <p class="text-sm text-gray-600">{{ $event->address }}</p>
+                                @if($event->coordinates)
+                                    <p class="text-xs text-gray-400 mt-1">Coordenadas: {{ $event->coordinates }}</p>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -110,8 +113,6 @@
                         </div>
                     @endforeach
                 </div>
-
-
 
                 <!-- Order Summary -->
                 <div class="border-t pt-6">

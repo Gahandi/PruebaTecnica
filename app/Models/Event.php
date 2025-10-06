@@ -17,23 +17,23 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $id
  * @property string $name
  * @property Carbon $date
- * @property string $location
+ * @property string $address
  * @property string $coordinates
  * @property bool $active
  * @property string $description
  * @property int $type_events_id
- * @property int $collaborators_id
+ * @property int $spaces_id
  * @property int $state_id
  * @property string $image
  * @property string $banner
  * @property string $banner_app
  * @property string $icon
- * @property string $temario
+ * @property string $agenda
  * @property string|null $deleted_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * 
- * @property Collaborator $collaborator
+ * @property space $space
  * @property State $state
  * @property TypeEvent $type_event
  * @property Collection|Order[] $orders
@@ -50,30 +50,31 @@ class Event extends Model
 		'date' => 'datetime',
 		'active' => 'bool',
 		'type_events_id' => 'int',
-		'collaborators_id' => 'int',
+		'spaces_id' => 'int',
 		'state_id' => 'int'
 	];
 
 	protected $fillable = [
 		'name',
 		'date',
-		'location',
+		'address',
 		'coordinates',
+		'slug',
 		'active',
 		'description',
 		'type_events_id',
-		'collaborators_id',
+		'spaces_id',
 		'state_id',
 		'image',
 		'banner',
 		'banner_app',
 		'icon',
-		'temario'
+		'agenda'
 	];
 
-	public function collaborator()
+	public function space()
 	{
-		return $this->belongsTo(Collaborator::class, 'collaborators_id');
+		return $this->belongsTo(space::class, 'spaces_id');
 	}
 
 	public function state()
@@ -94,5 +95,12 @@ class Event extends Model
 	public function tickets_events()
 	{
 		return $this->hasMany(TicketsEvent::class);
+	}
+
+	public function ticketTypes()
+	{
+		return $this->belongsToMany(TicketType::class, 'tickets_events', 'event_id', 'ticket_types_id')
+			->withPivot('quantity', 'price')
+			->withTimestamps();
 	}
 }

@@ -67,8 +67,11 @@ class Kernel extends HttpKernel
         'role' => \App\Http\Middleware\CheckRole::class,
         'permission' => \App\Http\Middleware\CheckPermission::class,
         'api.security' => \App\Http\Middleware\ApiSecurity::class,
+        'space.member' => \App\Http\Middleware\SpaceMember::class,
         'redirect.after.login' => \App\Http\Middleware\RedirectAfterLogin::class,
         'handle.403' => \App\Http\Middleware\Handle403::class,
         'redirect.staff' => \App\Http\Middleware\RedirectStaffToStaffRoutes::class,
+        'subdomain.session' => \App\Http\Middleware\SubdomainSession::class,
+        'cart.context' => \App\Http\Middleware\CartContext::class,
     ];
 }

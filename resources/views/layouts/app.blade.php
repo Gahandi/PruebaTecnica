@@ -104,43 +104,121 @@
                             </div>
                             @endif
                         <a href="{{ route('events.public') }}" class="text-xl font-bold text-gray-900">
-                            {{ config('app.name', 'Laravel') }}
+                            {{ config('app.name', 'Boletos') }}
                         </a>
                     </div>
                     
                     <div class="flex items-center space-x-4">
                         <!-- Cart Link -->
-                        <a href="{{ route('checkout.cart') }}" class="text-gray-700 hover:text-gray-900 flex items-center">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
+                        <a href="http://boletos.local/cart" class="text-gray-700 hover:text-gray-900 relative p-2 rounded-lg hover:bg-gray-100 transition-colors group">
+                            <svg class="w-6 h-6 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l-1 7a2 2 0 01-2 2H8a2 2 0 01-2-2L5 9z"></path>
                             </svg>
-                            <span class="ml-1">Carrito</span>
-                            @if(session('cart'))
-                                <span class="ml-1 bg-red-500 text-white text-xs rounded-full px-2 py-1">
-                                    {{ count(session('cart')) }}
+
+                            @if(\App\Helpers\CartHelper::getCartCount() > 0)
+                                <span class="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center
+                                            bg-red-500 text-white text-xs font-bold 
+                                            min-w-[18px] h-[18px] px-1 rounded-full border-2 border-white shadow-lg
+                                            animate-pulse">
+                                    {{ \App\Helpers\CartHelper::getCartCount() }}
                                 </span>
                             @endif
                         </a>
-                        
+                        <a href="{{ route('events.public') }}" class="text-gray-700 hover:text-gray-900">
+                            Eventos
+                        </a>
                         @auth
-
-                            
-                            <!-- Public Menu -->
-                            <a href="{{ route('events.public') }}" class="text-gray-700 hover:text-gray-900">
-                                Eventos
-                            </a>
-                            <a href="{{ route('tickets.my') }}" class="text-gray-700 hover:text-gray-900">
-                                Mis Boletos
-                            </a>
-                            <a href="{{ route('profile') }}" class="text-gray-700 hover:text-gray-900">
-                                Perfil
-                            </a>
-                            <form method="POST" action="{{ route('logout') }}" class="inline">
-                                @csrf
-                                <button type="submit" class="text-gray-700 hover:text-gray-900">
-                                    Cerrar sesión
+                            <!-- Spaces Menu Dropdown -->
+                            <div class="relative group" id="spaces-dropdown">
+                                <button class="text-gray-700 hover:text-gray-900 flex items-center" onclick="toggleSpacesDropdown()">
+                                    <svg class="w-6 h-6 transition-transform duration-200 hover:scale-110" id="spaces-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                    </svg>
+                                    <span class="ml-1">Espacios</span>
+                                    <svg class="w-4 h-4 ml-1 transition-transform duration-200" id="spaces-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
                                 </button>
-                            </form>
+                                <div class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200" id="spaces-menu" style="display: none;">
+                                    @if(auth()->user()->spaces->count() > 0)
+                                        @foreach(auth()->user()->spaces as $space)
+                                            <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                <div class="flex items-center">
+                                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                                    </svg>
+                                                    <div>
+                                                        <div class="font-medium">{{ $space->name }}</div>
+                                                        <div class="text-xs text-gray-500">{{ $space->subdomain }}.{{ \App\Helpers\SubdomainHelper::getBaseDomain() }}</div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        @endforeach
+                                        <div class="border-t border-gray-100 my-1"></div>
+                                    @endif
+                                    
+                                    <a href="{{ route('user.spaces.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                        <div class="flex items-center">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                            </svg>
+                                            Gestionar Mis Espacios
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <!-- User Menu Dropdown -->
+                            <div class="relative group" id="user-dropdown">
+                                <button class="text-gray-700 hover:text-gray-900 flex items-center" onclick="toggleUserDropdown()">
+                                    <svg class="w-6 h-6 transition-transform duration-200 hover:scale-110" id="user-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
+                                    <svg class="w-4 h-4 ml-1 transition-transform duration-200" id="user-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+                                <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200" id="user-menu" style="display: none;">
+                                    <!-- User Info -->
+                                    <div class="px-4 py-3 border-b border-gray-100">
+                                        <p class="text-sm font-medium text-gray-900">{{ auth()->user()->name }} {{ auth()->user()->last_name }}</p>
+                                        <p class="text-xs text-gray-500">{{ auth()->user()->email }}</p>
+                                    </div>
+                                    
+                                    <!-- Menu Items -->
+                                    <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                        <div class="flex items-center">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                            </svg>
+                                            Perfil
+                                        </div>
+                                    </a>
+                                    
+                                    <a href="{{ route('tickets.my') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                        <div class="flex items-center">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
+                                            </svg>
+                                            Mis Boletos
+                                        </div>
+                                    </a>
+                                    
+                                    
+                                    <!-- Logout -->
+                                    <form method="POST" action="{{ route('logout') }}" class="block">
+                                        @csrf
+                                        <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                                            <div class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                                </svg>
+                                                Cerrar sesión
+                                            </div>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
                         @else
                             <a href="{{ route('login') }}" class="text-gray-700 hover:text-gray-900">
                                 Iniciar sesión
@@ -174,15 +252,72 @@
             }
         }
         
-        // Cerrar dropdown al hacer clic fuera
-        document.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('admin-dropdown');
-            const menu = document.getElementById('admin-menu');
-            const arrow = document.getElementById('admin-arrow');
+        function toggleSpacesDropdown() {
+            const menu = document.getElementById('spaces-menu');
+            const arrow = document.getElementById('spaces-arrow');
+            const icon = document.getElementById('spaces-icon');
             
-            if (dropdown && !dropdown.contains(event.target)) {
+            if (menu.style.display === 'none' || menu.style.display === '') {
+                menu.style.display = 'block';
+                arrow.style.transform = 'rotate(180deg)';
+                icon.style.transform = 'scale(1.1)';
+            } else {
                 menu.style.display = 'none';
                 arrow.style.transform = 'rotate(0deg)';
+                icon.style.transform = 'scale(1)';
+            }
+        }
+        
+        function toggleUserDropdown() {
+            const menu = document.getElementById('user-menu');
+            const arrow = document.getElementById('user-arrow');
+            const icon = document.getElementById('user-icon');
+            
+            if (menu.style.display === 'none' || menu.style.display === '') {
+                menu.style.display = 'block';
+                arrow.style.transform = 'rotate(180deg)';
+                icon.style.transform = 'scale(1.1)';
+            } else {
+                menu.style.display = 'none';
+                arrow.style.transform = 'rotate(0deg)';
+                icon.style.transform = 'scale(1)';
+            }
+        }
+        
+        // Cerrar dropdowns al hacer clic fuera
+        document.addEventListener('click', function(event) {
+            const adminDropdown = document.getElementById('admin-dropdown');
+            const adminMenu = document.getElementById('admin-menu');
+            const adminArrow = document.getElementById('admin-arrow');
+            
+            const spacesDropdown = document.getElementById('spaces-dropdown');
+            const spacesMenu = document.getElementById('spaces-menu');
+            const spacesArrow = document.getElementById('spaces-arrow');
+            const spacesIcon = document.getElementById('spaces-icon');
+            
+            const userDropdown = document.getElementById('user-dropdown');
+            const userMenu = document.getElementById('user-menu');
+            const userArrow = document.getElementById('user-arrow');
+            const userIcon = document.getElementById('user-icon');
+            
+            // Cerrar admin dropdown
+            if (adminDropdown && !adminDropdown.contains(event.target)) {
+                adminMenu.style.display = 'none';
+                adminArrow.style.transform = 'rotate(0deg)';
+            }
+            
+            // Cerrar spaces dropdown
+            if (spacesDropdown && !spacesDropdown.contains(event.target)) {
+                spacesMenu.style.display = 'none';
+                spacesArrow.style.transform = 'rotate(0deg)';
+                spacesIcon.style.transform = 'scale(1)';
+            }
+            
+            // Cerrar user dropdown
+            if (userDropdown && !userDropdown.contains(event.target)) {
+                userMenu.style.display = 'none';
+                userArrow.style.transform = 'rotate(0deg)';
+                userIcon.style.transform = 'scale(1)';
             }
         });
     </script>

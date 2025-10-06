@@ -43,4 +43,11 @@ class TicketType extends Model
 	{
 		return $this->hasMany(TicketsEvent::class, 'ticket_types_id');
 	}
+
+	public function events()
+	{
+		return $this->belongsToMany(Event::class, 'tickets_events', 'ticket_types_id', 'event_id')
+			->withPivot('quantity', 'price')
+			->withTimestamps();
+	}
 }

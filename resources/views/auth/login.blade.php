@@ -73,25 +73,6 @@
                     Iniciar Sesión
                 </button>
             </div>
-
-            <!-- Demo Users -->
-            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-                <h3 class="text-sm font-medium text-gray-900 mb-3">Usuarios de Prueba:</h3>
-                <div class="space-y-2 text-xs text-gray-600">
-                    <div class="flex justify-between">
-                        <span class="font-medium">Admin:</span>
-                        <span>admin@example.com / password</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="font-medium">Staff:</span>
-                        <span>staff@example.com / password</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="font-medium">Viewer:</span>
-                        <span>viewer@example.com / password</span>
-                    </div>
-                </div>
-            </div>
         </form>
     </div>
 </div>

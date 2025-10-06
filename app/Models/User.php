@@ -1,44 +1,17 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
-
 namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Spatie\Permission\Traits\HasRoles; 
 
-/**
- * Class User
- * 
- * @property int $id
- * @property string $name
- * @property string $last_name
- * @property string $phone
- * @property string $image
- * @property Carbon|null $email_verified_at
- * @property bool|null $verified
- * @property string $email
- * @property string $password
- * @property string $role
- * @property string|null $remember_token
- * @property string|null $deleted_at
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- * 
- * @property Collection|Checkin[] $checkins
- * @property Collection|Collaborator[] $collaborators
- * @property Collection|Order[] $orders
- * @property Collection|UsersCode[] $users_codes
- *
- * @package App\Models
- */
-class User extends Model
+class User extends Authenticatable
 {
-	use SoftDeletes;
+	use SoftDeletes, HasRoles; 
+
 	protected $table = 'users';
 
 	protected $casts = [
@@ -60,8 +33,7 @@ class User extends Model
 		'verified',
 		'email',
 		'password',
-		'role',
-		'remember_token'
+		'role'
 	];
 
 	public function checkins()
@@ -69,10 +41,10 @@ class User extends Model
 		return $this->hasMany(Checkin::class, 'scanned_by');
 	}
 
-	public function collaborators()
+	public function spaces()
 	{
-		return $this->belongsToMany(Collaborator::class, 'collaborators_users')
-					->withPivot('id', 'role_collaborator_id', 'deleted_at')
+		return $this->belongsToMany(Space::class, 'spaces_users')
+					->withPivot('id', 'role_space_id', 'deleted_at')
 					->withTimestamps();
 	}
 
