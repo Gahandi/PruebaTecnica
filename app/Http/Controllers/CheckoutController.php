@@ -26,7 +26,7 @@ class CheckoutController extends Controller
     public function cart()
     {
         $cart = session()->get('cart', []);
-        
+
         // Cargar relaciones necesarias para cada item del carrito
         foreach ($cart as $ticketTypeId => $item) {
             if (isset($item['ticket_type'])) {
@@ -34,9 +34,9 @@ class CheckoutController extends Controller
                 $cart[$ticketTypeId] = $item;
             }
         }
-        
+
         $events = Event::with('ticketTypes')->get();
-        
+
         return view('checkout.cart', compact('cart', 'events'));
     }
 
@@ -52,11 +52,11 @@ class CheckoutController extends Controller
 
         $ticketType = TicketType::findOrFail($request->ticket_type_id);
         $cart = session()->get('cart', []);
-        
+
         // Verificar disponibilidad
         $currentQuantity = isset($cart[$ticketType->id]) ? $cart[$ticketType->id]['quantity'] : 0;
         $totalQuantity = $currentQuantity + $request->quantity;
-        
+
         if ($totalQuantity > $ticketType->quantity) {
             return back()->with('error', 'No hay suficientes boletos disponibles.');
         }
@@ -72,7 +72,7 @@ class CheckoutController extends Controller
         }
 
         session()->put('cart', $cart);
-        
+
         return back()->with('success', 'Boletos agregados al carrito.');
     }
 
@@ -87,21 +87,21 @@ class CheckoutController extends Controller
         ]);
 
         $cart = session()->get('cart', []);
-        
+
         if ($request->quantity == 0) {
             unset($cart[$request->ticket_type_id]);
         } else {
             $ticketType = TicketType::findOrFail($request->ticket_type_id);
-            
+
             if ($request->quantity > $ticketType->quantity) {
                 return back()->with('error', 'No hay suficientes boletos disponibles.');
             }
-            
+
             $cart[$request->ticket_type_id]['quantity'] = $request->quantity;
         }
 
         session()->put('cart', $cart);
-        
+
         return back()->with('success', 'Carrito actualizado.');
     }
 
@@ -113,7 +113,7 @@ class CheckoutController extends Controller
         $cart = session()->get('cart', []);
         unset($cart[$ticketTypeId]);
         session()->put('cart', $cart);
-        
+
         return back()->with('success', 'Item removido del carrito.');
     }
 
@@ -123,7 +123,7 @@ class CheckoutController extends Controller
     public function checkout()
     {
         $cart = session()->get('cart', []);
-        
+
         if (empty($cart)) {
             return redirect()->route('checkout.cart')->with('error', 'Tu carrito está vacío.');
         }
@@ -146,13 +146,13 @@ class CheckoutController extends Controller
         \Log::info('=== SIMPLE PAYMENT TEST ===');
         \Log::info('User ID: ' . auth()->id());
         \Log::info('User authenticated: ' . (auth()->check() ? 'Yes' : 'No'));
-        
+
         try {
             $cart = session()->get('cart', []);
-            
+
             \Log::info('Cart contents in processPayment', $cart);
             \Log::info('Cart count', ['count' => count($cart)]);
-            
+
             if (empty($cart)) {
                 \Log::info('Cart is empty, redirecting to cart');
                 return redirect()->route('checkout.cart')->with('error', 'Tu carrito está vacío.');
@@ -163,17 +163,17 @@ class CheckoutController extends Controller
         foreach ($cart as $item) {
             $subtotal += $item['price'] * $item['quantity'];
         }
-        
+
         // Aplicar cupón si existe
         $appliedCoupon = session()->get('applied_coupon');
         $discountAmount = 0;
         $couponId = null;
-        
+
         if ($appliedCoupon) {
             $discountAmount = ($subtotal * $appliedCoupon->discount_percentage) / 100;
             $couponId = $appliedCoupon->id;
         }
-        
+
         $taxableAmount = $subtotal - $discountAmount;
         $taxes = $taxableAmount * 0.16; // 16% IVA
         $total = $taxableAmount + $taxes;
@@ -189,7 +189,7 @@ class CheckoutController extends Controller
                 'taxes' => $taxes,
                 'status' => 'completed',
             ]);
-            
+
             \Log::info('Order created successfully', ['order_id' => $order->id]);
 
             // Crear tickets para cada item del carrito
@@ -207,7 +207,7 @@ class CheckoutController extends Controller
                     // Generar QR code en formato PNG para mejor compatibilidad con PDF
                     $ticketId = Str::uuid();
                     $qrCodeData = route('tickets.checkin', $ticketId);
-                    
+
                     try {
                         // Generar QR code como SVG (no requiere imagick ni GD)
                         $qrCodeSvg = QrCode::format('svg')
@@ -215,27 +215,27 @@ class CheckoutController extends Controller
                             ->margin(1)
                             ->errorCorrection('M')
                             ->generate($qrCodeData);
-                        
+
                         // Guardar QR code como archivo SVG
                         $qrCodePath = 'qrcodes/ticket_' . $ticketId . '.svg';
-                        
+
                         if (!file_exists(public_path('qrcodes'))) {
                             mkdir(public_path('qrcodes'), 0755, true);
                         }
-                        
+
                         file_put_contents(public_path($qrCodePath), $qrCodeSvg);
-                        
+
                         \Log::info('QR Code generated successfully', ['path' => $qrCodePath]);
-                        
+
                     } catch (\Exception $e) {
                         \Log::error('QR Code generation failed: ' . $e->getMessage());
                         // Usar un placeholder simple como texto
                         $qrCodePath = 'qrcodes/ticket_' . $ticketId . '.txt';
-                        
+
                         if (!file_exists(public_path('qrcodes'))) {
                             mkdir(public_path('qrcodes'), 0755, true);
                         }
-                        
+
                         // Crear un archivo de texto con la información del QR
                         file_put_contents(public_path($qrCodePath), "QR Code Data: " . $qrCodeData);
                     }
@@ -250,7 +250,7 @@ class CheckoutController extends Controller
                         'qr_url' => $qrCodePath,
                     ]);
                     \Log::info('Ticket created with actual ID: ' . $ticket->id);
-                    
+
                     \Log::info('Ticket created successfully', [
                         'ticket_id' => $ticket->id,
                         'order_id' => $order->id,
@@ -303,7 +303,7 @@ class CheckoutController extends Controller
         foreach ($cart as $item) {
             $subtotal += $item['price'] * $item['quantity'];
         }
-        
+
         $discount = ($subtotal * $coupon->discount_percentage) / 100;
         $taxes = ($subtotal - $discount) * 0.16;
         $total = $subtotal - $discount + $taxes;
@@ -338,7 +338,7 @@ class CheckoutController extends Controller
         foreach ($cart as $item) {
             $subtotal += $item['price'] * $item['quantity'];
         }
-        
+
         $taxes = $subtotal * 0.16;
         $total = $subtotal + $taxes;
 
@@ -360,7 +360,7 @@ class CheckoutController extends Controller
     public function success(Order $order)
     {
         $order->load(['orderItems.ticketType', 'tickets', 'coupon']);
-        
+
         return view('checkout.success', compact('order'));
     }
 
@@ -370,7 +370,7 @@ class CheckoutController extends Controller
     public function showOrder(Order $order)
     {
         $order->load(['orderItems.ticketType', 'tickets', 'coupon']);
-        
+
         return view('checkout.order', compact('order'));
     }
 }

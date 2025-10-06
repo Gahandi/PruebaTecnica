@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('openpay_id');
             $table->string('reference');
+            $table->string('logo');
             $table->string('subdomain');
             $table->string('description');
             $table->softDeletes();

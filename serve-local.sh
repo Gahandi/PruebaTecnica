@@ -34,4 +34,4 @@ echo "🛑 Para detener: Ctrl+C"
 echo ""
 
 # Iniciar servidor Laravel en puerto 80
-php artisan serve --host=boletos.local --port=80
+php artisan serve --host=boletos.local --port=8080

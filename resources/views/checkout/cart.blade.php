@@ -10,7 +10,7 @@
             <h1 class="text-3xl font-bold text-gray-900">Carrito de Compras</h1>
             <p class="text-gray-600">Revisa tus boletos antes de proceder al pago</p>
         </div>
-        <a href="{{ route('events.public') }}" 
+        <a href="{{ route('events.public') }}"
            class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors">
             ← Continuar Comprando
         </a>
@@ -20,13 +20,13 @@
         <!-- Empty Cart -->
         <div class="text-center py-12">
             <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
+                <svg class="w-14 h-14 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l-1 7a2 2 0 01-2 2H8a2 2 0 01-2-2L5 9z"></path>
                 </svg>
             </div>
             <h3 class="text-lg font-medium text-gray-900 mb-2">Tu carrito está vacío</h3>
             <p class="text-gray-500 mb-4">Agrega algunos boletos para comenzar tu compra.</p>
-            <a href="{{ route('events.public') }}" 
+            <a href="{{ route('events.public') }}"
                class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
                 Ver Eventos
             </a>
@@ -44,21 +44,21 @@
                             <div class="p-6">
                                 <div class="flex items-center justify-between">
                                     <div class="flex-1">
-                                        <h3 class="text-lg font-medium text-gray-900">{{ $item['ticket_type']->name }}</h3>
-                                        <p class="text-sm text-gray-500">{{ $item['ticket_type']->event->name }}</p>
-                                        <p class="text-sm text-gray-500">{{ \Carbon\Carbon::parse($item['ticket_type']->event->date)->format('d/m/Y H:i') }}</p>
-                                        <p class="text-sm text-gray-500">{{ $item['ticket_type']->event->address }}</p>
+                                        <h3 class="text-lg font-medium text-gray-900">{{ $item['ticket_type'] }}</h3>
+                                        <p class="text-sm text-gray-500">{{ $item['ticket_type'] }}</p>
+                                        <p class="text-sm text-gray-500"></p>
+                                        <p class="text-sm text-gray-500">{{ $item['ticket_type'] }}</p>
                                         <div class="mt-2 space-y-1">
                                             <div class="flex items-center">
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                                                     </svg>
-                                                    {{ $item['ticket_type']->event->space->name }}
+                                                    {{ $item['ticket_type'] }}
                                                 </span>
                                             </div>
                                             <div class="text-xs text-gray-500">
-                                                <span class="font-medium">Cajón:</span> {{ $item['ticket_type']->event->space->subdomain }}.boletos.local
+                                                <span class="font-medium">Cajón:</span> {{ $item['ticket_type'] }}.boletos.local
                                             </div>
                                         </div>
                                     </div>
@@ -71,11 +71,11 @@
                                             <form method="POST" action="{{ route('checkout.update-cart') }}" class="inline">
                                                 @csrf
                                                 <input type="hidden" name="ticket_type_id" value="{{ $ticketTypeId }}">
-                                                <input type="number" 
-                                                       name="quantity" 
-                                                       value="{{ $item['quantity'] }}" 
-                                                       min="0" 
-                                                       max="{{ $item['ticket_type']->quantity }}"
+                                                <input type="number"
+                                                       name="quantity"
+                                                       value="{{ $item['quantity'] }}"
+                                                       min="0"
+                                                       max="{{ $item['ticket_type']}}"
                                                        class="w-16 px-2 py-1 border border-gray-300 rounded text-center"
                                                        onchange="this.form.submit()">
                                             </form>
@@ -112,7 +112,7 @@
                                 $totalItems += $item['quantity'];
                             }
                         @endphp
-                        
+
                         <dl class="space-y-4">
                             <div class="flex justify-between">
                                 <dt class="text-sm font-medium text-gray-500">Boletos ({{ $totalItems }})</dt>
@@ -139,7 +139,7 @@
                         </dl>
 
                         <div class="mt-6">
-                            <a href="{{ route('checkout.checkout') }}" 
+                            <a href="{{ route('checkout.checkout') }}"
                                class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-center block">
                                 Proceder al Pago
                             </a>

@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Event
- * 
+ *
  * @property int $id
  * @property string $name
  * @property Carbon $date
@@ -32,7 +32,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $deleted_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property space $space
  * @property State $state
  * @property TypeEvent $type_event
@@ -74,7 +74,7 @@ class Event extends Model
 
 	public function space()
 	{
-		return $this->belongsTo(space::class, 'spaces_id');
+		return $this->belongsTo(Space::class, 'spaces_id');
 	}
 
 	public function state()

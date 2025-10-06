@@ -13,7 +13,7 @@
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Custom CSS -->
     <style>
         [x-cloak] { display: none !important; }
@@ -78,7 +78,7 @@
                                             </div>
                                         </a>
                                     @endif
-                                    
+
                                     @if(auth()->check() && auth()->user()->hasRole('admin'))
                                     <a href="{{ route('admin.checkins.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                         <div class="flex items-center">
@@ -89,7 +89,7 @@
                                         </div>
                                     </a>
                                     @endif
-                                    
+
                                     @if(auth()->check() && auth()->user()->hasRole('staff'))
                                     <a href="{{ route('staff.checkins.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                         <div class="flex items-center">
@@ -107,17 +107,17 @@
                             {{ config('app.name', 'Boletos') }}
                         </a>
                     </div>
-                    
+
                     <div class="flex items-center space-x-4">
                         <!-- Cart Link -->
-                        <a href="http://boletos.local/cart" class="text-gray-700 hover:text-gray-900 relative p-2 rounded-lg hover:bg-gray-100 transition-colors group">
+                        <a href="cart" class="text-gray-700 hover:text-gray-900 relative p-2 rounded-lg hover:bg-gray-100 transition-colors group">
                             <svg class="w-6 h-6 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l-1 7a2 2 0 01-2 2H8a2 2 0 01-2-2L5 9z"></path>
                             </svg>
 
                             @if(\App\Helpers\CartHelper::getCartCount() > 0)
                                 <span class="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center
-                                            bg-red-500 text-white text-xs font-bold 
+                                            bg-red-500 text-white text-xs font-bold
                                             min-w-[18px] h-[18px] px-1 rounded-full border-2 border-white shadow-lg
                                             animate-pulse">
                                     {{ \App\Helpers\CartHelper::getCartCount() }}
@@ -156,7 +156,7 @@
                                         @endforeach
                                         <div class="border-t border-gray-100 my-1"></div>
                                     @endif
-                                    
+
                                     <a href="{{ route('user.spaces.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                         <div class="flex items-center">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -167,7 +167,7 @@
                                     </a>
                                 </div>
                             </div>
-                            
+
                             <!-- User Menu Dropdown -->
                             <div class="relative group" id="user-dropdown">
                                 <button class="text-gray-700 hover:text-gray-900 flex items-center" onclick="toggleUserDropdown()">
@@ -184,7 +184,7 @@
                                         <p class="text-sm font-medium text-gray-900">{{ auth()->user()->name }} {{ auth()->user()->last_name }}</p>
                                         <p class="text-xs text-gray-500">{{ auth()->user()->email }}</p>
                                     </div>
-                                    
+
                                     <!-- Menu Items -->
                                     <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                         <div class="flex items-center">
@@ -194,7 +194,7 @@
                                             Perfil
                                         </div>
                                     </a>
-                                    
+
                                     <a href="{{ route('tickets.my') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                         <div class="flex items-center">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -203,8 +203,8 @@
                                             Mis Boletos
                                         </div>
                                     </a>
-                                    
-                                    
+
+
                                     <!-- Logout -->
                                     <form method="POST" action="{{ route('logout') }}" class="block">
                                         @csrf
@@ -237,12 +237,12 @@
 
     <!-- Scripts -->
     @stack('scripts')
-    
+
     <script>
         function toggleAdminDropdown() {
             const menu = document.getElementById('admin-menu');
             const arrow = document.getElementById('admin-arrow');
-            
+
             if (menu.style.display === 'none' || menu.style.display === '') {
                 menu.style.display = 'block';
                 arrow.style.transform = 'rotate(180deg)';
@@ -251,12 +251,12 @@
                 arrow.style.transform = 'rotate(0deg)';
             }
         }
-        
+
         function toggleSpacesDropdown() {
             const menu = document.getElementById('spaces-menu');
             const arrow = document.getElementById('spaces-arrow');
             const icon = document.getElementById('spaces-icon');
-            
+
             if (menu.style.display === 'none' || menu.style.display === '') {
                 menu.style.display = 'block';
                 arrow.style.transform = 'rotate(180deg)';
@@ -267,12 +267,12 @@
                 icon.style.transform = 'scale(1)';
             }
         }
-        
+
         function toggleUserDropdown() {
             const menu = document.getElementById('user-menu');
             const arrow = document.getElementById('user-arrow');
             const icon = document.getElementById('user-icon');
-            
+
             if (menu.style.display === 'none' || menu.style.display === '') {
                 menu.style.display = 'block';
                 arrow.style.transform = 'rotate(180deg)';
@@ -283,36 +283,36 @@
                 icon.style.transform = 'scale(1)';
             }
         }
-        
+
         // Cerrar dropdowns al hacer clic fuera
         document.addEventListener('click', function(event) {
             const adminDropdown = document.getElementById('admin-dropdown');
             const adminMenu = document.getElementById('admin-menu');
             const adminArrow = document.getElementById('admin-arrow');
-            
+
             const spacesDropdown = document.getElementById('spaces-dropdown');
             const spacesMenu = document.getElementById('spaces-menu');
             const spacesArrow = document.getElementById('spaces-arrow');
             const spacesIcon = document.getElementById('spaces-icon');
-            
+
             const userDropdown = document.getElementById('user-dropdown');
             const userMenu = document.getElementById('user-menu');
             const userArrow = document.getElementById('user-arrow');
             const userIcon = document.getElementById('user-icon');
-            
+
             // Cerrar admin dropdown
             if (adminDropdown && !adminDropdown.contains(event.target)) {
                 adminMenu.style.display = 'none';
                 adminArrow.style.transform = 'rotate(0deg)';
             }
-            
+
             // Cerrar spaces dropdown
             if (spacesDropdown && !spacesDropdown.contains(event.target)) {
                 spacesMenu.style.display = 'none';
                 spacesArrow.style.transform = 'rotate(0deg)';
                 spacesIcon.style.transform = 'scale(1)';
             }
-            
+
             // Cerrar user dropdown
             if (userDropdown && !userDropdown.contains(event.target)) {
                 userMenu.style.display = 'none';

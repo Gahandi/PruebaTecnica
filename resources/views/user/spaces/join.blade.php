@@ -11,7 +11,7 @@
                 <h1 class="text-3xl font-bold text-gray-900">Unirse a Espacio</h1>
                 <p class="text-gray-600 mt-1">Únete a un espacio de eventos existente</p>
             </div>
-            <a href="{{ route('user.spaces.index') }}" 
+            <a href="{{ route('user.spaces.index') }}"
                class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors">
                 Volver
             </a>
@@ -29,9 +29,9 @@
                             Disponible
                         </span>
                     </div>
-                    
+
                     <p class="text-gray-600 mb-4 line-clamp-3">{{ $space->description }}</p>
-                    
+
                     <div class="mb-4">
                         <div class="flex items-center text-sm text-gray-500 mb-2">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -43,19 +43,19 @@
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9"></path>
                             </svg>
-                            {{ $space->subdomain }}.boletos.com
+                            {{ $space->subdomain }}.{{ config('app.url') }}
                         </div>
                     </div>
-                    
+
                     <div class="flex space-x-2">
                         <form method="POST" action="{{ route('user.spaces.join.space', $space) }}" class="flex-1">
                             @csrf
-                            <button type="submit" 
+                            <button type="submit"
                                     class="w-full bg-green-600 text-white text-center py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
                                 Unirse
                             </button>
                         </form>
-                        <a href="http://{{ $space->subdomain }}.boletos.com" 
+                        <a href="http://{{ $space->subdomain }}.'.'config('app.url'))"
                            target="_blank"
                            class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,11 +77,11 @@
             <h3 class="text-xl font-semibold text-gray-900 mb-2">No hay espacios disponibles</h3>
             <p class="text-gray-600 mb-8">No hay espacios públicos disponibles para unirse en este momento.</p>
             <div class="flex justify-center space-x-4">
-                <a href="{{ route('user.spaces.create') }}" 
+                <a href="{{ route('user.spaces.create') }}"
                    class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
                     Crear Espacio
                 </a>
-                <a href="{{ route('user.spaces.index') }}" 
+                <a href="{{ route('user.spaces.index') }}"
                    class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors">
                     Volver
                 </a>

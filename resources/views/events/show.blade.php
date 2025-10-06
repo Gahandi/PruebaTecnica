@@ -16,7 +16,7 @@
                 <h1 class="text-3xl font-bold">{{ $event->name }}</h1>
             </div>
         </div>
-        
+
         <div class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -31,7 +31,7 @@
                                 <p class="text-sm text-gray-600">{{ \Carbon\Carbon::parse($event->date)->format('l, d F Y \a \l\a\s H:i') }}</p>
                             </div>
                         </div>
-                        
+
                         <div class="flex items-center">
                             <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
@@ -47,7 +47,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div>
                     <h2 class="text-xl font-semibold text-gray-900 mb-4">Compra de Boletos</h2>
                     <p class="text-sm text-gray-600 mb-4">Selecciona los tipos de boletos que deseas comprar</p>
@@ -62,9 +62,9 @@
             <form id="purchaseForm" class="space-y-6">
                 @csrf
                 <input type="hidden" name="event_id" value="{{ $event->id }}">
-                
+
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Selecciona tus boletos</h3>
-                
+
                 <div class="space-y-4">
                     @foreach($event->ticketTypes as $ticketType)
                         <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
@@ -76,7 +76,7 @@
                                             <svg class="w-4 h-4 text-green-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                                             </svg>
-                                            <span class="text-sm font-medium text-green-600">{{ $ticketType->pivot->quantity }} disponibles</span>
+                                            <span class="text-sm font-medium text-green-600">{{ $ticketType->quantity }} disponibles</span>
                                         </div>
                                         @if($ticketType->pivot->quantity <= 5)
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
@@ -89,39 +89,39 @@
                                         @endif
                                     </div>
                                 </div>
-                                
+
                                 <div class="flex items-center space-x-4">
                                     <div class="text-right">
                                         <p class="text-lg font-semibold text-green-600">${{ number_format($ticketType->pivot->price, 2) }}</p>
                                         <p class="text-xs text-gray-500">por boleto</p>
                                     </div>
-                                    
+
                                     <div class="flex items-center space-x-2">
-                                        <button type="button" 
+                                        <button type="button"
                                                 class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors"
                                                 onclick="decreaseQuantity({{ $ticketType->id }})">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
                                             </svg>
                                         </button>
-                                        
-                                        <input type="number" 
-                                               id="quantity_{{ $ticketType->id }}" 
-                                               name="tickets[{{ $loop->index }}][quantity]" 
-                                               value="0" 
-                                               min="0" 
-                                               max="{{ $ticketType->quantity }}"
+
+                                        <input type="number"
+                                               id="quantity_{{ $ticketType->id }}"
+                                               name="tickets[{{ $loop->index }}][quantity]"
+                                               value="0"
+                                               min="0"
+                                               max="{{ $ticketType->pivot->quantity }}"
                                                class="w-16 text-center border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                                                onchange="updateTotal()">
-                                               
-                                        <button type="button" 
+
+                                        <button type="button"
                                                 class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors"
-                                                onclick="increaseQuantity({{ $ticketType->id }}, {{ $ticketType->quantity }})">
+                                                onclick="increaseQuantity({{ $ticketType->id }}, {{ $ticketType->pivot->quantity }})">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                             </svg>
                                         </button>
-                                        
+
                                         <input type="hidden" name="tickets[{{ $loop->index }}][ticket_type_id]" value="{{ $ticketType->id }}">
                                     </div>
                                 </div>
@@ -159,14 +159,14 @@
 
         <!-- Purchase Button -->
         <div class="flex justify-end space-x-4">
-            <button type="button" 
+            <button type="button"
                     id="add_to_cart_button"
                     disabled
                     onclick="addToCart()"
                     class="bg-blue-600 text-white px-8 py-3 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 Agregar al Carrito
             </button>
-            <button type="button" 
+            <button type="button"
                     id="view_cart_button"
                     onclick="window.location.href='http://boletos.local/cart'"
                     class="bg-gray-600 text-white px-8 py-3 rounded-md hover:bg-gray-700 transition-colors">
@@ -194,7 +194,7 @@ console.log('JavaScript starting...');
 
 let ticketPrices = {
     @foreach($event->ticketTypes as $ticketType)
-        {{ $ticketType->id }}: {{ $ticketType->price }},
+        {{ $ticketType->id }}: {{ $ticketType->pivot->price }},
     @endforeach
 };
 
@@ -233,31 +233,31 @@ function decreaseQuantity(ticketTypeId) {
 function updateTotal() {
     let subtotal = 0;
     let hasTickets = false;
-    
+
     // Calculate subtotal
     @foreach($event->ticketTypes as $ticketType)
         const quantity{{ $ticketType->id }} = parseInt(document.getElementById('quantity_{{ $ticketType->id }}').value) || 0;
         if (quantity{{ $ticketType->id }} > 0) hasTickets = true;
         subtotal += quantity{{ $ticketType->id }} * {{ $ticketType->pivot->price }};
     @endforeach
-    
+
     // Apply coupon discount
     let discount = 0;
     if (appliedCoupon) {
         discount = (subtotal * appliedCoupon.discount_percentage) / 100;
     }
-    
+
     // Calculate taxes (16% IVA)
     const taxableAmount = subtotal - discount;
     const taxes = taxableAmount * 0.16;
     const total = taxableAmount + taxes;
-    
+
     // Update display
     document.getElementById('subtotal').textContent = '$' + subtotal.toFixed(2);
     document.getElementById('discount').textContent = '$' + discount.toFixed(2);
     document.getElementById('taxes').textContent = '$' + taxes.toFixed(2);
     document.getElementById('total').textContent = '$' + total.toFixed(2);
-    
+
     // Enable/disable add to cart button
     document.getElementById('add_to_cart_button').disabled = !hasTickets;
 }
@@ -265,14 +265,14 @@ function updateTotal() {
 async function applyCoupon() {
     const couponCode = document.getElementById('coupon_code').value;
     const messageDiv = document.getElementById('coupon_message');
-    
+
     if (!couponCode) {
         messageDiv.textContent = 'Por favor ingresa un código de descuento';
         messageDiv.className = 'mt-2 text-sm text-red-600';
         messageDiv.classList.remove('hidden');
         return;
     }
-    
+
     try {
         const response = await fetch('/api/v1/coupons/validate', {
             method: 'POST',
@@ -282,9 +282,9 @@ async function applyCoupon() {
             },
             body: JSON.stringify({ code: couponCode })
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             appliedCoupon = data.coupon;
             messageDiv.textContent = `Descuento del ${appliedCoupon.discount_percentage}% aplicado`;
@@ -315,17 +315,17 @@ async function addToCart() {
             });
         }
     @endforeach
-    
+
     if (tickets.length === 0) {
         alert('Por favor selecciona al menos un boleto.');
         return;
     }
-    
+
     // Disable button to prevent multiple submissions
     const button = document.getElementById('add_to_cart_button');
     button.disabled = true;
     button.textContent = 'Agregando...';
-    
+
     try {
         // Add each ticket type to cart sequentially
         for (const ticket of tickets) {
@@ -333,7 +333,7 @@ async function addToCart() {
             formData.append('_token', '{{ csrf_token() }}');
             formData.append('ticket_type_id', ticket.ticket_type_id);
             formData.append('quantity', ticket.quantity);
-            
+
             const response = await fetch('{{ route("cart.add") }}', {
                 method: 'POST',
                 body: formData,
@@ -342,17 +342,17 @@ async function addToCart() {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 }
             });
-            
+
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error('Error response:', response.status, errorText);
                 throw new Error(`Error ${response.status}: ${errorText}`);
             }
         }
-        
+
         // Redirect to cart after all tickets are added
-        window.location.href = 'http://boletos.local/cart';
-        
+        window.location.href = 'http://{{ config('app.url') }}/cart';
+
     } catch (error) {
         console.error('Error:', error);
         alert('Error al agregar boletos al carrito. Inténtalo de nuevo.');

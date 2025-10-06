@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\RoleSpace;
 use Illuminate\Database\Seeder;
-use App\Models\Rolespace;
 
 class RoleSpaceSeeder extends Seeder
 {
@@ -25,7 +25,7 @@ class RoleSpaceSeeder extends Seeder
         ];
 
         foreach ($roles as $role) {
-            Rolespace::create($role);
+            RoleSpace::create($role);
         }
     }
 }

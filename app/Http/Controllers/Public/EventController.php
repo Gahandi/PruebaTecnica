@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\TicketType;
+use App\Models\TicketsEvent;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
@@ -12,14 +14,14 @@ class EventController extends Controller
     public function index()
     {
         $events = Event::with('ticketTypes')->get();
-        
+
         return view('public.events.index', compact('events'));
     }
 
     public function show(Event $event)
     {
         $event->load('ticketTypes');
-        
+
         return view('public.events.show', compact('event'));
     }
 
@@ -33,29 +35,30 @@ class EventController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $ticketType = TicketType::with(['event.space'])->findOrFail($request->ticket_type_id);
+        $ticket_event = TicketsEvent::where('ticket_types_id', $request->ticket_type_id)->first();
         $cart = session()->get('cart', []);
-        
+        Log::info($cart);
+
         // Verificar disponibilidad
-        $currentQuantity = isset($cart[$ticketType->id]) ? $cart[$ticketType->id]['quantity'] : 0;
+        $currentQuantity = isset($cart[$ticket_event->ticket_type_id]) ? $cart[$ticket_event->ticket_type_id]['quantity'] : 0;
         $totalQuantity = $currentQuantity + $request->quantity;
-        
-        if ($totalQuantity > $ticketType->quantity) {
+
+        if ($totalQuantity > $ticket_event->quantity) {
             return back()->with('error', 'No hay suficientes boletos disponibles.');
         }
 
-        if (isset($cart[$ticketType->id])) {
-            $cart[$ticketType->id]['quantity'] += $request->quantity;
+        if (isset($cart[$ticket_event->ticket_type_id])) {
+            $cart[$ticket_event->ticket_type_id]['quantity'] += $request->quantity;
         } else {
-            $cart[$ticketType->id] = [
-                'ticket_type' => $ticketType,
+            $cart[$ticket_event->ticket_type_id] = [
+                'ticket_type' => $ticket_event->ticket_type_id,
                 'quantity' => $request->quantity,
-                'price' => $ticketType->price,
+                'price' => $ticket_event->price,
             ];
         }
 
         session()->put('cart', $cart);
-        
+
         if (request()->ajax()) {
             return response()->json([
                 'success' => true,
@@ -63,7 +66,7 @@ class EventController extends Controller
                 'cart_count' => count($cart)
             ]);
         }
-        
+
         return back()->with('success', 'Boletos agregados al carrito.');
     }
 
@@ -73,7 +76,7 @@ class EventController extends Controller
     public function checkout()
     {
         $cart = session()->get('cart', []);
-        
+
         if (empty($cart)) {
             return redirect()->route('public.events.index')->with('error', 'Tu carrito está vacío.');
         }
