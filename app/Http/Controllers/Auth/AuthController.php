@@ -29,7 +29,12 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
             
-            return redirect()->intended(route('events.public'));
+            // Redirigir a la URL previa o al dashboard si es admin, o a eventos si es usuario normal
+            if (Auth::user()->hasRole('admin') || Auth::user()->hasRole('staff')) {
+                return redirect()->intended(route('dashboard'));
+            }
+            
+            return redirect()->intended('/');
         }
 
         throw ValidationException::withMessages([
@@ -65,7 +70,7 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('events.public')->with('success', '¡Cuenta creada exitosamente!');
+        return redirect()->intended('/')->with('success', '¡Cuenta creada exitosamente!');
     }
 
     public function logout(Request $request)

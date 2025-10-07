@@ -11,8 +11,8 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Custom CSS -->
     <style>
@@ -22,7 +22,7 @@
 <body class="font-sans antialiased bg-gray-100">
     <div class="min-h-screen">
         <!-- Navigation -->
-        <nav class="bg-white shadow-sm border-b border-gray-200">
+        <nav class="bg-white shadow-sm border-b sticky top-0 left-0 right-0 z-50 border-gray-200">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16">
                     <div class="flex items-center flex-row-reverse gap-6">
@@ -110,7 +110,7 @@
 
                     <div class="flex items-center space-x-4">
                         <!-- Cart Link -->
-                        <a href="cart" class="text-gray-700 hover:text-gray-900 relative p-2 rounded-lg hover:bg-gray-100 transition-colors group">
+                        <a href="{{ config('app.url') }}/cart" class="text-gray-700 hover:text-gray-900 relative p-2 rounded-lg hover:bg-gray-100 transition-colors group">
                             <svg class="w-6 h-6 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l-1 7a2 2 0 01-2 2H8a2 2 0 01-2-2L5 9z"></path>
                             </svg>
@@ -124,7 +124,7 @@
                                 </span>
                             @endif
                         </a>
-                        <a href="{{ route('events.public') }}" class="text-gray-700 hover:text-gray-900">
+                        <a href="{{ config('app.url') }}/" class="text-gray-700 hover:text-gray-900">
                             Eventos
                         </a>
                         @auth
@@ -220,7 +220,7 @@
                                 </div>
                             </div>
                         @else
-                            <a href="{{ route('login') }}" class="text-gray-700 hover:text-gray-900">
+                            <a href="{{ config('app.url') }}/login" class="text-gray-700 hover:text-gray-900">
                                 Iniciar sesión
                             </a>
                         @endauth

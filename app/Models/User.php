@@ -53,8 +53,36 @@ class User extends Authenticatable
 		return $this->hasMany(Order::class);
 	}
 
-	public function users_codes()
-	{
-		return $this->hasMany(UsersCode::class);
-	}
+    public function users_codes()
+    {
+        return $this->hasMany(UsersCode::class);
+    }
+
+    /**
+     * Check if user is admin of a specific space
+     */
+    public function isAdminOfSpace($spaceId)
+    {
+        return $this->spaces()
+            ->where('spaces.id', $spaceId)
+            ->wherePivot('role_space_id', 1) // 1 = admin role
+            ->exists();
+    }
+
+    /**
+     * Check if user has any role in a specific space
+     */
+    public function hasRoleInSpace($spaceId, $roleName = null)
+    {
+        $query = $this->spaces()
+            ->where('spaces.id', $spaceId);
+        
+        if ($roleName) {
+            $query->whereHas('role_space', function($q) use ($roleName) {
+                $q->where('name', $roleName);
+            });
+        }
+        
+        return $query->exists();
+    }
 }

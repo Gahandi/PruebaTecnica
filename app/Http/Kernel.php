@@ -21,6 +21,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        \App\Http\Middleware\ConfigureSessionDomain::class,
     ];
 
     /**
@@ -72,6 +73,7 @@ class Kernel extends HttpKernel
         'handle.403' => \App\Http\Middleware\Handle403::class,
         'redirect.staff' => \App\Http\Middleware\RedirectStaffToStaffRoutes::class,
         'subdomain.session' => \App\Http\Middleware\SubdomainSession::class,
+        'configure.session' => \App\Http\Middleware\ConfigureSessionDomain::class,
         'cart.context' => \App\Http\Middleware\CartContext::class,
     ];
 }

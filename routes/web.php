@@ -36,6 +36,7 @@ Route::domain('{subdomain}.' . config('app.url'))
         Route::get('/', [SpaceController::class, 'show'])->name('spaces.profile');
         Route::get('/edit', [SpaceController::class, 'edit'])->name('spaces.edit');
         Route::put('/update', [SpaceController::class, 'update'])->name('spaces.update-profile');
+        Route::post('/update-profile', [SpaceController::class, 'updateProfile'])->name('spaces.update-profile');
         Route::get('/events/create', [SpaceEventController::class, 'create'])
             ->name('spaces.events.create')
             ->middleware('space.member');
