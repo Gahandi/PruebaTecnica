@@ -39,6 +39,9 @@
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h2 class="text-xl font-semibold text-gray-900">Boletos en tu carrito</h2>
                     </div>
+                    <script>
+                        console.log("{{ json_encode($cart) }}as")
+                    </script>
                     <div class="divide-y divide-gray-200">
                         @foreach($cart as $ticketTypeId => $item)
                             <div class="p-6">

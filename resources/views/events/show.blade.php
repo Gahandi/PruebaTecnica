@@ -168,7 +168,7 @@
             </button>
             <button type="button"
                     id="view_cart_button"
-                    onclick="window.location.href='http://boletos.local/cart'"
+                    onclick="window.location.href='{{ config('app.url') }}/cart'"
                     class="bg-gray-600 text-white px-8 py-3 rounded-md hover:bg-gray-700 transition-colors">
                 Ver Carrito
             </button>
@@ -320,7 +320,7 @@ async function addToCart() {
         alert('Por favor selecciona al menos un boleto.');
         return;
     }
-
+    console.log(tickets)
     // Disable button to prevent multiple submissions
     const button = document.getElementById('add_to_cart_button');
     button.disabled = true;
@@ -328,30 +328,42 @@ async function addToCart() {
 
     try {
         // Add each ticket type to cart sequentially
-        for (const ticket of tickets) {
-            const formData = new FormData();
-            formData.append('_token', '{{ csrf_token() }}');
-            formData.append('ticket_type_id', ticket.ticket_type_id);
-            formData.append('quantity', ticket.quantity);
+    console.log(tickets)
+tickets.forEach(async (ticket) => {
+    const formData = new FormData(); // ✅
 
-            const response = await fetch('{{ route("cart.add") }}', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            });
+    formData.append('_token', '{{ csrf_token() }}');
+    formData.append('ticket_type_id', ticket.ticket_type_id);
+    formData.append('quantity', ticket.quantity);
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Error response:', response.status, errorText);
-                throw new Error(`Error ${response.status}: ${errorText}`);
+    for (let pair of formData.entries()) {
+        console.log(pair[0]+ ': ' + pair[1]);
+    }
+
+    try {
+        const response = await fetch('{{ route("cart.add") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
             }
+        });
+        console.log(response)
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Error response:', response.status, errorText);
         }
+    } catch (error) {
+        console.error('Request failed:', error);
+    }
+});
+
+
 
         // Redirect to cart after all tickets are added
-        window.location.href = 'http://{{ config('app.url') }}/cart';
+
+        //window.location.href = '{{ config('app.url') }}/cart';
 
     } catch (error) {
         console.error('Error:', error);

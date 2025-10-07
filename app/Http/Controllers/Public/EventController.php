@@ -63,7 +63,8 @@ class EventController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Boletos agregados al carrito.',
-                'cart_count' => count($cart)
+                'cart_count' => count($cart),
+                'cart' => json_encode($cart)
             ]);
         }
 
