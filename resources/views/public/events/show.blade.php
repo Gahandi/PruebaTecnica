@@ -71,12 +71,12 @@
                             <div class="flex items-center justify-between">
                                 <div class="flex-1">
                                     <h4 class="text-lg font-medium text-gray-900">{{ $ticketType->name }}</h4>
-                                    <p class="text-sm text-gray-600">Disponibles: {{ $ticketType->quantity }}</p>
+                                    <p class="text-sm text-gray-600">Disponibles: {{ $ticketType->pivot->quantity }}</p>
                                 </div>
                                 
                                 <div class="flex items-center space-x-4">
                                     <div class="text-right">
-                                        <p class="text-lg font-semibold text-green-600">${{ number_format($ticketType->price, 2) }}</p>
+                                        <p class="text-lg font-semibold text-green-600">${{ number_format($ticketType->pivot->price, 2) }}</p>
                                         <p class="text-xs text-gray-500">por boleto</p>
                                     </div>
                                     
@@ -94,13 +94,13 @@
                                                name="tickets[{{ $loop->index }}][quantity]" 
                                                value="0" 
                                                min="0" 
-                                               max="{{ $ticketType->quantity }}"
+                                               max="{{ $ticketType->pivot->quantity }}"
                                                class="w-16 text-center border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                                                onchange="updateTotal()">
                                                
                                         <button type="button" 
                                                 class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors"
-                                                onclick="increaseQuantity({{ $ticketType->id }}, {{ $ticketType->quantity }})">
+                                                onclick="increaseQuantity({{ $ticketType->id }}, {{ $ticketType->pivot->quantity }})">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                             </svg>
@@ -178,7 +178,7 @@ console.log('JavaScript starting...');
 
 let ticketPrices = {
     @foreach($event->ticketTypes as $ticketType)
-        {{ $ticketType->id }}: {{ $ticketType->price }},
+        {{ $ticketType->id }}: {{ $ticketType->pivot->price }}{{ $loop->last ? '' : ',' }}
     @endforeach
 };
 
@@ -222,7 +222,7 @@ function updateTotal() {
     @foreach($event->ticketTypes as $ticketType)
         const quantity{{ $ticketType->id }} = parseInt(document.getElementById('quantity_{{ $ticketType->id }}').value) || 0;
         if (quantity{{ $ticketType->id }} > 0) hasTickets = true;
-        subtotal += quantity{{ $ticketType->id }} * {{ $ticketType->price }};
+        subtotal += quantity{{ $ticketType->id }} * {{ $ticketType->pivot->price }};
     @endforeach
     
     // Apply coupon discount
@@ -334,8 +334,8 @@ async function addToCart() {
             }
         }
         
-        // Redirect to cart after all tickets are added
-        window.location.href = '{{ route("cart") }}';
+        // Disparar evento de carrito actualizado
+        document.dispatchEvent(new CustomEvent('cartUpdated'));
         
     } catch (error) {
         console.error('Error:', error);

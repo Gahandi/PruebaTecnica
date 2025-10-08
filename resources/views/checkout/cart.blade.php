@@ -43,49 +43,68 @@
                         console.log("{{ json_encode($cart) }}as")
                     </script>
                     <div class="divide-y divide-gray-200">
-                        @foreach($cart as $ticketTypeId => $item)
+                        @foreach($cart as $key => $item)
                             <div class="p-6">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex-1">
-                                        <h3 class="text-lg font-medium text-gray-900">{{ $item['ticket_type'] }}</h3>
-                                        <p class="text-sm text-gray-500">{{ $item['ticket_type'] }}</p>
-                                        <p class="text-sm text-gray-500"></p>
-                                        <p class="text-sm text-gray-500">{{ $item['ticket_type'] }}</p>
-                                        <div class="mt-2 space-y-1">
-                                            <div class="flex items-center">
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                                                    </svg>
-                                                    {{ $item['ticket_type'] }}
-                                                </span>
-                                            </div>
-                                            <div class="text-xs text-gray-500">
-                                                <span class="font-medium">Cajón:</span> {{ $item['ticket_type'] }}.boletos.local
+                                <div class="flex items-start space-x-4">
+                                    <!-- Event Image -->
+                                    @if(isset($item['event_image']) && $item['event_image'])
+                                        <img src="{{ asset('storage/' . $item['event_image']) }}" alt="{{ $item['event_name'] ?? 'Evento' }}" class="w-20 h-20 rounded-lg object-cover flex-shrink-0">
+                                    @else
+                                        <div class="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                        </div>
+                                    @endif
+                                    
+                                    <div class="flex-1 min-w-0">
+                                        <!-- Event Info -->
+                                        <div class="mb-2">
+                                            <h3 class="text-lg font-medium text-gray-900">{{ $item['event_name'] ?? 'Evento' }}</h3>
+                                            @if(isset($item['event_date']))
+                                                <p class="text-sm text-gray-500">{{ \Carbon\Carbon::parse($item['event_date'])->format('d M Y, H:i') }}</p>
+                                            @endif
+                                        </div>
+                                        
+                                        <!-- Ticket Type Info -->
+                                        <div class="mb-3">
+                                            <h4 class="text-md font-semibold text-gray-800">{{ $item['ticket_type_name'] ?? 'Tipo de Boleto' }}</h4>
+                                            <div class="mt-1 space-y-1">
+                                                <div class="flex items-center">
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
+                                                        </svg>
+                                                        {{ $item['ticket_type_name'] ?? 'Boleto' }}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+                                    
+                                    <!-- Price and Controls -->
                                     <div class="flex items-center space-x-4">
                                         <div class="text-right">
                                             <p class="text-lg font-semibold text-gray-900">${{ number_format($item['price'], 2) }}</p>
                                             <p class="text-sm text-gray-500">por boleto</p>
+                                            <p class="text-sm font-medium text-gray-700">Total: ${{ number_format($item['price'] * $item['quantity'], 2) }}</p>
                                         </div>
                                         <div class="flex items-center space-x-2">
                                             <form method="POST" action="{{ route('checkout.update-cart') }}" class="inline">
                                                 @csrf
-                                                <input type="hidden" name="ticket_type_id" value="{{ $ticketTypeId }}">
+                                                <input type="hidden" name="ticket_type_id" value="{{ $item['ticket_type_id'] ?? $key }}">
                                                 <input type="number"
                                                        name="quantity"
                                                        value="{{ $item['quantity'] }}"
                                                        min="0"
-                                                       max="{{ $item['ticket_type']}}"
+                                                       max="10"
                                                        class="w-16 px-2 py-1 border border-gray-300 rounded text-center"
                                                        onchange="this.form.submit()">
                                             </form>
-                                            <form method="POST" action="{{ route('checkout.remove-from-cart', $ticketTypeId) }}" class="inline">
+                                            <form method="POST" action="{{ route('checkout.remove-from-cart', $item['ticket_type_id'] ?? $key) }}" class="inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900">
+                                                <button type="submit" class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                                     </svg>

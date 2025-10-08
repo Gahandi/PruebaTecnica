@@ -27,7 +27,9 @@ class OrderController extends Controller
             abort(403, 'No tienes permisos para ver este boleto.');
         }
         
-        $ticket->load(['order.user', 'ticketType.event', 'checkin']);
+        $ticket->load(['order.user', 'ticketType.event.ticketTypes' => function($query) {
+            $query->withPivot('quantity', 'price');
+        }, 'checkin']);
         return view('tickets.show', compact('ticket'));
     }
 

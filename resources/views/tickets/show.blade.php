@@ -43,7 +43,7 @@
                     
                     <div class="flex justify-between">
                         <span class="text-gray-600">Precio:</span>
-                        <span class="font-semibold">${{ number_format($ticket->ticketType->price, 2) }}</span>
+                        <span class="font-semibold">${{ number_format($ticket->getPrice(), 2) }}</span>
                     </div>
                     
                     <div class="flex justify-between">

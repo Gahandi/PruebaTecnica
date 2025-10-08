@@ -20,8 +20,10 @@ class SpaceEventController extends Controller
             abort(404, 'Evento no encontrado');
         }
 
-        // Cargar la relación ticketTypes
-        $event->load('ticketTypes');
+        // Cargar la relación ticketTypes con información de la tabla intermedia
+        $event->load(['ticketTypes' => function($query) {
+            $query->withPivot('quantity', 'price');
+        }]);
 
         return view('events.show', compact('event', 'space'));
     }

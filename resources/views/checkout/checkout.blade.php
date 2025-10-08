@@ -40,7 +40,7 @@
                             @foreach($cart as $item)
                                 <div class="flex justify-between items-center">
                                     <div>
-                                        <p class="text-sm font-medium text-gray-900">{{ $item['ticket_type']->name }}</p>
+                                        <p class="text-sm font-medium text-gray-900">{{ $item['ticket_type_name'] ?? 'Boleto' }}</p>
                                         <p class="text-sm text-gray-500">{{ $item['quantity'] }} x ${{ number_format($item['price'], 2) }}</p>
                                     </div>
                                     <p class="text-sm font-medium text-gray-900">${{ number_format($item['price'] * $item['quantity'], 2) }}</p>

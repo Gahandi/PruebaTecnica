@@ -106,6 +106,7 @@ Route::get('/events/{event}', [PublicEventController::class, 'show'])->name('eve
 Route::middleware(['cart.context'])->group(function () {
     Route::post('/cart/add', [PublicEventController::class, 'addToCart'])->name('cart.add');
     Route::get('/cart', [App\Http\Controllers\CheckoutController::class, 'cart'])->name('cart');
+    Route::get('/cart/count', [App\Http\Controllers\CheckoutController::class, 'getCartCount'])->name('cart.count');
 });
 
 // Rutas protegidas por roles

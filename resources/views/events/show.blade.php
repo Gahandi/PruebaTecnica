@@ -194,7 +194,7 @@ console.log('JavaScript starting...');
 
 let ticketPrices = {
     @foreach($event->ticketTypes as $ticketType)
-        {{ $ticketType->id }}: {{ $ticketType->pivot->price }},
+        {{ $ticketType->id }}: {{ $ticketType->pivot->price }}{{ $loop->last ? '' : ',' }}
     @endforeach
 };
 
@@ -361,9 +361,8 @@ tickets.forEach(async (ticket) => {
 
 
 
-        // Redirect to cart after all tickets are added
-
-        //window.location.href = '{{ config('app.url') }}/cart';
+        // Disparar evento de carrito actualizado
+        document.dispatchEvent(new CustomEvent('cartUpdated'));
 
     } catch (error) {
         console.error('Error:', error);

@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property int $event_id
  * @property int $ticket_types_id
  * @property int $quantity
+ * @property float $price
  * @property string|null $deleted_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -34,13 +35,15 @@ class TicketsEvent extends Model
 	protected $casts = [
 		'event_id' => 'int',
 		'ticket_types_id' => 'int',
-		'quantity' => 'int'
+		'quantity' => 'int',
+		'price' => 'decimal:2'
 	];
 
 	protected $fillable = [
 		'event_id',
 		'ticket_types_id',
-		'quantity'
+		'quantity',
+		'price'
 	];
 
 	public function event()
