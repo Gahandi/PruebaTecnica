@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignUuid('order_id')->constrained('orders')->onDelete('cascade');
-            $table->foreignId('coupon_id')->constrained('coupons')->onDelete('cascade');
+            $table->foreignId('coupon_id')->nullable()->constrained('coupons')->onDelete('cascade');
             $table->enum('status', ['pending', 'completed', 'cancelled', 'refunded'])->default('pending');
             $table->softDeletes();
             $table->timestamps();

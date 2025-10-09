@@ -14,21 +14,21 @@ class CartHelper
     {
         $host = $host ?: request()->getHost();
         $isSubdomain = self::isSubdomain($host);
-        
+
         $cart = session()->get('cart', []);
-        
+
         if ($isSubdomain) {
             $subdomain = explode('.', $host)[0];
             $space = Space::where('subdomain', $subdomain)->first();
-            
+
             if ($space) {
                 return self::filterCartBySpace($cart, $space->id);
             }
         }
-        
+
         return $cart;
     }
-    
+
     /**
      * Verificar si es un subdominio
      */
@@ -37,7 +37,7 @@ class CartHelper
         $parts = explode('.', $host);
         return count($parts) > 2; // Ej: prueba-de-cajon-2.boletos.local
     }
-    
+
     /**
      * Obtener el subdominio del host
      */
@@ -49,14 +49,14 @@ class CartHelper
         }
         return null;
     }
-    
+
     /**
      * Filtrar carrito para mostrar solo boletos del espacio actual
      */
     public static function filterCartBySpace($cart, $spaceId)
     {
         $filteredCart = [];
-        
+
         foreach ($cart as $key => $item) {
             // Si el item tiene event_id, verificar directamente
             if (isset($item['event_id'])) {
@@ -79,10 +79,10 @@ class CartHelper
                 }
             }
         }
-        
+
         return $filteredCart;
     }
-    
+
     /**
      * Obtener el conteo del carrito filtrado
      */
@@ -91,7 +91,7 @@ class CartHelper
         $cart = self::getFilteredCart($host);
         return count($cart);
     }
-    
+
     /**
      * Obtener el total del carrito filtrado
      */
@@ -99,14 +99,14 @@ class CartHelper
     {
         $cart = self::getFilteredCart($host);
         $total = 0;
-        
+
         foreach ($cart as $item) {
             $total += $item['price'] * $item['quantity'];
         }
-        
+
         return $total;
     }
-    
+
     /**
      * Obtener la ruta correcta para agregar al carrito
      */
@@ -114,39 +114,30 @@ class CartHelper
     {
         $host = $host ?: request()->getHost();
         $isSubdomain = self::isSubdomain($host);
-        
+
         if ($isSubdomain) {
             return route('subdomain.cart.add');
         }
-        
+
         return route('cart.add');
     }
-    
+
     /**
      * Obtener la ruta correcta para ver el carrito
      */
     public static function getCartViewRoute($host = null)
     {
-        $host = $host ?: request()->getHost();
-        $isSubdomain = self::isSubdomain($host);
-        
-        if ($isSubdomain) {
-            $subdomain = self::getSubdomain($host);
-            return route('subdomain.cart', ['subdomain' => $subdomain]);
-        }
-        
-        return route('cart');
+        return config('app.domain') . '/cart';
     }
-    
+
     /**
      * Obtener la ruta correcta para checkout
      */
     public static function getCheckoutRoute($host = null)
     {
-        // Para checkout, siempre usar la ruta principal ya que no hay rutas de subdominio
-        return route('checkout.checkout');
+return config('app.domain') . '/checkout/checkout';
     }
-    
+
     /**
      * Obtener el carrito con información completa del evento
      */
@@ -154,14 +145,14 @@ class CartHelper
     {
         $cart = self::getFilteredCart($host);
         $cartWithInfo = [];
-        
+
         foreach ($cart as $key => $item) {
             if (!isset($item['event_id'])) {
                 // Buscar el evento asociado al tipo de boleto
                 $ticketEvent = \App\Models\TicketsEvent::where('ticket_types_id', $item['ticket_type_id'] ?? $key)
                     ->with('event')
                     ->first();
-                
+
                 if ($ticketEvent) {
                     $item['event_id'] = $ticketEvent->event_id;
                     $item['event'] = $ticketEvent->event;
@@ -170,28 +161,28 @@ class CartHelper
                     $item['event_image'] = $ticketEvent->event->image;
                 }
             }
-            
+
             $cartWithInfo[$key] = $item;
         }
-        
+
         return $cartWithInfo;
     }
-    
+
     /**
      * Crear reserva temporal para un item del carrito
      */
     public static function createReservation($ticketTypeId, $eventId, $quantity, $minutes = 15)
     {
         $sessionId = session()->getId();
-        
+
         // Verificar si ya existe una reserva activa
         $existingReservation = \App\Models\TicketReservation::where('session_id', $sessionId)
-            ->where('ticket_type_id', $ticketTypeId)
+            ->where('ticket_types_id', $ticketTypeId)
             ->where('event_id', $eventId)
             ->where('reserved_until', '>', now())
             ->where('is_active', true)
             ->first();
-            
+
         if ($existingReservation) {
             $existingReservation->update([
                 'quantity' => $quantity,
@@ -199,16 +190,16 @@ class CartHelper
             ]);
             return $existingReservation;
         }
-        
+
         return \App\Models\TicketReservation::createReservation(
-            $sessionId, 
-            $ticketTypeId, 
-            $eventId, 
-            $quantity, 
+            $sessionId,
+            $ticketTypeId,
+            $eventId,
+            $quantity,
             $minutes
         );
     }
-    
+
     /**
      * Obtener reservas activas del usuario actual
      */
@@ -217,7 +208,7 @@ class CartHelper
         $sessionId = session()->getId();
         return \App\Models\TicketReservation::getActiveReservations($sessionId);
     }
-    
+
     /**
      * Limpiar reservas expiradas
      */

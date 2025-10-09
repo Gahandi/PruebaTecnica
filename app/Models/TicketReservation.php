@@ -12,7 +12,7 @@ class TicketReservation extends Model
 
     protected $fillable = [
         'session_id',
-        'ticket_type_id',
+        'ticket_types_id',
         'event_id',
         'quantity',
         'reserved_until',
@@ -27,7 +27,7 @@ class TicketReservation extends Model
 
     public function ticket_type()
     {
-        return $this->belongsTo(TicketType::class, 'ticket_type_id');
+        return $this->belongsTo(TicketType::class, 'ticket_types_id');
     }
 
     public function event()
@@ -37,7 +37,7 @@ class TicketReservation extends Model
 
     public function tickets_event()
     {
-        return $this->belongsTo(TicketsEvent::class, 'ticket_type_id', 'ticket_types_id')
+        return $this->belongsTo(TicketsEvent::class, 'ticket_types_id', 'ticket_types_id')
             ->where('event_id', $this->event_id);
     }
 
@@ -56,7 +56,7 @@ class TicketReservation extends Model
         // Crear nueva reserva
         return self::create([
             'session_id' => $sessionId,
-            'ticket_type_id' => $ticketTypeId,
+            'ticket_types_id' => $ticketTypeId,
             'event_id' => $eventId,
             'quantity' => $quantity,
             'reserved_until' => now()->addMinutes($minutes),

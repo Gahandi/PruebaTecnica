@@ -15,6 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('order_id')->constrained('orders')->onDelete('cascade');
             $table->foreignId('ticket_types_id')->constrained('ticket_types')->onDelete('cascade');
+            $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
             $table->boolean('used')->default(false);
             $table->softDeletes();
             $table->timestamps();

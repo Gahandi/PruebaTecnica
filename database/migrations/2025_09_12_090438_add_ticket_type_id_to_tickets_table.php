@@ -14,14 +14,6 @@ return new class extends Migration
         Schema::table('tickets', function (Blueprint $table) {
             $table->foreignId('ticket_type_id')->after('order_id')->nullable()->constrained('ticket_types')->onDelete('cascade');
         });
-        
-        // Actualizar tickets existentes con un ticket_type_id por defecto
-        \App\Models\Ticket::whereNull('ticket_type_id')->update(['ticket_type_id' => 1]);
-        
-        // Hacer la columna no nullable después de actualizar
-        Schema::table('tickets', function (Blueprint $table) {
-            $table->foreignId('ticket_type_id')->nullable(false)->change();
-        });
     }
 
     /**

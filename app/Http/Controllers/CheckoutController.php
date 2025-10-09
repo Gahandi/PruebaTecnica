@@ -8,6 +8,7 @@ use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Ticket;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -38,7 +39,7 @@ class CheckoutController extends Controller
     public function getCartCount()
     {
         $count = \App\Helpers\CartHelper::getCartCount();
-        
+
         return response()->json([
             'count' => $count
         ]);
@@ -54,7 +55,7 @@ class CheckoutController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $ticketType = TicketType::findOrFail($request->ticket_type_id);
+        $ticketType = TicketType::findOrFail($request->ticket_types_id);
         $cart = session()->get('cart', []);
 
         // Verificar disponibilidad
@@ -162,11 +163,15 @@ class CheckoutController extends Controller
                 return redirect()->route('checkout.cart')->with('error', 'Tu carrito está vacío.');
             }
 
-        // Calcular totales
         $subtotal = 0;
+        $event_id_json = [];
+
         foreach ($cart as $item) {
+            $event_id_json[] = $item['event_id'];
+
             $subtotal += $item['price'] * $item['quantity'];
         }
+
 
         // Aplicar cupón si existe
         $appliedCoupon = session()->get('applied_coupon');
@@ -182,11 +187,16 @@ class CheckoutController extends Controller
         $taxes = $taxableAmount * 0.16; // 16% IVA
         $total = $taxableAmount + $taxes;
 
+        \Log::info('Log del carrito: ', [$cart]);
+
+
             // Crear la orden
             $order = Order::create([
+                'id' => Str::uuid(),
                 'user_id' => auth()->id(),
-                'event_id' => 1, // Temporal
+                'event_id' => json_encode($event_id_json),
                 'coupon_id' => $couponId,
+                'state_id' => 4,
                 'subtotal' => $subtotal,
                 'discount_amount' => $discountAmount,
                 'total' => $total,
@@ -195,72 +205,25 @@ class CheckoutController extends Controller
             ]);
 
             \Log::info('Order created successfully', ['order_id' => $order->id]);
-
-            // Crear tickets para cada item del carrito
-            foreach ($cart as $ticketTypeId => $item) {
-                // Crear item de la orden
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'ticket_type_id' => $ticketTypeId,
-                    'quantity' => $item['quantity'],
-                    'price' => $item['price'],
-                ]);
-
-                // Crear tickets individuales
-                for ($i = 0; $i < $item['quantity']; $i++) {
-                    // Generar QR code en formato PNG para mejor compatibilidad con PDF
-                    $ticketId = Str::uuid();
-                    $qrCodeData = route('tickets.checkin', $ticketId);
-
-                    try {
-                        // Generar QR code como SVG (no requiere imagick ni GD)
-                        $qrCodeSvg = QrCode::format('svg')
-                            ->size(200)
-                            ->margin(1)
-                            ->errorCorrection('M')
-                            ->generate($qrCodeData);
-
-                        // Guardar QR code como archivo SVG
-                        $qrCodePath = 'qrcodes/ticket_' . $ticketId . '.svg';
-
-                        if (!file_exists(public_path('qrcodes'))) {
-                            mkdir(public_path('qrcodes'), 0755, true);
-                        }
-
-                        file_put_contents(public_path($qrCodePath), $qrCodeSvg);
-
-                        \Log::info('QR Code generated successfully', ['path' => $qrCodePath]);
-
-                    } catch (\Exception $e) {
-                        \Log::error('QR Code generation failed: ' . $e->getMessage());
-                        // Usar un placeholder simple como texto
-                        $qrCodePath = 'qrcodes/ticket_' . $ticketId . '.txt';
-
-                        if (!file_exists(public_path('qrcodes'))) {
-                            mkdir(public_path('qrcodes'), 0755, true);
-                        }
-
-                        // Crear un archivo de texto con la información del QR
-                        file_put_contents(public_path($qrCodePath), "QR Code Data: " . $qrCodeData);
-                    }
-
-                    // Crear el ticket con el QR URL ya generado
-                    \Log::info('Creating ticket with ID: ' . $ticketId);
+        $payment = Payment::create([
+                'state_id' => 4,
+                'coupon_id' => $couponId,
+                'order_id' => $order->id,
+                'subtotal' => $subtotal,
+                'discount_amount' => $discountAmount,
+                'total' => $total,
+                'taxes' => $taxes,
+            ]);
+            foreach ($cart as $item) {
+                $ticketId = Str::uuid();
+                \Log::info('Creating ticket with ID: ' . $ticketId);
                     $ticket = Ticket::create([
-                        'id' => $ticketId,
+                        'id' => Str::uuid(),
                         'order_id' => $order->id,
-                        'ticket_type_id' => $ticketTypeId,
-                        'qr_code' => 'ticket-' . $ticketId,
-                        'qr_url' => $qrCodePath,
+                        'ticket_types_id' => $item['ticket_type_id'],
+                        'used' => false,
                     ]);
-                    \Log::info('Ticket created with actual ID: ' . $ticket->id);
-
-                    \Log::info('Ticket created successfully', [
-                        'ticket_id' => $ticket->id,
-                        'order_id' => $order->id,
-                        'ticket_type_id' => $ticketTypeId
-                    ]);
-                }
+                \Log::info('Ticket created with actual ID: ' . $ticket->id);
             }
 
             // Limpiar carrito y cupón

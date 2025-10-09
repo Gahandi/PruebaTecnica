@@ -40,7 +40,7 @@ class EventController extends Controller
         ]);
 
         $ticket_event = TicketsEvent::where('ticket_types_id', $request->ticket_type_id)->first();
-        
+
         if (!$ticket_event) {
             return back()->with('error', 'Tipo de boleto no encontrado.');
         }
@@ -53,7 +53,7 @@ class EventController extends Controller
         $totalQuantity = $currentQuantity + $request->quantity;
 
         // Verificar reservas activas de otros usuarios (excluyendo la sesión actual)
-        $reservedByOthers = \App\Models\TicketReservation::where('ticket_type_id', $ticket_event->ticket_types_id)
+        $reservedByOthers = \App\Models\TicketReservation::where('ticket_types_id', $ticket_event->ticket_types_id)
             ->where('event_id', $ticket_event->event_id)
             ->where('reserved_until', '>', now())
             ->where('is_active', true)
@@ -61,7 +61,7 @@ class EventController extends Controller
             ->sum('quantity');
 
         // Verificar reservas del usuario actual
-        $reservedByCurrentUser = \App\Models\TicketReservation::where('ticket_type_id', $ticket_event->ticket_types_id)
+        $reservedByCurrentUser = \App\Models\TicketReservation::where('ticket_types_id', $ticket_event->ticket_types_id)
             ->where('event_id', $ticket_event->event_id)
             ->where('reserved_until', '>', now())
             ->where('is_active', true)

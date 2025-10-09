@@ -21,6 +21,9 @@ class StateSeeder extends Seeder
             ],
             [
                 'name' => 'Eliminado',
+            ],
+            [
+                'name' => 'Pagado',
             ]
 
         ];

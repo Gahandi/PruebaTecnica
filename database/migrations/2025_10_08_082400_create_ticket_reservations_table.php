@@ -17,10 +17,8 @@ return new class extends Migration
             $table->foreignId('ticket_types_id')->constrained('ticket_types')->onDelete('cascade');
             $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
             $table->integer('quantity');
-            $table->timestamp('expires_at');
+            $table->timestamp('reserved_until');
             $table->timestamps();
-            
-            $table->index(['session_id', 'expires_at']);
             $table->index(['ticket_types_id', 'event_id']);
         });
     }

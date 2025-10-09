@@ -10,10 +10,11 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 /**
  * Class Order
- * 
+ *
  * @property string $id
  * @property int $user_id
  * @property int $event_id
@@ -23,7 +24,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property string $status
- * 
+ *
  * @property User $user
  * @property Event $event
  * @property State $state
@@ -36,11 +37,12 @@ class Order extends Model
 {
 	use SoftDeletes;
 	protected $table = 'orders';
+    protected $keyType = 'string';
 	public $incrementing = false;
 
 	protected $casts = [
 		'user_id' => 'int',
-		'event_id' => 'int',
+		'event_id' => 'string',
 		'created_by' => 'int',
 		'state_id' => 'int'
 	];
@@ -53,14 +55,20 @@ class Order extends Model
 		'status'
 	];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->id)) {
+                $model->id = Str::uuid();
+            }
+        });
+    }
+
 	public function user()
 	{
 		return $this->belongsTo(User::class);
-	}
-
-	public function event()
-	{
-		return $this->belongsTo(Event::class);
 	}
 
 	public function state()

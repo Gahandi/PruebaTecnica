@@ -9,11 +9,15 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+
 use Illuminate\Database\Eloquent\SoftDeletes;
+
+
 
 /**
  * Class Ticket
- * 
+ *
  * @property string $id
  * @property string $order_id
  * @property int $ticket_types_id
@@ -21,7 +25,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $deleted_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
+ *
  * @property Order $order
  * @property TicketType $ticket_type
  * @property Collection|Checkin[] $checkins
@@ -45,17 +49,33 @@ class Ticket extends Model
 		'used'
 	];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->id)) {
+                $model->id = Str::uuid();
+            }
+        });
+    }
+
 	public function order()
 	{
 		return $this->belongsTo(Order::class);
 	}
 
-	public function ticket_type()
+	public function ticketType()
 	{
 		return $this->belongsTo(TicketType::class, 'ticket_types_id');
 	}
 
-	public function checkins()
+    public function eventTicket()
+	{
+		return $this->belongsTo(Event::class, 'event_id');
+	}
+
+	public function checkin()
 	{
 		return $this->hasMany(Checkin::class);
 	}
@@ -68,7 +88,7 @@ class Ticket extends Model
 		$ticketEvent = \App\Models\TicketsEvent::where('ticket_types_id', $this->ticket_types_id)
 			->where('event_id', $this->order->event_id)
 			->first();
-		
+
 		return $ticketEvent ? $ticketEvent->price : 0;
 	}
 }

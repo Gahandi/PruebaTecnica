@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Ticket;
+use App\Models\Payment;
 use Illuminate\Http\Request;
+use App\Models\Event;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
@@ -26,26 +28,46 @@ class OrderController extends Controller
         if (auth()->id() !== $ticket->order->user_id && !auth()->user()->hasRole('admin')) {
             abort(403, 'No tienes permisos para ver este boleto.');
         }
-        
-        $ticket->load(['order.user', 'ticketType.event.ticketTypes' => function($query) {
+
+        $ticket->load(['order.user', 'eventTicket.event.ticketTypes' => function($query) {
             $query->withPivot('quantity', 'price');
         }, 'checkin']);
         return view('tickets.show', compact('ticket'));
     }
 
+
     public function myTickets()
     {
         $userId = auth()->id();
-        \Log::info('MyTickets - User ID: ' . $userId);
-        
-        // Cargar órdenes del usuario con sus boletos agrupados
+
+        // 1. Obtenemos los pedidos paginados SIN intentar cargar la relación 'event'
         $orders = Order::where('user_id', $userId)
-            ->with(['tickets.ticketType.event', 'tickets.checkin', 'event', 'coupon'])
+            ->with([
+                // 'event', <-- LO QUITAMOS DE AQUÍ
+                'tickets.ticketType',
+                'tickets.checkin',
+                'payments.coupon'
+            ])
             ->latest()
             ->paginate(10);
-        
-        \Log::info('MyTickets - Orders found: ' . $orders->count());
-        
+
+        // 2. Extraemos todos los IDs de eventos de los pedidos que ya tenemos en esta página.
+        // ->pluck('event_id') extrae el array, ->flatten() los une todos en una sola lista.
+        $eventIds = $orders->pluck('event_id')->flatten()->unique()->filter();
+
+        // 3. Buscamos todos los eventos necesarios en UNA SOLA consulta para ser eficientes.
+        // ->keyBy('id') convierte la colección para que podamos buscar eventos por su ID fácilmente.
+        $events = Event::whereIn('id', $eventIds)->get()->keyBy('id');
+
+        // 4. Asignamos manualmente cada evento a su orden correspondiente.
+        foreach ($orders as $order) {
+            // Obtenemos el primer ID del array de event_id de la orden
+            $eventId = $order->event_id[0] ?? null;
+
+            // Creamos una propiedad 'event' en el objeto order y le asignamos el evento que encontramos.
+            $order->event = $events->get($eventId);
+        }
+
         return view('tickets.my', compact('orders'));
     }
 
@@ -55,12 +77,12 @@ class OrderController extends Controller
         if (auth()->id() !== $ticket->order->user_id && !auth()->user()->hasRole('admin')) {
             abort(403, 'No tienes permisos para descargar este boleto.');
         }
-        
+
         $ticket->load(['order.user', 'ticketType.event', 'checkin']);
-        
+
         $pdf = Pdf::loadView('tickets.pdf', compact('ticket'));
         $pdf->setPaper('A4', 'portrait');
-        
+
         return $pdf->download('boleto-' . substr($ticket->id, 0, 8) . '.pdf');
     }
 

@@ -3,6 +3,9 @@
 @section('title', 'Mis Boletos')
 
 @section('content')
+<script src=
+"https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js">
+    </script>
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
     <!-- Success Message -->
     @if(session('success'))
@@ -53,16 +56,20 @@
                             <!-- Event Info -->
                             <div>
                                 <h4 class="font-semibold text-gray-900 mb-2">Evento</h4>
-                                <p class="text-gray-700">{{ $order->event->name }}</p>
-                                <p class="text-sm text-gray-500">{{ \Carbon\Carbon::parse($order->event->date)->format('d/m/Y H:i') }}</p>
-                                <p class="text-sm text-gray-500">{{ $order->event->location }}</p>
+                                @if($order->event)
+                                    <p class="text-gray-700">{{ $order->event->name }}</p>
+                                    <p class="text-sm text-gray-500">{{ \Carbon\Carbon::parse($order->event->date)->format('d/m/Y H:i') }}</p>
+                                    <p class="text-sm text-gray-500">{{ $order->event->location }}</p>
+                                @else
+                                    <p class="text-gray-500 italic">Información del evento no disponible.</p>
+                                @endif
                             </div>
 
                             <!-- Order Status -->
                             <div>
                                 <h4 class="font-semibold text-gray-900 mb-2">Estado</h4>
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {{ $order->status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                    {{ $order->status === 'completed' ? 'Completada' : ucfirst($order->status) }}
+                                    {{ $order->status === 'completed' ? 'Pagado' : ucfirst($order->status) }}
                                 </span>
                             </div>
                         </div>
@@ -78,41 +85,26 @@
                                                 <h5 class="font-medium text-gray-900">{{ $ticket->ticketType->name }}</h5>
                                                 <p class="text-sm text-gray-500">${{ number_format($ticket->ticketType->price, 2) }}</p>
                                             </div>
-                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $ticket->checkin ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
-                                                {{ $ticket->checkin ? 'Canjeado' : 'Válido' }}
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $ticket->canjeado ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
+                                                {{ $ticket->used ? 'Canjeado' : 'Válido' }}
                                             </span>
                                         </div>
 
                                         <!-- QR Code Preview -->
-                                        <div class="mb-3 text-center">
-                                            @if($ticket->qr_url && file_exists(public_path($ticket->qr_url)))
-                                                @if(pathinfo($ticket->qr_url, PATHINFO_EXTENSION) === 'svg')
-                                                    <div class="w-16 h-16 mx-auto border border-gray-200 rounded flex items-center justify-center">
-                                                        {!! file_get_contents(public_path($ticket->qr_url)) !!}
-                                                    </div>
-                                                @elseif(pathinfo($ticket->qr_url, PATHINFO_EXTENSION) === 'txt')
-                                                    <div class="w-16 h-16 mx-auto bg-gray-100 border border-gray-200 rounded flex items-center justify-center text-xs text-gray-500">
-                                                        QR Code
-                                                    </div>
-                                                @else
-                                                    <img src="{{ asset($ticket->qr_url) }}" alt="QR Code" class="w-16 h-16 mx-auto border border-gray-200 rounded object-contain">
-                                                @endif
-                                            @else
-                                                <div class="w-16 h-16 mx-auto bg-gray-100 border border-gray-200 rounded flex items-center justify-center">
-                                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
-                                                    </svg>
-                                                </div>
-                                            @endif
+                                        <div class="mb-3 text-center items-center  rounded-lg  justify-center flex mb-5">
+                                           <div id="qrcode" class="p-2 border-black  rounded-lg  border-8"></div>
                                         </div>
-
+                                        <script>
+                                            var qrcode = new QRCode("qrcode",
+                                            "https://www.geeksforgeeks.org/");
+                                        </script>
                                         <!-- Actions -->
                                         <div class="flex space-x-2">
-                                            <a href="{{ route('tickets.show', $ticket->id) }}" 
+                                            <a href="{{ route('tickets.show', $ticket->id) }}"
                                                class="flex-1 bg-blue-600 text-white text-center px-3 py-2 rounded-md hover:bg-blue-700 transition-colors text-xs">
                                                 Ver
                                             </a>
-                                            <a href="{{ route('tickets.pdf', $ticket->id) }}" 
+                                            <a href="{{ route('tickets.pdf', $ticket->id) }}"
                                                class="flex-1 bg-red-600 text-white text-center px-3 py-2 rounded-md hover:bg-red-700 transition-colors text-xs">
                                                 PDF
                                             </a>
@@ -140,7 +132,7 @@
             </div>
             <h3 class="text-lg font-medium text-gray-900 mb-2">No tienes órdenes</h3>
             <p class="text-gray-500 mb-4">Compra algunos boletos para ver tus órdenes aquí.</p>
-            <a href="{{ route('events.public') }}" 
+            <a href="{{ route('events.public') }}"
                class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
                 Ver Eventos
             </a>

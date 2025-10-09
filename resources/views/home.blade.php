@@ -23,7 +23,7 @@
                 <div class="relative">
                     <input type="text"
                            placeholder="¿Qué evento buscas?"
-                           class="w-full px-6 py-4 text-lg rounded-full border-0 shadow-lg focus:ring-4 focus:ring-yellow-400 focus:outline-none">
+                           class="w-full px-6 py-4 text-lg rounded-full border-0 shadow-lg focus:ring-4 focus:ring-yellow-400 focus:outline-none bg-gray-100">
                     <button class="absolute right-2 top-2 bg-yellow-400 hover:bg-yellow-500 text-black px-8 py-2 rounded-full font-semibold transition-colors">
                         Buscar
                     </button>

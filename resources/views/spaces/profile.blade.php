@@ -8,46 +8,22 @@
 
 @section('content')
 <div class="min-h-screen bg-gray-50">
-     <!-- Hero Section con Banner -->
-     <div class="relative h-80 md:h-96 overflow-hidden">
-         <!-- Banner de fondo -->
-         <div class="absolute inset-0 hero-banner">
-             @if($space->banner)
-                 <img src="{{ $space->banner }}" alt="{{ $space->name }}" class="w-full h-full object-cover">
-             @else
-                 <img src="https://wallpapers.com/images/hd/windows-default-background-8ewlfdlkk30zt499.jpg" alt="Banner por defecto" class="w-full h-full object-cover">
-             @endif
-             <!-- Overlay con gradiente y blur -->
-             <div class="absolute inset-0 hero-overlay" style="background: linear-gradient(135deg, {{ $space->color_primary ?? '#3b82f6' }}, {{ $space->color_secondary ?? '#8b5cf6' }});"></div>
-         </div>
-         
-         <!-- Contenido del hero -->
-         <div class="relative z-10 h-full flex items-center justify-center">
-             <div class="text-center text-white">
-                 <h1 class="text-5xl md:text-6xl font-bold mb-4">{{ $space->name }}</h1>
-                 <p class="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto">{{ $space->description }}</p>
-             </div>
-         </div>
-        
-        <!-- Logo de la Organización -->
-        <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2">
-            <div class="w-28 h-28 md:w-36 md:h-36 rounded-full border-4 border-white shadow-2xl overflow-hidden bg-white">
-                    @if($space->logo)
-                        <img src="{{ $space->logo }}" alt="{{ $space->name }}" class="w-full h-full object-cover">
-                    @else
-                    <div class="w-full h-full flex items-center justify-center text-3xl font-bold text-white" style="background: linear-gradient(135deg, {{ $space->color_primary }}, {{ $space->color_secondary ?? $space->color_primary }});">
-                            {{ substr($space->name, 0, 2) }}
-                        </div>
-                    @endif
-                </div>
-            </div>
-            
-        <!-- Badge de Organización con Botón de Edición -->
-        <div class="absolute top-8 right-8">
+
+
+     <!-- Contenido Principal -->
+     <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+         <!-- Foto de la Organización - Estilo Facebook -->
+         <div class="mb-8">
+             <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+
+
+                 <!-- Imagen principal - Estilo Facebook -->
+                 <div class="relative facebook-style-photo">
+                           <div class="absolute top-8 right-8">
                 @auth
                 @if(auth()->user()->isAdminOfSpace($space->id))
                     <!-- Botón de Edición -->
-                        <button onclick="toggleEditMode()" 
+                        <button onclick="toggleEditMode()"
                     class="bg-white bg-opacity-90 backdrop-blur-sm rounded-full px-6 py-3 shadow-xl flex items-center space-x-3 hover:bg-opacity-100 transition-all duration-300 hover:scale-105 edit-organization-button">
                     <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a2 2 0 114 0 2 2 0 01-4 0zm8 0a2 2 0 114 0 2 2 0 01-4 0z" clip-rule="evenodd"></path>
@@ -68,34 +44,8 @@
                 </div>
                 @endauth
             </div>
-        </div>
-
-     <!-- Contenido Principal -->
-     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-         <!-- Foto de la Organización - Estilo Facebook -->
-         <div class="mb-8">
-             <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-                 <!-- Header de la sección -->
-                 <div class="p-6 border-b border-gray-200">
-                     <div class="flex items-center justify-between">
-                         <h3 class="text-2xl font-bold text-gray-900">Foto de el espacio</h3>
-                         @auth
-                         @if(auth()->user()->isAdminOfSpace($space->id))
-                             <button onclick="editPhoto()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm">
-                                 <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                 </svg>
-                                 Editar
-                             </button>
-                         @endif
-                         @endauth
-    </div>
-</div>
-
-                 <!-- Imagen principal - Estilo Facebook -->
-                 <div class="relative facebook-style-photo">
                      @if($space->logo)
-                         <img src="{{ $space->logo }}" alt="{{ $space->name }}" class="w-full h-96 object-cover">
+                         <img src="https://cdn.prod.website-files.com/64949e4863d96e26a1da8386/64b94436579d789944d1f7a6_60aeadbd09ddbd2a228e2a48_University-20--20Overflow-20none.png" alt="{{ $space->name }}" class="w-full h-96 object-cover">
                      @else
                          <div class="w-full h-96 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                              <div class="text-center text-gray-500">
@@ -107,7 +57,7 @@
                              </div>
                          </div>
                      @endif
-                     
+
                      <!-- Overlay con información -->
                      <div class="photo-overlay">
                          <div class="text-white">
@@ -119,75 +69,29 @@
              </div>
          </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <!-- Columna Izquierda - Información de la Organización -->
-            <div class="lg:col-span-1 space-y-6">
+            <div class="lg:col-span-1 space-y-6 sticky top-6">
                 <!-- Información de la Organización -->
                 <div class="bg-white rounded-2xl shadow-xl p-8">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-2xl font-bold text-gray-900">Acerca de <span id="space-name-display">{{ $space->name }}</span></h2>
-                    </div>
-                    
-                    <div id="about-section">
-                        @if($space->about)
-                            <p id="about-display" class="text-gray-700 mb-6 leading-relaxed">{{ $space->about }}</p>
-                        @else
-                            <p id="about-display" class="text-gray-700 mb-6 leading-relaxed italic text-gray-500">No hay descripción disponible</p>
-                        @endif
-                    </div>
-                    
-                    <div class="space-y-4" id="contact-info">
-                        <!-- Ubicación -->
-                        <div class="flex items-center text-gray-600 group">
-                            <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mr-4 group-hover:bg-blue-100 transition-colors">
-                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                </svg>
-                            </div>
-                            <div class="flex-1">
-                                <span id="location-display" class="font-medium">{{ $space->location ?: 'No especificada' }}</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Sitio Web -->
-                        <div class="flex items-center text-gray-600 group">
-                            <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mr-4 group-hover:bg-green-100 transition-colors">
-                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                                </svg>
-                            </div>
-                            <div class="flex-1">
-                                <span id="website-display" class="font-medium text-blue-600">{{ $space->website ?: 'No especificado' }}</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Email -->
-                        <div class="flex items-center text-gray-600 group">
-                            <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mr-4 group-hover:bg-red-100 transition-colors">
-                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                </svg>
-                            </div>
-                            <div class="flex-1">
-                                <span id="email-display" class="font-medium text-blue-600">{{ $space->contact_email ?: 'No especificado' }}</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Teléfono -->
-                        <div class="flex items-center text-gray-600 group">
-                            <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mr-4 group-hover:bg-purple-100 transition-colors">
-                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                                </svg>
-                            </div>
-                            <div class="flex-1">
-                                <span id="phone-display" class="font-medium text-blue-600">{{ $space->contact_phone ?: 'No especificado' }}</span>
-                            </div>
-                        </div>
+                    <div class="flex item-center justify-center pt-10">
+                        <div class="z-20 w-25 h-25 md:w-42 md:h-42 rounded-full border-4 border-white shadow-2xl overflow-hidden bg-white">
+                            @if($space->logo)
+                                <img src="https://th.bing.com/th/id/R.dba4054ba56a7fd2704055ecc2c86814?rik=sgRUCz90LS6sgg&pid=ImgRaw&r=0" alt="{{ $space->name }}" class="w-full h-full object-cover">
+                            @else
+                            <div class="w-full h-full flex items-center justify-center text-3xl font-bold text-white" style="background: linear-gradient(135deg, {{ $space->color_primary }}, {{ $space->color_secondary ?? $space->color_primary }});">
+                                    {{ substr($space->name, 0, 2) }}
+                                </div>
+                            @endif
                         </div>
                     </div>
-                    
+                    <div class="flex items-center justify-between mb-6 mt-3">
+                        <h2 class="text-2xl text-center w-full font-bold text-gray-900"><span id="space-name-display">{{ $space->name }}</span></h2>
+                    </div>
+
+
+                </div>
+
                 <!-- Estadísticas de la Organización -->
                 <div class="bg-white rounded-2xl shadow-xl p-8">
                     <h3 class="text-xl font-bold text-gray-900 mb-6">Estadísticas</h3>
@@ -206,7 +110,7 @@
                 <!-- Redes Sociales -->
                 <div class="bg-white rounded-2xl shadow-xl p-8">
                     <h3 class="text-xl font-bold text-gray-900 mb-6">Redes Sociales</h3>
-                    
+
                     <!-- Facebook -->
                     <div class="flex items-center text-gray-600 group mb-4">
                         <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-4 group-hover:bg-blue-200 transition-colors">
@@ -218,7 +122,7 @@
                             <span id="facebook-display" class="font-medium text-blue-600">{{ $space->social_facebook ?: 'No especificado' }}</span>
                         </div>
                     </div>
-                    
+
                     <!-- Instagram -->
                     <div class="flex items-center text-gray-600 group mb-4">
                         <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-100 to-pink-100 flex items-center justify-center mr-4 group-hover:from-purple-200 group-hover:to-pink-200 transition-colors">
@@ -230,7 +134,7 @@
                             <span id="instagram-display" class="font-medium text-pink-600">{{ $space->social_instagram ?: 'No especificado' }}</span>
                         </div>
                     </div>
-                    
+
                     <!-- Twitter -->
                     <div class="flex items-center text-gray-600 group">
                         <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-4 group-hover:bg-blue-200 transition-colors">
@@ -247,8 +151,8 @@
             </div>
 
             <!-- Columna Derecha - Eventos -->
-            <div class="lg:col-span-2">
-                <div class="bg-white rounded-2xl shadow-xl p-8">
+            <div class="lg:col-span-3 ">
+                <div class="bg-white  rounded-2xl shadow-xl p-8">
                     <div class="flex items-center justify-between mb-8">
                         <div>
                             <h2 class="text-3xl font-bold text-gray-900">Eventos de {{ $space->name }}</h2>
@@ -257,7 +161,7 @@
                         <div class="flex space-x-3">
                             @auth
                                 @if(auth()->user()->isAdminOfSpace($space->id))
-                                    <a href="{{ route('spaces.events.create', $space->subdomain) }}" 
+                                    <a href="{{ route('spaces.events.create', $space->subdomain) }}"
                                        class="px-6 py-3 rounded-xl text-white font-semibold transition-all duration-200 hover:shadow-lg transform hover:scale-105"
                                        style="background: linear-gradient(135deg, {{ $space->color_primary }}, {{ $space->color_secondary ?? $space->color_primary }});">
                                         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -275,9 +179,7 @@
                             @foreach($space->events as $event)
                                 <div class="bg-white border-2 border-gray-100 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:border-gray-200 transform hover:-translate-y-1">
                                     <div class="relative">
-                                        @if($event->banner)
-                                            <img src="{{ asset('storage/' . $event->banner) }}" alt="{{ $event->name }}" class="w-full h-56 object-cover">
-                                        @else
+
                                             <div class="w-full h-56 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                                                 <div class="text-center text-white">
                                                     <svg class="w-16 h-16 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
@@ -286,8 +188,7 @@
                                                     <p class="text-lg font-semibold">{{ $event->name }}</p>
                                                 </div>
                                             </div>
-                                        @endif
-                                        
+
                                         <!-- Badge de Fecha -->
                                         <div class="absolute top-4 right-4">
                                             <div class="bg-white bg-opacity-90 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg">
@@ -297,7 +198,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="p-6">
                                         <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $event->name }}</h3>
                                         <div class="flex items-center text-gray-600 mb-3">
@@ -306,7 +207,7 @@
                                             </svg>
                                             <span class="font-medium">{{ \Carbon\Carbon::parse($event->date)->format('d M Y, H:i') }}</span>
                                         </div>
-                                        
+
                                         <div class="flex items-center text-gray-600 mb-4">
                                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
@@ -314,18 +215,18 @@
                                             </svg>
                                             <span class="text-sm">{{ $event->address }}</span>
                                                 </div>
-                                        
+
                                         @if($event->description)
                                             <p class="text-gray-700 text-sm mb-6 line-clamp-2 leading-relaxed">{{ $event->description }}</p>
                                         @endif
-                                        
+
                                         <div class="flex items-center justify-between">
                                             <div class="flex items-center">
                                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                                     {{ $space->name }}
                                                 </span>
                                             </div>
-                                            <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}/{{ $event->slug }}" 
+                                            <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}/{{ $event->slug }}"
                                                class="px-6 py-3 rounded-xl text-white font-semibold transition-all duration-200 hover:shadow-lg transform hover:scale-105"
                                                style="background: linear-gradient(135deg, {{ $space->color_primary }}, {{ $space->color_secondary ?? $space->color_primary }});">
                                                 Ver Evento
@@ -347,7 +248,7 @@
                             @auth
                                 @if(auth()->user()->isAdminOfSpace($space->id))
                                     <div class="mt-8">
-                                        <a href="{{ route('spaces.events.create', $space->subdomain) }}" 
+                                        <a href="{{ route('spaces.events.create', $space->subdomain) }}"
                                            class="inline-flex items-center px-8 py-4 rounded-xl text-white font-semibold transition-all duration-200 hover:shadow-lg transform hover:scale-105"
                                            style="background: linear-gradient(135deg, {{ $space->color_primary }}, {{ $space->color_secondary ?? $space->color_primary }});">
                                             <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -374,14 +275,14 @@ let originalValues = {};
 function updateQuickColors() {
     const primaryColor = document.getElementById('quick-primary-color').value;
     const secondaryColor = document.getElementById('quick-secondary-color').value;
-    
+
     // Actualizar el gradiente del hero en tiempo real
     const heroSection = document.querySelector('.w-full.h-80.md\\:h-96.bg-gradient-to-r');
     if (heroSection) {
         heroSection.style.transition = 'background 0.3s ease';
         heroSection.style.background = `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`;
     }
-    
+
     // Actualizar logo background
     const logoDiv = document.querySelector('.w-28.h-28.md\\:w-36.md\\:h-36.rounded-full.border-4.border-white.shadow-2xl.overflow-hidden.bg-white div');
     if (logoDiv) {
@@ -398,43 +299,43 @@ function showColorControls() {
     colorControls.innerHTML = `
         <div class="flex items-center space-x-4">
             <div class="flex items-center space-x-2">
-                <input type="color" 
-                       id="edit-primary-color" 
-                       value="{{ $space->color_primary ?? '#3b82f6' }}" 
+                <input type="color"
+                       id="edit-primary-color"
+                       value="{{ $space->color_primary ?? '#3b82f6' }}"
                        class="w-10 h-10 rounded-lg border-2 border-gray-300 shadow-sm cursor-pointer transition-all duration-300 hover:scale-110"
                        onchange="updateEditColors()">
                 <span class="text-sm font-medium text-gray-600">Primario</span>
             </div>
-            
+
             <div class="flex items-center space-x-2">
-                <input type="color" 
-                       id="edit-secondary-color" 
-                       value="{{ $space->color_secondary ?? '#8b5cf6' }}" 
+                <input type="color"
+                       id="edit-secondary-color"
+                       value="{{ $space->color_secondary ?? '#8b5cf6' }}"
                        class="w-10 h-10 rounded-lg border-2 border-gray-300 shadow-sm cursor-pointer transition-all duration-300 hover:scale-110"
                        onchange="updateEditColors()">
                 <span class="text-sm font-medium text-gray-600">Secundario</span>
             </div>
-            
+
             <div class="text-xs text-blue-500 font-medium">
                 👁️ Vista previa en tiempo real
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(colorControls);
 }
 
 function updateEditColors() {
     const primaryColor = document.getElementById('edit-primary-color').value;
     const secondaryColor = document.getElementById('edit-secondary-color').value;
-    
+
     // Actualizar el gradiente del hero en tiempo real
     const heroSection = document.querySelector('.w-full.h-80.md\\:h-96.bg-gradient-to-r');
     if (heroSection) {
         heroSection.style.transition = 'background 0.3s ease';
         heroSection.style.background = `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`;
     }
-    
+
     // Actualizar logo background
     const logoDiv = document.querySelector('.w-28.h-28.md\\:w-36.md\\:h-36.rounded-full.border-4.border-white.shadow-2xl.overflow-hidden.bg-white div');
     if (logoDiv) {
@@ -458,7 +359,7 @@ function toggleEditMode() {
 
 function enterEditMode() {
     isEditMode = true;
-    
+
     // Guardar valores originales
     originalValues = {
         name: document.getElementById('space-name-display').textContent,
@@ -473,13 +374,13 @@ function enterEditMode() {
         primaryColor: '{{ $space->color_primary ?? "#3b82f6" }}',
         secondaryColor: '{{ $space->color_secondary ?? "#8b5cf6" }}'
     };
-    
+
     // Mostrar controles de color
     showColorControls();
-    
+
     // Convertir a inputs con animación
     animateToInputs();
-    
+
     // Cambiar el botón a modo guardar/cancelar
     const editButton = document.querySelector('button[onclick="toggleEditMode()"]');
     editButton.innerHTML = `
@@ -508,17 +409,17 @@ function animateToInputs() {
     nameInput.value = originalValues.name;
     nameInput.className = 'bg-transparent border-b-2 border-blue-500 outline-none font-bold text-2xl text-gray-900 transition-all duration-300';
     nameInput.id = 'name-input';
-    
+
     nameElement.style.opacity = '0';
     nameElement.style.transform = 'translateY(-10px)';
-    
+
     setTimeout(() => {
         nameElement.parentNode.replaceChild(nameInput, nameElement);
         nameInput.style.opacity = '1';
         nameInput.style.transform = 'translateY(0)';
         nameInput.focus();
     }, 150);
-    
+
     // Animar descripción
     const aboutElement = document.getElementById('about-display');
     const aboutTextarea = document.createElement('textarea');
@@ -527,22 +428,22 @@ function animateToInputs() {
     aboutTextarea.rows = 3;
     aboutTextarea.id = 'about-input';
     aboutTextarea.placeholder = 'Describe tu organización...';
-    
+
     aboutElement.style.opacity = '0';
     aboutElement.style.transform = 'translateY(-10px)';
-    
+
     setTimeout(() => {
         aboutElement.parentNode.replaceChild(aboutTextarea, aboutElement);
         aboutTextarea.style.opacity = '1';
         aboutTextarea.style.transform = 'translateY(0)';
     }, 200);
-    
+
     // Animar campos de contacto
     animateContactFields();
-    
+
     // Animar redes sociales
     animateSocialFields();
-    
+
     // Animar colores
     animateColorFields();
 }
@@ -554,7 +455,7 @@ function animateContactFields() {
         { id: 'email-display', inputId: 'email-input', placeholder: 'Email de contacto', valueKey: 'email' },
         { id: 'phone-display', inputId: 'phone-input', placeholder: 'Teléfono', valueKey: 'phone' }
     ];
-    
+
     fields.forEach((field, index) => {
         setTimeout(() => {
             const element = document.getElementById(field.id);
@@ -565,10 +466,10 @@ function animateContactFields() {
                 input.className = 'w-full bg-transparent border-b-2 border-blue-500 outline-none font-medium transition-all duration-300';
                 input.id = field.inputId;
                 input.placeholder = field.placeholder;
-                
+
                 element.style.opacity = '0';
                 element.style.transform = 'translateY(-10px)';
-                
+
                 setTimeout(() => {
                     element.parentNode.replaceChild(input, element);
                     input.style.opacity = '1';
@@ -585,7 +486,7 @@ function animateSocialFields() {
         { id: 'instagram-display', inputId: 'instagram-input', placeholder: 'Instagram URL', valueKey: 'instagram' },
         { id: 'twitter-display', inputId: 'twitter-input', placeholder: 'Twitter URL', valueKey: 'twitter' }
     ];
-    
+
     socialFields.forEach((field, index) => {
         setTimeout(() => {
             const element = document.getElementById(field.id);
@@ -596,10 +497,10 @@ function animateSocialFields() {
                 input.className = 'w-full bg-transparent border-b-2 border-blue-500 outline-none font-medium transition-all duration-300';
                 input.id = field.inputId;
                 input.placeholder = field.placeholder;
-                
+
                 element.style.opacity = '0';
                 element.style.transform = 'translateY(-10px)';
-                
+
                 setTimeout(() => {
                     element.parentNode.replaceChild(input, element);
                     input.style.opacity = '1';
@@ -615,7 +516,7 @@ function animateColorFields() {
         { id: 'primary-color-display', inputId: 'primary-color-input', valueKey: 'primaryColor' },
         { id: 'secondary-color-display', inputId: 'secondary-color-input', valueKey: 'secondaryColor' }
     ];
-    
+
     colorFields.forEach((field, index) => {
         setTimeout(() => {
             const element = document.getElementById(field.id);
@@ -626,29 +527,29 @@ function animateColorFields() {
                 input.value = originalValues[field.valueKey] || '#3b82f6';
                 input.className = 'w-12 h-12 rounded-xl border-2 border-gray-300 shadow-sm transition-all duration-300';
                 input.id = field.inputId;
-                
+
                 // Crear un contenedor para el input
                 const inputContainer = document.createElement('div');
                 inputContainer.className = 'flex items-center space-x-3';
                 inputContainer.appendChild(input);
-                
+
                 const span = document.createElement('span');
                 span.className = 'text-gray-600 font-mono text-sm';
                 span.textContent = input.value;
                 inputContainer.appendChild(span);
-                
+
                 // Agregar indicador de preview en tiempo real
                 const previewIndicator = document.createElement('div');
                 previewIndicator.className = 'text-xs text-blue-500 font-medium';
                 previewIndicator.textContent = '👁️ Vista previa en tiempo real';
                 inputContainer.appendChild(previewIndicator);
-                
+
                 // Actualizar el span cuando cambie el color
                 input.addEventListener('input', function() {
                     span.textContent = this.value;
                     // Actualizar el background del hero en tiempo real
                     updateHeroBackgroundRealtime();
-                    
+
                     // Agregar indicador visual de que se está actualizando
                     const heroSection = document.querySelector('.relative.bg-gradient-to-r');
                     if (heroSection) {
@@ -658,10 +559,10 @@ function animateColorFields() {
                         }, 300);
                     }
                 });
-                
+
                 element.style.opacity = '0';
                 element.style.transform = 'translateY(-10px)';
-                
+
                 setTimeout(() => {
                     element.parentNode.replaceChild(inputContainer, element);
                     inputContainer.style.opacity = '1';
@@ -675,13 +576,13 @@ function animateColorFields() {
 function updateHeroBackground() {
     const primaryColor = document.getElementById('primary-color-input')?.value || '#3b82f6';
     const secondaryColor = document.getElementById('secondary-color-input')?.value || '#8b5cf6';
-    
+
     // Actualizar hero section background
     const heroSection = document.querySelector('.relative.bg-gradient-to-r');
     if (heroSection) {
         heroSection.style.background = `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`;
     }
-    
+
     // Actualizar logo background
     const logoDiv = document.querySelector('.w-28.h-28.md\\:w-36.md\\:h-36.rounded-full.border-4.border-white.shadow-2xl.overflow-hidden.bg-white div');
     if (logoDiv) {
@@ -692,35 +593,35 @@ function updateHeroBackground() {
 function updateHeroBackgroundRealtime() {
     const primaryColor = document.getElementById('primary-color-input')?.value || originalValues.primaryColor || '#3b82f6';
     const secondaryColor = document.getElementById('secondary-color-input')?.value || originalValues.secondaryColor || '#8b5cf6';
-    
+
     // Actualizar hero section background con transición suave
     const heroSection = document.querySelector('.relative.bg-gradient-to-r');
     if (heroSection) {
         heroSection.style.transition = 'background 0.3s ease';
         heroSection.style.background = `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`;
     }
-    
+
     // Actualizar logo background con transición suave
     const logoDiv = document.querySelector('.w-28.h-28.md\\:w-36.md\\:h-36.rounded-full.border-4.border-white.shadow-2xl.overflow-hidden.bg-white div');
     if (logoDiv) {
         logoDiv.style.transition = 'background 0.3s ease';
         logoDiv.style.background = `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`;
     }
-    
+
     // Actualizar preview de gradiente en la sección de colores
     const gradientPreview = document.querySelector('.h-16.rounded-lg.shadow-sm[style*="linear-gradient"]');
     if (gradientPreview) {
         gradientPreview.style.transition = 'background 0.3s ease';
         gradientPreview.style.background = `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`;
     }
-    
+
     // Actualizar previews individuales de colores
     const primaryPreview = document.querySelector('.h-16.rounded-lg.shadow-sm[style*="background-color"]');
     if (primaryPreview) {
         primaryPreview.style.transition = 'background-color 0.3s ease';
         primaryPreview.style.backgroundColor = primaryColor;
     }
-    
+
     // Buscar y actualizar el preview del color secundario
     const colorPreviews = document.querySelectorAll('.h-16.rounded-lg.shadow-sm');
     colorPreviews.forEach(preview => {
@@ -745,7 +646,7 @@ function saveChanges() {
     formData.append('social_twitter', document.getElementById('twitter-input')?.value || '');
     formData.append('color_primary', document.getElementById('primary-color-input')?.value || '#3b82f6');
     formData.append('color_secondary', document.getElementById('secondary-color-input')?.value || '#8b5cf6');
-    
+
     // Mostrar loading
     const editButton = document.querySelector('button[onclick="toggleEditMode()"]');
     editButton.innerHTML = `
@@ -754,7 +655,7 @@ function saveChanges() {
             <span>Guardando...</span>
         </div>
     `;
-    
+
     fetch('{{ route("spaces.update-profile", $space->subdomain) }}', {
             method: 'POST',
             body: formData,
@@ -795,7 +696,7 @@ function updateDisplayValues() {
         nameDisplay.className = 'text-2xl font-bold text-gray-900';
         nameInput.parentNode.replaceChild(nameDisplay, nameInput);
     }
-    
+
     // Actualizar descripción
     const aboutInput = document.getElementById('about-input');
     if (aboutInput) {
@@ -806,13 +707,13 @@ function updateDisplayValues() {
         aboutDisplay.className = aboutValue ? 'text-gray-700 mb-6 leading-relaxed' : 'text-gray-700 mb-6 leading-relaxed italic text-gray-500';
         aboutInput.parentNode.replaceChild(aboutDisplay, aboutInput);
     }
-    
+
     // Actualizar campos de contacto
     updateContactFieldsDisplay();
-    
+
     // Actualizar redes sociales
     updateSocialMediaFieldsDisplay();
-    
+
     // Actualizar colores
     updateColorDisplays();
 }
@@ -824,7 +725,7 @@ function updateContactFieldsDisplay() {
         { inputId: 'email-input', displayId: 'email-display', defaultText: 'No especificado' },
         { inputId: 'phone-input', displayId: 'phone-display', defaultText: 'No especificado' }
     ];
-    
+
     fields.forEach(field => {
         const input = document.getElementById(field.inputId);
         if (input) {
@@ -844,7 +745,7 @@ function updateSocialMediaFieldsDisplay() {
         { inputId: 'instagram-input', displayId: 'instagram-display', defaultText: 'No especificado', classColor: 'text-pink-600' },
         { inputId: 'twitter-input', displayId: 'twitter-display', defaultText: 'No especificado', classColor: 'text-blue-400' }
     ];
-    
+
     socialFields.forEach(field => {
         const input = document.getElementById(field.inputId);
         if (input) {
@@ -861,7 +762,7 @@ function updateSocialMediaFieldsDisplay() {
 function updateColorDisplays() {
     const primaryColorInput = document.getElementById('primary-color-input');
     const secondaryColorInput = document.getElementById('secondary-color-input');
-    
+
     if (primaryColorInput) {
         const primaryColorDisplay = document.createElement('div');
         primaryColorDisplay.id = 'primary-color-display';
@@ -873,7 +774,7 @@ function updateColorDisplays() {
         `;
         primaryColorInput.parentNode.parentNode.replaceChild(primaryColorDisplay, primaryColorInput.parentNode);
     }
-    
+
     if (secondaryColorInput) {
         const secondaryColorDisplay = document.createElement('div');
         secondaryColorDisplay.id = 'secondary-color-display';
@@ -893,13 +794,13 @@ function cancelEdit() {
 
 function exitEditMode() {
     isEditMode = false;
-    
+
     // Ocultar controles de color
     const colorControls = document.getElementById('color-controls');
     if (colorControls) {
         colorControls.remove();
     }
-    
+
     // Restaurar botón original
     const editButtonContainer = document.querySelector('.edit-organization-button');
     editButtonContainer.innerHTML = `
@@ -910,7 +811,7 @@ function exitEditMode() {
         <div class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
     `;
     editButtonContainer.setAttribute('onclick', 'toggleEditMode()');
-    
+
     // Restaurar elementos originales
     restoreOriginalElements();
 }
@@ -925,7 +826,7 @@ function restoreOriginalElements() {
         nameDisplay.className = 'text-2xl font-bold text-gray-900';
         nameInput.parentNode.replaceChild(nameDisplay, nameInput);
     }
-    
+
     // Restaurar descripción
     const aboutInput = document.getElementById('about-input');
     if (aboutInput) {
@@ -935,13 +836,13 @@ function restoreOriginalElements() {
         aboutDisplay.className = originalValues.about === 'No hay descripción disponible' ? 'text-gray-700 mb-6 leading-relaxed italic text-gray-500' : 'text-gray-700 mb-6 leading-relaxed';
         aboutInput.parentNode.replaceChild(aboutDisplay, aboutInput);
     }
-    
+
     // Restaurar campos de contacto
     restoreContactFields();
-    
+
     // Restaurar redes sociales
     restoreSocialMediaFields();
-    
+
     // Restaurar colores
     restoreColorFields();
 }
@@ -953,7 +854,7 @@ function restoreContactFields() {
         { inputId: 'email-input', displayId: 'email-display', value: originalValues.email },
         { inputId: 'phone-input', displayId: 'phone-display', value: originalValues.phone }
     ];
-    
+
     fields.forEach(field => {
         const input = document.getElementById(field.inputId);
         if (input) {
@@ -972,7 +873,7 @@ function restoreSocialMediaFields() {
         { inputId: 'instagram-input', displayId: 'instagram-display', value: originalValues.instagram, defaultText: 'No especificado', classColor: 'text-pink-600' },
         { inputId: 'twitter-input', displayId: 'twitter-display', value: originalValues.twitter, defaultText: 'No especificado', classColor: 'text-blue-400' }
     ];
-    
+
     socialFields.forEach(field => {
         const input = document.getElementById(field.inputId);
         if (input) {
@@ -990,7 +891,7 @@ function restoreColorFields() {
         { inputId: 'primary-color-input', displayId: 'primary-color-display', value: originalValues.primaryColor, defaultText: '#3b82f6' },
         { inputId: 'secondary-color-input', displayId: 'secondary-color-display', value: originalValues.secondaryColor, defaultText: '#8b5cf6' }
     ];
-    
+
     colorFields.forEach(field => {
         const inputContainer = document.getElementById(field.inputId)?.parentNode;
         if (inputContainer) {
@@ -1020,11 +921,11 @@ function showSuccessMessage(message) {
         </div>
     `;
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
         notification.style.transform = 'translateX(0)';
     }, 100);
-    
+
     setTimeout(() => {
         notification.style.transform = 'translateX(full)';
         setTimeout(() => notification.remove(), 300);
@@ -1044,11 +945,11 @@ function showErrorMessage(message) {
         </div>
     `;
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
         notification.style.transform = 'translateX(0)';
     }, 100);
-    
+
     setTimeout(() => {
         notification.style.transform = 'translateX(full)';
         setTimeout(() => notification.remove(), 300);

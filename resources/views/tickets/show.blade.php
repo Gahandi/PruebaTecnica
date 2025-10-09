@@ -8,14 +8,14 @@
     <div class="flex justify-between items-center mb-6">
         <div>
             <h1 class="text-3xl font-bold text-gray-900">Boleto #{{ substr($ticket->id, 0, 8) }}</h1>
-            <p class="text-gray-600">{{ $ticket->ticketType->event->name }}</p>
+            <p class="text-gray-600">{{ $ticket->eventTicket->event->name }}</p>
         </div>
         <div class="flex space-x-3">
-            <a href="{{ route('tickets.my') }}" 
+            <a href="{{ route('tickets.my') }}"
                class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors">
                 ← Mis Boletos
             </a>
-            <a href="{{ route('tickets.pdf', $ticket->id) }}" 
+            <a href="{{ route('tickets.pdf', $ticket->id) }}"
                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors">
                 📄 Descargar PDF
             </a>
@@ -40,31 +40,31 @@
                         <span class="text-gray-600">Tipo de Boleto:</span>
                         <span class="font-semibold">{{ $ticket->ticketType->name }}</span>
                     </div>
-                    
+
                     <div class="flex justify-between">
                         <span class="text-gray-600">Precio:</span>
                         <span class="font-semibold">${{ number_format($ticket->getPrice(), 2) }}</span>
                     </div>
-                    
+
                     <div class="flex justify-between">
                         <span class="text-gray-600">Ubicación:</span>
                         <span class="font-semibold">{{ $ticket->ticketType->event->location }}</span>
                     </div>
-                    
+
                     <div class="flex justify-between">
                         <span class="text-gray-600">Estado:</span>
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $ticket->checkin ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
                             {{ $ticket->checkin ? 'Canjeado' : 'Válido' }}
                         </span>
                     </div>
-                    
+
                     @if($ticket->checkin)
                     <div class="flex justify-between">
                         <span class="text-gray-600">Canjeado el:</span>
                         <span class="font-semibold text-red-600">{{ \Carbon\Carbon::parse($ticket->checkin->scanned_at)->format('d/m/Y H:i') }}</span>
                     </div>
                     @endif
-                    
+
                     <div class="flex justify-between">
                         <span class="text-gray-600">Comprado:</span>
                         <span class="font-semibold">{{ \Carbon\Carbon::parse($ticket->created_at)->format('d/m/Y H:i') }}</span>
@@ -114,12 +114,12 @@
                         <span class="text-gray-600 font-medium">Fecha y Hora:</span>
                         <p class="text-lg">{{ \Carbon\Carbon::parse($ticket->ticketType->event->date)->format('l, d F Y \a \l\a\s H:i') }}</p>
                     </div>
-                    
+
                     <div>
                         <span class="text-gray-600 font-medium">Ubicación:</span>
                         <p class="text-lg">{{ $ticket->ticketType->event->location }}</p>
                     </div>
-                    
+
                     <div>
                         <span class="text-gray-600 font-medium">Descripción:</span>
                         <p class="text-gray-700">{{ $ticket->ticketType->event->description ?? 'Sin descripción disponible.' }}</p>
@@ -135,17 +135,17 @@
                         <span class="text-gray-600">Orden #:</span>
                         <span class="font-mono text-sm">{{ substr($ticket->order->id, 0, 8) }}</span>
                     </div>
-                    
+
                     <div class="flex justify-between">
                         <span class="text-gray-600">Comprador:</span>
                         <span>{{ auth()->user()->name }}</span>
                     </div>
-                    
+
                     <div class="flex justify-between">
                         <span class="text-gray-600">Email:</span>
                         <span class="text-sm">{{ auth()->user()->email }}</span>
                     </div>
-                    
+
                     <div class="flex justify-between">
                         <span class="text-gray-600">Fecha de compra:</span>
                         <span>{{ \Carbon\Carbon::parse($ticket->order->created_at)->format('d/m/Y H:i') }}</span>
