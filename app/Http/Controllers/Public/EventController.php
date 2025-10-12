@@ -42,6 +42,12 @@ class EventController extends Controller
         $ticket_event = TicketsEvent::where('ticket_types_id', $request->ticket_type_id)->first();
 
         if (!$ticket_event) {
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tipo de boleto no encontrado.'
+                ], 404);
+            }
             return back()->with('error', 'Tipo de boleto no encontrado.');
         }
 
@@ -72,6 +78,12 @@ class EventController extends Controller
         $availableQuantity = $ticket_event->quantity - $reservedByOthers - $reservedByCurrentUser;
 
         if ($totalQuantity > $availableQuantity) {
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No hay suficientes boletos disponibles. Solo quedan ' . $availableQuantity . ' boletos.'
+                ], 400);
+            }
             return back()->with('error', 'No hay suficientes boletos disponibles. Solo quedan ' . $availableQuantity . ' boletos.');
         }
 

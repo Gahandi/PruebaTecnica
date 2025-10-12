@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('quantity');
             $table->timestamp('reserved_until');
             $table->timestamps();
+            $table->softDeletes();
             $table->index(['ticket_types_id', 'event_id']);
         });
     }
@@ -28,6 +29,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ticket_reservations');
+        Schema::dropIfExists('ticket_reservations', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
     }
 };

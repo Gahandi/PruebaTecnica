@@ -214,16 +214,48 @@ class CheckoutController extends Controller
                 'total' => $total,
                 'taxes' => $taxes,
             ]);
-            foreach ($cart as $item) {
-                $ticketId = Str::uuid();
-                \Log::info('Creating ticket with ID: ' . $ticketId);
-                    $ticket = Ticket::create([
+
+
+
+            \Log::info('Order created successfully', ['order_id' => $order->id]);
+
+            // Crear tickets para cada item del carrito
+            foreach ($cart as $cartKey => $item) {
+                // Extraer el ticket_type_id de la clave del carrito (formato: ticket_type_id_event_id)
+                $ticketTypeId = $item['ticket_type_id'];
+                
+                // Crear item de la orden
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'ticket_type_id' => $ticketTypeId,
+                    'quantity' => $item['quantity'],
+                ]);
+
+                // Crear tickets individuales
+                for ($i = 0; $i < $item['quantity']; $i++) {
+                    // Generar QR code en formato PNG para mejor compatibilidad con PDF
+                    $ticketId = Str::uuid();
+
+                    // Crear el ticket con el QR URL ya generado
+                    \Log::info('Creating ticket with ID: ' . $ticketId);
+                   $ticket = Ticket::create([
                         'id' => Str::uuid(),
                         'order_id' => $order->id,
-                        'ticket_types_id' => $item['ticket_type_id'],
+                        'ticket_types_id' => $ticketTypeId,
+                        'event_id' => $item['event_id'],
                         'used' => false,
                     ]);
-                \Log::info('Ticket created with actual ID: ' . $ticket->id);
+                    \Log::info('Ticket created with actual ID: ' . $ticket->id);
+                    
+                    \Log::info('Ticket created successfully', [
+                        'order_id' => $order->id,
+                        'ticket_type_id' => $ticketTypeId,
+                        'event_id' => $item['event_id'],
+                        'ticket_types_id' => $ticketTypeId,
+                        'event_id' => $item['event_id'],
+                        'ticket_id' => $ticket->id,
+                    ]);
+                }
             }
 
             // Limpiar carrito y cupón

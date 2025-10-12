@@ -29,7 +29,7 @@ class OrderController extends Controller
             abort(403, 'No tienes permisos para ver este boleto.');
         }
 
-        $ticket->load(['order.user', 'eventTicket.event.ticketTypes' => function($query) {
+        $ticket->load(['order.user', 'eventTicket.ticketTypes' => function($query) {
             $query->withPivot('quantity', 'price');
         }, 'checkin']);
         return view('tickets.show', compact('ticket'));
@@ -78,7 +78,7 @@ class OrderController extends Controller
             abort(403, 'No tienes permisos para descargar este boleto.');
         }
 
-        $ticket->load(['order.user', 'ticketType.event', 'checkin']);
+        $ticket->load(['order.user', 'eventTicket', 'checkin']);
 
         $pdf = Pdf::loadView('tickets.pdf', compact('ticket'));
         $pdf->setPaper('A4', 'portrait');

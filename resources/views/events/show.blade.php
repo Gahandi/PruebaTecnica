@@ -45,6 +45,42 @@
                                 @endif
                             </div>
                         </div>
+
+                        @if($event->description)
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-gray-400 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">Descripción</p>
+                                <p class="text-sm text-gray-600">{{ $event->description }}</p>
+                            </div>
+                        </div>
+                        @endif
+
+                        @if($event->agenda)
+                        <div class="flex items-start">
+                            <svg class="w-5 h-5 text-gray-400 mr-3 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">Agenda</p>
+                                <p class="text-sm text-gray-600">{{ $event->agenda }}</p>
+                            </div>
+                        </div>
+                        @endif
+
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 0h10m-9 0a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V6a2 2 0 00-2-2H7z"></path>
+                            </svg>
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">Estado</p>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $event->active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                    {{ $event->active ? 'Activo' : 'Inactivo' }}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -76,7 +112,7 @@
                                             <svg class="w-4 h-4 text-green-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                                             </svg>
-                                            <span class="text-sm font-medium text-green-600">{{ $ticketType->quantity }} disponibles</span>
+                                            <span class="text-sm font-medium text-green-600">{{ $ticketType->pivot->quantity }} disponibles</span>
                                         </div>
                                         @if($ticketType->pivot->quantity <= 5)
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
@@ -320,7 +356,7 @@ async function addToCart() {
         alert('Por favor selecciona al menos un boleto.');
         return;
     }
-    console.log(tickets)
+
     // Disable button to prevent multiple submissions
     const button = document.getElementById('add_to_cart_button');
     button.disabled = true;
@@ -328,49 +364,99 @@ async function addToCart() {
 
     try {
         // Add each ticket type to cart sequentially
-    console.log(tickets)
-tickets.forEach(async (ticket) => {
-    const formData = new FormData(); // ✅
+        for (const ticket of tickets) {
+            const formData = new FormData();
+            formData.append('_token', '{{ csrf_token() }}');
+            formData.append('ticket_type_id', ticket.ticket_type_id);
+            formData.append('quantity', ticket.quantity);
 
-    formData.append('_token', '{{ csrf_token() }}');
-    formData.append('ticket_type_id', ticket.ticket_type_id);
-    formData.append('quantity', ticket.quantity);
+            const response = await fetch('{{ route("cart.add") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            });
 
-    for (let pair of formData.entries()) {
-        console.log(pair[0]+ ': ' + pair[1]);
-    }
-
-    try {
-        const response = await fetch('{{ route("cart.add") }}', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Error response:', response.status, errorText);
+                throw new Error('Error al agregar boletos al carrito');
             }
-        });
-        console.log(response)
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Error response:', response.status, errorText);
+
+            const result = await response.json();
+            if (!result.success) {
+                throw new Error(result.message || 'Error al agregar boletos');
+            }
         }
-    } catch (error) {
-        console.error('Request failed:', error);
-    }
-});
 
+        // Mostrar mensaje de éxito
+        showSuccessMessage('Boletos agregados al carrito exitosamente');
+        
+        // Limpiar formulario
+        @foreach($event->ticketTypes as $ticketType)
+            document.getElementById('quantity_{{ $ticketType->id }}').value = 0;
+        @endforeach
+        updateTotal();
 
-
-        // Disparar evento de carrito actualizado
-        document.dispatchEvent(new CustomEvent('cartUpdated'));
+        // Actualizar contador del carrito
+        updateCartCount();
 
     } catch (error) {
         console.error('Error:', error);
-        alert('Error al agregar boletos al carrito. Inténtalo de nuevo.');
+        showErrorMessage(error.message || 'Error al agregar boletos al carrito. Inténtalo de nuevo.');
     } finally {
         // Re-enable button
         button.disabled = false;
         button.textContent = 'Agregar al Carrito';
+    }
+}
+
+// Función para mostrar mensajes de éxito
+function showSuccessMessage(message) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+    messageDiv.textContent = message;
+    document.body.appendChild(messageDiv);
+    
+    setTimeout(() => {
+        messageDiv.remove();
+    }, 3000);
+}
+
+// Función para mostrar mensajes de error
+function showErrorMessage(message) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+    messageDiv.textContent = message;
+    document.body.appendChild(messageDiv);
+    
+    setTimeout(() => {
+        messageDiv.remove();
+    }, 5000);
+}
+
+// Función para actualizar el contador del carrito
+async function updateCartCount() {
+    try {
+        const response = await fetch('{{ route("cart.count") }}', {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            // Actualizar contador en la interfaz si existe
+            const cartCountElement = document.getElementById('cart-count');
+            if (cartCountElement) {
+                cartCountElement.textContent = data.count;
+            }
+        }
+    } catch (error) {
+        console.error('Error updating cart count:', error);
     }
 }
 
