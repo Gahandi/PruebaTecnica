@@ -87,6 +87,20 @@
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
+
+                <div class="col-span-2">
+                    <label for="syllabus" class="block text-sm font-medium text-gray-700 mb-2">Temario</label>
+                    <textarea id="syllabus" name="syllabus" class="w-full rounded-lg border-gray-300 shadow-sm" rows="10">{{ old('syllabus') }}</textarea>
+                </div>
+
+                <div class="col-span-2">
+                    <label for="banner"class="block text-sm font-medium text-gray-700 mb-2">Iconos</label>
+                    <input type="file" name="icons" id="icons" accept="image/*"
+                           class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500 @error('icons') border-red-500 @enderror">
+                    @error('icons')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
                 
                 <!-- Imágenes -->
                 <div class="md:col-span-2">
@@ -202,5 +216,26 @@ function addTicketType() {
 function removeTicketType(button) {
     button.closest('.ticket-type').remove();
 }
+</script>
+<link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+<script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        new EasyMDE({
+            element: document.getElementById("syllabus"),
+            spellChecker: false,
+            placeholder: "Escribe el temario aquí (usa Markdown)...",
+        });
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        new EasyMDE({
+            element: document.getElementById("description"),
+            spellChecker: false,
+            placeholder: "Escribe la descripción aquí...",
+        });
+    });
 </script>
 @endsection
