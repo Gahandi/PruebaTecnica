@@ -86,20 +86,27 @@
                     @error('coordinates')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
+
+                    <!-- Mapa -->
+                </div>
+                
+                <div class="col-span-2" id="map" style="height: 500px; width: 100%; margin-top: 10px;"></div>
+
+                <div class="col-span-2">
+                    <label for="agenda" class="block text-sm font-medium text-gray-700 mb-2">Temario</label>
+                    <textarea id="agenda" name="agenda" class="w-full rounded-lg border-gray-300 shadow-sm" rows="10">{{ old('agenda') }}</textarea>
                 </div>
 
                 <div class="col-span-2">
-                    <label for="syllabus" class="block text-sm font-medium text-gray-700 mb-2">Temario</label>
-                    <textarea id="syllabus" name="syllabus" class="w-full rounded-lg border-gray-300 shadow-sm" rows="10">{{ old('syllabus') }}</textarea>
-                </div>
-
-                <div class="col-span-2">
-                    <label for="banner"class="block text-sm font-medium text-gray-700 mb-2">Iconos</label>
-                    <input type="file" name="icons" id="icons" accept="image/*"
-                           class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500 @error('icons') border-red-500 @enderror">
-                    @error('icons')
+                    <label for="icon"class="block text-sm font-medium text-gray-700 mb-2">Iconos</label>
+                    <input type="file" name="icon" id="icon" accept="image/*"
+                           class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500 @error('icon') border-red-500 @enderror">
+                    @error('icon')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
+                    <div class="mt-3">
+                        <img id="preview-icon" class="hidden w-32 h-32 object-cover rounded-lg border border border-gray-200" alt="Vista previa icono">
+                    </div>
                 </div>
                 
                 <!-- Imágenes -->
@@ -114,6 +121,9 @@
                     @error('banner')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
+                    <div class="mt-3">
+                        <img id="preview-banner" class="hidden w-full h-48 object-cover rounded-lg border border-gray-200" alt="Vista previa banner">
+                    </div>
                 </div>
                 
                 <div>
@@ -123,6 +133,9 @@
                     @error('image')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
+                    <div class="mt-3">
+                        <img id="preview-image" class="hidden w-full h-48 object-cover rounded-lg border border-gray-200" alt="Vista previa imagen">
+                    </div>
                 </div>
                 
                 <!-- Tipos de Boletos -->
@@ -217,24 +230,110 @@ function removeTicketType(button) {
     button.closest('.ticket-type').remove();
 }
 </script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
 <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
 <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        
+        // --- INICIALIZACIÓN DE EASYMDE ---
+
+        // Instancia para Agenda
         new EasyMDE({
-            element: document.getElementById("syllabus"),
+            element: document.getElementById("agenda"),
             spellChecker: false,
             placeholder: "Escribe el temario aquí (usa Markdown)...",
         });
-    });
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        new EasyMDE({
+    
+        // Instancia para Descripción
+        const easyMDE_description = new EasyMDE({
             element: document.getElementById("description"),
             spellChecker: false,
             placeholder: "Escribe la descripción aquí...",
+        });
+        
+        // Esto asegura que la validación 'required' de Laravel reciba el texto.
+        easyMDE_description.codemirror.on('change', () => {
+            document.getElementById('description').value = easyMDE_description.value();
+        });
+
+        // --- SCRIPT DE PREVISUALIZACIÓN DE IMÁGENES ---
+        const previewImage = (inputId, previewId) => {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+
+            input.addEventListener("change", (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        preview.src = e.target.result;
+                        preview.classList.remove("hidden");
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    preview.src = "";
+                    preview.classList.add("hidden");
+                }
+            });
+        };
+        previewImage("icon", "preview-icon");
+        previewImage("banner", "preview-banner");
+        previewImage("image", "preview-image");
+
+        // --- SCRIPT DE SELECT DE MAPA ---
+        // Coordenadas por defecto (CDMX)
+        const defaultLat = 19.432608;
+        const defaultLng = -99.133209;
+
+        const map = L.map('map').setView([defaultLat, defaultLng], 12);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        let marker;
+        
+        const coordInput = document.getElementById('coordinates');
+        const addressInput = document.getElementById('address');
+
+        if(coordInput.value) {
+            const parts = coordInput.value.split(',').map(Number);
+            if(parts.length === 2) {
+                const lat = parts[0];
+                const lng = parts[1];
+                marker = L.marker([lat, lng]).addTo(map);
+                map.setView([lat, lng], 15);
+            }
+        }
+
+        map.on('click', function(e) {
+            const lat = e.latlng.lat.toFixed(6);
+            const lng = e.latlng.lng.toFixed(6);
+
+            if(marker) {
+                marker.setLatLng(e.latlng);
+            } else {
+                marker = L.marker(e.latlng).addTo(map);
+            }
+
+            coordInput.value = `${lat}, ${lng}`;
+
+            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`)
+                .then(response => response.json())
+                .then(data=>{
+                    if (data && data.display_name){
+                        addressInput.value = data.display_name;
+                    }else{
+                        addressInput.value = 'Dirección no encontrada';
+                    }
+                })
+                .catch(() => {
+                    addressInput.value = 'Error al obtener dirección';
+                });
         });
     });
 </script>
