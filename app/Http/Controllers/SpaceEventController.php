@@ -8,9 +8,12 @@ use App\Models\TicketType;
 use App\Models\TypeEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Traits\S3ImageManager;
 
 class SpaceEventController extends Controller
 {
+    use S3ImageManager; 
+
     public function show(Request $request, $subdomain, Event $event)
     {
         // Verificar que el evento pertenece al espacio correcto
@@ -41,7 +44,6 @@ class SpaceEventController extends Controller
 
     public function store(Request $request, $subdomain)
     {
-        // El espacio ya está disponible en la request por el middleware
         $space = $request->get('space');
 
         $request->validate([
@@ -60,7 +62,6 @@ class SpaceEventController extends Controller
             'ticket_types.*.quantity' => 'required|integer|min:1',
         ]);
 
-        // Crear el evento
         $eventData = [
             'name' => $request->name,
             'description' => $request->description,
@@ -69,49 +70,51 @@ class SpaceEventController extends Controller
             'coordinates' => $request->coordinates,
             'spaces_id' => $space->id,
             'type_events_id' => $request->type_event_id,
-            'state_id' => 1, // Estado por defecto "Activo"
+            'state_id' => 1, // Estado "Activo"
             'slug' => Str::slug($request->name),
             'active' => true,
             'agenda' => $request->agenda ?? 'N/A',
-            'banner_app' => 'test.jpg',
+            'banner_app' => 'default.jpg',
         ];
 
-        // Manejar upload de banner
+        // ----- Subir archivos a S3 -----
+
+        // Subir banner
         if ($request->hasFile('banner')) {
-            $bannerPath = $request->file('banner')->store('events/banners', 'public');
-            $eventData['banner'] = $bannerPath;
+            $bannerFile = $request->file('banner');
+            $bannerBase64 = base64_encode(file_get_contents($bannerFile));
+            $eventData['banner'] = $this->saveImages($bannerBase64, 'events/banners', $space->id . '_' . time());
         } else {
-            $eventData['banner'] = 'test.jpg';
+            $eventData['banner'] = 'https://via.placeholder.com/1200x400?text=Sin+Banner';
         }
 
-        // Manejar upload de imagen
+        // Subir imagen
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('events/images', 'public');
-            $eventData['image'] = $imagePath;
+            $imageFile = $request->file('image');
+            $imageBase64 = base64_encode(file_get_contents($imageFile));
+            $eventData['image'] = $this->saveImages($imageBase64, 'events/images', $space->id . '_' . time());
         } else {
-            $eventData['image'] = 'test.jpg';
-        }
-        
-        // Añadir: Manejar upload de icon
-        if( $request->hasFIle('icon')){
-            $iconPath = $request->file('icon')->store('events/icons', 'public');
-            $eventData['icon'] = $iconPath;
-        }else {
-            $eventData['icon'] = 'test.jpg';
+            $eventData['image'] = 'https://via.placeholder.com/800x600?text=Sin+Imagen';
         }
 
-        // ----- FIN DE LA CORRECIÓN ----
+        // Subir icono
+        if ($request->hasFile('icon')) {
+            $iconFile = $request->file('icon');
+            $iconBase64 = base64_encode(file_get_contents($iconFile));
+            $eventData['icon'] = $this->saveImages($iconBase64, 'events/icons', $space->id . '_' . time());
+        } else {
+            $eventData['icon'] = 'https://via.placeholder.com/200x200?text=Sin+Icono';
+        }
 
+        // Guardar el evento
         $event = Event::create($eventData);
 
         // Crear tipos de boletos y asociarlos al evento
         foreach ($request->ticket_types as $ticketTypeData) {
-            // Buscar o crear el tipo de boleto
             $ticketType = TicketType::firstOrCreate([
                 'name' => $ticketTypeData['name']
             ]);
 
-            // Asociar el tipo de boleto al evento con precio y cantidad específicos
             $event->ticketTypes()->attach($ticketType->id, [
                 'price' => $ticketTypeData['price'],
                 'quantity' => $ticketTypeData['quantity']
@@ -119,6 +122,6 @@ class SpaceEventController extends Controller
         }
 
         return redirect()->route('spaces.profile', $space->subdomain)
-                        ->with('success', 'Evento creado exitosamente');
+                        ->with('success', 'Evento creado exitosamente y las imágenes fueron subidas a S3.');
     }
 }

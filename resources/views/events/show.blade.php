@@ -1,11 +1,12 @@
+
 @extends('layouts.app')
 
 @section('title', $event->name)
 
 @section('content')
-<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 ">
     <!-- Event Header -->
-    <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8 ">
         <div class="h-64 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
             <div class="text-center text-white">
                 <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -58,7 +59,7 @@
 
     <!-- Ticket Purchase Form -->
     @if($event->ticketTypes->count() > 0)
-        <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
             <form id="purchaseForm" class="space-y-6">
                 @csrf
                 <input type="hidden" name="event_id" value="{{ $event->id }}">
@@ -186,7 +187,18 @@
             <p class="text-gray-500">Este evento no tiene tipos de boletos configurados.</p>
         </div>
     @endif
+
+    <div class="space-y-4 bg-white shadow-lg p-6 rounded-lg p-4">
+            <h1 class="text-xl font-semibold text-gray-900 mb-4"> Ubicación del evento </h1>
+            <div id="map" style="height: 400px; border-radius: 12px;"></div>
+    </div>
 </div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+<script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
 
 @push('scripts')
 <script>
@@ -377,6 +389,50 @@ tickets.forEach(async (ticket) => {
 // Initialize
 console.log('JavaScript loaded successfully');
 updateTotal();
+
+// SCRIPT DEL MAPA
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("Inicializando mapa...");
+    const mapElement = document.getElementById('map');
+
+    if(!mapElement){
+        console.error("El contenedor del mapa (#map) no se encontró");
+        return;
+    }
+   @if($event->coordinates) 
+   const [latStr, lngStr] = "{{ $event->coordinates }}".split(',');
+   const lat = parseFloat(latStr.trim());
+   const lng = parseFloat(lngStr.trim()); 
+
+   if (!isNaN(lat) && !isNaN(lng)) {
+        // Crear el mapa centrado en las coordenadas del evento
+        const map = L.map('map').setView([lat, lng], 15);
+
+        // Cargar el mapa base
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Agregar el marcador
+        L.marker([lat, lng]).addTo(map)
+            .bindPopup(`<b>{{ $event->name }}</b><br>{{ $event->address }}`)
+            .openPopup();
+
+        map.invalidateSize();
+
+        console.log("Mapa inicializado y tamaño recalculado.");
+
+   } else {
+        document.getElementById('map').innerHTML =
+            '<p class="text-gray-500 text-center py-8">Coordenadas no válidas para este evento.</p>';
+   }
+   @else
+        document.getElementById('map').innerHTML = 
+            '<p class="text-gray-500 text-center py-8">No hay coordenadas disponibles para este evento.</p>';
+  @endif          
+});
+
 </script>
 @endpush
 @endsection
