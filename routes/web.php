@@ -44,11 +44,6 @@ Route::domain('{subdomain}.' . config('app.url'))
             ->name('spaces.events.store')
             ->middleware('space.member');
         Route::get('/{event:slug}', [SpaceEventController::class, 'show']);
-
-        // Rutas del carrito para subdominios
-        Route::post('/cart/add', [App\Http\Controllers\Public\EventController::class, 'addToCart'])->name('subdomain.cart.add');
-        Route::get('/cart', [App\Http\Controllers\CheckoutController::class, 'cart'])->name('subdomain.cart');
-
         // Rutas de checkout para subdominio
     });
 

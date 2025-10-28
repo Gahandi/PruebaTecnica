@@ -106,16 +106,23 @@ class SpaceEventController extends Controller
 
         // Crear tipos de boletos y asociarlos al evento
         foreach ($request->ticket_types as $ticketTypeData) {
-            // Buscar o crear el tipo de boleto
-            $ticketType = TicketType::firstOrCreate([
-                'name' => $ticketTypeData['name']
-            ]);
+            // Si el nombre es un ID numérico, buscar el tipo existente
+            if (is_numeric($ticketTypeData['name'])) {
+                $ticketType = TicketType::find($ticketTypeData['name']);
+            } else {
+                // Si es "other" o un nombre personalizado, crear nuevo tipo
+                $ticketType = TicketType::firstOrCreate([
+                    'name' => $ticketTypeData['name']
+                ]);
+            }
 
-            // Asociar el tipo de boleto al evento con precio y cantidad específicos
-            $event->ticketTypes()->attach($ticketType->id, [
-                'price' => $ticketTypeData['price'],
-                'quantity' => $ticketTypeData['quantity']
-            ]);
+            if ($ticketType) {
+                // Asociar el tipo de boleto al evento con precio y cantidad específicos
+                $event->ticketTypes()->attach($ticketType->id, [
+                    'price' => $ticketTypeData['price'],
+                    'quantity' => $ticketTypeData['quantity']
+                ]);
+            }
         }
 
         return redirect()->route('spaces.profile', $space->subdomain)
