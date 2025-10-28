@@ -53,17 +53,6 @@
                     <!-- Order Details -->
                     <div class="p-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Event Info -->
-                            <div>
-                                <h4 class="font-semibold text-gray-900 mb-2">Evento</h4>
-                                @if($order->event)
-                                    <p class="text-gray-700">{{ $order->event->name }}</p>
-                                    <p class="text-sm text-gray-500">{{ \Carbon\Carbon::parse($order->event->date)->format('d/m/Y H:i') }}</p>
-                                    <p class="text-sm text-gray-500">{{ $order->event->location }}</p>
-                                @else
-                                    <p class="text-gray-500 italic">Información del evento no disponible.</p>
-                                @endif
-                            </div>
 
                             <!-- Order Status -->
                             <div>
@@ -78,26 +67,46 @@
                         <div class="mt-6">
                             <h4 class="font-semibold text-gray-900 mb-4">Tus Boletos</h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                @foreach($order->tickets as $ticket)
+                                @foreach($order->tickets as $index => $ticket)
                                     <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                        <!-- Ticket Header -->
                                         <div class="flex justify-between items-start mb-3">
                                             <div>
                                                 <h5 class="font-medium text-gray-900">{{ $ticket->ticketType->name }}</h5>
-                                                <p class="text-sm text-gray-500">${{ number_format($ticket->ticketType->price, 2) }}</p>
+                                                @php
+                                                    $ticketEvent = \App\Models\TicketsEvent::where('ticket_types_id', $ticket->ticket_types_id)
+                                                        ->where('event_id', $ticket->event_id)
+                                                        ->first();
+                                                @endphp
+                                                @if($ticketEvent)
+                                                    <p class="text-sm text-gray-500">${{ number_format($ticketEvent->price, 2) }}</p>
+                                                @else
+                                                    <p class="text-sm text-gray-500">${{ number_format($ticket->getPrice(), 2) }}</p>
+                                                @endif
+                                                @if($ticket->eventTicket)
+                                                    <p class="text-xs text-gray-400 mt-1">
+                                                        <a href="{{ route('events.show', $ticket->eventTicket->id) }}" 
+                                                           class="text-blue-600 hover:text-blue-800 underline">
+                                                            {{ $ticket->eventTicket->name }}
+                                                        </a>
+                                                    </p>
+                                                @endif
                                             </div>
-                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $ticket->canjeado ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $ticket->used ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800' }}">
                                                 {{ $ticket->used ? 'Canjeado' : 'Válido' }}
                                             </span>
                                         </div>
 
                                         <!-- QR Code Preview -->
-                                        <div class="mb-3 text-center items-center  rounded-lg  justify-center flex mb-5">
-                                           <div id="qrcode" class="p-2 border-black  rounded-lg  border-8"></div>
+                                        <div class="mb-3 text-center">
+                                            <div id="qrcode-{{ $ticket->id }}" class="inline-block p-2 border-2 border-gray-300 rounded-lg"></div>
                                         </div>
-                                        <script>
-                                            var qrcode = new QRCode("qrcode",
-                                            "https://www.geeksforgeeks.org/");
-                                        </script>
+                                        
+                                        <!-- Ticket ID -->
+                                        <div class="text-center mb-3">
+                                            <p class="text-xs text-gray-500">ID: {{ substr($ticket->id, 0, 8) }}</p>
+                                        </div>
+
                                         <!-- Actions -->
                                         <div class="flex space-x-2">
                                             <a href="{{ route('tickets.show', $ticket->id) }}"
@@ -109,6 +118,16 @@
                                                 PDF
                                             </a>
                                         </div>
+                                        
+                                        <!-- Event Link -->
+                                        @if($ticket->eventTicket)
+                                            <div class="mt-2">
+                                                <a href="{{ route('events.show', $ticket->eventTicket->id) }}" 
+                                                   class="w-full bg-green-600 text-white text-center px-3 py-2 rounded-md hover:bg-green-700 transition-colors text-xs block">
+                                                    Ver Evento
+                                                </a>
+                                            </div>
+                                        @endif
                                     </div>
                                 @endforeach
                             </div>
@@ -139,4 +158,31 @@
         </div>
     @endif
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Generar QR codes únicos para cada ticket
+    @foreach($orders as $order)
+        @foreach($order->tickets as $ticket)
+            setTimeout(function() {
+                try {
+                    var qrElement = document.getElementById("qrcode-{{ $ticket->id }}");
+                    if (qrElement) {
+                        new QRCode(qrElement, {
+                            text: "{{ url('/tickets/verify/' . $ticket->id) }}",
+                            width: 120,
+                            height: 120,
+                            colorDark: "#000000",
+                            colorLight: "#ffffff",
+                            correctLevel: QRCode.CorrectLevel.H
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error generating QR code for ticket {{ $ticket->id }}:', error);
+                }
+            }, {{ $loop->index * 100 }});
+        @endforeach
+    @endforeach
+});
+</script>
 @endsection

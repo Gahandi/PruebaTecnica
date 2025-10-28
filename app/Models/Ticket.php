@@ -40,12 +40,14 @@ class Ticket extends Model
 
 	protected $casts = [
 		'ticket_types_id' => 'int',
+		'event_id' => 'int',
 		'used' => 'bool'
 	];
 
 	protected $fillable = [
 		'order_id',
 		'ticket_types_id',
+		'event_id',
 		'used'
 	];
 
