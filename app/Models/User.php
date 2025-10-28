@@ -2,62 +2,87 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
-use Spatie\Permission\Traits\HasRoles;
+use Spatie\Permission\Traits\HasRoles; 
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
-    protected $table = 'users';
+	use SoftDeletes, HasRoles; 
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'role',
-    ];
+	protected $table = 'users';
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token'
-    ];
+	protected $casts = [
+		'email_verified_at' => 'datetime',
+		'verified' => 'bool'
+	];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed'
-    ];
+	protected $hidden = [
+		'password',
+		'remember_token'
+	];
 
-    public function orders(): HasMany
+	protected $fillable = [
+		'name',
+		'last_name',
+		'phone',
+		'image',
+		'email_verified_at',
+		'verified',
+		'email',
+		'password',
+		'role'
+	];
+
+	public function checkins()
+	{
+		return $this->hasMany(Checkin::class, 'scanned_by');
+	}
+
+	public function spaces()
+	{
+		return $this->belongsToMany(Space::class, 'spaces_users')
+					->withPivot('id', 'role_space_id', 'deleted_at')
+					->withTimestamps();
+	}
+
+	public function orders()
+	{
+		return $this->hasMany(Order::class);
+	}
+
+    public function users_codes()
     {
-        return $this->hasMany(Order::class, 'user_id');
-    }
-    
-    /**
-     * Sobrescribe el método para obtener la contraseña para la autenticación,
-     * ya que la columna se llama 'contrasena'.
-     */
-    public function getAuthPassword()
-    {
-        return $this->password;
+        return $this->hasMany(UsersCode::class);
     }
 
+    /**
+     * Check if user is admin of a specific space
+     */
+    public function isAdminOfSpace($spaceId)
+    {
+        return $this->spaces()
+            ->where('spaces.id', $spaceId)
+            ->wherePivot('role_space_id', 1) // 1 = admin role
+            ->exists();
+    }
+
+    /**
+     * Check if user has any role in a specific space
+     */
+    public function hasRoleInSpace($spaceId, $roleName = null)
+    {
+        $query = $this->spaces()
+            ->where('spaces.id', $spaceId);
+        
+        if ($roleName) {
+            $query->whereHas('role_space', function($q) use ($roleName) {
+                $q->where('name', $roleName);
+            });
+        }
+        
+        return $query->exists();
+    }
 }

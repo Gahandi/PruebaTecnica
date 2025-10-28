@@ -12,7 +12,7 @@ class ProfileController extends Controller
     public function show()
     {
         $user = Auth::user();
-        return view('profile', compact('user'));
+        return view('users.profile', compact('user'));
     }
 
     public function update(Request $request)
@@ -21,12 +21,16 @@ class ProfileController extends Controller
         
         $request->validate([
             'name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:20',
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'current_password' => 'nullable|string',
             'password' => 'nullable|string|min:8|confirmed',
         ]);
 
         $user->name = $request->name;
+        $user->last_name = $request->last_name;
+        $user->phone = $request->phone;
         $user->email = $request->email;
 
         // Update password if provided

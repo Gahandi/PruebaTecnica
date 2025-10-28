@@ -12,14 +12,24 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Ejecutar el seeder de roles y permisos primero
+         // Ejecutar el seeder de roles y permisos primero
+
         $this->call([
             RolePermissionSeeder::class,
         ]);
-
-        // Crear solo usuarios con roles
         $this->call([
-            UserSeeder::class,
+            RoleSpaceSeeder::class,
         ]);
+        $this->call([
+            StateSeeder::class,
+        ]);
+        $this->call([
+            TypeEventSeeder::class,
+        ]);
+
+        //Crear solo usuarios con roles
+        //$this->call([
+            //UserSeeder::class,
+        //]);
     }
 }

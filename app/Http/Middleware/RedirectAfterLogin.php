@@ -17,7 +17,7 @@ class RedirectAfterLogin
     {
         if (auth()->check()) {
             $user = auth()->user();
-            
+
             // Redirigir según el rol del usuario
             if ($user->hasRole('admin')) {
                 return redirect()->route('dashboard');
@@ -25,10 +25,10 @@ class RedirectAfterLogin
                 return redirect()->route('dashboard');
             } else {
                 // Para viewers y otros roles, ir a la página principal
-                return redirect()->route('events.public');
+                return redirect('/');
             }
         }
-        
+
         return $next($request);
     }
 }
