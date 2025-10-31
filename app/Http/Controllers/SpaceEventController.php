@@ -81,23 +81,23 @@ class SpaceEventController extends Controller
             // ----- Subir archivos a S3 -----
             if ($request->hasFile('banner')) {
                 $bannerFile = $request->file('banner');
-                $bannerBase64 = base64_encode(file_get_contents($bannerFile));
+                $bannerBase64 = base64_encode(file_get_contents($bannerFile->getRealPath()));
                 $eventData['banner'] = $this->saveImages($bannerBase64, 'events/banners', $space->id . '_' . time());
             } else {
                 $eventData['banner'] = 'https://via.placeholder.com/1200x400?text=Sin+Banner';
             }
-        
+            
             if ($request->hasFile('image')) {
                 $imageFile = $request->file('image');
-                $imageBase64 = base64_encode(file_get_contents($imageFile));
+                $imageBase64 = base64_encode(file_get_contents($imageFile->getRealPath()));
                 $eventData['image'] = $this->saveImages($imageBase64, 'events/images', $space->id . '_' . time());
             } else {
                 $eventData['image'] = 'https://via.placeholder.com/800x600?text=Sin+Imagen';
             }
-        
+            
             if ($request->hasFile('icon')) {
                 $iconFile = $request->file('icon');
-                $iconBase64 = base64_encode(file_get_contents($iconFile));
+                $iconBase64 = base64_encode(file_get_contents($iconFile->getRealPath()));
                 $eventData['icon'] = $this->saveImages($iconBase64, 'events/icons', $space->id . '_' . time());
             } else {
                 $eventData['icon'] = 'https://via.placeholder.com/200x200?text=Sin+Icono';
@@ -124,13 +124,22 @@ class SpaceEventController extends Controller
         } catch (\Exception $e) {
             // Registrar el error en el log
             \Log::error('Error al crear el evento: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
+                'exception' => get_class($e)
             ]);
+        
+            // Mensaje de error más específico si es un error de S3
+            $errorMessage = 'Ocurrió un error al crear el evento. ';
+            if (strpos($e->getMessage(), 'S3') !== false || strpos($e->getMessage(), 'AWS') !== false) {
+                $errorMessage .= 'Error al subir las imágenes a S3. Verifica la configuración de AWS y los logs para más detalles.';
+            } else {
+                $errorMessage .= 'Por favor, intenta nuevamente.';
+            }
         
             // Retornar con mensaje de error
             return back()
                 ->withInput()
-                ->with('error', 'Ocurrió un error al crear el evento. Por favor, intenta nuevamente.');
+                ->with('error', $errorMessage);
         } 
     }
 }
