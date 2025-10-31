@@ -48,15 +48,20 @@ class TicketController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Ticket already used',
-                'used_at' => $ticket->checkin->scanned_at ?? null
+                'used_at' => $ticket->updated_at,
             ], 400);
         }
 
+        //Marcar como usado
+        $ticket->update(['used' => true]);
+
         return response()->json([
             'success' => true,
+            'message' => 'Ticket valid',
             'data' => [
                 'ticket' => $ticket,
-                'valid' => true
+                'event' => $ticket->order->event->name ?? null,
+                'used_at' => now()->toDateTimeString(),
             ]
         ]);
     }

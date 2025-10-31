@@ -287,6 +287,13 @@
                                     </div>
 
                                     <!-- Menu Items -->
+                                    <a href="{{ route('scanner.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                        <div class="flex items-center">
+                                            <img class="w-5 h-4 mr-2" src="https://img.icons8.com/parakeet-line/48/portrait-mode-scanning.png" alt="portrait-mode-scanning"/>
+                                            Scanner
+                                        </div>
+                                    </a>
+
                                     <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                         <div class="flex items-center">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
