@@ -1,31 +1,53 @@
 <?php
 
+/**
+ * Created by Reliese Model.
+ */
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Class TicketType
+ * 
+ * @property int $id
+ * @property string $name
+ * @property string|null $deleted_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * 
+ * @property Collection|Ticket[] $tickets
+ * @property Collection|TicketsEvent[] $tickets_events
+ *
+ * @package App\Models
+ */
 class TicketType extends Model
 {
-    use HasFactory;
-    protected $table = 'ticket_types';
-    protected $fillable = ['event_id', 'name', 'price', 'quantity'];
+	use SoftDeletes;
+	protected $table = 'ticket_types';
 
-    public function event(): BelongsTo
-    {
-        return $this->belongsTo(Event::class, 'event_id');
-    }
-    
-    public function orderItems(): HasMany
-    {
-        return $this->hasMany(OrderItem::class, 'ticket_type_id');
-    }
+	protected $fillable = [
+		'name'
+	];
 
-    public function tickets()
-    {
-        return $this->hasManyThrough(Ticket::class, OrderItem::class, 'ticket_type_id', 'order_id', 'id', 'order_id');
-    }
+	public function tickets()
+	{
+		return $this->hasMany(Ticket::class, 'ticket_types_id');
+	}
+
+	public function tickets_events()
+	{
+		return $this->hasMany(TicketsEvent::class, 'ticket_types_id');
+	}
+
+	public function events()
+	{
+		return $this->belongsToMany(Event::class, 'tickets_events', 'ticket_types_id', 'event_id')
+			->withPivot('quantity', 'price')
+			->withTimestamps();
+	}
 }

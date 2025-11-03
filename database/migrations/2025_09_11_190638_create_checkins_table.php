@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignUuid('ticket_id')->constrained('tickets')->onDelete('cascade');
             $table->dateTime('scanned_at');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -24,6 +25,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('checkins');
+        Schema::dropIfExists('checkins', function (Blueprint $table) {
+            $table->dropSoftDeletes(); // Removes the 'deleted_at' column
+        });
     }
 };

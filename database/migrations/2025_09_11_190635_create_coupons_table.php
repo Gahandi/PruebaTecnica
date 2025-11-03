@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->unsignedInteger('discount_percentage');
             $table->dateTime('expires_at')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -25,6 +26,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('coupons');
+        Schema::dropIfExists('coupons', function (Blueprint $table) {
+            $table->dropSoftDeletes(); // Removes the 'deleted_at' column
+        });
     }
 };
