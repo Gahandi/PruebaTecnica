@@ -44,6 +44,7 @@ class SpaceEventController extends Controller
 
     public function store(Request $request, $subdomain)
     {
+
         try {
             $space = $request->get('space');
         
@@ -81,24 +82,24 @@ class SpaceEventController extends Controller
             // ----- Subir archivos a S3 -----
             if ($request->hasFile('banner')) {
                 $bannerFile = $request->file('banner');
-                $bannerBase64 = base64_encode(file_get_contents($bannerFile->getRealPath()));
-                $eventData['banner'] = $this->saveImages($bannerBase64, 'events/banners', $space->id . '_' . time());
+                $fileContents = file_get_contents($bannerFile->getRealPath());
+                $eventData['banner'] = $this->saveImages($fileContents, 'events/banners', $space->id . '_' . time());
             } else {
                 $eventData['banner'] = 'https://via.placeholder.com/1200x400?text=Sin+Banner';
             }
             
             if ($request->hasFile('image')) {
                 $imageFile = $request->file('image');
-                $imageBase64 = base64_encode(file_get_contents($imageFile->getRealPath()));
-                $eventData['image'] = $this->saveImages($imageBase64, 'events/images', $space->id . '_' . time());
+                $fileContents = file_get_contents($imageFile->getRealPath());
+                $eventData['image'] = $this->saveImages($fileContents, 'events/images', $space->id . '_' . time());
             } else {
                 $eventData['image'] = 'https://via.placeholder.com/800x600?text=Sin+Imagen';
             }
             
             if ($request->hasFile('icon')) {
                 $iconFile = $request->file('icon');
-                $iconBase64 = base64_encode(file_get_contents($iconFile->getRealPath()));
-                $eventData['icon'] = $this->saveImages($iconBase64, 'events/icons', $space->id . '_' . time());
+                $fileContents = file_get_contents($iconFile->getRealPath());
+                $eventData['icon'] = $this->saveImages($fileContents, 'events/icons', $space->id . '_' . time());
             } else {
                 $eventData['icon'] = 'https://via.placeholder.com/200x200?text=Sin+Icono';
             }

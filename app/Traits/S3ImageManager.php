@@ -12,7 +12,7 @@ use Exception;
 
 trait S3ImageManager { 
 
-    public function saveImages($base64Image, $folder, $productId)
+    public function saveImages($fileContents, $folder, $productId)
     {
         try {
             // Validar que las credenciales de AWS estén configuradas
@@ -34,17 +34,8 @@ trait S3ImageManager {
                 throw new Exception('Error de configuración: Las credenciales de AWS no están configuradas correctamente. Faltan: ' . implode(', ', $missing));
             }
             
-            // Decodificar la imagen base64
-            $imageData = base64_decode($base64Image, true);
-            
-            // Verificar que la decodificación fue exitosa
-            if ($imageData === false) {
-                Log::error('Error al decodificar imagen base64', [
-                    'folder' => $folder,
-                    'productId' => $productId
-                ]);
-                throw new Exception('Error al decodificar la imagen base64');
-            }
+            // Asigna el contenido directamente
+            $imageData = $fileContents;
 
             // Detectar el tipo MIME desde los primeros bytes de la imagen
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -77,7 +68,7 @@ trait S3ImageManager {
 
             // Almacenar la imagen en S3 y verificar que fue exitoso
             try {
-                $result = Storage::disk('s3')->put($filePath, $imageData, 'public');
+                $result = Storage::disk('s3')->put($filePath, $imageData);
                 
                 if (!$result) {
                     Log::error('Error al subir archivo a S3 - Storage::put retornó false', [
