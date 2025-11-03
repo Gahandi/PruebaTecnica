@@ -1,51 +1,18 @@
-@extends('layouts.space')
+
+@extends('layouts.app')
 
 @section('title', $event->name . ' - ' . $space->name)
 
 @section('content')
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-      crossorigin=""/>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
-
-<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-    <div class="relative overflow-hidden">
-        @if($event->banner)
-            <div class="relative h-[60vh] min-h-[500px] overflow-hidden">
-                <img src="https://cevents.es/wp-content/uploads/2021/11/evento-corporativo-imgpost.jpg" alt="{{ $event->name }}" 
-                     id="hero-image"
-                     class="absolute inset-0 w-full h-full object-cover">
-                
-                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-                
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <div class="text-center text-white px-6 max-w-4xl">
-                        <div class="backdrop-blur-lg bg-black/20 rounded-2xl p-8 border border-white/30 shadow-2xl">
-                            <h1 class="text-3xl md:text-5xl font-light mb-4 tracking-wide">
-                                {{ $event->name }}
-                            </h1>
-                            <div class="flex items-center justify-center gap-6 mb-4">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-2 h-2 bg-white/80 rounded-full"></div>
-                                    <span class="text-sm font-medium text-white/90">por {{ $space->name }}</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                    </svg>
-                                    <span class="text-sm font-medium text-white/90">{{ \Carbon\Carbon::parse($event->date)->format('d M Y \a \l\a\s H:i') }}</span>
-                                </div>
-                            </div>
-                            @if($event->ticketTypes->count() > 0)
-                                <div class="inline-block ">
-                                    <p class="text-white text-xs font-medium mb-1">Desde</p>
-                                    <p class="text-white text-lg font-semibold">${{ number_format($event->ticketTypes->min('pivot.price'), 2) }}</p>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 ">
+    <!-- Event Header -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8 ">
+        <div class="h-64 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+            <div class="text-center text-white">
+                <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                    </svg>
                 </div>
             </div>
         @else
@@ -155,16 +122,10 @@
             @endif
         </div>
 
-        @if($event->ticketTypes->count() > 0)
-            <div class="bg-white/80 backdrop-blur-lg rounded-2xl p-8 border border-white/30 shadow-xl">
-                <h2 class="text-2xl font-semibold text-gray-900 mb-8 flex items-center">
-                    <svg class="w-6 h-6 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
-                    </svg>
-                    Compra de Boletos
-                </h2>
-
-                <form id="purchaseForm" class="space-y-8">
+    <!-- Ticket Purchase Form -->
+    @if($event->ticketTypes->count() > 0)
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <form id="purchaseForm" class="space-y-6">
                 @csrf
                 <input type="hidden" name="event_id" value="{{ $event->id }}">
 
@@ -290,11 +251,18 @@
             <p class="text-gray-500">Este evento no tiene tipos de boletos configurados.</p>
         </div>
     @endif
-    </div> </div> <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossorigin=""></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <div class="space-y-4 bg-white shadow-lg p-6 rounded-lg p-4">
+            <h1 class="text-xl font-semibold text-gray-900 mb-4"> Ubicación del evento </h1>
+            <div id="map" style="height: 400px; border-radius: 12px;"></div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+<script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
 
 @push('scripts')
 <script>
@@ -562,6 +530,50 @@ document.addEventListener('cartUpdated', function() {
 // Initialize
 console.log('JavaScript loaded successfully');
 updateTotal();
+
+// SCRIPT DEL MAPA
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("Inicializando mapa...");
+    const mapElement = document.getElementById('map');
+
+    if(!mapElement){
+        console.error("El contenedor del mapa (#map) no se encontró");
+        return;
+    }
+   @if($event->coordinates) 
+   const [latStr, lngStr] = "{{ $event->coordinates }}".split(',');
+   const lat = parseFloat(latStr.trim());
+   const lng = parseFloat(lngStr.trim()); 
+
+   if (!isNaN(lat) && !isNaN(lng)) {
+        // Crear el mapa centrado en las coordenadas del evento
+        const map = L.map('map').setView([lat, lng], 15);
+
+        // Cargar el mapa base
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Agregar el marcador
+        L.marker([lat, lng]).addTo(map)
+            .bindPopup(`<b>{{ $event->name }}</b><br>{{ $event->address }}`)
+            .openPopup();
+
+        map.invalidateSize();
+
+        console.log("Mapa inicializado y tamaño recalculado.");
+
+   } else {
+        document.getElementById('map').innerHTML =
+            '<p class="text-gray-500 text-center py-8">Coordenadas no válidas para este evento.</p>';
+   }
+   @else
+        document.getElementById('map').innerHTML = 
+            '<p class="text-gray-500 text-center py-8">No hay coordenadas disponibles para este evento.</p>';
+  @endif          
+});
+
 </script>
 @endpush
 @endsection

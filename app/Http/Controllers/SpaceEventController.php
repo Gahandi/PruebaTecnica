@@ -8,9 +8,12 @@ use App\Models\TicketType;
 use App\Models\TypeEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Traits\S3ImageManager;
 
 class SpaceEventController extends Controller
 {
+    use S3ImageManager; 
+
     public function show(Request $request, $subdomain, Event $event)
     {
         // Verificar que el evento pertenece al espacio correcto
@@ -41,91 +44,103 @@ class SpaceEventController extends Controller
 
     public function store(Request $request, $subdomain)
     {
-        // El espacio ya está disponible en la request por el middleware
-        $space = $request->get('space');
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'date' => 'required|date|after:now',
-            'address' => 'required|string|max:255',
-            'coordinates' => 'nullable|string|max:255',
-            'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'type_event_id' => 'required|exists:type_events,id',
-            'ticket_types' => 'required|array|min:1',
-            'ticket_types.*.name' => 'required|string|max:255',
-            'ticket_types.*.price' => 'required|numeric|min:0',
-            'ticket_types.*.quantity' => 'required|integer|min:1',
-        ]);
-
-        // Crear el evento
-        $eventData = [
-            'name' => $request->name,
-            'description' => $request->description,
-            'date' => $request->date,
-            'address' => $request->address,
-            'coordinates' => $request->coordinates,
-            'spaces_id' => $space->id,
-            'type_events_id' => $request->type_event_id,
-            'state_id' => 1, // Estado por defecto "Activo"
-            'slug' => Str::slug($request->name),
-            'active' => true,
-            'agenda' => $request->agenda ?? 'N/A',
-            'banner_app' => 'test.jpg',
-        ];
-
-        // Manejar upload de banner
-        if ($request->hasFile('banner')) {
-            $bannerPath = $request->file('banner')->store('events/banners', 'public');
-            $eventData['banner'] = $bannerPath;
-        } else {
-            $eventData['banner'] = 'test.jpg';
-        }
-
-        // Manejar upload de imagen
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('events/images', 'public');
-            $eventData['image'] = $imagePath;
-        } else {
-            $eventData['image'] = 'test.jpg';
-        }
+        try {
+            $space = $request->get('space');
         
-        // Añadir: Manejar upload de icon
-        if( $request->hasFIle('icon')){
-            $iconPath = $request->file('icon')->store('events/icons', 'public');
-            $eventData['icon'] = $iconPath;
-        }else {
-            $eventData['icon'] = 'test.jpg';
-        }
-
-        // ----- FIN DE LA CORRECIÓN ----
-
-        $event = Event::create($eventData);
-
-        // Crear tipos de boletos y asociarlos al evento
-        foreach ($request->ticket_types as $ticketTypeData) {
-            // Si el nombre es un ID numérico, buscar el tipo existente
-            if (is_numeric($ticketTypeData['name'])) {
-                $ticketType = TicketType::find($ticketTypeData['name']);
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'required|string',
+                'date' => 'required|date|after:now',
+                'address' => 'required|string|max:255',
+                'coordinates' => 'nullable|string|max:255',
+                'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'type_event_id' => 'required|exists:type_events,id',
+                'ticket_types' => 'required|array|min:1',
+                'ticket_types.*.name' => 'required|string|max:255',
+                'ticket_types.*.price' => 'required|numeric|min:0',
+                'ticket_types.*.quantity' => 'required|integer|min:1',
+            ]);
+        
+            $eventData = [
+                'name' => $request->name,
+                'description' => $request->description,
+                'date' => $request->date,
+                'address' => $request->address,
+                'coordinates' => $request->coordinates,
+                'spaces_id' => $space->id,
+                'type_events_id' => $request->type_event_id,
+                'state_id' => 1, // Estado "Activo"
+                'slug' => Str::slug($request->name),
+                'active' => true,
+                'agenda' => $request->agenda ?? 'N/A',
+                'banner_app' => 'default.jpg',
+            ];
+        
+            // ----- Subir archivos a S3 -----
+            if ($request->hasFile('banner')) {
+                $bannerFile = $request->file('banner');
+                $fileContents = file_get_contents($bannerFile->getRealPath());
+                $eventData['banner'] = $this->saveImages($fileContents, 'events/banners', $space->id . '_' . time());
             } else {
-                // Si es "other" o un nombre personalizado, crear nuevo tipo
+                $eventData['banner'] = 'https://via.placeholder.com/1200x400?text=Sin+Banner';
+            }
+            
+            if ($request->hasFile('image')) {
+                $imageFile = $request->file('image');
+                $fileContents = file_get_contents($imageFile->getRealPath());
+                $eventData['image'] = $this->saveImages($fileContents, 'events/images', $space->id . '_' . time());
+            } else {
+                $eventData['image'] = 'https://via.placeholder.com/800x600?text=Sin+Imagen';
+            }
+            
+            if ($request->hasFile('icon')) {
+                $iconFile = $request->file('icon');
+                $fileContents = file_get_contents($iconFile->getRealPath());
+                $eventData['icon'] = $this->saveImages($fileContents, 'events/icons', $space->id . '_' . time());
+            } else {
+                $eventData['icon'] = 'https://via.placeholder.com/200x200?text=Sin+Icono';
+            }
+        
+            // Guardar el evento
+            $event = Event::create($eventData);
+        
+            // Crear tipos de boletos y asociarlos al evento
+            foreach ($request->ticket_types as $ticketTypeData) {
                 $ticketType = TicketType::firstOrCreate([
                     'name' => $ticketTypeData['name']
                 ]);
-            }
-
-            if ($ticketType) {
-                // Asociar el tipo de boleto al evento con precio y cantidad específicos
+        
                 $event->ticketTypes()->attach($ticketType->id, [
                     'price' => $ticketTypeData['price'],
                     'quantity' => $ticketTypeData['quantity']
                 ]);
             }
-        }
-
-        return redirect()->route('spaces.profile', $space->subdomain)
-                        ->with('success', 'Evento creado exitosamente');
+        
+            return redirect()
+                ->route('spaces.profile', $space->subdomain)
+                ->with('success', 'Evento creado exitosamente y las imágenes fueron subidas a S3.');
+        } catch (\Exception $e) {
+            // Registrar el error en el log
+            \Log::error('Error al crear el evento: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'exception' => get_class($e)
+            ]);
+        
+            // Mensaje de error más específico si es un error de S3
+            $errorMessage = 'Ocurrió un error al crear el evento. ';
+            if (strpos($e->getMessage(), 'S3') !== false || strpos($e->getMessage(), 'AWS') !== false) {
+                $errorMessage .= 'Error al subir las imágenes a S3. Verifica la configuración de AWS y los logs para más detalles.';
+            } else {
+                $errorMessage .= 'Por favor, intenta nuevamente.';
+            }
+        
+            // Retornar con mensaje de error
+            return back()
+                ->withInput()
+                ->with('error', $errorMessage);
+        } 
     }
 }
