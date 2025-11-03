@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.space')
 
 @section('title', $space->name)
 
@@ -100,7 +100,7 @@
                             <div class="text-3xl font-bold text-blue-600 mb-2">{{ $space->events->count() }}</div>
                             <div class="text-sm font-medium text-blue-800">Eventos</div>
                         </div>
-                        <div class="text-center p-4 rounded-xl bg-gradient-to-br from-green-50 to-green-100">
+                        <div class="text-center p-4 sm:px-0 rounded-xl bg-gradient-to-br from-green-50 to-green-100">
                             <div class="text-3xl font-bold text-green-600 mb-2">{{ $space->users->count() }}</div>
                             <div class="text-sm font-medium text-green-800">Miembros</div>
                         </div>
@@ -219,7 +219,36 @@
                                         @if($event->description)
                                             <p class="text-gray-700 text-sm mb-6 line-clamp-2 leading-relaxed">{{ $event->description }}</p>
                                         @endif
+                    <!-- Ticket Availability -->
+                    @if($event->ticketTypes->count() > 0)
+                        @php
+                            $totalTickets = $event->ticketTypes->sum('pivot.quantity');
+                            $availableTickets = $event->ticketTypes->sum('pivot.quantity');
 
+                            $ticketCount = \App\Models\Ticket::where('event_id', $event->id)->get();
+                            $vendidos = 0;
+                            \Log::info('=== SIMPLE TEST ===');
+                            \Log::info('Datos de prueba: '.json_encode($ticketCount));
+                            if ($ticketCount->count() > 0) {
+                                foreach ($ticketCount as $item => $value) {
+                                    $vendidos++;
+                                    \Log::info('Datos de prueba contador: '.$vendidos);
+                                }
+                            }
+                            $disponibles = $availableTickets - $vendidos;
+                            $porcentaje = ($disponibles * 100) / $availableTickets;
+
+                        @endphp
+                        <div class="mb-4">
+                            <div class="flex items-center justify-between text-sm text-gray-600 mb-1">
+                                <span>Boletos disponibles</span>
+                                <span>{{ $disponibles }} disponibles de {{ $availableTickets }} </span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: {{ $availableTickets > 0 ? $porcentaje : 0 }}%"></div>
+                            </div>
+                        </div>
+                    @endif
                                         <div class="flex items-center justify-between">
                                             <div class="flex items-center">
                                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">

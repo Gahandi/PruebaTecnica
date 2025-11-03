@@ -35,7 +35,7 @@ Route::domain('{subdomain}.' . config('app.url'))
     ->group(function () {
         Route::get('/', [SpaceController::class, 'show'])->name('spaces.profile');
         Route::get('/edit', [SpaceController::class, 'edit'])->name('spaces.edit');
-        Route::put('/update', [SpaceController::class, 'update'])->name('spaces.update-profile');
+        Route::put('/update', [SpaceController::class, 'update'])->name('spaces.update');
         Route::post('/update-profile', [SpaceController::class, 'updateProfile'])->name('spaces.update-profile');
         Route::get('/events/create', [SpaceEventController::class, 'create'])
             ->name('spaces.events.create')
@@ -44,11 +44,6 @@ Route::domain('{subdomain}.' . config('app.url'))
             ->name('spaces.events.store')
             ->middleware('space.member');
         Route::get('/{event:slug}', [SpaceEventController::class, 'show']);
-
-        // Rutas del carrito para subdominios
-        Route::post('/cart/add', [App\Http\Controllers\Public\EventController::class, 'addToCart'])->name('subdomain.cart.add');
-        Route::get('/cart', [App\Http\Controllers\CheckoutController::class, 'cart'])->name('subdomain.cart');
-
         // Rutas de checkout para subdominio
     });
 
@@ -168,13 +163,14 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/cart', [App\Http\Controllers\CheckoutController::class, 'cart'])->name('cart');
             Route::post('/add-to-cart', [App\Http\Controllers\CheckoutController::class, 'addToCart'])->name('add-to-cart');
             Route::post('/update-cart', [App\Http\Controllers\CheckoutController::class, 'updateCart'])->name('update-cart');
-            Route::delete('/remove-from-cart/{ticketType}', [App\Http\Controllers\CheckoutController::class, 'removeFromCart'])->name('remove-from-cart');
+            Route::delete('/remove-from-cart/{key}', [CheckoutController::class, 'removeFromCart'])->name('remove-from-cart');
             Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'checkout'])->name('checkout');
             Route::post('/process-payment', [App\Http\Controllers\CheckoutController::class, 'processPayment'])->name('process-payment');
             Route::post('/apply-coupon', [App\Http\Controllers\CheckoutController::class, 'applyCoupon'])->name('apply-coupon');
             Route::delete('/remove-coupon', [App\Http\Controllers\CheckoutController::class, 'removeCoupon'])->name('remove-coupon');
             Route::get('/success/{order}', [App\Http\Controllers\CheckoutController::class, 'success'])->name('success');
             Route::get('/order/{order}', [App\Http\Controllers\CheckoutController::class, 'showOrder'])->name('order');
+            Route::get('/callback', [App\Http\Controllers\CheckoutController::class, 'handlePaymentCallback'])->name('callback');
         });
 
     // Ruta de prueba para debug
@@ -183,6 +179,8 @@ Route::middleware(['auth'])->group(function () {
         \Log::info('Request data:', $request->all());
         return response()->json(['status' => 'success', 'message' => 'Test route working']);
     })->name('test.payment');
+
+    // Ruta para el callback de Openpay (3D Secure)
 
     // Rutas de espacios del usuario
     Route::prefix('spaces')

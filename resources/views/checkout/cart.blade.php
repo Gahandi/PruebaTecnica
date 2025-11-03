@@ -56,7 +56,7 @@
                                             </svg>
                                         </div>
                                     @endif
-                                    
+
                                     <div class="flex-1 min-w-0">
                                         <!-- Event Info -->
                                         <div class="mb-2">
@@ -65,7 +65,7 @@
                                                 <p class="text-sm text-gray-500">{{ \Carbon\Carbon::parse($item['event_date'])->format('d M Y, H:i') }}</p>
                                             @endif
                                         </div>
-                                        
+
                                         <!-- Ticket Type Info -->
                                         <div class="mb-3">
                                             <h4 class="text-md font-semibold text-gray-800">{{ $item['ticket_type_name'] ?? 'Tipo de Boleto' }}</h4>
@@ -81,7 +81,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <!-- Price and Controls -->
                                     <div class="flex items-center space-x-4">
                                         <div class="text-right">
@@ -101,7 +101,7 @@
                                                        class="w-16 px-2 py-1 border border-gray-300 rounded text-center"
                                                        onchange="this.form.submit()">
                                             </form>
-                                            <form method="POST" action="{{ route('checkout.remove-from-cart', $item['ticket_type_id'] ?? $key) }}" class="inline">
+                                            <form method="POST" action="{{ route('checkout.remove-from-cart', $key) }}">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50">

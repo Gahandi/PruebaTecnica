@@ -12,6 +12,7 @@
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
         "league/flysystem-aws-s3-v3": "^3.30",
+        "openpay/sdk": "^3.1",
         "predis/predis": "^3.2",
         "reliese/laravel": "^1.4",
         "simplesoftwareio/simple-qrcode": "^4.2",
