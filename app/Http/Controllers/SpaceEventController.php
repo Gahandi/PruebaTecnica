@@ -50,6 +50,7 @@ class SpaceEventController extends Controller
             'date' => 'required|date|after:now',
             'address' => 'required|string|max:255',
             'coordinates' => 'nullable|string|max:255',
+            'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'type_event_id' => 'required|exists:type_events,id',
@@ -71,6 +72,8 @@ class SpaceEventController extends Controller
             'state_id' => 1, // Estado por defecto "Activo"
             'slug' => Str::slug($request->name),
             'active' => true,
+            'agenda' => $request->agenda ?? 'N/A',
+            'banner_app' => 'test.jpg',
         ];
 
         // Manejar upload de banner
@@ -88,25 +91,38 @@ class SpaceEventController extends Controller
         } else {
             $eventData['image'] = 'test.jpg';
         }
+        
+        // Añadir: Manejar upload de icon
+        if( $request->hasFIle('icon')){
+            $iconPath = $request->file('icon')->store('events/icons', 'public');
+            $eventData['icon'] = $iconPath;
+        }else {
+            $eventData['icon'] = 'test.jpg';
+        }
 
-        // Asignar campos de imagen por defecto
-        $eventData['banner_app'] = 'test.jpg';
-        $eventData['icon'] = 'test.jpg';
+        // ----- FIN DE LA CORRECIÓN ----
 
         $event = Event::create($eventData);
 
         // Crear tipos de boletos y asociarlos al evento
         foreach ($request->ticket_types as $ticketTypeData) {
-            // Buscar o crear el tipo de boleto
-            $ticketType = TicketType::firstOrCreate([
-                'name' => $ticketTypeData['name']
-            ]);
+            // Si el nombre es un ID numérico, buscar el tipo existente
+            if (is_numeric($ticketTypeData['name'])) {
+                $ticketType = TicketType::find($ticketTypeData['name']);
+            } else {
+                // Si es "other" o un nombre personalizado, crear nuevo tipo
+                $ticketType = TicketType::firstOrCreate([
+                    'name' => $ticketTypeData['name']
+                ]);
+            }
 
-            // Asociar el tipo de boleto al evento con precio y cantidad específicos
-            $event->ticketTypes()->attach($ticketType->id, [
-                'price' => $ticketTypeData['price'],
-                'quantity' => $ticketTypeData['quantity']
-            ]);
+            if ($ticketType) {
+                // Asociar el tipo de boleto al evento con precio y cantidad específicos
+                $event->ticketTypes()->attach($ticketType->id, [
+                    'price' => $ticketTypeData['price'],
+                    'quantity' => $ticketTypeData['quantity']
+                ]);
+            }
         }
 
         return redirect()->route('spaces.profile', $space->subdomain)
