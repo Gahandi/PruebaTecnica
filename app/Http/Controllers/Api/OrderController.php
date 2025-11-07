@@ -107,6 +107,8 @@ class OrderController extends Controller
                 for ($i = 0; $i < $item['quantity']; $i++) {
                     $ticket = $order->tickets()->create([
                         'id' => Str::uuid(),
+                    ]);
+                    $ticket->update([
                         'qr_url' => 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($order->id . '-' . $i),
                     ]);
                     $tickets[] = $ticket;

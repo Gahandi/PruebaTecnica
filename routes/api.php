@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\CouponController;
+use App\Http\Controllers\ScannerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,3 +46,6 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 });
+
+Route::get('/scanner', [ScannerController::class, 'index'])->name('scanner.index');
+Route::post('/scanner/validate', [ScannerController::class, 'validateTicket'])->name('scanner.validate');
