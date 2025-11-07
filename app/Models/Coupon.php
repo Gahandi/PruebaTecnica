@@ -1,24 +1,49 @@
 <?php
 
+/**
+ * Created by Reliese Model.
+ */
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Class Coupon
+ * 
+ * @property int $id
+ * @property string $code
+ * @property int $discount_percentage
+ * @property Carbon|null $expires_at
+ * @property string|null $deleted_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * 
+ * @property Collection|Payment[] $payments
+ *
+ * @package App\Models
+ */
 class Coupon extends Model
 {
-    use HasFactory;
-    protected $table = 'coupons';
-    
-    protected $fillable = ['code', 'discount_percentage', 'expires_at'];
-    
-    protected $casts = [
-        'expires_at' => 'datetime',
-    ];
+	use SoftDeletes;
+	protected $table = 'coupons';
 
-    public function orders(): HasMany
-    {
-        return $this->hasMany(Order::class, 'coupon_id');
-    }
+	protected $casts = [
+		'discount_percentage' => 'int',
+		'expires_at' => 'datetime'
+	];
+
+	protected $fillable = [
+		'code',
+		'discount_percentage',
+		'expires_at'
+	];
+
+	public function payments()
+	{
+		return $this->hasMany(Payment::class);
+	}
 }

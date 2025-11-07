@@ -14,42 +14,42 @@ class RolePermissionSeeder extends Seeder
         // Crear permisos
         $permissions = [
             // Eventos
-            'view events',
-            'create events',
-            'edit events',
-            'delete events',
+            'view events' => 'Ver eventos',
+            'create events' => 'Crear eventos',
+            'edit events' => 'Editar eventos',
+            'delete events' => 'Eliminar eventos',
             
             // Tipos de boletos
-            'view ticket types',
-            'create ticket types',
-            'edit ticket types',
-            'delete ticket types',
+            'view ticket types' => 'Ver tipos de boletos',
+            'create ticket types' => 'Crear tipos de boletos',
+            'edit ticket types' => 'Editar tipos de boletos',
+            'delete ticket types' => 'Eliminar tipos de boletos',
             
             // Cupones
-            'view coupons',
-            'create coupons',
-            'edit coupons',
-            'delete coupons',
+            'view coupons' => 'Ver cupones',
+            'create coupons' => 'Crear cupones',
+            'edit coupons' => 'Editar cupones',
+            'delete coupons' => 'Eliminar cupones',
             
             // Órdenes
-            'view orders',
-            'create orders',
-            'edit orders',
-            'delete orders',
+            'view orders' => 'Ver órdenes',
+            'create orders' => 'Crear órdenes',
+            'edit orders' => 'Editar órdenes',
+            'delete orders' => 'Eliminar órdenes',
             
             // Check-in
-            'view checkins',
-            'create checkins',
-            'edit checkins',
-            'delete checkins',
+            'view checkins' => 'Ver check-ins',
+            'create checkins' => 'Crear check-ins'  ,
+            'edit checkins' => 'Editar check-ins',
+            'delete checkins' => 'Eliminar check-ins',
             
             // Dashboard
-            'view dashboard',
-            'view admin panel',
+            'view dashboard' => 'Ver dashboard',
+            'view admin panel' => 'Ver panel de administración',
         ];
 
-        foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+        foreach ($permissions as $permission => $description) {
+            Permission::create(['name' => $permission, 'description' => $description]);
         }
 
         // Crear roles
@@ -70,7 +70,7 @@ class RolePermissionSeeder extends Seeder
             'create checkins',
             'edit checkins',
             'view dashboard',
-            'view admin panel',
+            'view admin panel'
         ]);
 
         // Asignar permisos a viewer
@@ -85,6 +85,7 @@ class RolePermissionSeeder extends Seeder
         // Crear usuarios de ejemplo
         $admin = User::create([
             'name' => 'Administrador',
+            'last_name' => 'Del sistema',
             'email' => 'admin@example.com',
             'password' => bcrypt('password'),
         ]);
@@ -92,6 +93,7 @@ class RolePermissionSeeder extends Seeder
 
         $staff = User::create([
             'name' => 'Staff',
+            'last_name' => 'Del sistema',
             'email' => 'staff@example.com',
             'password' => bcrypt('password'),
         ]);
@@ -99,6 +101,7 @@ class RolePermissionSeeder extends Seeder
 
         $viewer = User::create([
             'name' => 'Viewer',
+            'last_name' => 'Del sistema',
             'email' => 'viewer@example.com',
             'password' => bcrypt('password'),
         ]);

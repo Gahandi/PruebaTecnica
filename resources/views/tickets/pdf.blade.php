@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boleto - {{ $ticket->ticketType->event->name }}</title>
+    <title>Boleto - {{ $ticket->eventTicket->name }}</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -139,8 +139,8 @@
     <div class="ticket">
         <!-- Header -->
         <div class="header">
-            <h1>{{ $ticket->ticketType->event->name }}</h1>
-            <p>{{ \Carbon\Carbon::parse($ticket->ticketType->event->date)->format('l, d F Y \a \l\a\s H:i') }}</p>
+            <h1>{{ $ticket->eventTicket->name }}</h1>
+            <p>{{ \Carbon\Carbon::parse($ticket->eventTicket->date)->format('l, d F Y \a \l\a\s H:i') }}</p>
         </div>
 
         <!-- Content -->
@@ -164,22 +164,22 @@
                 
                 <div class="info-item">
                     <div class="info-label">Ubicación</div>
-                    <div class="info-value">{{ $ticket->ticketType->event->location }}</div>
+                    <div class="info-value">{{ $ticket->eventTicket->address }}</div>
                 </div>
                 
                 <div class="info-item">
                     <div class="info-label">Estado</div>
                     <div class="info-value">
-                        <span class="status {{ $ticket->checkin ? 'used' : 'valid' }}">
-                            {{ $ticket->checkin ? 'Canjeado' : 'Válido' }}
+                        <span class="status {{ $ticket->used ? 'used' : 'valid' }}">
+                            {{ $ticket->used ? 'Canjeado' : 'Válido' }}
                         </span>
                     </div>
                 </div>
                 
-                @if($ticket->checkin)
+                @if($ticket->used)
                 <div class="info-item">
                     <div class="info-label">Canjeado el</div>
-                    <div class="info-value">{{ $ticket->checkin->scanned_at->format('d/m/Y H:i') }}</div>
+                    <div class="info-value">{{ $ticket->updated_at->format('d/m/Y H:i') }}</div>
                 </div>
                 @endif
                 

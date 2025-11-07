@@ -25,12 +25,34 @@
             
             <div class="space-y-4">
                 <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700">Nombre completo</label>
-                    <input id="name" name="name" type="text" autocomplete="name" required 
+                    <label for="name" class="block text-sm font-medium text-gray-700">Nombre</label>
+                    <input id="name" name="name" type="text" autocomplete="given-name" required 
                            class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('name') border-red-500 @enderror" 
-                           placeholder="Tu nombre completo"
+                           placeholder="Tu nombre"
                            value="{{ old('name') }}">
                     @error('name')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+                
+                <div>
+                    <label for="last_name" class="block text-sm font-medium text-gray-700">Apellido</label>
+                    <input id="last_name" name="last_name" type="text" autocomplete="family-name" required 
+                           class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('last_name') border-red-500 @enderror" 
+                           placeholder="Tu apellido"
+                           value="{{ old('last_name') }}">
+                    @error('last_name')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+                
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-700">Teléfono (opcional)</label>
+                    <input id="phone" name="phone" type="tel" autocomplete="tel" 
+                           class="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('phone') border-red-500 @enderror" 
+                           placeholder="+1 234 567 8900"
+                           value="{{ old('phone') }}">
+                    @error('phone')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
@@ -63,19 +85,6 @@
                            placeholder="Repite tu contraseña">
                 </div>
 
-                <div>
-                    <label for="role" class="block text-sm font-medium text-gray-700">Tipo de cuenta</label>
-                    <select id="role" name="role" 
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm @error('role') border-red-500 @enderror">
-                        <option value="viewer" {{ old('role') == 'viewer' ? 'selected' : '' }}>Viewer - Solo visualización</option>
-                        <option value="staff" {{ old('role') == 'staff' ? 'selected' : '' }}>Staff - Check-in de tickets</option>
-                        <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin - Acceso completo</option>
-                    </select>
-                    @error('role')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                    <p class="mt-1 text-xs text-gray-500">Selecciona el tipo de acceso que necesitas</p>
-                </div>
             </div>
 
             <div class="flex items-center">

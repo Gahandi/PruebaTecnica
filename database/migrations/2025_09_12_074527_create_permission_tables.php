@@ -25,8 +25,9 @@ return new class extends Migration
             $table->bigIncrements('id'); // permission id
             $table->string('name');       // For MyISAM use string('name', 225); // (or 166 for InnoDB with Redundant/Compact row format)
             $table->string('guard_name'); // For MyISAM use string('guard_name', 25);
+            $table->string('description');
             $table->timestamps();
-
+            $table->softDeletes();
             $table->unique(['name', 'guard_name']);
         });
 
@@ -39,6 +40,7 @@ return new class extends Migration
             }
             $table->string('name');       // For MyISAM use string('name', 225); // (or 166 for InnoDB with Redundant/Compact row format)
             $table->string('guard_name'); // For MyISAM use string('guard_name', 25);
+            $table->softDeletes();
             $table->timestamps();
             if ($teams || config('permission.testing')) {
                 $table->unique([$columnNames['team_foreign_key'], 'name', 'guard_name']);
@@ -127,10 +129,20 @@ return new class extends Migration
             throw new \Exception('Error: config/permission.php not found and defaults could not be merged. Please publish the package configuration before proceeding, or drop the tables manually.');
         }
 
-        Schema::drop($tableNames['role_has_permissions']);
-        Schema::drop($tableNames['model_has_roles']);
-        Schema::drop($tableNames['model_has_permissions']);
-        Schema::drop($tableNames['roles']);
-        Schema::drop($tableNames['permissions']);
+        Schema::dropIfExists('role_has_permissions', function (Blueprint $table) {
+            $table->dropSoftDeletes(); // Removes the 'deleted_at' column
+        });
+        Schema::dropIfExists('model_has_roles', function (Blueprint $table) {
+            $table->dropSoftDeletes(); // Removes the 'deleted_at' column
+        });
+        Schema::dropIfExists('model_has_permissions', function (Blueprint $table) {
+            $table->dropSoftDeletes(); // Removes the 'deleted_at' column
+        });
+        Schema::dropIfExists('roles', function (Blueprint $table) {
+            $table->dropSoftDeletes(); // Removes the 'deleted_at' column
+        });
+        Schema::dropIfExists('permissions', function (Blueprint $table) {
+            $table->dropSoftDeletes(); // Removes the 'deleted_at' column
+        });
     }
 };

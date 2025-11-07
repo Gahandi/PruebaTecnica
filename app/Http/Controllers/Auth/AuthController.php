@@ -29,7 +29,12 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
             
-            return redirect()->intended(route('events.public'));
+            // Redirigir a la URL previa o al dashboard si es admin, o a eventos si es usuario normal
+            if (Auth::user()->hasRole('admin') || Auth::user()->hasRole('staff')) {
+                return redirect()->intended(route('dashboard'));
+            }
+            
+            return redirect()->intended('/');
         }
 
         throw ValidationException::withMessages([
@@ -46,22 +51,26 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:20',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:admin,staff,viewer',
             'terms' => 'required|accepted',
         ]);
 
         $user = User::create([
             'name' => $request->name,
+            'last_name' => $request->last_name,
+            'phone' => $request->phone,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $request->role,
+            'role' => 'viewer',
+            'verified' => false,
         ]);
 
         Auth::login($user);
 
-        return redirect()->route('events.public')->with('success', '¡Cuenta creada exitosamente!');
+        return redirect()->intended('/')->with('success', '¡Cuenta creada exitosamente!');
     }
 
     public function logout(Request $request)
