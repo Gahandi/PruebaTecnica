@@ -196,10 +196,22 @@ public function processPayment(Request $request)
             if ($request->payment_method === 'openpay') {
                 \Log::info('Procesando con Openpay...', ['token' => $request->openpay_token]);
 
+                // Validar que las credenciales de Openpay estén configuradas
+                $merchantId = config('services.openpay.merchant_id');
+                $privateKey = config('services.openpay.private_key');
+                
+                if (empty($merchantId) || empty($privateKey)) {
+                    \Log::error(' Credenciales de Openpay no configuradas', [
+                        'merchant_id_set' => !empty($merchantId),
+                        'private_key_set' => !empty($privateKey),
+                    ]);
+                    return back()->with('error', 'Error de configuración: Las credenciales de Openpay no están configuradas. Por favor, contacta al administrador.');
+                }
+
                 $ip_user = $request->ip();
 
-                $openpay = Openpay::getInstance(env('OPENPAY_ID'), env('OPENPAY_PRIVATE_KEY'), 'MX', $ip_user);
-                Openpay::setSandboxMode(env('OPENPAY_SANDBOX_MODE', true));
+                $openpay = Openpay::getInstance($merchantId, $privateKey, 'MX', $ip_user);
+                Openpay::setSandboxMode(config('services.openpay.sandbox_mode', true));
 
                 $customer = [
                     'name' => auth()->user()->name,
@@ -277,10 +289,22 @@ public function processPayment(Request $request)
         }
 
         try {
+            // Validar que las credenciales de Openpay estén configuradas
+            $merchantId = config('services.openpay.merchant_id');
+            $privateKey = config('services.openpay.private_key');
+            
+            if (empty($merchantId) || empty($privateKey)) {
+                \Log::error('❌ Credenciales de Openpay no configuradas en callback', [
+                    'merchant_id_set' => !empty($merchantId),
+                    'private_key_set' => !empty($privateKey),
+                ]);
+                return redirect()->route('checkout.cart')->with('error', 'Error de configuración: Las credenciales de Openpay no están configuradas.');
+            }
+
             $ip_user = $request->ip();
 
-            $openpay = Openpay::getInstance(env('OPENPAY_ID'), env('OPENPAY_PRIVATE_KEY'), 'MX', $ip_user);
-            Openpay::setSandboxMode(env('OPENPAY_SANDBOX_MODE', true));
+            $openpay = Openpay::getInstance($merchantId, $privateKey, 'MX', $ip_user);
+            Openpay::setSandboxMode(config('services.openpay.sandbox_mode', true));
 
             // Consultamos el estado final del cargo en Openpay usando el ID.
             $charge = $openpay->charges->get($chargeIdFromSession);
