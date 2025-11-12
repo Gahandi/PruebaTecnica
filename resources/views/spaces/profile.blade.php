@@ -148,6 +148,14 @@
                     </div>
                 </div>
 
+                <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
+                    <a href="{{ route('scanner.index', ['subdomain' => $space->subdomain]) }}"
+                       class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-xl transition duration-200"
+                    >
+                        Ir al Scanner
+                    </a>
+                </div>
+
             </div>
 
             <!-- Columna Derecha - Eventos -->

@@ -4,29 +4,35 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Ticket;
+use Illuminate\Support\Str;
+use App\Models\Space;
+use App\Models\RoleSpacePermission;
 
 class ScannerController extends Controller
 {
     //
     public function index()
     {
-        return view('scanner.index');
-    }
+        $host = request()->getHost();
 
-    public function validateTicket(Request $request)
-    {
-        $ticket = Ticket::find($request->code);
+        // Extraer el subdominio (antes del primer punto)
+        $subdomain = Str::before($host, '.');
+    
+        // Buscar en la tabla spaces donde el slug coincida con el subdominio
+        $space = Space::where('subdomain', $subdomain)->first();
+    
+        // Si no existe el space, retornar 404
+        if (!$space) {
+            abort(404, 'Espacio no encontrado.');
+        }
+        // Verificar si el usuario autenticado tiene el permiso
+        $canSeeScanner = RoleSpacePermission::hasPermission($space->id, 'create checkins');
 
-        if (!$ticket) {
-            return response()->json(['status' => 'error', 'message' => 'Ticket not found']);
+        if ($canSeeScanner) {
+            return view('scanner.index', ['space' => $space]);
         }
 
-        if ($ticket->used) {
-            return response()->json(['status' => 'used', 'message' => 'Ticket already used']);
-        }
-
-        $ticket->update(['used' => true]);
-
-        return response()->json(['status' => 'valid', 'message' => 'Ticket valid']);
+        abort(403, 'No tienes permisos para acceder al escáner.');
     }
+    
 }

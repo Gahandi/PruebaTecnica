@@ -109,7 +109,7 @@ class OrderController extends Controller
                         'id' => Str::uuid(),
                     ]);
                     $ticket->update([
-                        'qr_url' => 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($order->id . '-' . $i),
+                        'qr_url' => 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($ticket->id),
                     ]);
                     $tickets[] = $ticket;
                 }

@@ -16,6 +16,8 @@ use App\Http\Controllers\UserSpacesController;
 use App\Http\Controllers\SpaceController;
 use App\Http\Controllers\SpaceEventController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ScannerController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,6 +35,7 @@ use Illuminate\Support\Facades\Route;
 Route::domain('{subdomain}.' . config('app.url'))
     ->middleware(['subdomain.session', 'cart.context'])
     ->group(function () {
+        Route::get('/scanner', [ScannerController::class, 'index'])->name('scanner.index');
         Route::get('/', [SpaceController::class, 'show'])->name('spaces.profile');
         Route::get('/edit', [SpaceController::class, 'edit'])->name('spaces.edit');
         Route::put('/update', [SpaceController::class, 'update'])->name('spaces.update');
@@ -193,3 +196,4 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/join/{space}', [UserSpacesController::class, 'joinSpace'])->name('join.space');
         });
 });
+

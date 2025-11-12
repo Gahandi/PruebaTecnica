@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     var qrElement = document.getElementById("qrcode-{{ $ticket->id }}");
                     if (qrElement) {
                         new QRCode(qrElement, {
-                            text: "{{ url('/tickets/verify/' . $ticket->id) }}",
+                            text: "{{ $ticket->id }}",
                             width: 120,
                             height: 120,
                             colorDark: "#000000",

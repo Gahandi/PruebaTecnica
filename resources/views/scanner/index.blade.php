@@ -3,47 +3,72 @@
 @section('title', 'Scanner de Boletos')
 
 @section('content')
-<div class="max-w-3xl mx-auto mt-10 p-8 bg-white shadow rounded-xl text-center">
-    <h1 class="text-2xl font-bold mb-4">Escáner de Boletos</h1>
-    <p class="mb-6 text-gray-600">Apunta la cámara al código QR del boleto para validar.</p>
+<div class="max-w-3xl mx-auto mt-10 p-8 bg-white shadow-lg rounded-2xl text-center border border-gray-200">
+    <h1 class="text-3xl font-extrabold mb-4 text-gray-800 tracking-tight">Escáner de Boletos</h1>
+    <p class="mb-6 text-gray-600">Apunta la cámara al código QR del boleto para validar acceso.</p>
 
-    <div id="reader" class="mx-auto w-full max-w-md"></div>
+    <div id="reader" class="mx-auto w-full max-w-md rounded-lg overflow-hidden shadow-md border border-gray-300"></div>
 
-    <div id="result" class="mt-6 text-lg font-semibold text-gray-700"></div>
+    <div id="result" class="mt-6 text-lg font-medium"></div>
 </div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const resultContainer = document.getElementById('result');
-    const qrRegion = document.getElementById('reader');
+    let lock = false;
+
+    function renderMessage(html) {
+        resultContainer.innerHTML = `
+            <div class="p-5 rounded-xl border shadow-sm animate-fade">
+                ${html}
+            </div>
+        `;
+    }
 
     function onScanSuccess(decodedText, decodedResult) {
-        // Mostrar temporalmente lo leído
-        resultContainer.innerHTML = `<p>Escaneando: <strong>${decodedText}</strong></p>`;
+        if (lock) return;
+        lock = true;
 
-        // Enviar a backend para validar
-        fetch(`/api/validate-ticket/${decodedText}`)
-            .then(response => response.json())
+        let parts = decodedText.split('/');
+        let ticketId = parts[parts.length - 1];
+
+        renderMessage(`<p class="text-gray-500">Validando boleto <strong>${ticketId}</strong>...</p>`);
+
+        fetch(`/api/v1/validate-ticket/${ticketId}`)
+            .then(r => r.json())
             .then(data => {
-                if (data.valid) {
-                    resultContainer.innerHTML = `
-                        <div class="text-green-600 font-bold text-xl">
-                            ✅ Boleto válido: ${data.ticket_id}
+
+                if (data.success) {
+                    renderMessage(`
+                        <div class="text-green-700">
+                            <div class="text-2xl font-bold mb-2">✅ Acceso Concedido</div>
+                            <div class="text-lg">Boleto: <strong>${data.data.ticket.id}</strong></div>
+                            <div class="text-lg">Evento: <strong>${data.data.event.name}</strong></div>
                         </div>
-                    `;
+                    `);
                 } else {
-                    resultContainer.innerHTML = `
-                        <div class="text-red-600 font-bold text-xl">
-                            ❌ ${data.message}
+                    renderMessage(`
+                        <div class="text-red-700">
+                            <div class="text-2xl font-bold mb-2">❌ Acceso Denegado</div>
+                            <div class="text-lg">Este boleto ya ha sido escaneado</div>
+                            <div class="mt-2 text-lg">
+                                Evento: <strong>${data.data?.event?.name ?? 'No disponible'}</strong>
+                            </div>
                         </div>
-                    `;
+                    `);
                 }
+
             })
             .catch(() => {
-                resultContainer.innerHTML = `
-                    <div class="text-red-500 font-bold">
-                        Error al validar el boleto.
+                renderMessage(`
+                    <div class="text-red-700">
+                        <div class="text-xl font-bold">⚠ Error</div>
+                        <p>No se pudo validar el boleto. Intente de nuevo.</p>
                     </div>
-                `;
+                `);
+            })
+            .finally(() => {
+                setTimeout(() => { lock = false; }, 2000);
             });
     }
 
@@ -52,17 +77,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     Html5Qrcode.getCameras().then(devices => {
         if (devices && devices.length) {
-            const cameraId = devices[0].id;
-            html5QrCode.start(
-                cameraId,
-                config,
-                onScanSuccess
-            );
+            html5QrCode.start(devices[0].id, config, onScanSuccess);
         }
     }).catch(err => {
         resultContainer.innerHTML = `<p class="text-red-500">No se pudo acceder a la cámara: ${err}</p>`;
     });
 });
 </script>
+
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 @endsection
