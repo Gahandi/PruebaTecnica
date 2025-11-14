@@ -14,7 +14,7 @@
     <div class="relative overflow-hidden">
         @if($event->banner)
             <div class="relative h-[60vh] min-h-[500px] overflow-hidden">
-                <img src="https://cevents.es/wp-content/uploads/2021/11/evento-corporativo-imgpost.jpg" alt="{{ $event->name }}" 
+                <img src="{{ $event->image }} " alt="{{ $event->name }}" 
                      id="hero-image"
                      class="absolute inset-0 w-full h-full object-cover">
                 

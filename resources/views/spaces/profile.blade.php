@@ -2,6 +2,11 @@
 
 @section('title', $space->name)
 
+@php
+    use App\Models\RoleSpacePermission;
+    $canSeeScanner = RoleSpacePermission::hasPermission($space->id, 'create checkins');
+@endphp
+
 @push('head')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @endpush
@@ -147,14 +152,16 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
-                    <a href="{{ route('scanner.index', ['subdomain' => $space->subdomain]) }}"
-                       class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-xl transition duration-200"
-                    >
-                        Ir al Scanner
-                    </a>
-                </div>
+                 
+                @if($canSeeScanner)
+                    <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
+                        <a href="{{ route('scanner.index', ['subdomain' => $space->subdomain]) }}"
+                        class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-xl transition duration-200"
+                        >
+                            Ir al Scanner
+                        </a>
+                    </div>
+                @endif
 
             </div>
 
@@ -188,14 +195,11 @@
                                 <div class="bg-white border-2 border-gray-100 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:border-gray-200 transform hover:-translate-y-1">
                                     <div class="relative">
 
-                                            <div class="w-full h-56 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                                                <div class="text-center text-white">
-                                                    <svg class="w-16 h-16 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
-                                                    </svg>
-                                                    <p class="text-lg font-semibold">{{ $event->name }}</p>
-                                                </div>
-                                            </div>
+                                           
+                                        <img src="{{$event->banner }}"
+                                            alt="{{ $event->name }}"
+                                            class="w-full h-48 object-cover">
+
 
                                         <!-- Badge de Fecha -->
                                         <div class="absolute top-4 right-4">
