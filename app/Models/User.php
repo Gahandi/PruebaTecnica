@@ -66,6 +66,7 @@ class User extends Authenticatable
         return $this->spaces()
             ->where('spaces.id', $spaceId)
             ->wherePivot('role_space_id', 1) // 1 = admin role
+            ->wherePivotNull('deleted_at') // Excluir relaciones eliminadas
             ->exists();
     }
 
