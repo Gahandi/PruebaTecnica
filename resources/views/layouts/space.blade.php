@@ -301,7 +301,7 @@
         // Escuchar eventos de agregar al carrito
         document.addEventListener('cartUpdated', function() {
             showCartNotification();
-            // Actualizar el contador del carrito
+            // Actualizar el contador del carrito inmediatamente
             updateCartCount();
         });
 
@@ -317,13 +317,30 @@
             })
             .then(response => response.json())
             .then(data => {
-                // Actualizar el contador visual
-                const cartCount = document.querySelector('#cart-dropdown .bg-red-500');
-                if (cartCount) {
-                    cartCount.textContent = data.count;
-                    if (data.count > 0) {
+                const cartButton = document.querySelector('#cart-dropdown button');
+                let cartCount = document.querySelector('#cart-dropdown .bg-red-500');
+                
+                if (data.count > 0) {
+                    // Si el badge no existe, crearlo
+                    if (!cartCount && cartButton) {
+                        cartCount = document.createElement('span');
+                        cartCount.className = 'absolute -top-0.5 -right-0.5 inline-flex items-center justify-center bg-red-500 text-white text-xs font-bold min-w-[18px] h-[18px] px-1 rounded-full border-2 border-white shadow-lg';
+                        cartButton.appendChild(cartCount);
+                    }
+                    
+                    // Actualizar el contador
+                    if (cartCount) {
+                        cartCount.textContent = data.count;
                         cartCount.style.display = 'inline-flex';
-                    } else {
+                        // Agregar animación
+                        cartCount.classList.add('animate-pulse');
+                        setTimeout(() => {
+                            cartCount.classList.remove('animate-pulse');
+                        }, 500);
+                    }
+                } else {
+                    // Si el contador es 0, ocultar el badge
+                    if (cartCount) {
                         cartCount.style.display = 'none';
                     }
                 }
@@ -332,6 +349,9 @@
                 console.error('Error updating cart count:', error);
             });
         }
+        
+        // Hacer la función disponible globalmente
+        window.updateCartCount = updateCartCount;
 
         function toggleUserDropdown() {
             const menu = document.getElementById('user-menu');

@@ -311,6 +311,8 @@
             }
         }
 
+// Estas funciones se definen más abajo en el script
+
         // Cerrar dropdown cuando se hace clic en los enlaces del carrito
         document.addEventListener('click', function(event) {
             if (event.target.closest('a[href*="cart"]') || event.target.closest('a[href*="checkout"]')) {
@@ -345,9 +347,8 @@
         // Escuchar eventos de agregar al carrito
         document.addEventListener('cartUpdated', function() {
             showCartNotification();
-            // Actualizar el contador del carrito y el dropdown
+            // Actualizar el contador del carrito inmediatamente
             updateCartCount();
-            updateCartDropdown();
         });
 
         // Función para actualizar el contador del carrito
@@ -377,9 +378,14 @@
                     if (cartCount) {
                         cartCount.textContent = data.count;
                         cartCount.style.display = 'inline-flex';
+                        // Agregar animación
+                        cartCount.classList.add('animate-pulse');
+                        setTimeout(() => {
+                            cartCount.classList.remove('animate-pulse');
+                        }, 500);
                     }
                 } else {
-                    // Si el contador es 0, ocultar o eliminar el badge
+                    // Si el contador es 0, ocultar el badge
                     if (cartCount) {
                         cartCount.style.display = 'none';
                     }
@@ -389,7 +395,7 @@
                 console.error('Error updating cart count:', error);
             });
         }
-
+        
         // Función para actualizar el dropdown del carrito
         function updateCartDropdown() {
             fetch('{{ route("cart.dropdown") }}', {
@@ -406,35 +412,15 @@
                 if (cartMenu) {
                     cartMenu.innerHTML = data.html;
                 }
-                
-                // Actualizar el contador también
-                const cartButton = document.querySelector('#cart-dropdown button');
-                let cartCount = document.querySelector('#cart-dropdown .bg-red-500');
-                
-                if (data.count > 0) {
-                    // Si el badge no existe, crearlo
-                    if (!cartCount && cartButton) {
-                        cartCount = document.createElement('span');
-                        cartCount.className = 'absolute -top-0.5 -right-0.5 inline-flex items-center justify-center bg-red-500 text-white text-xs font-bold min-w-[18px] h-[18px] px-1 rounded-full border-2 border-white shadow-lg';
-                        cartButton.appendChild(cartCount);
-                    }
-                    
-                    // Actualizar el contador
-                    if (cartCount) {
-                        cartCount.textContent = data.count;
-                        cartCount.style.display = 'inline-flex';
-                    }
-                } else {
-                    // Si el contador es 0, ocultar el badge
-                    if (cartCount) {
-                        cartCount.style.display = 'none';
-                    }
-                }
             })
             .catch(error => {
                 console.error('Error updating cart dropdown:', error);
             });
         }
+        
+        // Hacer las funciones disponibles globalmente
+        window.updateCartCount = updateCartCount;
+        window.updateCartDropdown = updateCartDropdown;
 
         function toggleUserDropdown() {
             const menu = document.getElementById('user-menu');

@@ -426,14 +426,21 @@ async function addToCart() {
             }
         }
 
+        // Actualizar contador inmediatamente (sin esperar evento)
+        if (typeof updateCartCount === 'function') {
+            updateCartCount();
+        }
+        
+        // Actualizar dropdown si está abierto
+        if (typeof updateCartDropdown === 'function') {
+            updateCartDropdown();
+        }
+        
         // Mostrar notificación de éxito
         showNotification('¡Boletos agregados al carrito exitosamente!', 'success');
 
         // Disparar evento de carrito actualizado
         document.dispatchEvent(new CustomEvent('cartUpdated'));
-        
-        // Actualizar contador del carrito
-        updateCartCount();
 
     } catch (error) {
         console.error('Error:', error);

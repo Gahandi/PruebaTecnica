@@ -329,6 +329,16 @@ async function addToCart() {
             }
         }
         
+        // Actualizar contador inmediatamente (sin esperar evento)
+        if (typeof updateCartCount === 'function') {
+            updateCartCount();
+        }
+        
+        // Actualizar dropdown si está abierto
+        if (typeof updateCartDropdown === 'function') {
+            updateCartDropdown();
+        }
+        
         // Disparar evento de carrito actualizado
         document.dispatchEvent(new CustomEvent('cartUpdated'));
         
