@@ -170,9 +170,8 @@
 
                         @auth
                             @php
-                                use App\Models\RoleSpacePermission;
                                 $canSeeScanner = auth()->user()->isAdminOfSpace($space->id) || 
-                                                RoleSpacePermission::hasPermission($space->id, 'create checkins');
+                                                \App\Models\RoleSpacePermission::hasPermission($space->id, 'create checkins');
                             @endphp
                             @if($canSeeScanner)
                                 <a href="{{ route('scanner.index') }}" class="text-gray-700 hover:text-gray-900 flex items-center gap-1">
