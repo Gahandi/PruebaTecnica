@@ -35,7 +35,7 @@ return [
         'merchant_id' => env('OPENPAY_ID'),
         'private_key' => env('OPENPAY_PRIVATE_KEY'),
         'public_key' => env('OPENPAY_PUBLIC_KEY'),
-        'sandbox_mode' => env('OPENPAY_SANDBOX_MODE', true),
+        'sandbox_mode' => env('OPENPAY_SANDBOX_MODE', false),
     ],
 
 ];

@@ -83,7 +83,28 @@ class SpaceEventController extends Controller
             if ($request->hasFile('banner')) {
                 $bannerFile = $request->file('banner');
                 $fileContents = file_get_contents($bannerFile->getRealPath());
-                $eventData['banner'] = $this->saveImages($fileContents, 'events/banners', $space->id . '_' . time());
+                
+                // Detectar extensión desde MIME type (igual que saveImages)
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mimeType = finfo_buffer($finfo, $fileContents);
+                finfo_close($finfo);
+                $extensions = [
+                    'image/jpeg' => 'jpg',
+                    'image/jpg' => 'jpg',
+                    'image/png' => 'png',
+                    'image/gif' => 'gif',
+                    'image/webp' => 'webp',
+                ];
+                $extension = $extensions[$mimeType] ?? 'jpg';
+                
+                $productId = $space->id . '_' . time();
+                $fileName = $productId . '.' . $extension;
+                $bannerPath = env('S3_ENVIRONMENT') . '/events/banners/' . $fileName;
+                
+                // Primero guardar la imagen
+                $this->saveImages($fileContents, 'events/banners', $productId);
+                // Guardar la ruta relativa en la DB
+                $eventData['banner'] = $bannerPath;
             } else {
                 $eventData['banner'] = 'https://via.placeholder.com/1200x400?text=Sin+Banner';
             }
@@ -91,7 +112,28 @@ class SpaceEventController extends Controller
             if ($request->hasFile('image')) {
                 $imageFile = $request->file('image');
                 $fileContents = file_get_contents($imageFile->getRealPath());
-                $eventData['image'] = $this->saveImages($fileContents, 'events/images', $space->id . '_' . time());
+                
+                // Detectar extensión desde MIME type (igual que saveImages)
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mimeType = finfo_buffer($finfo, $fileContents);
+                finfo_close($finfo);
+                $extensions = [
+                    'image/jpeg' => 'jpg',
+                    'image/jpg' => 'jpg',
+                    'image/png' => 'png',
+                    'image/gif' => 'gif',
+                    'image/webp' => 'webp',
+                ];
+                $extension = $extensions[$mimeType] ?? 'jpg';
+                
+                $productId = $space->id . '_' . time();
+                $fileName = $productId . '.' . $extension;
+                $imagePath = env('S3_ENVIRONMENT') . '/events/images/' . $fileName;
+                
+                // Primero guardar la imagen
+                $this->saveImages($fileContents, 'events/images', $productId);
+                // Guardar la ruta relativa en la DB
+                $eventData['image'] = $imagePath;
             } else {
                 $eventData['image'] = 'https://via.placeholder.com/800x600?text=Sin+Imagen';
             }
@@ -99,7 +141,28 @@ class SpaceEventController extends Controller
             if ($request->hasFile('icon')) {
                 $iconFile = $request->file('icon');
                 $fileContents = file_get_contents($iconFile->getRealPath());
-                $eventData['icon'] = $this->saveImages($fileContents, 'events/icons', $space->id . '_' . time());
+                
+                // Detectar extensión desde MIME type (igual que saveImages)
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mimeType = finfo_buffer($finfo, $fileContents);
+                finfo_close($finfo);
+                $extensions = [
+                    'image/jpeg' => 'jpg',
+                    'image/jpg' => 'jpg',
+                    'image/png' => 'png',
+                    'image/gif' => 'gif',
+                    'image/webp' => 'webp',
+                ];
+                $extension = $extensions[$mimeType] ?? 'jpg';
+                
+                $productId = $space->id . '_' . time();
+                $fileName = $productId . '.' . $extension;
+                $iconPath = env('S3_ENVIRONMENT') . '/events/icons/' . $fileName;
+                
+                // Primero guardar la imagen
+                $this->saveImages($fileContents, 'events/icons', $productId);
+                // Guardar la ruta relativa en la DB
+                $eventData['icon'] = $iconPath;
             } else {
                 $eventData['icon'] = 'https://via.placeholder.com/200x200?text=Sin+Icono';
             }
