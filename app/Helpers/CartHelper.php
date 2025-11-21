@@ -123,19 +123,19 @@ class CartHelper
     }
 
     /**
-     * Obtener la ruta correcta para ver el carrito
+     * Obtener la ruta correcta para ver el carrito (siempre dominio base)
      */
     public static function getCartViewRoute($host = null)
     {
-        return config('app.domain') . '/cart';
+        return config('app.url') . '/cart';
     }
 
     /**
-     * Obtener la ruta correcta para checkout
+     * Obtener la ruta correcta para checkout (siempre dominio base)
      */
     public static function getCheckoutRoute($host = null)
     {
-return config('app.domain') . '/checkout/checkout';
+        return config('app.url') . '/checkout/checkout';
     }
 
     /**

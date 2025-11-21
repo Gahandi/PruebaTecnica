@@ -107,7 +107,7 @@
                                 </div>
                             </div>
                             @endif
-                        <a href="{{ route('events.public') }}" class="text-xl font-bold text-gray-900">
+                        <a href="{{ config('app.url') }}/" class="text-xl font-bold text-gray-900">
                             {{ config('app.name', 'Boletos') }}
                         </a>
                     </div>

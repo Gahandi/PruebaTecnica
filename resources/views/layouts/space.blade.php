@@ -164,11 +164,24 @@
                         <a href="{{ route('spaces.profile', $space->subdomain ?? '') }}" class="text-gray-700 hover:text-gray-900">
                             Inicio
                         </a>
-                        <a href="{{ config('app.url') }}/events" class="text-gray-700 hover:text-gray-900">
+                        <a href="{{ config('app.url') }}" class="text-gray-700 hover:text-gray-900">
                             Todos los Eventos
                         </a>
 
                         @auth
+                            @php
+                                use App\Models\RoleSpacePermission;
+                                $canSeeScanner = auth()->user()->isAdminOfSpace($space->id) || 
+                                                RoleSpacePermission::hasPermission($space->id, 'create checkins');
+                            @endphp
+                            @if($canSeeScanner)
+                                <a href="{{ route('scanner.index') }}" class="text-gray-700 hover:text-gray-900 flex items-center gap-1">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                                    </svg>
+                                    Scanner
+                                </a>
+                            @endif
                             <!-- User Menu Dropdown -->
                             <div class="relative group" id="user-dropdown">
                                 <button class="text-gray-700 hover:text-gray-900 flex items-center" onclick="toggleUserDropdown()">
@@ -187,7 +200,7 @@
                                     </div>
 
                                     <!-- Menu Items -->
-                                    <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                    <a href="{{ config('app.url') }}/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                         <div class="flex items-center">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
@@ -196,7 +209,7 @@
                                         </div>
                                     </a>
 
-                                    <a href="{{ route('tickets.my') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                    <a href="{{ config('app.url') }}/my-tickets" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                         <div class="flex items-center">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
@@ -206,7 +219,7 @@
                                     </a>
 
                                     <!-- Logout -->
-                                    <form method="POST" action="{{ route('logout') }}" class="block">
+                                    <form method="POST" action="{{ config('app.url') }}/logout" class="block">
                                         @csrf
                                         <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
                                             <div class="flex items-center">
