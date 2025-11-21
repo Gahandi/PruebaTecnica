@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Space;
 use App\Models\Event;
 use Illuminate\Http\Request;
+use App\Traits\S3ImageManager;
 
 class SpaceController extends Controller
 {
+    use S3ImageManager; 
+
     public function show(Request $request, $subdomain)
     {
         // Buscar el espacio por subdomain
@@ -78,14 +81,40 @@ class SpaceController extends Controller
         
         // Manejar upload de logo
         if ($request->hasFile('logo')) {
-            $logoPath = $request->file('logo')->store('spaces/logos', 'public');
-            $space->update(['logo' => $logoPath]);
+
+            // Si ya había un logo, eliminarlo del bucket
+            if (!empty($space->logo)) {
+                $oldLogo = basename($space->logo); // Obtiene solo el archivo.ext
+                $this->deleteS3Image('spaces/logos', $oldLogo);
+            }
+    
+            $fileContents = file_get_contents($request->file('logo')->getRealPath());
+    
+            $logoUrl = $this->saveImages(
+                $fileContents,
+                'spaces/logos',
+                $space->id
+            );
+    
+            $space->update(['logo' => $logoUrl]);
         }
-        
-        // Manejar upload de banner
+
         if ($request->hasFile('banner')) {
-            $bannerPath = $request->file('banner')->store('spaces/banners', 'public');
-            $space->update(['banner' => $bannerPath]);
+
+            if (!empty($space->banner)) {
+                $oldBanner = basename($space->banner);
+                $this->deleteS3Image('spaces/banners', $oldBanner);
+            }
+    
+            $fileContents = file_get_contents($request->file('banner')->getRealPath());
+    
+            $bannerUrl = $this->saveImages(
+                $fileContents,
+                'spaces/banners',
+                $space->id
+            );
+    
+            $space->update(['banner' => $bannerUrl]);
         }
         
         return redirect()->route('spaces.profile', $space->subdomain)

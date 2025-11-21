@@ -8,9 +8,14 @@ use App\Models\Payment;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Traits\S3ImageManager;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+
 
 class OrderController extends Controller
 {
+    use S3ImageManager;
+
     public function show(Order $order)
     {
         // Verificar que el usuario puede ver esta orden
@@ -71,17 +76,44 @@ class OrderController extends Controller
         return view('tickets.my', compact('orders'));
     }
 
-    public function downloadPdf(Ticket $ticket)
+        public function downloadPdf(Ticket $ticket)
     {
-        // Verificar que el usuario sea el propietario o admin
+        // Verificar permisos (usuario dueño o admin)
         if (auth()->id() !== $ticket->order->user_id && !auth()->user()->hasRole('admin')) {
             abort(403, 'No tienes permisos para descargar este boleto.');
         }
 
+        // Cargar relaciones
         $ticket->load(['order.user', 'eventTicket', 'checkin']);
 
-        $pdf = Pdf::loadView('tickets.pdf', compact('ticket'));
-        $pdf->setPaper('A4', 'portrait');
+        /* 1. GENERAR QR SI NO EXISTE*/
+        if (!$ticket->qr_url) {
+
+            // Generar el QR en memoria (png binario)
+            $qrBinary = QrCode::format('png')
+                ->size(300)
+                ->generate($ticket->id);
+    
+            // Subir a S3 usando tu trait
+            $qrS3Url = $this->saveImages($qrBinary, 'tickets_qr', $ticket->id);
+    
+            // Guardar URL del S3 en BD
+            $ticket->qr_url = $qrS3Url;
+            $ticket->save();
+        }
+
+        /*2. CONVERTIR IMAGEN QR A BASE64 PARA DOMPDF*/
+        try {
+            $qrBinary = file_get_contents($ticket->qr_url);
+            $ticket->qr_base64 = 'data:image/png;base64,' . base64_encode($qrBinary);
+        } catch (\Exception $e) {
+            // Si falla, el PDF se genera sin QR
+            $ticket->qr_base64 = null;
+        }
+
+        /*| 3. GENERAR PDF*/
+        $pdf = \PDF::loadView('tickets.pdf', compact('ticket'))
+        ->setPaper('A4', 'portrait');
 
         return $pdf->download('boleto-' . substr($ticket->id, 0, 8) . '.pdf');
     }

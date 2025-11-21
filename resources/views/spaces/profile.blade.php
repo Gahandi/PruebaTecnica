@@ -20,21 +20,21 @@
          <!-- Foto de la Organización - Estilo Facebook -->
          <div class="mb-8">
              <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-
-
-                 <!-- Imagen principal - Estilo Facebook -->
-                 <div class="relative facebook-style-photo">
-                           <div class="absolute top-8 right-8">
+                 
+                 <div class="relative facebook-style-photo" >
+                     <div class="absolute top-8 right-8 z-30">
                 @auth
                 @if(auth()->user()->isAdminOfSpace($space->id))
                     <!-- Botón de Edición -->
-                        <button onclick="toggleEditMode()"
-                    class="bg-white bg-opacity-90 backdrop-blur-sm rounded-full px-6 py-3 shadow-xl flex items-center space-x-3 hover:bg-opacity-100 transition-all duration-300 hover:scale-105 edit-organization-button">
-                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a2 2 0 114 0 2 2 0 01-4 0zm8 0a2 2 0 114 0 2 2 0 01-4 0z" clip-rule="evenodd"></path>
-                    </svg>
-                    <span class="text-sm font-semibold text-gray-800">Editar</span>
-                    <div class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                        <button 
+                            type="button"
+                            onclick="toggleEditMode()"
+                            class="bg-white bg-opacity-90 backdrop-blur-sm rounded-full px-6 py-3 shadow-xl flex items-center space-x-3 hover:bg-opacity-100 transition-all duration-300 hover:scale-105 edit-organization-button">
+                            <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a2 2 0 114 0 2 2 0 01-4 0zm8 0a2 2 0 114 0 2 2 0 01-4 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-sm font-semibold text-gray-800">Editar</span>
+                            <div class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
                         </button>
                     @endif
             @else
@@ -49,8 +49,8 @@
                 </div>
                 @endauth
             </div>
-                     @if($space->logo)
-                         <img src="https://cdn.prod.website-files.com/64949e4863d96e26a1da8386/64b94436579d789944d1f7a6_60aeadbd09ddbd2a228e2a48_University-20--20Overflow-20none.png" alt="{{ $space->name }}" class="w-full h-96 object-cover">
+                     @if($space->banner)
+                     <img src="{{ $space->banner }}" alt="{{ $space->name }}" class="w-full h-96 object-cover">
                      @else
                          <div class="w-full h-96 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                              <div class="text-center text-gray-500">
@@ -82,7 +82,7 @@
                     <div class="flex item-center justify-center pt-10">
                         <div class="z-20 w-25 h-25 md:w-42 md:h-42 rounded-full border-4 border-white shadow-2xl overflow-hidden bg-white">
                             @if($space->logo)
-                                <img src="https://th.bing.com/th/id/R.dba4054ba56a7fd2704055ecc2c86814?rik=sgRUCz90LS6sgg&pid=ImgRaw&r=0" alt="{{ $space->name }}" class="w-full h-full object-cover">
+                                <img src="{{ $space->logo }}" alt="{{ $space->name }}" class="w-full h-full object-cover">
                             @else
                             <div class="w-full h-full flex items-center justify-center text-3xl font-bold text-white" style="background: linear-gradient(135deg, {{ $space->color_primary }}, {{ $space->color_secondary ?? $space->color_primary }});">
                                     {{ substr($space->name, 0, 2) }}
@@ -394,7 +394,7 @@ function toggleEditMode() {
     if (isEditMode) {
         exitEditMode();
     } else {
-        enterEditMode();
+        window.location.href = "{{ route('spaces.edit', $space->subdomain) }}";
     }
 }
 
@@ -1157,10 +1157,6 @@ function showErrorMessage(message) {
 
 .facebook-style-photo img {
     transition: transform 0.3s ease;
-}
-
-.facebook-style-photo:hover img {
-    transform: scale(1.05);
 }
 
 .photo-overlay {

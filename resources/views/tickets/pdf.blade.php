@@ -157,10 +157,10 @@
                     <div class="info-value">{{ $ticket->ticketType->name }}</div>
                 </div>
                 
-                <div class="info-item">
+                <!-- <div class="info-item">
                     <div class="info-label">Precio</div>
                     <div class="info-value">${{ number_format($ticket->ticketType->price, 2) }}</div>
-                </div>
+                </div> -->
                 
                 <div class="info-item">
                     <div class="info-label">Ubicación</div>
@@ -202,22 +202,11 @@
             <!-- QR Code Section -->
             <div class="qr-section">
                 <h3 style="margin: 0 0 15px 0; color: #374151;">Código QR de Entrada</h3>
-                <div class="qr-code">
-                    @if($ticket->qr_url && file_exists(public_path($ticket->qr_url)))
-                        @if(pathinfo($ticket->qr_url, PATHINFO_EXTENSION) === 'svg')
-                            @php
-                                $svgContent = file_get_contents(public_path($ticket->qr_url));
-                                $base64Svg = 'data:image/svg+xml;base64,' . base64_encode($svgContent);
-                            @endphp
-                            <img src="{{ $base64Svg }}" alt="QR Code" style="width: 180px; height: 180px; display: block; margin: 0 auto;">
-                        @elseif(pathinfo($ticket->qr_url, PATHINFO_EXTENSION) === 'txt')
-                            <div style="color: #6b7280; font-size: 14px; text-align: center;">
-                                <div style="font-size: 24px; margin-bottom: 8px;">📱</div>
-                                <div>QR Code</div>
-                            </div>
-                        @else
-                            <img src="{{ public_path($ticket->qr_url) }}" alt="QR Code" style="width: 180px; height: 180px; display: block; margin: 0 auto;">
-                        @endif
+                <div class="qr-code" style="text-align: center; margin-top: 20px;">
+                    @if($ticket->qr_base64)
+                        <img src="{{ $ticket->qr_base64 }}" 
+                            alt="QR Code" 
+                            style="width: 180px; height: 180px; margin: 0 auto;">
                     @else
                         <div style="color: #9ca3af; font-size: 12px;">
                             QR no disponible
