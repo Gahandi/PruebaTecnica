@@ -2,6 +2,11 @@
 
 @section('title', $space->name)
 
+@php
+    use App\Models\RoleSpacePermission;
+    $canSeeScanner = RoleSpacePermission::hasPermission($space->id, 'create checkins');
+@endphp
+
 @push('head')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 @endpush
@@ -15,21 +20,21 @@
          <!-- Foto de la Organización - Estilo Facebook -->
          <div class="mb-8">
              <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-
-
-                 <!-- Imagen principal - Estilo Facebook -->
-                 <div class="relative facebook-style-photo">
-                           <div class="absolute top-8 right-8">
+                 
+                 <div class="relative facebook-style-photo" >
+                     <div class="absolute top-8 right-8 z-30">
                 @auth
                 @if(auth()->user()->isAdminOfSpace($space->id))
                     <!-- Botón de Edición -->
-                        <button onclick="toggleEditMode()"
-                    class="bg-white bg-opacity-90 backdrop-blur-sm rounded-full px-6 py-3 shadow-xl flex items-center space-x-3 hover:bg-opacity-100 transition-all duration-300 hover:scale-105 edit-organization-button">
-                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a2 2 0 114 0 2 2 0 01-4 0zm8 0a2 2 0 114 0 2 2 0 01-4 0z" clip-rule="evenodd"></path>
-                    </svg>
-                    <span class="text-sm font-semibold text-gray-800">Editar</span>
-                    <div class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                        <button 
+                            type="button"
+                            onclick="toggleEditMode()"
+                            class="bg-white bg-opacity-90 backdrop-blur-sm rounded-full px-6 py-3 shadow-xl flex items-center space-x-3 hover:bg-opacity-100 transition-all duration-300 hover:scale-105 edit-organization-button">
+                            <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a2 2 0 114 0 2 2 0 01-4 0zm8 0a2 2 0 114 0 2 2 0 01-4 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-sm font-semibold text-gray-800">Editar</span>
+                            <div class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
                         </button>
                     @endif
             @else
@@ -44,8 +49,8 @@
                 </div>
                 @endauth
             </div>
-                     @if($space->logo)
-                         <img src="https://cdn.prod.website-files.com/64949e4863d96e26a1da8386/64b94436579d789944d1f7a6_60aeadbd09ddbd2a228e2a48_University-20--20Overflow-20none.png" alt="{{ $space->name }}" class="w-full h-96 object-cover">
+                     @if($space->banner)
+                     <img src="{{ $space->banner }}" alt="{{ $space->name }}" class="w-full h-96 object-cover">
                      @else
                          <div class="w-full h-96 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                              <div class="text-center text-gray-500">
@@ -77,7 +82,7 @@
                     <div class="flex item-center justify-center pt-10">
                         <div class="z-20 w-25 h-25 md:w-42 md:h-42 rounded-full border-4 border-white shadow-2xl overflow-hidden bg-white">
                             @if($space->logo)
-                                <img src="https://th.bing.com/th/id/R.dba4054ba56a7fd2704055ecc2c86814?rik=sgRUCz90LS6sgg&pid=ImgRaw&r=0" alt="{{ $space->name }}" class="w-full h-full object-cover">
+                                <img src="{{ $space->logo }}" alt="{{ $space->name }}" class="w-full h-full object-cover">
                             @else
                             <div class="w-full h-full flex items-center justify-center text-3xl font-bold text-white" style="background: linear-gradient(135deg, {{ $space->color_primary }}, {{ $space->color_secondary ?? $space->color_primary }});">
                                     {{ substr($space->name, 0, 2) }}
@@ -147,6 +152,16 @@
                         </div>
                     </div>
                 </div>
+                 
+                @if($canSeeScanner)
+                    <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
+                        <a href="{{ route('scanner.index', ['subdomain' => $space->subdomain]) }}"
+                        class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-xl transition duration-200"
+                        >
+                            Ir al Scanner
+                        </a>
+                    </div>
+                @endif
 
             </div>
 
@@ -180,14 +195,11 @@
                                 <div class="bg-white border-2 border-gray-100 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:border-gray-200 transform hover:-translate-y-1">
                                     <div class="relative">
 
-                                            <div class="w-full h-56 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                                                <div class="text-center text-white">
-                                                    <svg class="w-16 h-16 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
-                                                    </svg>
-                                                    <p class="text-lg font-semibold">{{ $event->name }}</p>
-                                                </div>
-                                            </div>
+                                           
+                                        <img src="{{$event->banner }}"
+                                            alt="{{ $event->name }}"
+                                            class="w-full h-48 object-cover">
+
 
                                         <!-- Badge de Fecha -->
                                         <div class="absolute top-4 right-4">
@@ -382,7 +394,7 @@ function toggleEditMode() {
     if (isEditMode) {
         exitEditMode();
     } else {
-        enterEditMode();
+        window.location.href = "{{ route('spaces.edit', $space->subdomain) }}";
     }
 }
 
@@ -1145,10 +1157,6 @@ function showErrorMessage(message) {
 
 .facebook-style-photo img {
     transition: transform 0.3s ease;
-}
-
-.facebook-style-photo:hover img {
-    transform: scale(1.05);
 }
 
 .photo-overlay {

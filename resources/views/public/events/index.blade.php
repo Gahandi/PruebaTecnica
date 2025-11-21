@@ -16,16 +16,9 @@
             @foreach($events as $event)
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
                     <!-- Event Image Placeholder -->
-                    <div class="h-48 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                        <div class="text-center text-white">
-                            <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-2">
-                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <p class="text-sm font-medium">Evento</p>
-                        </div>
-                    </div>
+                    <img src="{{$event->banner }}"
+                             alt="{{ $event->name }}"
+                             class="w-full h-48 object-cover">
 
                     <!-- Event Content -->
                     <div class="p-6">

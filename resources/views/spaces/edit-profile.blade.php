@@ -7,7 +7,7 @@
     <div class="bg-white shadow-xl rounded-xl p-8 border border-gray-100">
         <h1 class="text-3xl font-bold text-gray-900 mb-6">Editar Perfil del Cajón</h1>
         
-        <form method="POST" action="{{ route('spaces.update-profile', $space) }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('spaces.update', ['subdomain' => $space->subdomain]) }}" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             

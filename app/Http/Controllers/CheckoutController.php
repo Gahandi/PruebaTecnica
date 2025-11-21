@@ -14,9 +14,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Openpay\Data\Openpay;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Facades\Storage;
+use App\Traits\S3ImageManager;
 
 class CheckoutController extends Controller
 {
+    use S3ImageManager;
+
     public function __construct()
     {
         $this->middleware('auth')->except(['addToCart', 'cart']);
@@ -402,13 +406,26 @@ public function processPayment(Request $request)
             ]);
 
             for ($i = 0; $i < $item['quantity']; $i++) {
-                Ticket::create([
+                $ticket = Ticket::create([
                     'id' => Str::uuid(),
                     'order_id' => $order->id,
                     'ticket_types_id' => $item['ticket_type_id'],
                     'event_id' => $item['event_id'],
                     'used' => false,
                 ]);
+
+             // Generar QR en memoria (sin archivo local)
+                $qrBinary = QrCode::format('png')
+                ->size(300)
+                ->generate($ticket->id);
+
+                // Subir a S3 directamente
+                $qrS3Url = $this->saveImages($qrBinary, 'tickets_qr', $ticket->id);
+
+                // Guardar URL de S3 en el ticket
+                $ticket->qr_url = $qrS3Url;
+                $ticket->save();
+
             }
         }
         \Log::info('Items de orden y tickets creados.', ['order_id' => $order->id]);

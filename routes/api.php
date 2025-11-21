@@ -6,7 +6,6 @@ use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\CouponController;
-use App\Http\Controllers\ScannerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,7 +33,7 @@ Route::prefix('v1')->middleware(['api.security', 'throttle:60,1'])->group(functi
     
     // Tickets
     Route::get('/tickets/{id}', [TicketController::class, 'show']);
-    Route::get('/tickets/{id}/validate', [TicketController::class, 'validateTicket']);
+    Route::get('/validate-ticket/{id}', [TicketController::class, 'validateTicket']);
     
     // Coupons
     Route::post('/coupons/validate', [CouponController::class, 'validateCoupon']);
@@ -47,5 +46,3 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
-Route::get('/scanner', [ScannerController::class, 'index'])->name('scanner.index');
-Route::post('/scanner/validate', [ScannerController::class, 'validateTicket'])->name('scanner.validate');

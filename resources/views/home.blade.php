@@ -19,7 +19,7 @@
             </p>
 
             <!-- Search Bar -->
-            <div class="max-w-2xl mx-auto mb-12">
+            <!-- <div class="max-w-2xl mx-auto mb-12">
                 <div class="relative">
                     <input type="text"
                            placeholder="¿Qué evento buscas?"
@@ -28,7 +28,7 @@
                         Buscar
                     </button>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </div>
@@ -50,7 +50,7 @@
                         <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
                             <div class="relative">
                                 @if($event->banner && $event->banner !== 'test.jpg')
-                                    <img src="{{ asset('storage/' . $event->banner) }}"
+                                    <img src="{{ $event->banner }}"
                                          alt="{{ $event->name }}"
                                          class="w-full h-64 object-cover">
                                 @else
@@ -149,7 +149,7 @@
             <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
                 <div class="relative">
                     @if($event->banner && $event->banner !== 'test.jpg')
-                        <img src="{{ asset('storage/' . $event->banner) }}"
+                        <img src="{{$event->banner }}"
                              alt="{{ $event->name }}"
                              class="w-full h-48 object-cover">
                     @else

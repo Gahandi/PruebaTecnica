@@ -29,7 +29,7 @@
                         <!-- Space Logo/Name -->
                         <div class="flex items-center space-x-4">
                             @if(isset($space) && $space->logo)
-                                <img src="{{ asset('storage/' . $space->logo) }}" alt="{{ $space->name }}" class="h-10 w-10 rounded-lg object-cover">
+                                <img src="{{ $space->logo }}" alt="{{ $space->name }}" class="h-10 w-10 rounded-lg object-cover">
                             @else
                                 <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                                     <span class="text-white font-bold text-lg">{{ substr($space->name ?? 'S', 0, 1) }}</span>
