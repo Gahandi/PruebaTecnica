@@ -19,7 +19,7 @@
             </p>
 
             <!-- Search Bar -->
-            <div class="max-w-2xl mx-auto mb-12">
+            <!-- <div class="max-w-2xl mx-auto mb-12">
                 <div class="relative">
                     <input type="text"
                            placeholder="¿Qué evento buscas?"
@@ -28,7 +28,7 @@
                         Buscar
                     </button>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </div>
