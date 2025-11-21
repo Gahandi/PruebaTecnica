@@ -3,26 +3,28 @@
 @section('title', 'Checkout')
 
 @section('content')
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
         <!-- Header -->
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex justify-between items-center mb-8">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">Checkout</h1>
-                <p class="text-gray-600">Completa tu compra de boletos</p>
+                <h1 class="text-3xl font-bold text-gray-900">Finalizar Compra</h1>
+                <p class="text-gray-600 mt-1">Revisa tu orden y completa el pago de forma segura</p>
             </div>
             <a href="{{ route('checkout.cart') }}"
-                class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors">
-                ← Volver al Carrito
+                class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Volver al Carrito
             </a>
         </div>
 
         <script>
     document.addEventListener('DOMContentLoaded', function() {
         // --- 1. Inicialización de OpenPay ---
-        // Estas son tus claves públicas de prueba
-        OpenPay.setId('mwhnrmwyovfltcwhbs8r');
-        OpenPay.setApiKey('pk_233292d84bc64d3fbfb290a22d9de4bc');
-        OpenPay.setSandboxMode(true);
+        OpenPay.setId('{{ config('services.openpay.merchant_id') }}');
+        OpenPay.setApiKey('{{ config('services.openpay.public_key') }}');
+        OpenPay.setSandboxMode({{ config('services.openpay.sandbox_mode', false) ? 'true' : 'false' }});
 
         // --- 2. Configurar Device Session ID (SOLO UNA VEZ al cargar la página) ---
         var deviceSessionId = OpenPay.deviceData.setup("payment-form", "device_session_id");
@@ -42,7 +44,10 @@
             });
         });
         // Para asegurar que al cargar la página se muestre el método correcto
-        document.querySelector('input[name="payment_method"]:checked').dispatchEvent(new Event('change'));
+        const checkedMethod = document.querySelector('input[name="payment_method"]:checked');
+        if (checkedMethod) {
+            checkedMethod.dispatchEvent(new Event('change'));
+        }
 
 
         // --- 5. Manejador del envío del formulario (SOLO UNO) ---
@@ -92,14 +97,37 @@
     });
 </script>
 
+        @if(!auth()->check())
+            <!-- Mostrar formulario de registro/login si no está autenticado -->
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
+                <div class="flex items-start">
+                    <svg class="w-6 h-6 text-yellow-600 mr-3 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                    </svg>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-yellow-900 mb-2">Necesitas una cuenta para completar tu compra</h3>
+                        <p class="text-yellow-800 mb-4">Por favor, inicia sesión o regístrate para proceder con el pago.</p>
+                        <div class="flex space-x-4">
+                            <a href="{{ route('login') }}" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                                Iniciar Sesión
+                            </a>
+                            <a href="{{ route('register') }}" class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors">
+                                Registrarse
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <form id="payment-form" method="POST" action="{{ route('checkout.process-payment') }}">
             @csrf
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Payment Form -->
                 <div class="space-y-6">
                     <!-- Order Summary -->
-                    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-                        <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
+                        <div class="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
                             <h2 class="text-xl font-semibold text-gray-900">Resumen de la Orden</h2>
                         </div>
                         <div class="p-6">
@@ -161,8 +189,8 @@
                     </div>
 
                     <!-- Coupon Code -->
-                    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-                        <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
+                        <div class="px-6 py-4 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-gray-200">
                             <h2 class="text-xl font-semibold text-gray-900">Código de Descuento</h2>
                         </div>
                         <div class="p-6">
@@ -197,7 +225,7 @@
                                 </div>
                                 <div id="coupon_message" class="mt-2 text-sm hidden"></div>
                             @endif
-                            @if (auth()->user()->hasRole('admin') || auth()->user()->hasRole('staff'))
+                            @if (auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('staff')))
                                 @if ($coupons->count() > 0)
                                     <div class="mt-4">
                                         <p class="text-sm text-gray-500 mb-2">Cupones disponibles:</p>
@@ -233,8 +261,8 @@
                 <!-- Payment Information -->
                 <div class="space-y-6">
                     <!-- Payment Method -->
-                    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-                        <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
+                        <div class="px-6 py-4 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-gray-200">
                             <h2 class="text-xl font-semibold text-gray-900">Información de Pago</h2>
                         </div>
                         <div class="p-6">
@@ -244,79 +272,22 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Método de Pago</label>
                                     <div class="space-y-2">
                                         <label class="flex items-center">
-                                            <input type="radio" name="payment_method" value="card" checked
+                                            <input type="radio" name="payment_method" value="openpay" checked
                                                 class="mr-2">
-                                            <span class="text-sm text-gray-900">Tarjeta de Crédito/Débito</span>
-                                        </label>
-                                        <label class="flex items-center">
-                                            <input type="radio" name="payment_method" value="openpay" class="mr-2">
-                                            <span class="text-sm text-gray-900">Tarjeta con Openpay</span>
-                                        </label>
-                                        <label class="flex items-center">
-                                            <input type="radio" name="payment_method" value="paypal" class="mr-2">
-                                            <span class="text-sm text-gray-900">PayPal</span>
+                                            <span class="text-sm text-gray-900">Tarjeta de Crédito/Débito (Openpay)</span>
                                         </label>
                                     </div>
                                 </div>
 
-                                <!-- Card Information (Simulated) -->
-                                <div id="card-info">
-                                    <div class="mb-4">
-                                        <button type="button" onclick="fillSimulatedData()"
-                                            class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm">
-                                            🔧 Rellenar Datos Simulados
-                                        </button>
+                                <!-- Card Information (Simulated) - Hidden in production -->
+                                <div id="card-info" class="hidden">
+                                    <div class="p-4 bg-blue-50 rounded-md">
+                                        <p class="text-sm text-blue-800">Este método de pago no está disponible actualmente. Por favor, utiliza Openpay.</p>
                                     </div>
-
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-1">Número de
-                                                Tarjeta</label>
-                                            <input type="text" name="card_number" placeholder="1234 5678 9012 3456"
-                                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
-                                            <input type="text" name="card_cvv" placeholder="123"
-                                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                        </div>
-                                    </div>
-                                    <div class="mt-4">
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de
-                                            Expiración</label>
-                                        <input type="text" name="card_expiry" placeholder="MM/YY"
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                    </div>
-                                    <div class="mt-4">
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre en la
-                                            Tarjeta</label>
-                                        <input type="text" name="card_name" placeholder="Juan Pérez"
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                    </div>
-                                    @if (session('error'))
-                                        <div class="my-4 rounded-md bg-red-50 p-4 border border-red-200">
-                                            <div class="flex">
-                                                <div class="flex-shrink-0">
-                                                    <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </div>
-                                                <div class="ml-3">
-                                                    <p class="text-sm font-medium text-red-800">
-                                                        {{ session('error') }}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endif
                                 </div>
 
-                                <!-- OpenPay Information (Hidden by default) -->
-                                <div id="openpay-card-info" class="hidden">
-                                    {{-- Los scripts de Openpay es mejor cargarlos en el <head> o al final del <body>,
-         pero si los dejas aquí, asegúrate de que se carguen antes de usarlos. --}}
-                                    <script src="https://js.openpay.mx/openpay.v1.min.js"></script>
-                                    <script src="https://js.openpay.mx/openpay-data.v1.min.js"></script>
+                                <!-- OpenPay Information -->
+                                <div id="openpay-card-info">
 
                                     <input type="hidden" name="openpay_token" id="openpay_token">
                                     <input type="hidden" name="device_session_id" id="device_session_id">
@@ -366,7 +337,7 @@
 
 
                     <!-- Total and Submit -->
-                    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                    <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
                         <div class="p-6">
                             <div class="space-y-4">
                                 <div class="flex justify-between">
@@ -374,25 +345,34 @@
                                     <span class="text-lg font-bold text-gray-900">${{ number_format($total, 2) }}</span>
                                 </div>
 
-                                <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+                                <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
                                     <div class="flex">
-                                        <svg class="w-5 h-5 text-yellow-400 mr-2" fill="currentColor"
+                                        <svg class="w-5 h-5 text-blue-400 mr-2" fill="currentColor"
                                             viewBox="0 0 20 20">
                                             <path fill-rule="evenodd"
-                                                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
                                                 clip-rule="evenodd"></path>
                                         </svg>
                                         <div>
-                                            <h3 class="text-sm font-medium text-yellow-800">Pago Simulado</h3>
-                                            <p class="text-sm text-yellow-700">Este es un sistema de demostración. No se
-                                                procesará ningún pago real.</p>
+                                            <h3 class="text-sm font-medium text-blue-800">Pago Seguro</h3>
+                                            <p class="text-sm text-blue-700">Tus pagos están protegidos con Openpay. Todos los datos son procesados de forma segura.</p>
                                         </div>
                                     </div>
                                 </div>
-                                <button type="submit" id="pay-button"
-                                    class="w-full bg-green-600 text-white px-4 py-3 rounded-md hover:bg-green-700 transition-colors font-medium">
-                                    Completar Compra
-                                </button>
+                                @if(auth()->check())
+                                    <button type="submit" id="pay-button"
+                                        class="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-3 rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02] flex items-center justify-center gap-2">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                        </svg>
+                                        Completar Compra
+                                    </button>
+                                @else
+                                    <button type="button" disabled
+                                        class="w-full bg-gray-400 text-white px-4 py-3 rounded-lg cursor-not-allowed font-medium">
+                                        Inicia sesión para continuar
+                                    </button>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -411,26 +391,6 @@
             document.querySelector('input[name="coupon_code"]').value = code;
         }
 
-        function fillSimulatedData() {
-            // Datos simulados para pruebas
-            document.querySelector('input[name="card_number"]').value = '4111 1111 1111 1111';
-            document.querySelector('input[name="card_cvv"]').value = '123';
-            document.querySelector('input[name="card_expiry"]').value = '12/25';
-            document.querySelector('input[name="card_name"]').value = '{{ auth()->user()->name }}';
-
-            // Mostrar mensaje de confirmación
-            const button = event.target;
-            const originalText = button.innerHTML;
-            button.innerHTML = '✅ Datos Rellenados';
-            button.classList.remove('bg-green-600', 'hover:bg-green-700');
-            button.classList.add('bg-green-500');
-
-            setTimeout(() => {
-                button.innerHTML = originalText;
-                button.classList.remove('bg-green-500');
-                button.classList.add('bg-green-600', 'hover:bg-green-700');
-            }, 2000);
-        }
 
         // Payment method toggle
         document.querySelectorAll('input[name="payment_method"]').forEach(radio => {

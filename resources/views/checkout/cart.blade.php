@@ -39,16 +39,13 @@
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h2 class="text-xl font-semibold text-gray-900">Boletos en tu carrito</h2>
                     </div>
-                    <script>
-                        console.log("{{ json_encode($cart) }}as")
-                    </script>
                     <div class="divide-y divide-gray-200">
                         @foreach($cart as $key => $item)
                             <div class="p-6">
                                 <div class="flex items-start space-x-4">
                                     <!-- Event Image -->
                                     @if(isset($item['event_image']) && $item['event_image'])
-                                        <img src="{{ asset('storage/' . $item['event_image']) }}" alt="{{ $item['event_name'] ?? 'Evento' }}" class="w-20 h-20 rounded-lg object-cover flex-shrink-0">
+                                        <img src="{{ $item['event_image'] }}" alt="{{ $item['event_name'] ?? 'Evento' }}" class="w-20 h-20 rounded-lg object-cover flex-shrink-0">
                                     @else
                                         <div class="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
                                             <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
