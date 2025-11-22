@@ -106,7 +106,7 @@ class SpaceController extends Controller
             $roleId = $userSpace ? $userSpace->pivot->role_space_id : null;
             $roleName = 'Miembro';
             if ($roleId) {
-                $role = \App\Models\Rolespace::find($roleId);
+                $role = \App\Models\RoleSpace::find($roleId);
                 $roleName = $role ? $role->name : 'Miembro';
             }
             
