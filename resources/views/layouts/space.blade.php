@@ -174,18 +174,6 @@
                             $isProfilePage = $currentRoute === 'spaces.profile' && !$hasEventHash;
                             $isScannerPage = $currentRoute === 'scanner.index';
                             $isEventPage = $currentRoute === 'spaces.profile' && $hasEventHash;
-                            
-                            // Verificar si es admin del space (solo admin, sin permisos adicionales)
-                            $isAdmin = false;
-                            if (auth()->check() && isset($space) && $space && $space->id) {
-                                try {
-                                    $user = auth()->user();
-                                    $isAdmin = $user->isAdminOfSpace($space->id);
-                                } catch (\Exception $e) {
-                                    \Log::error('Error checking isAdminOfSpace: ' . $e->getMessage());
-                                    $isAdmin = false;
-                                }
-                            }
                         @endphp
                         
                         <div class="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
@@ -196,7 +184,7 @@
                             </a>
                             
                             @auth
-                                @if(isset($space) && $space && $isAdmin)
+                                @if(isset($space) && $space && auth()->user()->isAdminOfSpace($space->id))
                                     <!-- Tab Scanner -->
                                     <a href="{{ route('scanner.index', ['subdomain' => $space->subdomain]) }}" 
                                        class="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-1 {{ $isScannerPage ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900' }}">
