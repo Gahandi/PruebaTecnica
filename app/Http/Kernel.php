@@ -69,7 +69,6 @@ class Kernel extends HttpKernel
         'permission' => \App\Http\Middleware\CheckPermission::class,
         'api.security' => \App\Http\Middleware\ApiSecurity::class,
         'space.member' => \App\Http\Middleware\SpaceMember::class,
-        'space.admin' => \App\Http\Middleware\SpaceAdmin::class,
         'redirect.after.login' => \App\Http\Middleware\RedirectAfterLogin::class,
         'handle.403' => \App\Http\Middleware\Handle403::class,
         'redirect.staff' => \App\Http\Middleware\RedirectStaffToStaffRoutes::class,
