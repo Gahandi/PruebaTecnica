@@ -220,7 +220,18 @@
         }
 
         try {
-            const response = await fetch('{{ route("checkout.remove-from-cart", ":key") }}'.replace(':key', cartKey), {
+            // Primero eliminar de localStorage
+            if (typeof window.removeFromCart === 'function') {
+                const cartKeyParts = cartKey.split('_');
+                if (cartKeyParts.length === 2) {
+                    const ticketTypeId = cartKeyParts[0];
+                    const eventId = cartKeyParts[1];
+                    window.removeFromCart(ticketTypeId, eventId);
+                }
+            }
+
+            // Luego eliminar del servidor (usar encodeURIComponent para la clave)
+            const response = await fetch('{{ route("checkout.remove-from-cart", ":key") }}'.replace(':key', encodeURIComponent(cartKey)), {
                 method: 'DELETE',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
@@ -232,18 +243,14 @@
             const data = await response.json();
             
             if (data.success) {
-                // Actualizar localStorage también
-                if (typeof window.removeFromCart === 'function') {
-                    const cartKeyParts = cartKey.split('_');
-                    if (cartKeyParts.length === 2) {
-                        const ticketTypeId = cartKeyParts[0];
-                        const eventId = cartKeyParts[1];
-                        window.removeFromCart(ticketTypeId, eventId);
-                    }
+                // Actualizar contador del carrito
+                if (typeof window.updateCartCount === 'function') {
+                    window.updateCartCount();
                 }
                 // Recargar la página para mostrar los cambios
                 window.location.reload();
             } else {
+                console.error('Error del servidor:', data);
                 alert(data.message || 'Error al eliminar el item');
             }
         } catch (error) {
@@ -258,9 +265,15 @@
 @push('scripts')
 <script>
     // Sincronizar carrito desde localStorage al cargar la página
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
+        // Primero sincronizar localStorage con el servidor
         if (typeof window.syncCartWithServer === 'function') {
-            window.syncCartWithServer();
+            await window.syncCartWithServer();
+        }
+        
+        // Luego actualizar el contador del carrito
+        if (typeof window.updateCartCount === 'function') {
+            window.updateCartCount();
         }
     });
 </script>

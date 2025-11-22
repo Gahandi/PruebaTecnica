@@ -46,11 +46,13 @@ class CheckoutController extends Controller
      */
     public function cart()
     {
-        // Sincronizar desde localStorage si viene en la request
-        if (request()->has('sync') && request()->input('sync') === 'true') {
-            // El frontend enviará el carrito via POST antes de redirigir
-        }
+        // Obtener carrito de la sesión
+        $cart = session()->get('cart', []);
         
+        // Si el carrito está vacío, intentar sincronizar desde localStorage
+        // (esto se hará automáticamente desde el frontend)
+        
+        // Obtener carrito con información completa
         $cart = \App\Helpers\CartHelper::getCartWithEventInfo();
 
         $events = Event::with('ticketTypes')->get();
@@ -75,13 +77,20 @@ class CheckoutController extends Controller
         
         $cartData = $request->input('cart', []);
         
-        // Validar y limpiar datos del carrito
+        // Validar y limpiar datos del carrito, manteniendo las claves originales
         $validatedCart = [];
         foreach ($cartData as $key => $item) {
             if (isset($item['ticket_type_id']) && isset($item['event_id']) && isset($item['quantity'])) {
-                $validatedCart[$key] = [
-                    'ticket_type_id' => $item['ticket_type_id'],
-                    'event_id' => $item['event_id'],
+                // Usar la clave original si es válida, o generar una nueva
+                $cartKey = $key;
+                if (!preg_match('/^\d+_\d+$/', $key)) {
+                    // Si la clave no es del formato correcto, generar una nueva
+                    $cartKey = $item['ticket_type_id'] . '_' . $item['event_id'];
+                }
+                
+                $validatedCart[$cartKey] = [
+                    'ticket_type_id' => (int)$item['ticket_type_id'],
+                    'event_id' => (int)$item['event_id'],
                     'quantity' => (int)$item['quantity'],
                     'price' => isset($item['price']) ? (float)$item['price'] : 0,
                     'ticket_type_name' => $item['ticket_type_name'] ?? 'Boleto',
@@ -92,13 +101,15 @@ class CheckoutController extends Controller
             }
         }
         
-        // Guardar en sesión
+        // Guardar en sesión (reemplazar completamente)
         session()->put('cart', $validatedCart);
         
         $origin = $request->headers->get('Origin');
         $response = response()->json([
             'success' => true,
-            'message' => 'Carrito sincronizado correctamente.'
+            'message' => 'Carrito sincronizado correctamente.',
+            'cart' => $validatedCart,
+            'cart_count' => count($validatedCart)
         ]);
         
         // Agregar headers CORS
@@ -286,11 +297,34 @@ class CheckoutController extends Controller
     {
         $cart = session()->get('cart', []);
 
+        // Buscar el item por la clave exacta o por ticket_type_id y event_id
+        $found = false;
         if (isset($cart[$key])) {
             unset($cart[$key]);
+            $found = true;
+        } else {
+            // Si no se encuentra por clave, buscar por ticket_type_id y event_id
+            // La clave puede venir como "ticket_type_id_event_id"
+            $keyParts = explode('_', $key);
+            if (count($keyParts) === 2) {
+                $ticketTypeId = (int)$keyParts[0];
+                $eventId = (int)$keyParts[1];
+                
+                foreach ($cart as $cartKey => $item) {
+                    if (isset($item['ticket_type_id']) && isset($item['event_id']) &&
+                        (int)$item['ticket_type_id'] === $ticketTypeId &&
+                        (int)$item['event_id'] === $eventId) {
+                        unset($cart[$cartKey]);
+                        $found = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if ($found) {
             session()->put('cart', $cart);
 
-            // Sincronizar con localStorage si es necesario
             if (request()->ajax()) {
                 return response()->json([
                     'success' => true,
@@ -306,7 +340,8 @@ class CheckoutController extends Controller
         if (request()->ajax()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Item no encontrado en el carrito.'
+                'message' => 'Item no encontrado en el carrito. Clave: ' . $key,
+                'cart' => $cart
             ], 404);
         }
 
