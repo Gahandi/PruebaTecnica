@@ -26,7 +26,19 @@ class CheckoutController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth')->except(['addToCart', 'cart', 'checkout', 'quickLoginOrRegister', 'getCartCount', 'getCartDropdown']);
+        $this->middleware('auth')->except([
+            'addToCart', 
+            'cart', 
+            'checkout', 
+            'processPayment',
+            'handlePaymentCallback',
+            'quickLoginOrRegister', 
+            'getCartCount', 
+            'getCartDropdown',
+            'syncCart',
+            'applyCoupon',
+            'removeCoupon'
+        ]);
     }
 
     /**
@@ -175,25 +187,94 @@ class CheckoutController extends Controller
     public function updateCart(Request $request)
     {
         $request->validate([
-            'ticket_type_id' => 'required|exists:ticket_types,id',
+            'cart_key' => 'required|string',
             'quantity' => 'required|integer|min:0',
         ]);
 
         $cart = session()->get('cart', []);
+        $cartKey = $request->cart_key;
+
+        if (!isset($cart[$cartKey])) {
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Item no encontrado en el carrito.'
+                ], 404);
+            }
+            return back()->with('error', 'Item no encontrado en el carrito.');
+        }
+
+        $item = $cart[$cartKey];
 
         if ($request->quantity == 0) {
-            unset($cart[$request->ticket_type_id]);
+            unset($cart[$cartKey]);
         } else {
-            $ticketType = TicketType::findOrFail($request->ticket_type_id);
+            // Obtener el precio desde TicketsEvent si hay event_id
+            if (isset($item['event_id']) && isset($item['ticket_type_id'])) {
+                $ticketEvent = \App\Models\TicketsEvent::where('ticket_types_id', $item['ticket_type_id'])
+                    ->where('event_id', $item['event_id'])
+                    ->first();
 
-            if ($request->quantity > $ticketType->quantity) {
-                return back()->with('error', 'No hay suficientes boletos disponibles.');
+                if (!$ticketEvent) {
+                    if (request()->ajax()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'No se encontró la relación del boleto con el evento.'
+                        ], 404);
+                    }
+                    return back()->with('error', 'No se encontró la relación del boleto con el evento.');
+                }
+
+                // Verificar disponibilidad
+                if ($request->quantity > $ticketEvent->quantity) {
+                    if (request()->ajax()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'No hay suficientes boletos disponibles. Solo quedan ' . $ticketEvent->quantity . ' boletos.'
+                        ], 400);
+                    }
+                    return back()->with('error', 'No hay suficientes boletos disponibles. Solo quedan ' . $ticketEvent->quantity . ' boletos.');
+                }
+
+                // Mantener el precio original del carrito (que viene de TicketsEvent)
+                $cart[$cartKey]['quantity'] = $request->quantity;
+            } else {
+                // Si no hay event_id, usar TicketType directamente
+                if (isset($item['ticket_type_id'])) {
+                    $ticketType = TicketType::findOrFail($item['ticket_type_id']);
+                    
+                    if ($request->quantity > $ticketType->quantity) {
+                        if (request()->ajax()) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'No hay suficientes boletos disponibles.'
+                            ], 400);
+                        }
+                        return back()->with('error', 'No hay suficientes boletos disponibles.');
+                    }
+
+                    $cart[$cartKey]['quantity'] = $request->quantity;
+                    // Actualizar precio si no existe
+                    if (!isset($cart[$cartKey]['price'])) {
+                        $cart[$cartKey]['price'] = $ticketType->price;
+                    }
+                } else {
+                    // Si no hay ticket_type_id, simplemente actualizar cantidad
+                    $cart[$cartKey]['quantity'] = $request->quantity;
+                }
             }
-
-            $cart[$request->ticket_type_id]['quantity'] = $request->quantity;
         }
 
         session()->put('cart', $cart);
+
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Carrito actualizado.',
+                'cart' => $cart,
+                'cart_count' => \App\Helpers\CartHelper::getCartCount()
+            ]);
+        }
 
         return back()->with('success', 'Carrito actualizado.');
     }
@@ -209,7 +290,24 @@ class CheckoutController extends Controller
             unset($cart[$key]);
             session()->put('cart', $cart);
 
+            // Sincronizar con localStorage si es necesario
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Item removido del carrito.',
+                    'cart' => $cart,
+                    'cart_count' => \App\Helpers\CartHelper::getCartCount()
+                ]);
+            }
+
             return back()->with('success', 'Item removido del carrito.');
+        }
+
+        if (request()->ajax()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Item no encontrado en el carrito.'
+            ], 404);
         }
 
         return back()->with('error', 'Item no encontrado en el carrito.');
@@ -243,6 +341,15 @@ class CheckoutController extends Controller
     public function processPayment(Request $request)
     {
         try {
+            // Validar email y nombre
+            $request->validate([
+                'customer_email' => 'required|email|max:255',
+                'customer_name' => 'required|string|max:255',
+                'payment_method' => 'required|in:openpay',
+                'openpay_token' => 'required',
+                'device_session_id' => 'required',
+            ]);
+
             $cart = session()->get('cart', []);
             if (empty($cart)) {
                 return redirect()->route('checkout.cart')->with('error', 'Tu carrito está vacío.');
@@ -267,6 +374,12 @@ class CheckoutController extends Controller
             $taxes = $taxableAmount * 0.16; // 16% IVA
             $total = $taxableAmount + $taxes;
 
+            // Guardar datos del cliente en sesión para usar después
+            session([
+                'checkout_customer_email' => $request->customer_email,
+                'checkout_customer_name' => $request->customer_name,
+            ]);
+
             // Procesar pago con Openpay
             if ($request->payment_method === 'openpay') {
                 // Validar que las credenciales de Openpay estén configuradas
@@ -284,8 +397,8 @@ class CheckoutController extends Controller
                 Openpay::setSandboxMode(config('services.openpay.sandbox_mode', false));
 
                 $customer = [
-                    'name' => auth()->user()->name,
-                    'email' => auth()->user()->email,
+                    'name' => $request->customer_name,
+                    'email' => $request->customer_email,
                 ];
 
                 $redirectUrl = route('checkout.callback');
@@ -311,7 +424,7 @@ class CheckoutController extends Controller
 
                 // Si no hay URL, fue un cargo directo
                 if ($charge->status === 'completed') {
-                    return $this->finalizeOrderAndCreateTickets($charge, $cart, $couponId, $subtotal, $discountAmount, $total, $taxes);
+                    return $this->finalizeOrderAndCreateTickets($charge, $cart, $couponId, $subtotal, $discountAmount, $total, $taxes, $request->customer_email, $request->customer_name);
                 } else {
                     return back()->with('error', 'El pago no fue completado. Estado: ' . $charge->status);
                 }
@@ -374,6 +487,8 @@ class CheckoutController extends Controller
             if ($charge->status === 'completed') {
                 $cart = session()->get('cart', []);
                 $appliedCoupon = session()->get('applied_coupon');
+                $customerEmail = session('checkout_customer_email');
+                $customerName = session('checkout_customer_name');
 
                 // Recalcular totales
                 $subtotal = 0;
@@ -390,7 +505,7 @@ class CheckoutController extends Controller
                 $taxes = $taxableAmount * 0.16;
                 $total = $taxableAmount + $taxes;
 
-                return $this->finalizeOrderAndCreateTickets($charge, $cart, $couponId, $subtotal, $discountAmount, $total, $taxes);
+                return $this->finalizeOrderAndCreateTickets($charge, $cart, $couponId, $subtotal, $discountAmount, $total, $taxes, $customerEmail, $customerName);
             } else {
                 \Log::warning('Pago 3DS falló o fue declinado', ['status' => $charge->status]);
                 return redirect()->route('checkout.cart')->with('error', 'La autenticación del pago falló. Por favor, intenta de nuevo.');
@@ -415,8 +530,45 @@ class CheckoutController extends Controller
      * @param float $taxes
      * @return \Illuminate\Http\RedirectResponse
      */
-    private function finalizeOrderAndCreateTickets($charge, $cart, $couponId, $subtotal, $discountAmount, $total, $taxes)
+    private function finalizeOrderAndCreateTickets($charge, $cart, $couponId, $subtotal, $discountAmount, $total, $taxes, $customerEmail = null, $customerName = null)
     {
+        // Obtener datos del cliente de los parámetros o sesión
+        if (!$customerEmail) {
+            $customerEmail = session('checkout_customer_email');
+        }
+        if (!$customerName) {
+            $customerName = session('checkout_customer_name');
+        }
+        
+        // Si no hay datos, intentar obtener del usuario autenticado
+        if (!$customerEmail && auth()->check()) {
+            $customerEmail = auth()->user()->email;
+            $customerName = auth()->user()->name;
+        }
+        
+        // Si aún no hay datos, usar datos del charge de Openpay
+        if (!$customerEmail && isset($charge->customer)) {
+            $customerEmail = $charge->customer->email ?? null;
+            $customerName = $charge->customer->name ?? 'Cliente';
+        }
+        
+        // Buscar o crear usuario por email
+        $user = null;
+        if ($customerEmail) {
+            $user = User::where('email', $customerEmail)->first();
+            
+            // Si no existe, crear usuario temporal
+            if (!$user) {
+                $user = User::create([
+                    'name' => $customerName ?? 'Cliente',
+                    'last_name' => '',
+                    'email' => $customerEmail,
+                    'password' => Hash::make(Str::random(32)), // Password aleatorio
+                    'role' => 'viewer',
+                    'verified' => false,
+                ]);
+            }
+        }
 
         $event_id_json = [];
         foreach ($cart as $item) {
@@ -427,7 +579,7 @@ class CheckoutController extends Controller
         // --- Crear la Orden ---
         $order = Order::create([
             'id' => Str::uuid(),
-            'user_id' => auth()->id(),
+            'user_id' => $user ? $user->id : null,
             'event_id' => json_encode($event_id_json),
             'coupon_id' => $couponId,
             'state_id' => 4, // Asumiendo que 4 es un estado válido
@@ -485,10 +637,16 @@ class CheckoutController extends Controller
         }
 
         // Limpiar sesión
-        session()->forget(['cart', 'applied_coupon', 'openpay_charge_id']);
+        session()->forget(['cart', 'applied_coupon', 'openpay_charge_id', 'checkout_customer_email', 'checkout_customer_name']);
 
-        // Redirigir al usuario a su página de boletos
-        return redirect()->route('tickets.my')->with('success', '¡Compra realizada con éxito! Puedes ver tus boletos aquí.');
+        // Si hay usuario, iniciar sesión automáticamente y redirigir a boletos
+        if ($user) {
+            Auth::login($user);
+            return redirect()->route('tickets.my')->with('success', '¡Compra realizada con éxito! Puedes ver tus boletos aquí.');
+        }
+        
+        // Si no hay usuario, redirigir a página de éxito con el ID de la orden
+        return redirect()->route('checkout.success', $order)->with('success', '¡Compra realizada con éxito!');
     }
 
     /**

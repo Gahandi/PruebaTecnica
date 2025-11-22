@@ -141,6 +141,25 @@ Route::middleware(['auth', 'role:admin,staff'])->group(function () {
     Route::resource('admin/checkins', CheckinController::class)->names('admin.checkins');
 });
 
+// Rutas de checkout (sin autenticación requerida)
+Route::prefix('checkout')
+    ->name('checkout.')
+    ->middleware(['cart.context'])
+    ->group(function () {
+        Route::get('/cart', [App\Http\Controllers\CheckoutController::class, 'cart'])->name('cart');
+        Route::post('/add-to-cart', [App\Http\Controllers\CheckoutController::class, 'addToCart'])->name('add-to-cart');
+        Route::post('/update-cart', [App\Http\Controllers\CheckoutController::class, 'updateCart'])->name('update-cart');
+        Route::delete('/remove-from-cart/{key}', [CheckoutController::class, 'removeFromCart'])->name('remove-from-cart');
+        Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'checkout'])->name('checkout');
+        Route::post('/process-payment', [App\Http\Controllers\CheckoutController::class, 'processPayment'])->name('process-payment');
+        Route::post('/apply-coupon', [App\Http\Controllers\CheckoutController::class, 'applyCoupon'])->name('apply-coupon');
+        Route::delete('/remove-coupon', [App\Http\Controllers\CheckoutController::class, 'removeCoupon'])->name('remove-coupon');
+        Route::post('/quick-login-register', [App\Http\Controllers\CheckoutController::class, 'quickLoginOrRegister'])->name('quick-login-register');
+        Route::get('/success/{order}', [App\Http\Controllers\CheckoutController::class, 'success'])->name('success');
+        Route::get('/order/{order}', [App\Http\Controllers\CheckoutController::class, 'showOrder'])->name('order');
+        Route::get('/callback', [App\Http\Controllers\CheckoutController::class, 'handlePaymentCallback'])->name('callback');
+    });
+
 // Rutas para todos los usuarios autenticados
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
@@ -149,25 +168,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tickets/{ticket}', [OrderController::class, 'showTicket'])->name('tickets.show');
     Route::get('/tickets/{ticket}/pdf', [OrderController::class, 'downloadPdf'])->name('tickets.pdf');
     Route::get('/my-tickets', [OrderController::class, 'myTickets'])->name('tickets.my');
-
-    // Rutas de checkout
-    Route::prefix('checkout')
-        ->name('checkout.')
-        ->middleware(['cart.context'])
-        ->group(function () {
-            Route::get('/cart', [App\Http\Controllers\CheckoutController::class, 'cart'])->name('cart');
-            Route::post('/add-to-cart', [App\Http\Controllers\CheckoutController::class, 'addToCart'])->name('add-to-cart');
-            Route::post('/update-cart', [App\Http\Controllers\CheckoutController::class, 'updateCart'])->name('update-cart');
-            Route::delete('/remove-from-cart/{key}', [CheckoutController::class, 'removeFromCart'])->name('remove-from-cart');
-            Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'checkout'])->name('checkout');
-            Route::post('/process-payment', [App\Http\Controllers\CheckoutController::class, 'processPayment'])->name('process-payment');
-            Route::post('/apply-coupon', [App\Http\Controllers\CheckoutController::class, 'applyCoupon'])->name('apply-coupon');
-            Route::delete('/remove-coupon', [App\Http\Controllers\CheckoutController::class, 'removeCoupon'])->name('remove-coupon');
-            Route::post('/quick-login-register', [App\Http\Controllers\CheckoutController::class, 'quickLoginOrRegister'])->name('quick-login-register');
-            Route::get('/success/{order}', [App\Http\Controllers\CheckoutController::class, 'success'])->name('success');
-            Route::get('/order/{order}', [App\Http\Controllers\CheckoutController::class, 'showOrder'])->name('order');
-            Route::get('/callback', [App\Http\Controllers\CheckoutController::class, 'handlePaymentCallback'])->name('callback');
-        });
 
     // Ruta de prueba para debug
     Route::post('/test-payment', function (\Illuminate\Http\Request $request) {

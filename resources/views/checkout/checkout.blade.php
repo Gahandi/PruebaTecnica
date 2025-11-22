@@ -52,6 +52,16 @@
 
         // --- 5. Manejador del envío del formulario (SOLO UNO) ---
         form.addEventListener('submit', function(event) {
+            // Validar que los campos de cliente estén llenos
+            const customerName = document.getElementById('customer_name').value;
+            const customerEmail = document.getElementById('customer_email').value;
+            
+            if (!customerName || !customerEmail) {
+                event.preventDefault();
+                alert('Por favor completa tu nombre y correo electrónico antes de proceder al pago.');
+                return;
+            }
+            
             const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
 
             // Solo intervenimos si el método de pago es OpenPay
@@ -97,52 +107,44 @@
     });
 </script>
 
-        @if(!auth()->check())
-            <!-- Formulario de login/registro rápido -->
-            <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200 mb-6">
-                <div class="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
-                    <h2 class="text-xl font-semibold text-gray-900">Inicia sesión o regístrate para continuar</h2>
-                    <p class="text-sm text-gray-600 mt-1">Ingresa tus datos para proceder con el pago</p>
-                </div>
-                <div class="p-6">
-                    <form id="quick-auth-form" onsubmit="handleQuickAuth(event)">
-                        @csrf
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Nombre completo</label>
-                                <input type="text" name="name" id="auth_name" required
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Correo electrónico</label>
-                                <input type="email" name="email" id="auth_email" required
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
-                            <input type="password" name="password" id="auth_password" required minlength="8"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <p class="text-xs text-gray-500 mt-1">Mínimo 8 caracteres</p>
-                        </div>
-                        <div class="flex space-x-3">
-                            <button type="submit" name="action" value="login"
-                                class="flex-1 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                                Iniciar Sesión
-                            </button>
-                            <button type="submit" name="action" value="register"
-                                class="flex-1 bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors">
-                                Registrarse
-                            </button>
-                        </div>
-                        <div id="auth-message" class="mt-4 text-sm hidden"></div>
-                    </form>
-                </div>
-            </div>
-        @endif
-
         <form id="payment-form" method="POST" action="{{ route('checkout.process-payment') }}">
             @csrf
+            
+            <!-- Información del Cliente (siempre visible, no requiere login) -->
+            <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200 mb-6">
+                <div class="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-900">Información de Contacto</h2>
+                    <p class="text-sm text-gray-600 mt-1">Ingresa tus datos para completar la compra</p>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="customer_name" class="block text-sm font-medium text-gray-700 mb-2">
+                                Nombre completo <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" 
+                                   name="customer_name" 
+                                   id="customer_name" 
+                                   value="{{ auth()->check() ? auth()->user()->name : '' }}"
+                                   required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label for="customer_email" class="block text-sm font-medium text-gray-700 mb-2">
+                                Correo electrónico <span class="text-red-500">*</span>
+                            </label>
+                            <input type="email" 
+                                   name="customer_email" 
+                                   id="customer_email" 
+                                   value="{{ auth()->check() ? auth()->user()->email : '' }}"
+                                   required
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p class="text-xs text-gray-500 mt-1">Te enviaremos la confirmación de tu compra a este correo</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Payment Form -->
                 <div class="space-y-6">

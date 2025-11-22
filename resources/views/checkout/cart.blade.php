@@ -89,24 +89,20 @@
                                         <div class="flex items-center space-x-2">
                                             <form method="POST" action="{{ route('checkout.update-cart') }}" class="inline" id="update-form-{{ $key }}">
                                                 @csrf
-                                                <input type="hidden" name="ticket_type_id" value="{{ $item['ticket_type_id'] ?? $key }}">
+                                                <input type="hidden" name="cart_key" value="{{ $key }}">
                                                 <input type="number"
                                                        name="quantity"
                                                        value="{{ $item['quantity'] }}"
                                                        min="0"
                                                        max="10"
                                                        class="w-16 px-2 py-1 border border-gray-300 rounded text-center"
-                                                       onchange="document.getElementById('update-form-{{ $key }}').submit()">
+                                                       onchange="updateCartItem('{{ $key }}', this.value)">
                                             </form>
-                                            <form method="POST" action="{{ route('checkout.remove-from-cart', $key) }}" id="remove-form-{{ $key }}">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                    </svg>
-                                                </button>
-                                            </form>
+                                            <button type="button" onclick="removeCartItem('{{ $key }}')" class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                </svg>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -169,6 +165,68 @@
         </div>
     @endif
 </div>
+
+@push('scripts')
+<script>
+    async function updateCartItem(cartKey, quantity) {
+        const form = document.getElementById('update-form-' + cartKey);
+        const formData = new FormData(form);
+        
+        try {
+            const response = await fetch('{{ route("checkout.update-cart") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                credentials: 'include'
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                // Recargar la página para mostrar los cambios
+                window.location.reload();
+            } else {
+                alert(data.message || 'Error al actualizar el carrito');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al actualizar el carrito');
+        }
+    }
+
+    async function removeCartItem(cartKey) {
+        if (!confirm('¿Estás seguro de que deseas eliminar este item del carrito?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch('{{ route("checkout.remove-from-cart", ":key") }}'.replace(':key', cartKey), {
+                method: 'DELETE',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                credentials: 'include'
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                // Recargar la página para mostrar los cambios
+                window.location.reload();
+            } else {
+                alert(data.message || 'Error al eliminar el item');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al eliminar el item');
+        }
+    }
+</script>
+@endpush
 @endsection
 
 @push('scripts')
