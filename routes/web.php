@@ -57,31 +57,6 @@ Route::get('/refresh-csrf', function () {
     return response()->json(['csrf_token' => csrf_token()]);
 });
 
-// Ruta de prueba para verificar carrito
-Route::get('/debug-cart', function () {
-    $cart = session()->get('cart', []);
-    return response()->json([
-        'cart' => $cart,
-        'count' => count($cart),
-        'user_id' => auth()->id(),
-    ]);
-})->middleware('auth');
-
-// Ruta de prueba para verificar redirección
-Route::get('/test-redirect', function () {
-    if (!auth()->check()) {
-        return 'No autenticado';
-    }
-
-    $user = auth()->user();
-    return response()->json([
-        'email' => $user->email,
-        'roles' => $user->roles->pluck('name')->toArray(),
-        'has_staff' => $user->hasRole('staff'),
-        'has_admin' => $user->hasRole('admin'),
-        'path' => request()->path(),
-    ]);
-})->middleware('auth');
 
 // Check-in route for QR scanning (no auth required)
 Route::get('/checkin/{ticket}', [OrderController::class, 'checkinTicket'])->name('tickets.checkin');

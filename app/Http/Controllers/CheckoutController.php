@@ -60,7 +60,7 @@ class CheckoutController extends Controller
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $ticketType = TicketType::findOrFail($request->ticket_types_id);
+        $ticketType = TicketType::findOrFail($request->ticket_type_id);
         $cart = session()->get('cart', []);
 
         // Verificar disponibilidad
@@ -155,22 +155,17 @@ class CheckoutController extends Controller
     }
 
     /**
-     * Procesar el pago - VERSIÓN SIMPLE PARA DEBUG
+     * Procesar el pago
      */
-public function processPayment(Request $request)
+    public function processPayment(Request $request)
     {
-        \Log::info('=== INICIO DEL PROCESO DE PAGO ===');
-        \Log::info('Método de pago seleccionado:', ['method' => $request->payment_method]);
-        \Log::info('Usuario Autenticado:', ['user_id' => auth()->id(), 'auth_check' => auth()->check()]);
-
         try {
             $cart = session()->get('cart', []);
             if (empty($cart)) {
-               \Log::warning('Intento de pago con carrito vacío.');
                 return redirect()->route('checkout.cart')->with('error', 'Tu carrito está vacío.');
             }
 
-            // --- 1. Calcular Totales ---
+            // Calcular totales
             $subtotal = 0;
             foreach ($cart as $item) {
                 $subtotal += $item['price'] * $item['quantity'];
@@ -189,40 +184,27 @@ public function processPayment(Request $request)
             $taxes = $taxableAmount * 0.16; // 16% IVA
             $total = $taxableAmount + $taxes;
 
-            \Log::info('Cálculo de totales completado', [
-                'subtotal' => $subtotal,
-                'discount' => $discountAmount,
-                'taxes' => $taxes,
-                'total' => $total,
-            ]);
-
-            // --- 2. Procesar Pago con Openpay ---
+            // Procesar pago con Openpay
             if ($request->payment_method === 'openpay') {
-                \Log::info('Procesando con Openpay...', ['token' => $request->openpay_token]);
-
                 // Validar que las credenciales de Openpay estén configuradas
                 $merchantId = config('services.openpay.merchant_id');
                 $privateKey = config('services.openpay.private_key');
                 
                 if (empty($merchantId) || empty($privateKey)) {
-                    \Log::error(' Credenciales de Openpay no configuradas', [
-                        'merchant_id_set' => !empty($merchantId),
-                        'private_key_set' => !empty($privateKey),
-                    ]);
+                    \Log::error('Credenciales de Openpay no configuradas');
                     return back()->with('error', 'Error de configuración: Las credenciales de Openpay no están configuradas. Por favor, contacta al administrador.');
                 }
 
                 $ip_user = $request->ip();
 
                 $openpay = Openpay::getInstance($merchantId, $privateKey, 'MX', $ip_user);
-                Openpay::setSandboxMode(config('services.openpay.sandbox_mode', true));
+                Openpay::setSandboxMode(config('services.openpay.sandbox_mode', false));
 
                 $customer = [
                     'name' => auth()->user()->name,
                     'email' => auth()->user()->email,
                 ];
 
-                // La URL a la que Openpay regresará al usuario después de la autenticación 3DS.
                 $redirectUrl = route('checkout.callback');
 
                 $chargeRequest = [
@@ -233,42 +215,35 @@ public function processPayment(Request $request)
                     'description' => 'Compra de boletos para evento',
                     'device_session_id' => $request->device_session_id,
                     'customer' => $customer,
-                    'redirect_url' => $redirectUrl, // Parámetro obligatorio para 3D Secure
+                    'redirect_url' => $redirectUrl,
                 ];
 
                 $charge = $openpay->charges->create($chargeRequest);
 
-                // Si la respuesta de Openpay contiene una URL, es un cargo 3DS.
-                // Debemos redirigir al usuario a esa URL para que se autentique.
+                // Si la respuesta contiene una URL, es un cargo 3DS
                 if (isset($charge->payment_method->url)) {
-                    \Log::info('Redirección a 3D Secure requerida.', ['charge_id' => $charge->id]);
-                    // Guardamos el ID del cargo en la sesión para verificarlo en el callback.
                     session(['openpay_charge_id' => $charge->id]);
                     return redirect()->away($charge->payment_method->url);
                 }
 
-                // Si no hay URL, fue un cargo directo. Verificamos si se completó.
+                // Si no hay URL, fue un cargo directo
                 if ($charge->status === 'completed') {
-                    \Log::info('Cargo directo completado exitosamente.', ['charge_id' => $charge->id]);
                     return $this->finalizeOrderAndCreateTickets($charge, $cart, $couponId, $subtotal, $discountAmount, $total, $taxes);
                 } else {
-                   \Log::warning('El cargo directo no se completó.', ['status' => $charge->status]);
                     return back()->with('error', 'El pago no fue completado. Estado: ' . $charge->status);
                 }
             }
 
-            // Aquí puedes agregar la lógica para otros métodos de pago (ej. 'card' simulado, 'paypal')
-            // Por ahora, si no es 'openpay', mostraremos un error o lo manejamos según tu lógica de negocio.
-            return back()->with('error', 'Método de pago no implementado.');
+            return back()->with('error', 'Método de pago no válido.');
 
         } catch (\OpenpayApiTransactionError $e) {
-           \Log::error('❌ Error de Transacción Openpay: ' . $e->getMessage(), [
+            \Log::error('Error de transacción Openpay', [
                 'description' => $e->getDescription(),
                 'error_code' => $e->getErrorCode(),
             ]);
             return back()->with('error', 'Error con la tarjeta: ' . $e->getDescription());
         } catch (\Exception $e) {
-           \Log::error('❌ Error General en processPayment: ' . $e->getMessage());
+            \Log::error('Error al procesar pago: ' . $e->getMessage());
             return back()->with('error', 'Ocurrió un error inesperado al procesar tu pago.');
         }
     }
@@ -308,20 +283,20 @@ public function processPayment(Request $request)
             $ip_user = $request->ip();
 
             $openpay = Openpay::getInstance($merchantId, $privateKey, 'MX', $ip_user);
-            Openpay::setSandboxMode(config('services.openpay.sandbox_mode', true));
+            Openpay::setSandboxMode(config('services.openpay.sandbox_mode', false));
 
-            // Consultamos el estado final del cargo en Openpay usando el ID.
+            // Consultar el estado final del cargo en Openpay
             $charge = $openpay->charges->get($chargeIdFromSession);
-            \Log::info('Verificando estado final del cargo en Openpay', ['charge_id' => $charge->id, 'status' => $charge->status]);
 
             if ($charge->status === 'completed') {
-                // El pago 3DS fue exitoso, ahora creamos la orden y los tickets.
                 $cart = session()->get('cart', []);
                 $appliedCoupon = session()->get('applied_coupon');
 
-                // Recalculamos los totales para pasarlos al método finalizador
+                // Recalcular totales
                 $subtotal = 0;
-                foreach ($cart as $item) { $subtotal += $item['price'] * $item['quantity']; }
+                foreach ($cart as $item) {
+                    $subtotal += $item['price'] * $item['quantity'];
+                }
                 $discountAmount = 0;
                 $couponId = null;
                 if ($appliedCoupon) {
@@ -334,18 +309,18 @@ public function processPayment(Request $request)
 
                 return $this->finalizeOrderAndCreateTickets($charge, $cart, $couponId, $subtotal, $discountAmount, $total, $taxes);
             } else {
-               \Log::warning('La autenticación 3DS falló o el pago fue declinado.', ['status' => $charge->status]);
+                \Log::warning('Pago 3DS falló o fue declinado', ['status' => $charge->status]);
                 return redirect()->route('checkout.cart')->with('error', 'La autenticación del pago falló. Por favor, intenta de nuevo.');
             }
 
         } catch (\Exception $e) {
-           \Log::error('❌ Error General en handlePaymentCallback: ' . $e->getMessage());
+            \Log::error('Error en handlePaymentCallback: ' . $e->getMessage());
             return redirect()->route('checkout.cart')->with('error', 'Ocurrió un error al verificar el resultado de tu pago.');
         }
     }
 
     /**
-     * Método privado y centralizado para crear la orden, el pago y los tickets.
+     * Método privado para crear la orden, el pago y los tickets.
      * Se llama únicamente después de que un cargo de Openpay ha sido confirmado como 'completed'.
      *
      * @param object $charge El objeto del cargo exitoso de Openpay.
@@ -359,7 +334,6 @@ public function processPayment(Request $request)
      */
     private function finalizeOrderAndCreateTickets($charge, $cart, $couponId, $subtotal, $discountAmount, $total, $taxes)
     {
-        \Log::info('Finalizando orden y creando tickets...', ['charge_id' => $charge->id]);
 
         $event_id_json = [];
         foreach ($cart as $item) {
@@ -380,9 +354,8 @@ public function processPayment(Request $request)
             'taxes' => $taxes,
             'status' => 'completed',
         ]);
-        \Log::info('Orden creada exitosamente', ['order_id' => $order->id]);
 
-        // --- Registrar el Pago ---
+        // Registrar el pago
         Payment::create([
             'state_id' => 4,
             'coupon_id' => $couponId,
@@ -395,9 +368,8 @@ public function processPayment(Request $request)
             'gateway_transaction_id' => $charge->id,
             'gateway_authorization' => $charge->authorization,
         ]);
-        \Log::info('Registro de pago creado para la orden', ['order_id' => $order->id]);
 
-        // --- Crear Items de la Orden y Tickets ---
+        // Crear items de la orden y tickets
         foreach ($cart as $item) {
             OrderItem::create([
                 'order_id' => $order->id,
@@ -428,13 +400,11 @@ public function processPayment(Request $request)
 
             }
         }
-        \Log::info('Items de orden y tickets creados.', ['order_id' => $order->id]);
 
-        // --- Limpiar Sesión ---
+        // Limpiar sesión
         session()->forget(['cart', 'applied_coupon', 'openpay_charge_id']);
-        \Log::info('Sesión de compra limpiada.');
 
-        // --- Redirigir al usuario a su página de boletos ---
+        // Redirigir al usuario a su página de boletos
         return redirect()->route('tickets.my')->with('success', '¡Compra realizada con éxito! Puedes ver tus boletos aquí.');
     }
 

@@ -25,8 +25,18 @@ class ScannerController extends Controller
         if (!$space) {
             abort(404, 'Espacio no encontrado.');
         }
-        // Verificar si el usuario autenticado tiene el permiso
-        $canSeeScanner = RoleSpacePermission::hasPermission($space->id, 'create checkins');
+        
+        // Verificar autenticación
+        if (!auth()->check()) {
+            abort(403, 'Debes iniciar sesión para acceder al escáner.');
+        }
+        
+        // Verificar si el usuario es admin del space o tiene el permiso
+        $user = auth()->user();
+        $isAdmin = $user->isAdminOfSpace($space->id);
+        $hasPermission = RoleSpacePermission::hasPermission($space->id, 'create checkins');
+        
+        $canSeeScanner = $isAdmin || $hasPermission;
 
         if ($canSeeScanner) {
             return view('scanner.index', ['space' => $space]);

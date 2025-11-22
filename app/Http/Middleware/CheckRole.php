@@ -47,9 +47,7 @@ class CheckRole
         }
         
         if (!$hasRole) {
-            // Debug: mostrar información del usuario
-            $userRoles = $user->roles->pluck('name')->toArray();
-            abort(403, "No tienes permisos para acceder a esta sección. Usuario: {$user->email}, Roles: " . implode(', ', $userRoles) . ", Roles requeridos: " . $roles);
+            abort(403, 'No tienes permisos para acceder a esta sección.');
         }
 
         return $next($request);
