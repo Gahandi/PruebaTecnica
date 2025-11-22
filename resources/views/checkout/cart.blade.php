@@ -220,14 +220,9 @@
         }
 
         try {
-            // Primero eliminar de localStorage
-            if (typeof window.removeFromCart === 'function') {
-                const cartKeyParts = cartKey.split('_');
-                if (cartKeyParts.length === 2) {
-                    const ticketTypeId = cartKeyParts[0];
-                    const eventId = cartKeyParts[1];
-                    window.removeFromCart(ticketTypeId, eventId);
-                }
+            // Primero sincronizar localStorage con el servidor para asegurar que están en sync
+            if (typeof window.syncCartWithServer === 'function') {
+                await window.syncCartWithServer();
             }
 
             // Luego eliminar del servidor (usar encodeURIComponent para la clave)
@@ -243,6 +238,15 @@
             const data = await response.json();
             
             if (data.success) {
+                // Eliminar de localStorage también
+                if (typeof window.removeFromCart === 'function') {
+                    const cartKeyParts = cartKey.split('_');
+                    if (cartKeyParts.length === 2) {
+                        const ticketTypeId = cartKeyParts[0];
+                        const eventId = cartKeyParts[1];
+                        window.removeFromCart(ticketTypeId, eventId);
+                    }
+                }
                 // Actualizar contador del carrito
                 if (typeof window.updateCartCount === 'function') {
                     window.updateCartCount();
@@ -251,11 +255,15 @@
                 window.location.reload();
             } else {
                 console.error('Error del servidor:', data);
+                console.error('Clave buscada:', cartKey);
+                if (data.cart_keys) {
+                    console.error('Claves disponibles:', data.cart_keys);
+                }
                 alert(data.message || 'Error al eliminar el item');
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('Error al eliminar el item');
+            alert('Error al eliminar el item: ' + error.message);
         }
     }
 </script>

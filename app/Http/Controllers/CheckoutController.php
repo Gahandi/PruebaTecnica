@@ -297,11 +297,22 @@ class CheckoutController extends Controller
     {
         $cart = session()->get('cart', []);
 
+        // Log para debugging
+        \Log::info('removeFromCart called', [
+            'key' => $key,
+            'cart_keys' => array_keys($cart),
+            'cart' => $cart
+        ]);
+
         // Buscar el item por la clave exacta o por ticket_type_id y event_id
         $found = false;
+        $removedKey = null;
+        
+        // Primero intentar por clave exacta
         if (isset($cart[$key])) {
             unset($cart[$key]);
             $found = true;
+            $removedKey = $key;
         } else {
             // Si no se encuentra por clave, buscar por ticket_type_id y event_id
             // La clave puede venir como "ticket_type_id_event_id"
@@ -311,11 +322,13 @@ class CheckoutController extends Controller
                 $eventId = (int)$keyParts[1];
                 
                 foreach ($cart as $cartKey => $item) {
-                    if (isset($item['ticket_type_id']) && isset($item['event_id']) &&
-                        (int)$item['ticket_type_id'] === $ticketTypeId &&
-                        (int)$item['event_id'] === $eventId) {
+                    $itemTicketTypeId = isset($item['ticket_type_id']) ? (int)$item['ticket_type_id'] : null;
+                    $itemEventId = isset($item['event_id']) ? (int)$item['event_id'] : null;
+                    
+                    if ($itemTicketTypeId === $ticketTypeId && $itemEventId === $eventId) {
                         unset($cart[$cartKey]);
                         $found = true;
+                        $removedKey = $cartKey;
                         break;
                     }
                 }
@@ -330,18 +343,21 @@ class CheckoutController extends Controller
                     'success' => true,
                     'message' => 'Item removido del carrito.',
                     'cart' => $cart,
-                    'cart_count' => \App\Helpers\CartHelper::getCartCount()
+                    'cart_count' => \App\Helpers\CartHelper::getCartCount(),
+                    'removed_key' => $removedKey
                 ]);
             }
 
             return back()->with('success', 'Item removido del carrito.');
         }
 
+        // Si no se encontró, intentar sincronizar desde localStorage primero
         if (request()->ajax()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Item no encontrado en el carrito. Clave: ' . $key,
-                'cart' => $cart
+                'message' => 'Item no encontrado en el carrito. Clave buscada: ' . $key . '. Claves disponibles: ' . implode(', ', array_keys($cart)),
+                'cart' => $cart,
+                'cart_keys' => array_keys($cart)
             ], 404);
         }
 
