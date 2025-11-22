@@ -207,6 +207,8 @@
                         <a href="{{ config('app.url') }}" class="text-gray-700 hover:text-gray-900 ml-4">
                             Todos los Eventos
                         </a>
+
+                        @auth
                             <!-- User Menu Dropdown -->
                             <div class="relative group" id="user-dropdown">
                                 <button class="text-gray-700 hover:text-gray-900 flex items-center" onclick="toggleUserDropdown()">
