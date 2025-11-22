@@ -51,6 +51,16 @@ class CheckoutController extends Controller
      */
     public function syncCart(Request $request)
     {
+        // Manejar preflight OPTIONS request
+        if ($request->getMethod() === 'OPTIONS') {
+            $origin = $request->headers->get('Origin');
+            return response('', 200)
+                ->header('Access-Control-Allow-Origin', $origin ?: '*')
+                ->header('Access-Control-Allow-Credentials', 'true')
+                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN');
+        }
+        
         $cartData = $request->input('cart', []);
         
         // Validar y limpiar datos del carrito
@@ -73,10 +83,21 @@ class CheckoutController extends Controller
         // Guardar en sesión
         session()->put('cart', $validatedCart);
         
-        return response()->json([
+        $origin = $request->headers->get('Origin');
+        $response = response()->json([
             'success' => true,
             'message' => 'Carrito sincronizado correctamente.'
         ]);
+        
+        // Agregar headers CORS
+        if ($origin) {
+            $response->header('Access-Control-Allow-Origin', $origin)
+                     ->header('Access-Control-Allow-Credentials', 'true')
+                     ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                     ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN');
+        }
+        
+        return $response;
     }
 
     /**

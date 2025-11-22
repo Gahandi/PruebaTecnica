@@ -81,6 +81,14 @@ class EventController extends Controller
      */
     public function addToCart(Request $request)
     {
+        // Manejar preflight OPTIONS request
+        if ($request->getMethod() === 'OPTIONS') {
+            return response('', 200)
+                ->header('Access-Control-Allow-Origin', $request->headers->get('Origin'))
+                ->header('Access-Control-Allow-Credentials', 'true')
+                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN');
+        }
         $request->validate([
             'ticket_type_id' => 'required|exists:ticket_types,id',
             'quantity' => 'required|integer|min:1',
@@ -171,13 +179,24 @@ class EventController extends Controller
                 'event_image' => $ticket_event->event->image,
             ];
             
-            return response()->json([
+            $origin = $request->headers->get('Origin');
+            $response = response()->json([
                 'success' => true,
                 'message' => 'Boletos agregados al carrito.',
                 'cart_count' => \App\Helpers\CartHelper::getCartCount(),
                 'cart' => $cart,
                 'item_data' => $itemData
             ]);
+            
+            // Agregar headers CORS si hay un origin
+            if ($origin) {
+                $response->header('Access-Control-Allow-Origin', $origin)
+                         ->header('Access-Control-Allow-Credentials', 'true')
+                         ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                         ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN');
+            }
+            
+            return $response;
         }
 
         return back()->with('success', 'Boletos agregados al carrito.');

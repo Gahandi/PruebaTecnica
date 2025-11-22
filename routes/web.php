@@ -76,7 +76,8 @@ Route::get('/events', [PublicEventController::class, 'index'])->name('events.pub
 Route::get('/events/{event}', [PublicEventController::class, 'show'])->name('events.show');
 
 // Rutas del carrito (sin autenticación)
-Route::middleware(['cart.context'])->group(function () {
+Route::middleware(['cart.context', \App\Http\Middleware\HandleCorsForCart::class])->group(function () {
+    Route::options('/cart/{any}', function() { return response('', 200); })->where('any', '.*');
     Route::post('/cart/add', [PublicEventController::class, 'addToCart'])->name('cart.add');
     Route::post('/cart/sync', [App\Http\Controllers\CheckoutController::class, 'syncCart'])->name('cart.sync');
     Route::get('/cart', [App\Http\Controllers\CheckoutController::class, 'cart'])->name('cart');
