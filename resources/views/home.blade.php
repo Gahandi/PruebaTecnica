@@ -50,7 +50,7 @@
                         <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
                             <div class="relative">
                                 @if($event->banner && $event->banner !== 'test.jpg')
-                                    <img src="{{ $event->banner }}"
+                                    <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}"
                                          alt="{{ $event->name }}"
                                          class="w-full h-64 object-cover">
                                 @else
@@ -149,7 +149,7 @@
             <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
                 <div class="relative">
                     @if($event->banner && $event->banner !== 'test.jpg')
-                        <img src="{{$event->banner }}"
+                        <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}"
                              alt="{{ $event->name }}"
                              class="w-full h-48 object-cover">
                     @else

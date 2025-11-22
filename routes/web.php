@@ -78,6 +78,7 @@ Route::get('/events/{event}', [PublicEventController::class, 'show'])->name('eve
 // Rutas del carrito (sin autenticación)
 Route::middleware(['cart.context'])->group(function () {
     Route::post('/cart/add', [PublicEventController::class, 'addToCart'])->name('cart.add');
+    Route::post('/cart/sync', [App\Http\Controllers\CheckoutController::class, 'syncCart'])->name('cart.sync');
     Route::get('/cart', [App\Http\Controllers\CheckoutController::class, 'cart'])->name('cart');
     Route::get('/cart/count', [App\Http\Controllers\CheckoutController::class, 'getCartCount'])->name('cart.count');
     Route::get('/cart/dropdown', [App\Http\Controllers\CheckoutController::class, 'getCartDropdown'])->name('cart.dropdown');
@@ -147,6 +148,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/process-payment', [App\Http\Controllers\CheckoutController::class, 'processPayment'])->name('process-payment');
             Route::post('/apply-coupon', [App\Http\Controllers\CheckoutController::class, 'applyCoupon'])->name('apply-coupon');
             Route::delete('/remove-coupon', [App\Http\Controllers\CheckoutController::class, 'removeCoupon'])->name('remove-coupon');
+            Route::post('/quick-login-register', [App\Http\Controllers\CheckoutController::class, 'quickLoginOrRegister'])->name('quick-login-register');
             Route::get('/success/{order}', [App\Http\Controllers\CheckoutController::class, 'success'])->name('success');
             Route::get('/order/{order}', [App\Http\Controllers\CheckoutController::class, 'showOrder'])->name('order');
             Route::get('/callback', [App\Http\Controllers\CheckoutController::class, 'handlePaymentCallback'])->name('callback');

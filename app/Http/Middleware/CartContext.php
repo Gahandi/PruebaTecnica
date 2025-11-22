@@ -17,15 +17,12 @@ class CartContext
     public function handle(Request $request, Closure $next): Response
     {
         try {
-            $host = $request->getHost();
-            $isSubdomain = CartHelper::isSubdomain($host);
-            
-            if ($isSubdomain) {
-                // En subdominio: filtrar carrito para mostrar solo boletos del espacio actual
-                $filteredCart = CartHelper::getFilteredCart($host);
-                session()->put('cart', $filteredCart);
+            // El carrito es global - no se filtra por espacio
+            // La sesión se comparte entre dominio base y subdominios
+            // Solo nos aseguramos de que el carrito exista en la sesión
+            if (!session()->has('cart')) {
+                session()->put('cart', []);
             }
-            // En dominio principal: mantener el carrito completo (no se necesita filtrado)
             
             return $next($request);
         } catch (\Exception $e) {

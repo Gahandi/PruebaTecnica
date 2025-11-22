@@ -24,7 +24,7 @@
             @foreach($events as $event)
                 <div class="bg-white shadow-xl rounded-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-shadow">
                     @if($event->image)
-                        <img src="{{ $event->image }}" alt="{{ $event->name }}" class="w-full h-48 object-cover">
+                        <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->image) }}" alt="{{ $event->name }}" class="w-full h-48 object-cover">
                     @endif
 
                     <div class="p-6">

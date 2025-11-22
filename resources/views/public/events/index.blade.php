@@ -16,7 +16,7 @@
             @foreach($events as $event)
                 <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
                     <!-- Event Image Placeholder -->
-                    <img src="{{$event->banner }}"
+                    <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}"
                              alt="{{ $event->name }}"
                              class="w-full h-48 object-cover">
 

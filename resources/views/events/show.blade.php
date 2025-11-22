@@ -14,7 +14,7 @@
     <div class="relative overflow-hidden">
         @if($event->banner)
             <div class="relative h-[60vh] min-h-[500px] overflow-hidden">
-                <img src="{{ $event->image }} " alt="{{ $event->name }}" 
+                <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}" alt="{{ $event->name }}" 
                      id="hero-image"
                      class="absolute inset-0 w-full h-full object-cover">
                 
@@ -258,7 +258,6 @@
                     <div class="flex flex-col sm:flex-row gap-4">
             <button type="button"
                     id="add_to_cart_button"
-                    disabled
                     onclick="addToCart()"
                                 class="flex-1 bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-8 py-4 rounded-xl hover:from-indigo-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-lg flex items-center justify-center space-x-3">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -405,39 +404,74 @@ async function addToCart() {
         // Add each ticket type to cart sequentially
         for (const ticket of tickets) {
             const formData = new FormData();
-    formData.append('_token', '{{ csrf_token() }}');
-    formData.append('ticket_type_id', ticket.ticket_type_id);
-    formData.append('quantity', ticket.quantity);
+            formData.append('_token', '{{ csrf_token() }}');
+            formData.append('ticket_type_id', ticket.ticket_type_id);
+            formData.append('quantity', ticket.quantity);
 
-        const response = await fetch('{{ route("cart.add") }}', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            }
-        });
+            const response = await fetch(window.CartConfig?.cartAddUrl || '{{ \App\Helpers\CartHelper::getCartAddRoute() }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            });
 
             const responseData = await response.json();
             
-        if (!response.ok) {
+            if (!response.ok) {
                 console.error('Error response:', response.status, responseData);
                 throw new Error(responseData.message || 'Error al agregar al carrito');
             }
+            
+            // Guardar en localStorage si la respuesta incluye datos del item
+            if (responseData.success && responseData.item_data) {
+                if (typeof window.addToCartLocal === 'function') {
+                    window.addToCartLocal(
+                        ticket.ticket_type_id,
+                        responseData.item_data.event_id,
+                        ticket.quantity,
+                        responseData.item_data
+                    );
+                } else {
+                    console.error('addToCartLocal function not available');
+                    // Fallback: guardar directamente en localStorage
+                    try {
+                        const cart = JSON.parse(localStorage.getItem('cart_items') || '{}');
+                        const cartKey = `${ticket.ticket_type_id}_${responseData.item_data.event_id}`;
+                        if (cart[cartKey]) {
+                            cart[cartKey].quantity += ticket.quantity;
+                        } else {
+                            cart[cartKey] = {
+                                ticket_type_id: ticket.ticket_type_id,
+                                event_id: responseData.item_data.event_id,
+                                quantity: ticket.quantity,
+                                price: responseData.item_data.price,
+                                ticket_type_name: responseData.item_data.ticket_type_name,
+                                event_name: responseData.item_data.event_name,
+                                event_date: responseData.item_data.event_date,
+                                event_image: responseData.item_data.event_image
+                            };
+                        }
+                        localStorage.setItem('cart_items', JSON.stringify(cart));
+                    } catch (e) {
+                        console.error('Error saving to localStorage:', e);
+                    }
+                }
+            }
         }
 
-        // Actualizar contador inmediatamente (sin esperar evento)
-        if (typeof updateCartCount === 'function') {
-            updateCartCount();
-        }
-        
-        // Actualizar dropdown si está abierto
-        if (typeof updateCartDropdown === 'function') {
-            updateCartDropdown();
-        }
-        
         // Mostrar notificación de éxito
         showNotification('¡Boletos agregados al carrito exitosamente!', 'success');
+
+        // Actualizar contador y dropdown inmediatamente desde localStorage
+        if (typeof window.updateCartCount === 'function') {
+            window.updateCartCount();
+        }
+        
+        if (typeof window.updateCartDropdown === 'function') {
+            window.updateCartDropdown();
+        }
 
         // Disparar evento de carrito actualizado
         document.dispatchEvent(new CustomEvent('cartUpdated'));
@@ -483,9 +517,16 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
-// Función para actualizar contador del carrito
+// Función para actualizar contador del carrito (local, pero usa la global si está disponible)
 function updateCartCount() {
-    fetch('{{ route("cart.count") }}', {
+    // Si existe la función global, usarla
+    if (typeof window.updateCartCount === 'function') {
+        window.updateCartCount();
+        return;
+    }
+    
+    // Fallback local (siempre dominio base)
+    fetch('{{ \App\Helpers\CartHelper::getCartCountRoute() }}', {
         method: 'GET',
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
@@ -495,14 +536,25 @@ function updateCartCount() {
     .then(response => response.json())
     .then(data => {
         // Actualizar el contador visual en el header
-        const cartCount = document.querySelector('#cart-dropdown .bg-red-500');
-        if (cartCount) {
-            cartCount.textContent = data.count;
-            if (data.count > 0) {
+        const cartButton = document.querySelector('#cart-dropdown button');
+        let cartCount = document.querySelector('#cart-dropdown .bg-red-500');
+        
+        if (data.count > 0) {
+            // Si el badge no existe, crearlo
+            if (!cartCount && cartButton) {
+                cartCount = document.createElement('span');
+                cartCount.className = 'absolute -top-0.5 -right-0.5 inline-flex items-center justify-center bg-red-500 text-white text-xs font-bold min-w-[18px] h-[18px] px-1 rounded-full border-2 border-white shadow-lg';
+                cartButton.appendChild(cartCount);
+            }
+            
+            if (cartCount) {
+                cartCount.textContent = data.count;
                 cartCount.style.display = 'inline-flex';
                 cartCount.classList.add('animate-pulse');
                 setTimeout(() => cartCount.classList.remove('animate-pulse'), 1000);
-            } else {
+            }
+        } else {
+            if (cartCount) {
                 cartCount.style.display = 'none';
             }
         }
@@ -563,7 +615,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Escuchar eventos de carrito actualizado
 document.addEventListener('cartUpdated', function() {
-    updateCartCount();
+    // Usar función global si está disponible
+    if (typeof window.updateCartCount === 'function') {
+        window.updateCartCount();
+    } else {
+        updateCartCount();
+    }
+    
+    // Actualizar dropdown también
+    if (typeof window.updateCartDropdown === 'function') {
+        window.updateCartDropdown();
+    }
 });
 
 // Initialize

@@ -98,24 +98,45 @@
 </script>
 
         @if(!auth()->check())
-            <!-- Mostrar formulario de registro/login si no está autenticado -->
-            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
-                <div class="flex items-start">
-                    <svg class="w-6 h-6 text-yellow-600 mr-3 mt-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                    </svg>
-                    <div class="flex-1">
-                        <h3 class="text-lg font-semibold text-yellow-900 mb-2">Necesitas una cuenta para completar tu compra</h3>
-                        <p class="text-yellow-800 mb-4">Por favor, inicia sesión o regístrate para proceder con el pago.</p>
-                        <div class="flex space-x-4">
-                            <a href="{{ route('login') }}" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                                Iniciar Sesión
-                            </a>
-                            <a href="{{ route('register') }}" class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors">
-                                Registrarse
-                            </a>
+            <!-- Formulario de login/registro rápido -->
+            <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200 mb-6">
+                <div class="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+                    <h2 class="text-xl font-semibold text-gray-900">Inicia sesión o regístrate para continuar</h2>
+                    <p class="text-sm text-gray-600 mt-1">Ingresa tus datos para proceder con el pago</p>
+                </div>
+                <div class="p-6">
+                    <form id="quick-auth-form" onsubmit="handleQuickAuth(event)">
+                        @csrf
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nombre completo</label>
+                                <input type="text" name="name" id="auth_name" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Correo electrónico</label>
+                                <input type="email" name="email" id="auth_email" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
                         </div>
-                    </div>
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+                            <input type="password" name="password" id="auth_password" required minlength="8"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p class="text-xs text-gray-500 mt-1">Mínimo 8 caracteres</p>
+                        </div>
+                        <div class="flex space-x-3">
+                            <button type="submit" name="action" value="login"
+                                class="flex-1 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                                Iniciar Sesión
+                            </button>
+                            <button type="submit" name="action" value="register"
+                                class="flex-1 bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors">
+                                Registrarse
+                            </button>
+                        </div>
+                        <div id="auth-message" class="mt-4 text-sm hidden"></div>
+                    </form>
                 </div>
             </div>
         @endif
@@ -478,6 +499,50 @@
                 }
             } catch (error) {
                 console.error('Error removing coupon:', error);
+            }
+        }
+
+        // Manejar login/registro rápido
+        async function handleQuickAuth(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const action = event.submitter.value;
+            formData.append('action', action);
+
+            const messageDiv = document.getElementById('auth-message');
+            messageDiv.classList.add('hidden');
+
+            try {
+                const response = await fetch('{{ route('checkout.quick-login-register') }}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    messageDiv.className = 'mt-4 text-sm p-3 rounded bg-green-100 text-green-800';
+                    messageDiv.textContent = data.message;
+                    messageDiv.classList.remove('hidden');
+                    
+                    // Redirigir después de 1 segundo
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    messageDiv.className = 'mt-4 text-sm p-3 rounded bg-red-100 text-red-800';
+                    messageDiv.textContent = data.message;
+                    messageDiv.classList.remove('hidden');
+                }
+            } catch (error) {
+                messageDiv.className = 'mt-4 text-sm p-3 rounded bg-red-100 text-red-800';
+                messageDiv.textContent = 'Error al procesar la solicitud. Por favor, intenta de nuevo.';
+                messageDiv.classList.remove('hidden');
             }
         }
     </script>

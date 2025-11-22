@@ -50,7 +50,7 @@
                 @endauth
             </div>
                      @if($space->banner)
-                     <img src="{{ $space->banner }}" alt="{{ $space->name }}" class="w-full h-96 object-cover">
+                     <img src="{{ \App\Helpers\ImageHelper::getImageUrl($space->banner) }}" alt="{{ $space->name }}" class="w-full h-96 object-cover">
                      @else
                          <div class="w-full h-96 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                              <div class="text-center text-gray-500">
@@ -82,7 +82,7 @@
                     <div class="flex item-center justify-center pt-10">
                         <div class="z-20 w-25 h-25 md:w-42 md:h-42 rounded-full border-4 border-white shadow-2xl overflow-hidden bg-white">
                             @if($space->logo)
-                                <img src="{{ $space->logo }}" alt="{{ $space->name }}" class="w-full h-full object-cover">
+                                <img src="{{ \App\Helpers\ImageHelper::getImageUrl($space->logo) }}" alt="{{ $space->name }}" class="w-full h-full object-cover">
                             @else
                             <div class="w-full h-full flex items-center justify-center text-3xl font-bold text-white" style="background: linear-gradient(135deg, {{ $space->color_primary }}, {{ $space->color_secondary ?? $space->color_primary }});">
                                     {{ substr($space->name, 0, 2) }}
@@ -196,7 +196,7 @@
                                     <div class="relative">
 
                                            
-                                        <img src="{{$event->banner }}"
+                                        <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}"
                                             alt="{{ $event->name }}"
                                             class="w-full h-48 object-cover">
 

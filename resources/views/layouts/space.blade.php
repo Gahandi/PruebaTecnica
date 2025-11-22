@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="base-url" content="{{ config('app.url') }}">
 
     <title>@yield('title', $space->name ?? config('app.name', 'Laravel'))</title>
 
@@ -29,7 +30,7 @@
                         <!-- Space Logo/Name -->
                         <div class="flex items-center space-x-4">
                             @if(isset($space) && $space->logo)
-                                <img src="{{ $space->logo }}" alt="{{ $space->name }}" class="h-10 w-10 rounded-lg object-cover">
+                                <img src="{{ \App\Helpers\ImageHelper::getImageUrl($space->logo) }}" alt="{{ $space->name }}" class="h-10 w-10 rounded-lg object-cover">
                             @else
                                 <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                                     <span class="text-white font-bold text-lg">{{ substr($space->name ?? 'S', 0, 1) }}</span>
@@ -50,14 +51,12 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l-1 7a2 2 0 01-2 2H8a2 2 0 01-2-2L5 9z"></path>
                             </svg>
 
-                            @if(\App\Helpers\CartHelper::getCartCount() > 0)
-                                <span class="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center
-                                            bg-red-500 text-white text-xs font-bold
-                                            min-w-[18px] h-[18px] px-1 rounded-full border-2 border-white shadow-lg
-                                            animate-pulse">
-                                    {{ \App\Helpers\CartHelper::getCartCount() }}
-                                </span>
-                            @endif
+                            <span class="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center
+                                        bg-red-500 text-white text-xs font-bold
+                                        min-w-[18px] h-[18px] px-1 rounded-full border-2 border-white shadow-lg"
+                                  id="cart-count-badge" style="display: none;">
+                                0
+                            </span>
                             </button>
 
                             <!-- Cart Dropdown Menu -->
@@ -263,33 +262,76 @@
     @stack('scripts')
 
     <script>
+        // Funciones del carrito - disponibles inmediatamente
         function toggleCartDropdown() {
-            const menu = document.getElementById('cart-menu');
-
-            if (menu.style.display === 'none' || menu.style.display === '') {
-                menu.style.display = 'block';
-            } else {
-                menu.style.display = 'none';
-            }
-        }
-
-        // Cerrar dropdowns al hacer clic fuera
-        document.addEventListener('click', function(event) {
-            const cartDropdown = document.getElementById('cart-dropdown');
             const cartMenu = document.getElementById('cart-menu');
-
-            if (cartDropdown && cartMenu && !cartDropdown.contains(event.target)) {
+            if (!cartMenu) {
+                console.error('Cart menu not found');
+                return;
+            }
+            
+            if (cartMenu.style.display === 'none' || cartMenu.style.display === '') {
+                // Abrir dropdown y actualizar contenido desde localStorage
+                cartMenu.style.display = 'block';
+                if (typeof window.updateCartDropdown === 'function') {
+                    window.updateCartDropdown();
+                } else if (typeof window.renderCartDropdown === 'function') {
+                    window.renderCartDropdown();
+                } else {
+                    console.error('Cart functions not available');
+                }
+            } else {
+                // Cerrar dropdown
                 cartMenu.style.display = 'none';
             }
-        });
-
-        // Función para cerrar el dropdown del carrito
+        }
+        
+        // Inicializar contador cuando el DOM esté listo
+        function initCartCounter() {
+            setTimeout(function() {
+                console.log('Initializing cart counter...');
+                console.log('updateCartCount available:', typeof window.updateCartCount === 'function');
+                console.log('getCartCount available:', typeof window.getCartCount === 'function');
+                
+                if (typeof window.getCartCount === 'function') {
+                    const count = window.getCartCount();
+                    console.log('Cart count from localStorage:', count);
+                }
+                
+                if (typeof window.updateCartCount === 'function') {
+                    window.updateCartCount();
+                } else {
+                    console.error('updateCartCount function not found!');
+                }
+            }, 500);
+        }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initCartCounter);
+        } else {
+            initCartCounter();
+        }
+        
         function closeCartDropdown() {
             const cartMenu = document.getElementById('cart-menu');
             if (cartMenu) {
                 cartMenu.style.display = 'none';
             }
         }
+        
+        // Hacer funciones disponibles globalmente
+        window.toggleCartDropdown = toggleCartDropdown;
+        window.closeCartDropdown = closeCartDropdown;
+        
+        // Cerrar dropdowns al hacer clic fuera
+        document.addEventListener('click', function(event) {
+            const cartDropdown = document.getElementById('cart-dropdown');
+            const cartMenu = document.getElementById('cart-menu');
+
+            if (cartDropdown && cartMenu && !cartDropdown.contains(event.target)) {
+                closeCartDropdown();
+            }
+        });
 
         // Cerrar dropdown cuando se hace clic en los enlaces del carrito
         document.addEventListener('click', function(event) {
@@ -297,138 +339,6 @@
                 closeCartDropdown();
             }
         });
-
-        // Función para mostrar notificación de item agregado al carrito
-        function showCartNotification() {
-            const cartButton = document.querySelector('#cart-dropdown button');
-            const cartCount = document.querySelector('#cart-dropdown .bg-red-500');
-
-            if (cartButton) {
-                // Agregar clase de animación
-                cartButton.classList.add('animate-bounce');
-
-                // Remover la animación después de 1 segundo
-                setTimeout(() => {
-                    cartButton.classList.remove('animate-bounce');
-                }, 1000);
-            }
-
-            if (cartCount) {
-                // Animación del contador
-                cartCount.classList.add('animate-pulse');
-                setTimeout(() => {
-                    cartCount.classList.remove('animate-pulse');
-                }, 1000);
-            }
-        }
-
-        // Escuchar eventos de agregar al carrito
-        document.addEventListener('cartUpdated', function() {
-            showCartNotification();
-            // Actualizar el contador del carrito inmediatamente
-            updateCartCount();
-            // Actualizar el dropdown del carrito
-            if (typeof updateCartDropdown === 'function') {
-                updateCartDropdown();
-            }
-        });
-
-        // Función para actualizar el contador del carrito
-        function updateCartCount() {
-            // Hacer una petición AJAX para obtener el nuevo conteo
-            fetch('{{ route("cart.count") }}', {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                const cartButton = document.querySelector('#cart-dropdown button');
-                let cartCount = document.querySelector('#cart-dropdown .bg-red-500');
-                
-                if (data.count > 0) {
-                    // Si el badge no existe, crearlo
-                    if (!cartCount && cartButton) {
-                        cartCount = document.createElement('span');
-                        cartCount.className = 'absolute -top-0.5 -right-0.5 inline-flex items-center justify-center bg-red-500 text-white text-xs font-bold min-w-[18px] h-[18px] px-1 rounded-full border-2 border-white shadow-lg';
-                        cartButton.appendChild(cartCount);
-                    }
-                    
-                    // Actualizar el contador
-                    if (cartCount) {
-                        cartCount.textContent = data.count;
-                        cartCount.style.display = 'inline-flex';
-                        // Agregar animación
-                        cartCount.classList.add('animate-pulse');
-                        setTimeout(() => {
-                            cartCount.classList.remove('animate-pulse');
-                        }, 500);
-                    }
-                } else {
-                    // Si el contador es 0, ocultar el badge
-                    if (cartCount) {
-                        cartCount.style.display = 'none';
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error updating cart count:', error);
-            });
-        }
-        
-        // Función para actualizar el dropdown del carrito
-        function updateCartDropdown() {
-            fetch('{{ route("cart.dropdown") }}', {
-                method: 'GET',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Actualizar el contenido del dropdown
-                const cartMenu = document.getElementById('cart-menu');
-                if (cartMenu) {
-                    cartMenu.innerHTML = data.html;
-                }
-                
-                // También actualizar el contador si viene en la respuesta
-                if (data.count !== undefined) {
-                    const cartButton = document.querySelector('#cart-dropdown button');
-                    let cartCount = document.querySelector('#cart-dropdown .bg-red-500');
-                    
-                    if (data.count > 0) {
-                        // Si el badge no existe, crearlo
-                        if (!cartCount && cartButton) {
-                            cartCount = document.createElement('span');
-                            cartCount.className = 'absolute -top-0.5 -right-0.5 inline-flex items-center justify-center bg-red-500 text-white text-xs font-bold min-w-[18px] h-[18px] px-1 rounded-full border-2 border-white shadow-lg';
-                            cartButton.appendChild(cartCount);
-                        }
-                        
-                        // Actualizar el contador
-                        if (cartCount) {
-                            cartCount.textContent = data.count;
-                            cartCount.style.display = 'inline-flex';
-                        }
-                    } else {
-                        // Si el contador es 0, ocultar el badge
-                        if (cartCount) {
-                            cartCount.style.display = 'none';
-                        }
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error updating cart dropdown:', error);
-            });
-        }
-        
-        // Hacer las funciones disponibles globalmente
-        window.updateCartCount = updateCartCount;
-        window.updateCartDropdown = updateCartDropdown;
 
         function toggleUserDropdown() {
             const menu = document.getElementById('user-menu');

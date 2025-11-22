@@ -62,7 +62,7 @@
                            class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500 @error('logo') border-red-500 @enderror">
                     @if($space->logo)
                         <div class="mt-2">
-                            <img src="{{ $space->logo }}" alt="Logo actual" class="w-16 h-16 rounded-full object-cover">
+                            <img src="{{ \App\Helpers\ImageHelper::getImageUrl($space->logo) }}" alt="Logo actual" class="w-16 h-16 rounded-full object-cover">
                             <p class="text-sm text-gray-500">Logo actual</p>
                         </div>
                     @endif
@@ -77,7 +77,7 @@
                            class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500 @error('banner') border-red-500 @enderror">
                     @if($space->banner)
                         <div class="mt-2">
-                            <img src="{{ $space->banner }}" alt="Banner actual" class="w-full h-24 object-cover rounded">
+                            <img src="{{ \App\Helpers\ImageHelper::getImageUrl($space->banner) }}" alt="Banner actual" class="w-full h-24 object-cover rounded">
                             <p class="text-sm text-gray-500">Banner actual</p>
                         </div>
                     @endif

@@ -7,7 +7,7 @@
     <!-- Event Header -->
     <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
         <div class="relative h-64 flex items-center justify-center">
-            <img src="{{ $event->image }} " alt="{{ $event->name }}" 
+            <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->image) }}" alt="{{ $event->name }}" 
                 id="hero-image"
                 class="absolute inset-0 w-full h-full object-cover">
         </div>
@@ -313,7 +313,7 @@ async function addToCart() {
             formData.append('ticket_type_id', ticket.ticket_type_id);
             formData.append('quantity', ticket.quantity);
             
-            const response = await fetch('{{ route("cart.add") }}', {
+            const response = await fetch('{{ \App\Helpers\CartHelper::getCartAddRoute() }}', {
                 method: 'POST',
                 body: formData,
                 headers: {

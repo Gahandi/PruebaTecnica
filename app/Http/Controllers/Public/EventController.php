@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\TicketType;
 use App\Models\TicketsEvent;
+use App\Models\Space;
+use App\Models\TypeEvent;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
@@ -13,20 +15,65 @@ class EventController extends Controller
 {
     public function index()
     {
-        $events = Event::with(['ticketTypes' => function($query) {
-            $query->withPivot('quantity', 'price');
-        }])->get();
+        // Obtener eventos destacados (próximos eventos)
+        $featuredEvents = Event::with(['space', 'ticketTypes'])
+            ->where('active', true)
+            ->where('date', '>=', now())
+            ->orderBy('date', 'asc')
+            ->limit(6)
+            ->get();
 
-        return view('public.events.index', compact('events'));
+        // Obtener todos los eventos para la sección principal
+        $allEvents = Event::with(['space', 'ticketTypes'])
+            ->where('active', true)
+            ->where('date', '>=', now())
+            ->orderBy('date', 'asc')
+            ->limit(12)
+            ->get();
+
+        // Obtener categorías con conteo de eventos
+        $categories = TypeEvent::withCount('events')
+            ->having('events_count', '>', 0)
+            ->get()
+            ->map(function ($type) {
+                return [
+                    'name' => $type->name,
+                    'count' => $type->events_count
+                ];
+            });
+
+        // Si no hay categorías, crear algunas por defecto
+        if ($categories->isEmpty()) {
+            $categories = collect([
+                ['name' => 'Conciertos', 'count' => 0],
+                ['name' => 'Deportes', 'count' => 0],
+                ['name' => 'Teatro', 'count' => 0],
+                ['name' => 'Comedia', 'count' => 0],
+                ['name' => 'Conferencias', 'count' => 0],
+                ['name' => 'Festivales', 'count' => 0],
+                ['name' => 'Exposiciones', 'count' => 0],
+                ['name' => 'Otros', 'count' => 0],
+            ]);
+        }
+
+        return view('home', compact('featuredEvents', 'allEvents', 'categories'));
     }
 
-    public function show(Event $event)
+    public function show(Request $request, Event $event)
     {
+        // Cargar el espacio del evento
+        $space = $event->space;
+
+        if (!$space) {
+            abort(404, 'Evento no encontrado');
+        }
+
+        // Cargar la relación ticketTypes con información de la tabla intermedia
         $event->load(['ticketTypes' => function($query) {
             $query->withPivot('quantity', 'price');
         }]);
 
-        return view('public.events.show', compact('event'));
+        return view('events.show', compact('event', 'space'));
     }
 
     /**
@@ -113,11 +160,23 @@ class EventController extends Controller
         session()->put('cart', $cart);
 
         if (request()->ajax()) {
+            // Preparar datos del item para localStorage
+            $itemData = [
+                'ticket_type_id' => $ticket_event->ticket_types_id,
+                'event_id' => $ticket_event->event_id,
+                'price' => $ticket_event->price,
+                'ticket_type_name' => $ticket_event->ticket_type->name,
+                'event_name' => $ticket_event->event->name,
+                'event_date' => $ticket_event->event->date,
+                'event_image' => $ticket_event->event->image,
+            ];
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Boletos agregados al carrito.',
                 'cart_count' => \App\Helpers\CartHelper::getCartCount(),
-                'cart' => $cart
+                'cart' => $cart,
+                'item_data' => $itemData
             ]);
         }
 

@@ -45,7 +45,7 @@
                                 <div class="flex items-start space-x-4">
                                     <!-- Event Image -->
                                     @if(isset($item['event_image']) && $item['event_image'])
-                                        <img src="{{ $item['event_image'] }}" alt="{{ $item['event_name'] ?? 'Evento' }}" class="w-20 h-20 rounded-lg object-cover flex-shrink-0">
+                                        <img src="{{ \App\Helpers\ImageHelper::getImageUrl($item['event_image']) }}" alt="{{ $item['event_name'] ?? 'Evento' }}" class="w-20 h-20 rounded-lg object-cover flex-shrink-0">
                                     @else
                                         <div class="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
                                             <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,7 +87,7 @@
                                             <p class="text-sm font-medium text-gray-700">Total: ${{ number_format($item['price'] * $item['quantity'], 2) }}</p>
                                         </div>
                                         <div class="flex items-center space-x-2">
-                                            <form method="POST" action="{{ route('checkout.update-cart') }}" class="inline">
+                                            <form method="POST" action="{{ route('checkout.update-cart') }}" class="inline" id="update-form-{{ $key }}">
                                                 @csrf
                                                 <input type="hidden" name="ticket_type_id" value="{{ $item['ticket_type_id'] ?? $key }}">
                                                 <input type="number"
@@ -96,9 +96,9 @@
                                                        min="0"
                                                        max="10"
                                                        class="w-16 px-2 py-1 border border-gray-300 rounded text-center"
-                                                       onchange="this.form.submit()">
+                                                       onchange="document.getElementById('update-form-{{ $key }}').submit()">
                                             </form>
-                                            <form method="POST" action="{{ route('checkout.remove-from-cart', $key) }}">
+                                            <form method="POST" action="{{ route('checkout.remove-from-cart', $key) }}" id="remove-form-{{ $key }}">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50">
@@ -170,3 +170,14 @@
     @endif
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    // Sincronizar carrito desde localStorage al cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.syncCartWithServer === 'function') {
+            window.syncCartWithServer();
+        }
+    });
+</script>
+@endpush

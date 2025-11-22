@@ -8,25 +8,12 @@ use App\Models\TicketType;
 class CartHelper
 {
     /**
-     * Obtener el carrito filtrado según el contexto
+     * Obtener el carrito (global, sin filtrado)
      */
     public static function getFilteredCart($host = null)
     {
-        $host = $host ?: request()->getHost();
-        $isSubdomain = self::isSubdomain($host);
-
-        $cart = session()->get('cart', []);
-
-        if ($isSubdomain) {
-            $subdomain = explode('.', $host)[0];
-            $space = Space::where('subdomain', $subdomain)->first();
-
-            if ($space) {
-                return self::filterCartBySpace($cart, $space->id);
-            }
-        }
-
-        return $cart;
+        // El carrito es global - retornar siempre el carrito completo
+        return session()->get('cart', []);
     }
 
     /**
@@ -84,20 +71,20 @@ class CartHelper
     }
 
     /**
-     * Obtener el conteo del carrito filtrado
+     * Obtener el conteo del carrito (global)
      */
     public static function getCartCount($host = null)
     {
-        $cart = self::getFilteredCart($host);
+        $cart = session()->get('cart', []);
         return count($cart);
     }
 
     /**
-     * Obtener el total del carrito filtrado
+     * Obtener el total del carrito (global)
      */
     public static function getCartTotal($host = null)
     {
-        $cart = self::getFilteredCart($host);
+        $cart = session()->get('cart', []);
         $total = 0;
 
         foreach ($cart as $item) {
@@ -108,18 +95,27 @@ class CartHelper
     }
 
     /**
-     * Obtener la ruta correcta para agregar al carrito
+     * Obtener la ruta correcta para agregar al carrito (siempre dominio base)
      */
     public static function getCartAddRoute($host = null)
     {
-        $host = $host ?: request()->getHost();
-        $isSubdomain = self::isSubdomain($host);
-
-        if ($isSubdomain) {
-            return route('subdomain.cart.add');
-        }
-
-        return route('cart.add');
+        return config('app.url') . '/cart/add';
+    }
+    
+    /**
+     * Obtener la ruta correcta para obtener el conteo del carrito (siempre dominio base)
+     */
+    public static function getCartCountRoute($host = null)
+    {
+        return config('app.url') . '/cart/count';
+    }
+    
+    /**
+     * Obtener la ruta correcta para obtener el dropdown del carrito (siempre dominio base)
+     */
+    public static function getCartDropdownRoute($host = null)
+    {
+        return config('app.url') . '/cart/dropdown';
     }
 
     /**

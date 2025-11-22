@@ -16,6 +16,9 @@ use Openpay\Data\Openpay;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Storage;
 use App\Traits\S3ImageManager;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class CheckoutController extends Controller
 {
@@ -23,7 +26,7 @@ class CheckoutController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth')->except(['addToCart', 'cart']);
+        $this->middleware('auth')->except(['addToCart', 'cart', 'checkout', 'quickLoginOrRegister', 'getCartCount', 'getCartDropdown']);
     }
 
     /**
@@ -31,11 +34,49 @@ class CheckoutController extends Controller
      */
     public function cart()
     {
+        // Sincronizar desde localStorage si viene en la request
+        if (request()->has('sync') && request()->input('sync') === 'true') {
+            // El frontend enviará el carrito via POST antes de redirigir
+        }
+        
         $cart = \App\Helpers\CartHelper::getCartWithEventInfo();
 
         $events = Event::with('ticketTypes')->get();
 
         return view('checkout.cart', compact('cart', 'events'));
+    }
+
+    /**
+     * Sincronizar carrito desde localStorage con la sesión del servidor
+     */
+    public function syncCart(Request $request)
+    {
+        $cartData = $request->input('cart', []);
+        
+        // Validar y limpiar datos del carrito
+        $validatedCart = [];
+        foreach ($cartData as $key => $item) {
+            if (isset($item['ticket_type_id']) && isset($item['event_id']) && isset($item['quantity'])) {
+                $validatedCart[$key] = [
+                    'ticket_type_id' => $item['ticket_type_id'],
+                    'event_id' => $item['event_id'],
+                    'quantity' => (int)$item['quantity'],
+                    'price' => isset($item['price']) ? (float)$item['price'] : 0,
+                    'ticket_type_name' => $item['ticket_type_name'] ?? 'Boleto',
+                    'event_name' => $item['event_name'] ?? 'Evento',
+                    'event_date' => $item['event_date'] ?? null,
+                    'event_image' => $item['event_image'] ?? null,
+                ];
+            }
+        }
+        
+        // Guardar en sesión
+        session()->put('cart', $validatedCart);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Carrito sincronizado correctamente.'
+        ]);
     }
 
     /**
@@ -530,5 +571,64 @@ class CheckoutController extends Controller
         $order->load(['orderItems.ticketType', 'tickets', 'coupon']);
 
         return view('checkout.order', compact('order'));
+    }
+
+    /**
+     * Login o registro rápido desde el checkout
+     */
+    public function quickLoginOrRegister(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255',
+            'password' => 'required|string|min:8',
+            'action' => 'required|in:login,register'
+        ]);
+
+        if ($request->action === 'register') {
+            // Verificar si el usuario ya existe
+            if (User::where('email', $request->email)->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Este correo electrónico ya está registrado. Por favor, inicia sesión.'
+                ], 400);
+            }
+
+            // Crear nuevo usuario
+            $user = User::create([
+                'name' => $request->name,
+                'last_name' => '', // Se puede dejar vacío o pedir después
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'viewer',
+                'verified' => false,
+            ]);
+
+            Auth::login($user);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cuenta creada exitosamente. Redirigiendo...',
+                'redirect' => route('checkout.checkout')
+            ]);
+        } else {
+            // Login
+            $credentials = $request->only('email', 'password');
+
+            if (Auth::attempt($credentials)) {
+                $request->session()->regenerate();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Sesión iniciada exitosamente. Redirigiendo...',
+                    'redirect' => route('checkout.checkout')
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Las credenciales proporcionadas no coinciden con nuestros registros.'
+            ], 401);
+        }
     }
 }
