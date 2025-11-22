@@ -36,17 +36,22 @@ use Illuminate\Http\Request;
 Route::domain('{subdomain}.' . config('app.url'))
     ->middleware(['subdomain.session', 'cart.context'])
     ->group(function () {
-        Route::get('/scanner', [ScannerController::class, 'index'])->name('scanner.index');
         Route::get('/', [SpaceController::class, 'show'])->name('spaces.profile');
         Route::get('/edit', [SpaceController::class, 'edit'])->name('spaces.edit');
         Route::put('/update', [SpaceController::class, 'update'])->name('spaces.update');
         Route::post('/update-profile', [SpaceController::class, 'updateProfile'])->name('spaces.update-profile');
-        Route::get('/events/create', [SpaceEventController::class, 'create'])
-            ->name('spaces.events.create')
-            ->middleware('space.member');
-        Route::post('/events', [SpaceEventController::class, 'store'])
-            ->name('spaces.events.store')
-            ->middleware('space.member');
+        
+        // Rutas que requieren ser admin del space
+        Route::middleware(['auth', 'space.admin'])->group(function () {
+            Route::get('/scanner', [ScannerController::class, 'index'])->name('scanner.index');
+        });
+        
+        // Rutas que requieren ser miembro del space
+        Route::middleware(['auth', 'space.member'])->group(function () {
+            Route::get('/events/create', [SpaceEventController::class, 'create'])->name('spaces.events.create');
+            Route::post('/events', [SpaceEventController::class, 'store'])->name('spaces.events.store');
+        });
+        
         Route::get('/{event:slug}', [SpaceEventController::class, 'show']);
         // Rutas de checkout para subdominio
     });

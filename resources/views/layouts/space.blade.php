@@ -159,47 +159,54 @@
                             </div>
                         </div>
 
-                        <!-- Navigation Links -->
-                        <a href="{{ route('spaces.profile', $space->subdomain ?? '') }}" class="text-gray-700 hover:text-gray-900">
-                            Inicio
-                        </a>
-                        <a href="{{ config('app.url') }}" class="text-gray-700 hover:text-gray-900">
-                            Todos los Eventos
-                        </a>
-
-                        @auth
-                            @if(isset($space))
-                                @php
-                                    $user = auth()->user();
-                                    // Verificar si es admin del space (role_space_id = 1)
-                                    $isAdmin = $user->spaces()
-                                        ->where('spaces.id', $space->id)
-                                        ->wherePivot('role_space_id', 1)
-                                        ->wherePivotNull('deleted_at')
-                                        ->exists();
-                                    
-                                    // Verificar permisos adicionales
-                                    $hasPermission = \App\Models\RoleSpacePermission::hasPermission($space->id, 'create checkins');
-                                    
-                                    $canSeeScanner = $isAdmin || $hasPermission;
-                                @endphp
-                                @if($canSeeScanner)
-                                    <a href="{{ route('scanner.index', ['subdomain' => $space->subdomain]) }}" class="text-gray-700 hover:text-gray-900 flex items-center gap-1">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <!-- Navigation Tabs -->
+                        @php
+                            $currentRoute = request()->route()->getName();
+                            $isProfilePage = $currentRoute === 'spaces.profile';
+                            $isScannerPage = $currentRoute === 'scanner.index';
+                            $isEventPage = $currentRoute === 'spaces.events.create' || str_contains(request()->path(), 'events');
+                            
+                            // Verificar si es admin del space (solo admin, sin permisos adicionales)
+                            $isAdmin = false;
+                            if (auth()->check() && isset($space)) {
+                                $isAdmin = auth()->user()->isAdminOfSpace($space->id);
+                            }
+                        @endphp
+                        
+                        <div class="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+                            <!-- Tab Inicio -->
+                            <a href="{{ route('spaces.profile', $space->subdomain ?? '') }}" 
+                               class="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 {{ $isProfilePage ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900' }}">
+                                Inicio
+                            </a>
+                            
+                            @auth
+                                @if(isset($space) && $isAdmin)
+                                    <!-- Tab Scanner -->
+                                    <a href="{{ route('scanner.index', ['subdomain' => $space->subdomain]) }}" 
+                                       class="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-1 {{ $isScannerPage ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900' }}">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
                                         </svg>
                                         Scanner
                                     </a>
-                                @endif
-                                @if($canSeeScanner)
-                                    <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}" class="text-gray-700 hover:text-gray-900 flex items-center gap-1">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    
+                                    <!-- Tab Evento -->
+                                    <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}" 
+                                       class="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-1 {{ $isEventPage ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900' }}">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                         </svg>
                                         Evento
                                     </a>
                                 @endif
-                            @endif
+                            @endauth
+                        </div>
+                        
+                        <!-- Link a Todos los Eventos -->
+                        <a href="{{ config('app.url') }}" class="text-gray-700 hover:text-gray-900 ml-4">
+                            Todos los Eventos
+                        </a>
                             <!-- User Menu Dropdown -->
                             <div class="relative group" id="user-dropdown">
                                 <button class="text-gray-700 hover:text-gray-900 flex items-center" onclick="toggleUserDropdown()">

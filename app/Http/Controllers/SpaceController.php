@@ -20,6 +20,9 @@ class SpaceController extends Controller
             abort(404, 'Espacio no encontrado');
         }
         
+        // Cargar relaciones necesarias
+        $space->load(['events.ticketTypes', 'users']);
+        
         return view('spaces.profile', compact('space'));
     }
     
@@ -31,9 +34,9 @@ class SpaceController extends Controller
             abort(404, 'Espacio no encontrado');
         }
         
-        // Verificar que el usuario autenticado pertenece al espacio
-        if (!auth()->user() || !auth()->user()->spaces->contains($space->id)) {
-            abort(403, 'No tienes permisos para editar este espacio');
+        // Verificar que el usuario autenticado es admin del espacio
+        if (!auth()->check() || !auth()->user()->isAdminOfSpace($space->id)) {
+            abort(403, 'No tienes permisos de administrador para editar este espacio');
         }
         
         return view('spaces.edit-profile', compact('space'));
@@ -47,9 +50,9 @@ class SpaceController extends Controller
             abort(404, 'Espacio no encontrado');
         }
         
-        // Verificar que el usuario autenticado pertenece al espacio
-        if (!auth()->user() || !auth()->user()->spaces->contains($space->id)) {
-            abort(403, 'No tienes permisos para editar este espacio');
+        // Verificar que el usuario autenticado es admin del espacio
+        if (!auth()->check() || !auth()->user()->isAdminOfSpace($space->id)) {
+            abort(403, 'No tienes permisos de administrador para editar este espacio');
         }
         
         $request->validate([
