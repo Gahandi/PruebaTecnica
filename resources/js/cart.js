@@ -172,13 +172,58 @@ window.clearCart = function() {
 };
 
 /**
+ * Obtener token CSRF del dominio base
+ */
+window.getCsrfToken = async function() {
+    try {
+        const baseUrl = CartConfig.baseUrl;
+        if (!baseUrl) {
+            return CartConfig.csrfToken || null;
+        }
+        
+        const tokenResponse = await fetch(baseUrl + '/cart/csrf-token', {
+            method: 'GET',
+            credentials: 'include'
+        });
+        
+        if (tokenResponse.ok) {
+            const tokenData = await tokenResponse.json();
+            CartConfig.csrfToken = tokenData.token;
+            return tokenData.token;
+        }
+    } catch (error) {
+        console.warn('Could not fetch CSRF token from base domain:', error);
+    }
+    
+    // Fallback al token local
+    const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+    if (csrfMeta) {
+        CartConfig.csrfToken = csrfMeta.getAttribute('content');
+        return CartConfig.csrfToken;
+    }
+    
+    return null;
+};
+
+/**
  * Sincronizar carrito con el servidor
  */
 window.syncCartWithServer = async function() {
     const cart = getCart();
     
-    if (!CartConfig.cartSyncUrl || !CartConfig.csrfToken) {
+    if (!CartConfig.cartSyncUrl) {
         console.warn('Cart config not initialized');
+        return;
+    }
+    
+    // Obtener token CSRF si no lo tenemos
+    let csrfToken = CartConfig.csrfToken;
+    if (!csrfToken) {
+        csrfToken = await getCsrfToken();
+    }
+    
+    if (!csrfToken) {
+        console.warn('CSRF token not available');
         return;
     }
     
@@ -188,10 +233,10 @@ window.syncCartWithServer = async function() {
             headers: {
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': CartConfig.csrfToken
+                'X-CSRF-TOKEN': csrfToken
             },
             body: JSON.stringify({ cart: cart }),
-            credentials: 'same-origin'
+            credentials: 'include'
         });
         
         if (!response.ok) {
@@ -254,6 +299,12 @@ window.renderCartDropdown = function() {
     const cartMenu = document.getElementById('cart-menu');
     
     if (!cartMenu) return;
+    
+    // Prevenir ciclos infinitos - usar flag
+    if (cartMenu.dataset.rendering === 'true') {
+        return;
+    }
+    cartMenu.dataset.rendering = 'true';
     
     let html = `
         <div class="px-4 py-3 border-b border-gray-200 bg-gray-50 rounded-t-lg">
@@ -338,7 +389,29 @@ window.renderCartDropdown = function() {
     }
     
     cartMenu.innerHTML = html;
-    updateCartCount();
+    cartMenu.dataset.rendering = 'false';
+    
+    // Actualizar contador sin disparar eventos
+    const count = getCartCount();
+    const cartButton = document.querySelector('#cart-dropdown button');
+    let cartCountBadge = document.getElementById('cart-count-badge');
+    
+    if (count > 0) {
+        if (!cartCountBadge && cartButton) {
+            cartCountBadge = document.createElement('span');
+            cartCountBadge.id = 'cart-count-badge';
+            cartCountBadge.className = 'absolute -top-0.5 -right-0.5 inline-flex items-center justify-center bg-red-500 text-white text-xs font-bold min-w-[18px] h-[18px] px-1 rounded-full border-2 border-white shadow-lg';
+            cartButton.appendChild(cartCountBadge);
+        }
+        if (cartCountBadge) {
+            cartCountBadge.textContent = count;
+            cartCountBadge.style.display = 'inline-flex';
+        }
+    } else {
+        if (cartCountBadge) {
+            cartCountBadge.style.display = 'none';
+        }
+    }
 };
 
 /**
@@ -400,20 +473,36 @@ window.showCartNotification = function() {
 /**
  * Escuchar eventos de carrito actualizado
  */
+let cartUpdateInProgress = false;
 document.addEventListener('cartUpdated', function() {
+    // Prevenir múltiples ejecuciones simultáneas
+    if (cartUpdateInProgress) {
+        return;
+    }
+    cartUpdateInProgress = true;
+    
     // Mostrar notificación visual
     if (typeof window.showCartNotification === 'function') {
         window.showCartNotification();
     }
     
     // Actualizar contador y dropdown
-    updateCartCount();
-    updateCartDropdown();
+    if (typeof window.updateCartCount === 'function') {
+        window.updateCartCount();
+    }
+    if (typeof window.updateCartDropdown === 'function') {
+        window.updateCartDropdown();
+    }
     
     // Sincronizar con servidor en background
     if (typeof window.syncCartWithServer === 'function') {
-        syncCartWithServer();
+        window.syncCartWithServer();
     }
+    
+    // Resetear flag después de un breve delay
+    setTimeout(() => {
+        cartUpdateInProgress = false;
+    }, 100);
 });
 
 // Verificar que el script se haya cargado
@@ -425,10 +514,20 @@ if (typeof console !== 'undefined') {
     console.log('✅ updateCartCount function available:', typeof window.updateCartCount === 'function');
 }
 
-// Inicializar contador al cargar la página
+// Inicializar contador al cargar la página (solo una vez)
+let cartInitialized = false;
 (function initCart() {
+    if (cartInitialized) {
+        return;
+    }
+    
     function doInit() {
+        if (cartInitialized) {
+            return;
+        }
+        
         if (typeof window.updateCartCount === 'function') {
+            cartInitialized = true;
             window.updateCartCount();
             if (typeof console !== 'undefined') {
                 console.log('✅ Cart counter initialized');

@@ -401,10 +401,32 @@ async function addToCart() {
     `;
 
     try {
+        // Obtener token CSRF del dominio base si estamos en un subdominio
+        let csrfToken = '{{ csrf_token() }}';
+        const currentHost = window.location.host;
+        const baseUrl = window.CartConfig?.baseUrl || '{{ config("app.url") }}';
+        const baseHost = new URL(baseUrl).host;
+        
+        // Si estamos en un subdominio, obtener el token del dominio base
+        if (currentHost !== baseHost && currentHost.includes('.')) {
+            try {
+                const tokenResponse = await fetch(baseUrl + '/cart/csrf-token', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (tokenResponse.ok) {
+                    const tokenData = await tokenResponse.json();
+                    csrfToken = tokenData.token;
+                }
+            } catch (e) {
+                console.warn('Could not fetch CSRF token from base domain, using local token');
+            }
+        }
+        
         // Add each ticket type to cart sequentially
         for (const ticket of tickets) {
             const formData = new FormData();
-            formData.append('_token', '{{ csrf_token() }}');
+            formData.append('_token', csrfToken);
             formData.append('ticket_type_id', ticket.ticket_type_id);
             formData.append('quantity', ticket.quantity);
 
@@ -413,8 +435,9 @@ async function addToCart() {
                 body: formData,
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                credentials: 'include'
             });
 
             const responseData = await response.json();

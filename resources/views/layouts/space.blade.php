@@ -286,22 +286,17 @@
             }
         }
         
-        // Inicializar contador cuando el DOM esté listo
+        // Inicializar contador cuando el DOM esté listo (solo una vez)
+        let cartCounterInitialized = false;
         function initCartCounter() {
+            if (cartCounterInitialized) {
+                return;
+            }
+            cartCounterInitialized = true;
+            
             setTimeout(function() {
-                console.log('Initializing cart counter...');
-                console.log('updateCartCount available:', typeof window.updateCartCount === 'function');
-                console.log('getCartCount available:', typeof window.getCartCount === 'function');
-                
-                if (typeof window.getCartCount === 'function') {
-                    const count = window.getCartCount();
-                    console.log('Cart count from localStorage:', count);
-                }
-                
                 if (typeof window.updateCartCount === 'function') {
                     window.updateCartCount();
-                } else {
-                    console.error('updateCartCount function not found!');
                 }
             }, 500);
         }

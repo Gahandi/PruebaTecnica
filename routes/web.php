@@ -19,6 +19,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ScannerController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -78,6 +79,19 @@ Route::get('/events/{event}', [PublicEventController::class, 'show'])->name('eve
 // Rutas del carrito (sin autenticación)
 Route::middleware(['cart.context', \App\Http\Middleware\HandleCorsForCart::class])->group(function () {
     Route::options('/cart/{any}', function() { return response('', 200); })->where('any', '.*');
+    Route::get('/cart/csrf-token', function(Request $request) {
+        $origin = $request->headers->get('Origin');
+        $response = response()->json(['token' => csrf_token()]);
+        
+        if ($origin) {
+            $response->header('Access-Control-Allow-Origin', $origin)
+                     ->header('Access-Control-Allow-Credentials', 'true')
+                     ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                     ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN');
+        }
+        
+        return $response;
+    })->name('cart.csrf-token');
     Route::post('/cart/add', [PublicEventController::class, 'addToCart'])->name('cart.add');
     Route::post('/cart/sync', [App\Http\Controllers\CheckoutController::class, 'syncCart'])->name('cart.sync');
     Route::get('/cart', [App\Http\Controllers\CheckoutController::class, 'cart'])->name('cart');
