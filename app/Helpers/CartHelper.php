@@ -71,12 +71,18 @@ class CartHelper
     }
 
     /**
-     * Obtener el conteo del carrito (global)
+     * Obtener el conteo del carrito (global) - suma de cantidades
      */
     public static function getCartCount($host = null)
     {
         $cart = session()->get('cart', []);
-        return count($cart);
+        $count = 0;
+        
+        foreach ($cart as $item) {
+            $count += isset($item['quantity']) ? (int)$item['quantity'] : 0;
+        }
+        
+        return $count;
     }
 
     /**

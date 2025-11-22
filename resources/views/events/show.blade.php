@@ -447,49 +447,19 @@ async function addToCart() {
                 throw new Error(responseData.message || 'Error al agregar al carrito');
             }
             
-            // Guardar en localStorage si la respuesta incluye datos del item
-            if (responseData.success && responseData.item_data) {
-                if (typeof window.addToCartLocal === 'function') {
-                    window.addToCartLocal(
-                        ticket.ticket_type_id,
-                        responseData.item_data.event_id,
-                        ticket.quantity,
-                        responseData.item_data
-                    );
-                } else {
-                    console.error('addToCartLocal function not available');
-                    // Fallback: guardar directamente en localStorage
-                    try {
-                        const cart = JSON.parse(localStorage.getItem('cart_items') || '{}');
-                        const cartKey = `${ticket.ticket_type_id}_${responseData.item_data.event_id}`;
-                        if (cart[cartKey]) {
-                            cart[cartKey].quantity += ticket.quantity;
-                        } else {
-                            cart[cartKey] = {
-                                ticket_type_id: ticket.ticket_type_id,
-                                event_id: responseData.item_data.event_id,
-                                quantity: ticket.quantity,
-                                price: responseData.item_data.price,
-                                ticket_type_name: responseData.item_data.ticket_type_name,
-                                event_name: responseData.item_data.event_name,
-                                event_date: responseData.item_data.event_date,
-                                event_image: responseData.item_data.event_image
-                            };
-                        }
-                        localStorage.setItem('cart_items', JSON.stringify(cart));
-                    } catch (e) {
-                        console.error('Error saving to localStorage:', e);
-                    }
-                }
-            }
+            // El servidor ya guardó el item en la sesión, solo actualizar UI
         }
 
         // Mostrar notificación de éxito
         showNotification('¡Boletos agregados al carrito exitosamente!', 'success');
 
-        // Actualizar contador y dropdown inmediatamente desde localStorage
+        // Invalidar cache y actualizar contador y dropdown desde el servidor
+        if (typeof window.invalidateCartCache === 'function') {
+            window.invalidateCartCache();
+        }
+        
         if (typeof window.updateCartCount === 'function') {
-            window.updateCartCount();
+            await window.updateCartCount();
         }
         
         if (typeof window.updateCartDropdown === 'function') {

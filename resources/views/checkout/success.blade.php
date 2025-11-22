@@ -145,19 +145,9 @@
 
 @push('scripts')
 <script>
-    // Limpiar localStorage del carrito después de una compra exitosa
-    if (typeof window.clearCart === 'function') {
-        window.clearCart();
-    } else {
-        // Fallback: limpiar directamente
-        try {
-            localStorage.removeItem('cart_items');
-            if (window.CartConfig && window.CartConfig.storageKey) {
-                localStorage.removeItem(window.CartConfig.storageKey);
-            }
-        } catch (e) {
-            console.error('Error clearing cart from localStorage:', e);
-        }
+    // Invalidar cache del carrito después de una compra exitosa
+    if (typeof window.invalidateCartCache === 'function') {
+        window.invalidateCartCache();
     }
     // Actualizar contador del carrito
     if (typeof window.updateCartCount === 'function') {
