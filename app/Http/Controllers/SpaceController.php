@@ -20,7 +20,121 @@ class SpaceController extends Controller
             abort(404, 'Espacio no encontrado');
         }
         
-        return view('spaces.profile', compact('space'));
+        // Verificar si el usuario es admin del espacio
+        $isAdmin = auth()->check() && auth()->user()->isAdminOfSpace($space->id);
+        
+        // Cargar relaciones necesarias
+        $space->load(['events.ticketTypes', 'users']);
+        
+        // Estadísticas generales del espacio
+        $totalEvents = $space->events->count();
+        $totalMembers = $space->users()->wherePivotNull('deleted_at')->count();
+        
+        // Obtener todos los eventos del espacio con sus IDs
+        $eventIds = $space->events->pluck('id');
+        
+        // Estadísticas de boletos
+        $totalTicketsAvailable = 0;
+        $totalTicketsSold = 0;
+        $totalRevenue = 0;
+        
+        foreach ($space->events as $event) {
+            foreach ($event->ticketTypes as $ticketType) {
+                $ticketEvent = \App\Models\TicketsEvent::where('event_id', $event->id)
+                    ->where('ticket_types_id', $ticketType->id)
+                    ->first();
+                
+                if ($ticketEvent) {
+                    $totalTicketsAvailable += $ticketEvent->quantity;
+                    
+                    // Contar boletos vendidos para este evento y tipo
+                    $sold = \App\Models\Ticket::where('event_id', $event->id)
+                        ->where('ticket_types_id', $ticketType->id)
+                        ->count();
+                    
+                    $totalTicketsSold += $sold;
+                    $totalRevenue += $sold * $ticketEvent->price;
+                }
+            }
+        }
+        
+        // Estadísticas de usuarios con sus boletos
+        $usersWithStats = [];
+        $spaceUsers = $space->users()->wherePivotNull('deleted_at')->get();
+        
+        foreach ($spaceUsers as $user) {
+            // Obtener todas las órdenes del usuario
+            $allUserOrders = \App\Models\Order::where('user_id', $user->id)
+                ->with(['tickets', 'payments'])
+                ->get();
+            
+            // Filtrar órdenes que pertenecen a eventos de este espacio
+            $userOrders = $allUserOrders->filter(function($order) use ($eventIds) {
+                // Si event_id es un array JSON, verificar si contiene algún ID del espacio
+                if (is_string($order->event_id)) {
+                    $decoded = json_decode($order->event_id, true);
+                    if (is_array($decoded)) {
+                        return !empty(array_intersect($decoded, $eventIds->toArray()));
+                    }
+                    return in_array($order->event_id, $eventIds->toArray());
+                }
+                return in_array($order->event_id, $eventIds->toArray());
+            });
+            
+            // Obtener tickets del usuario para eventos de este espacio
+            $userTickets = \App\Models\Ticket::whereIn('event_id', $eventIds->toArray())
+                ->whereHas('order', function($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                })
+                ->get();
+            
+            $userTicketsOwned = $userTickets->count();
+            $userRevenue = 0;
+            
+            // Calcular revenue de las órdenes filtradas
+            foreach ($userOrders as $order) {
+                $payment = $order->payments->first();
+                if ($payment && $payment->total) {
+                    $userRevenue += $payment->total;
+                }
+            }
+            
+            $userOrdersCount = $userOrders->count();
+            
+            // Obtener rol del usuario en el espacio
+            $userSpace = $user->spaces()->where('spaces.id', $space->id)->first();
+            $roleId = $userSpace ? $userSpace->pivot->role_space_id : null;
+            $roleName = 'Miembro';
+            if ($roleId) {
+                $role = \App\Models\Rolespace::find($roleId);
+                $roleName = $role ? $role->name : 'Miembro';
+            }
+            
+            $usersWithStats[] = [
+                'user' => $user,
+                'tickets_owned' => $userTicketsOwned,
+                'revenue' => $userRevenue,
+                'orders_count' => $userOrdersCount,
+                'role' => $roleName,
+                'is_admin' => $roleId == 1
+            ];
+        }
+        
+        // Ordenar usuarios por revenue descendente
+        usort($usersWithStats, function($a, $b) {
+            return $b['revenue'] <=> $a['revenue'];
+        });
+        
+        return view('spaces.profile', compact(
+            'space',
+            'isAdmin',
+            'totalEvents',
+            'totalMembers',
+            'totalTicketsAvailable',
+            'totalTicketsSold',
+            'totalRevenue',
+            'usersWithStats'
+        ));
     }
     
     public function edit(Request $request, $subdomain)
@@ -31,9 +145,9 @@ class SpaceController extends Controller
             abort(404, 'Espacio no encontrado');
         }
         
-        // Verificar que el usuario autenticado pertenece al espacio
-        if (!auth()->user() || !auth()->user()->spaces->contains($space->id)) {
-            abort(403, 'No tienes permisos para editar este espacio');
+        // Verificar que el usuario autenticado es admin del espacio
+        if (!auth()->user() || !auth()->user()->isAdminOfSpace($space->id)) {
+            abort(403, 'No tienes permisos para editar este espacio. Solo los administradores pueden editar.');
         }
         
         return view('spaces.edit-profile', compact('space'));
@@ -47,9 +161,9 @@ class SpaceController extends Controller
             abort(404, 'Espacio no encontrado');
         }
         
-        // Verificar que el usuario autenticado pertenece al espacio
-        if (!auth()->user() || !auth()->user()->spaces->contains($space->id)) {
-            abort(403, 'No tienes permisos para editar este espacio');
+        // Verificar que el usuario autenticado es admin del espacio
+        if (!auth()->user() || !auth()->user()->isAdminOfSpace($space->id)) {
+            abort(403, 'No tienes permisos para editar este espacio. Solo los administradores pueden editar.');
         }
         
         $request->validate([

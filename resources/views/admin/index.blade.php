@@ -168,23 +168,6 @@
                                 <p class="mt-2 text-sm text-gray-500">Revisa y gestiona pedidos</p>
                             </div>
                         </a>
-
-                        <a href="{{ route('admin.users.index') }}" class="group relative bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500 rounded-lg border border-gray-200 hover:border-gray-300">
-                            <div>
-                                <span class="rounded-lg inline-flex p-3 bg-indigo-50 text-indigo-700 ring-4 ring-white">
-                                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                                    </svg>
-                                </span>
-                            </div>
-                            <div class="mt-4">
-                                <h3 class="text-lg font-medium">
-                                    <span class="absolute inset-0" aria-hidden="true"></span>
-                                    Usuarios
-                                </h3>
-                                <p class="mt-2 text-sm text-gray-500">Dashboard y estadísticas</p>
-                            </div>
-                        </a>
                     </div>
                 </div>
             </div>

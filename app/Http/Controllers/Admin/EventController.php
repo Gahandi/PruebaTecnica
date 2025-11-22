@@ -21,7 +21,7 @@ class EventController extends Controller
      */
     public function index()
     {
-        $events = Event::with(['space', 'ticketTypes'])->get();
+        $events = Event::all();
         // Devuelve la vista con la lista de eventos.
         // Debes crear esta vista en: resources/views/admin/events/index.blade.php
         return view('admin.events.index', compact('events'));

@@ -117,8 +117,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('admin/ticket-types', TicketTypeController::class)->names('admin.ticket-types');
     Route::resource('admin/coupons', CouponController::class)->names('admin.coupons');
     Route::resource('admin/orders', AdminOrderController::class)->names('admin.orders');
-    Route::get('/admin/users', [\App\Http\Controllers\Admin\UserDashboardController::class, 'index'])->name('admin.users.index');
-    Route::get('/admin/users/{user}', [\App\Http\Controllers\Admin\UserDashboardController::class, 'show'])->name('admin.users.show');
 });
 
 // Ruta de prueba sin middleware de roles
