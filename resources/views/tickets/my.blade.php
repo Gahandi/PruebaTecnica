@@ -44,7 +44,11 @@
                                 <p class="text-sm opacity-90">{{ \Carbon\Carbon::parse($order->created_at)->format('d/m/Y H:i') }}</p>
                             </div>
                             <div class="text-right">
-                                <div class="text-2xl font-bold">${{ number_format($order->total, 2) }}</div>
+                                @php
+                                    $payment = $order->payments->first();
+                                    $orderTotal = $payment ? $payment->total : ($order->total ?? 0);
+                                @endphp
+                                <div class="text-2xl font-bold">${{ number_format($orderTotal, 2) }}</div>
                                 <div class="text-sm opacity-90">{{ $order->tickets->count() }} boleto(s)</div>
                             </div>
                         </div>

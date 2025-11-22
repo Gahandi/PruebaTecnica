@@ -38,7 +38,9 @@ class Payment extends Model
 	protected $casts = [
 		'coupon_id' => 'int',
 		'subtotal' => 'float',
-		'discount_amount' => 'float'
+		'discount_amount' => 'float',
+		'total' => 'float',
+		'taxes' => 'float'
 	];
 
 	protected $fillable = [
@@ -46,7 +48,9 @@ class Payment extends Model
 		'coupon_id',
 		'status',
 		'subtotal',
-		'discount_amount'
+		'discount_amount',
+		'total',
+		'taxes'
 	];
 
 	public function coupon()
