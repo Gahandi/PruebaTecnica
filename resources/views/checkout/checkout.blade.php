@@ -50,6 +50,25 @@
         }
 
 
+        // Mostrar/ocultar campos de contraseña según checkbox
+        const createAccountCheckbox = document.getElementById('create_account');
+        const passwordFields = document.getElementById('password-fields');
+        if (createAccountCheckbox && passwordFields) {
+            createAccountCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    passwordFields.classList.remove('hidden');
+                    document.getElementById('customer_password').required = true;
+                    document.getElementById('customer_password_confirmation').required = true;
+                } else {
+                    passwordFields.classList.add('hidden');
+                    document.getElementById('customer_password').required = false;
+                    document.getElementById('customer_password_confirmation').required = false;
+                    document.getElementById('customer_password').value = '';
+                    document.getElementById('customer_password_confirmation').value = '';
+                }
+            });
+        }
+
         // --- 5. Manejador del envío del formulario (SOLO UNO) ---
         form.addEventListener('submit', function(event) {
             // Validar que los campos de cliente estén llenos
@@ -60,6 +79,24 @@
                 event.preventDefault();
                 alert('Por favor completa tu nombre y correo electrónico antes de proceder al pago.');
                 return;
+            }
+            
+            // Validar contraseña si se marcó crear cuenta
+            if (createAccountCheckbox && createAccountCheckbox.checked) {
+                const password = document.getElementById('customer_password').value;
+                const passwordConfirmation = document.getElementById('customer_password_confirmation').value;
+                
+                if (!password || password.length < 8) {
+                    event.preventDefault();
+                    alert('La contraseña debe tener al menos 8 caracteres.');
+                    return;
+                }
+                
+                if (password !== passwordConfirmation) {
+                    event.preventDefault();
+                    alert('Las contraseñas no coinciden.');
+                    return;
+                }
             }
             
             const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
@@ -142,6 +179,50 @@
                             <p class="text-xs text-gray-500 mt-1">Te enviaremos la confirmación de tu compra a este correo</p>
                         </div>
                     </div>
+                    
+                    @if(!auth()->check())
+                    <!-- Opción para crear cuenta (solo si no está logueado) -->
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <div class="flex items-start">
+                            <input type="checkbox" 
+                                   id="create_account" 
+                                   name="create_account" 
+                                   value="1"
+                                   class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <div class="ml-3">
+                                <label for="create_account" class="text-sm font-medium text-gray-700">
+                                    Crear una cuenta para acceder a tus boletos más rápido
+                                </label>
+                                <p class="text-xs text-gray-500 mt-1">Podrás ver y descargar tus boletos en cualquier momento</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Campos de contraseña (se muestran si se marca crear cuenta) -->
+                        <div id="password-fields" class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="customer_password" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Contraseña <span class="text-red-500">*</span>
+                                </label>
+                                <input type="password" 
+                                       name="customer_password" 
+                                       id="customer_password" 
+                                       minlength="8"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p class="text-xs text-gray-500 mt-1">Mínimo 8 caracteres</p>
+                            </div>
+                            <div>
+                                <label for="customer_password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">
+                                    Confirmar Contraseña <span class="text-red-500">*</span>
+                                </label>
+                                <input type="password" 
+                                       name="customer_password_confirmation" 
+                                       id="customer_password_confirmation" 
+                                       minlength="8"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </div>
             

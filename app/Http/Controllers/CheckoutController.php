@@ -394,13 +394,20 @@ class CheckoutController extends Controller
     {
         try {
             // Validar email y nombre
-            $request->validate([
+            $validationRules = [
                 'customer_email' => 'required|email|max:255',
                 'customer_name' => 'required|string|max:255',
                 'payment_method' => 'required|in:openpay',
                 'openpay_token' => 'required',
                 'device_session_id' => 'required',
-            ]);
+            ];
+            
+            // Si se solicita crear cuenta, validar contraseña
+            if ($request->has('create_account') && $request->create_account == '1') {
+                $validationRules['customer_password'] = 'required|string|min:8|confirmed';
+            }
+            
+            $request->validate($validationRules);
 
             $cart = session()->get('cart', []);
             if (empty($cart)) {
@@ -609,16 +616,28 @@ class CheckoutController extends Controller
         if ($customerEmail) {
             $user = User::where('email', $customerEmail)->first();
             
-            // Si no existe, crear usuario temporal
+            // Si no existe, crear usuario
             if (!$user) {
+                // Si se proporcionó contraseña (crear cuenta), usarla; si no, generar una aleatoria
+                $password = $request->has('customer_password') && $request->customer_password 
+                    ? Hash::make($request->customer_password)
+                    : Hash::make(Str::random(32)); // Password aleatorio si no se proporciona
+                
                 $user = User::create([
                     'name' => $customerName ?? 'Cliente',
                     'last_name' => '',
                     'email' => $customerEmail,
-                    'password' => Hash::make(Str::random(32)), // Password aleatorio
+                    'password' => $password,
                     'role' => 'viewer',
                     'verified' => false,
                 ]);
+            } else {
+                // Si el usuario ya existe pero se proporcionó una contraseña nueva, actualizarla
+                if ($request->has('customer_password') && $request->customer_password) {
+                    $user->update([
+                        'password' => Hash::make($request->customer_password)
+                    ]);
+                }
             }
         }
 
