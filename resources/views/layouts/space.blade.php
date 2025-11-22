@@ -161,6 +161,13 @@
 
                         <!-- Navigation Tabs -->
                         @php
+                            // Obtener el space si no está disponible
+                            if (!isset($space) || !$space) {
+                                $host = request()->getHost();
+                                $subdomain = explode('.', $host)[0];
+                                $space = \App\Models\Space::where('subdomain', $subdomain)->first();
+                            }
+                            
                             $currentRoute = request()->route()->getName();
                             $currentPath = request()->path();
                             $hasEventHash = request()->get('tab') === 'eventos' || str_contains(request()->getRequestUri(), '#eventos');
@@ -170,8 +177,14 @@
                             
                             // Verificar si es admin del space (solo admin, sin permisos adicionales)
                             $isAdmin = false;
-                            if (auth()->check() && isset($space)) {
-                                $isAdmin = auth()->user()->isAdminOfSpace($space->id);
+                            if (auth()->check() && isset($space) && $space && $space->id) {
+                                try {
+                                    $user = auth()->user();
+                                    $isAdmin = $user->isAdminOfSpace($space->id);
+                                } catch (\Exception $e) {
+                                    \Log::error('Error checking isAdminOfSpace: ' . $e->getMessage());
+                                    $isAdmin = false;
+                                }
                             }
                         @endphp
                         
@@ -183,7 +196,7 @@
                             </a>
                             
                             @auth
-                                @if(isset($space) && $isAdmin)
+                                @if(isset($space) && $space && $isAdmin)
                                     <!-- Tab Scanner -->
                                     <a href="{{ route('scanner.index', ['subdomain' => $space->subdomain]) }}" 
                                        class="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-1 {{ $isScannerPage ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900' }}">
