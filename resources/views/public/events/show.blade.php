@@ -311,6 +311,7 @@ async function addToCart() {
             const formData = new FormData();
             formData.append('_token', '{{ csrf_token() }}');
             formData.append('ticket_type_id', ticket.ticket_type_id);
+            formData.append('event_id', {{ $event->id }});
             formData.append('quantity', ticket.quantity);
             
             const response = await fetch('{{ \App\Helpers\CartHelper::getCartAddRoute() }}', {

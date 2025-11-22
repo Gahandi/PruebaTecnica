@@ -91,10 +91,14 @@ class EventController extends Controller
         }
         $request->validate([
             'ticket_type_id' => 'required|exists:ticket_types,id',
+            'event_id' => 'required|exists:events,id',
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $ticket_event = TicketsEvent::where('ticket_types_id', $request->ticket_type_id)->first();
+        // Buscar el ticket_event específico para este evento y tipo de boleto
+        $ticket_event = TicketsEvent::where('ticket_types_id', $request->ticket_type_id)
+            ->where('event_id', $request->event_id)
+            ->first();
 
         if (!$ticket_event) {
             if (request()->ajax()) {
@@ -152,6 +156,8 @@ class EventController extends Controller
 
         if (isset($cart[$cartKey])) {
             $cart[$cartKey]['quantity'] = $totalQuantity;
+            // Actualizar precio desde TicketsEvent para asegurar que sea el correcto para este evento
+            $cart[$cartKey]['price'] = $ticket_event->price;
         } else {
             $cart[$cartKey] = [
                 'ticket_type_id' => $ticket_event->ticket_types_id,

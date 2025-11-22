@@ -247,8 +247,9 @@ class CheckoutController extends Controller
                     return back()->with('error', 'No hay suficientes boletos disponibles. Solo quedan ' . $ticketEvent->quantity . ' boletos.');
                 }
 
-                // Mantener el precio original del carrito (que viene de TicketsEvent)
+                // Actualizar precio desde TicketsEvent para asegurar que sea el correcto
                 $cart[$cartKey]['quantity'] = $request->quantity;
+                $cart[$cartKey]['price'] = $ticketEvent->price; // Actualizar precio desde la BD
             } else {
                 // Si no hay event_id, usar TicketType directamente
                 if (isset($item['ticket_type_id'])) {
