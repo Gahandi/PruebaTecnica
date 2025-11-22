@@ -173,14 +173,28 @@
                         @php
                             $totalTickets = $event->ticketTypes->sum('pivot.quantity');
                             $availableTickets = $event->ticketTypes->sum('pivot.quantity');
+
+                            $ticketCount = \App\Models\Ticket::where('event_id', $event->id)->get();
+                            $vendidos = 0;
+                            \Log::info('=== SIMPLE TEST ===');
+                            \Log::info('Datos de prueba: '.json_encode($ticketCount));
+                            if ($ticketCount->count() > 0) {
+                                foreach ($ticketCount as $item => $value) {
+                                    $vendidos++;
+                                    \Log::info('Datos de prueba contador: '.$vendidos);
+                                }
+                            }
+                            $disponibles = $availableTickets - $vendidos;
+                            $porcentaje = ($disponibles * 100) / $availableTickets;
+
                         @endphp
                         <div class="mb-4">
                             <div class="flex items-center justify-between text-sm text-gray-600 mb-1">
                                 <span>Boletos disponibles</span>
-                                <span>{{ $availableTickets }} disponibles</span>
+                                <span>{{ $disponibles }} disponibles de {{ $availableTickets }} </span>
                             </div>
                             <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-green-500 h-2 rounded-full" style="width: {{ $availableTickets > 0 ? 100 : 0 }}%"></div>
+                            <div class="bg-green-500 h-2 rounded-full" style="width: {{ $availableTickets > 0 ? $porcentaje : 0 }}%"></div>
                             </div>
                         </div>
                     @endif

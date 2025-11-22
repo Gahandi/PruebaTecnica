@@ -121,9 +121,26 @@
                                                                 ->where('session_id', '!=', session()->getId())
                                                                 ->sum('quantity');
                                                             $available = $ticketEvent ? ($ticketEvent->quantity - $reservedQuantity) : 0;
+                                    
+                                                            $totalTickets = $event->ticketTypes->sum('pivot.quantity');
+                                                            $availableTickets = $event->ticketTypes->sum('pivot.quantity');
+
+                                                            $ticketCount = \App\Models\Ticket::where('event_id', $event->id)->get();
+                                                            $vendidos = 0;
+                                                            \Log::info('=== SIMPLE TEST ===');
+                                                            \Log::info('Datos de prueba: '.json_encode($ticketCount));
+                                                            if ($ticketCount->count() > 0) {
+                                                                foreach ($ticketCount as $ticketCountKey => $value) {
+                                                                    $vendidos++;
+                                                                    \Log::info('Datos de prueba contador: '.$vendidos);
+                                                                }
+                                                            }
+                                                            $disponibles = $availableTickets - $vendidos;
+                                                            $porcentaje = ($disponibles * 100) / $availableTickets;
+
                                                         @endphp
                                                         <p class="text-xs text-green-600 font-medium">
-                                                            Disponibles: {{ $available }} boletos
+                                                            Disponibles: {{ $disponibles }} boletos
                                                         </p>
                                                     </div>
 
