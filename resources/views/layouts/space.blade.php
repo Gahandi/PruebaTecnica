@@ -162,9 +162,11 @@
                         <!-- Navigation Tabs -->
                         @php
                             $currentRoute = request()->route()->getName();
-                            $isProfilePage = $currentRoute === 'spaces.profile';
+                            $currentPath = request()->path();
+                            $hasEventHash = request()->get('tab') === 'eventos' || str_contains(request()->getRequestUri(), '#eventos');
+                            $isProfilePage = $currentRoute === 'spaces.profile' && !$hasEventHash;
                             $isScannerPage = $currentRoute === 'scanner.index';
-                            $isEventPage = $currentRoute === 'spaces.events.create' || str_contains(request()->path(), 'events');
+                            $isEventPage = $currentRoute === 'spaces.profile' && $hasEventHash;
                             
                             // Verificar si es admin del space (solo admin, sin permisos adicionales)
                             $isAdmin = false;
@@ -192,7 +194,7 @@
                                     </a>
                                     
                                     <!-- Tab Evento -->
-                                    <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}" 
+                                    <a href="{{ route('spaces.profile', $space->subdomain) }}#eventos" 
                                        class="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-1 {{ $isEventPage ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900' }}">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -395,5 +397,19 @@
             }
         </script>
     @endif
+    
+    <script>
+        // Scroll automático a la sección de eventos si hay hash #eventos
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.location.hash === '#eventos') {
+                setTimeout(function() {
+                    const eventosSection = document.getElementById('eventos');
+                    if (eventosSection) {
+                        eventosSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 100);
+            }
+        });
+    </script>
     </body>
 </html>

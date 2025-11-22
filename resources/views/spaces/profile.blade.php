@@ -166,7 +166,7 @@
             </div>
 
             <!-- Columna Derecha - Eventos -->
-            <div class="lg:col-span-3 ">
+            <div class="lg:col-span-3 " id="eventos">
                 <div class="bg-white  rounded-2xl shadow-xl p-8">
                     <div class="flex items-center justify-between mb-8">
                         <div>
