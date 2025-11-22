@@ -121,26 +121,9 @@
                                                                 ->where('session_id', '!=', session()->getId())
                                                                 ->sum('quantity');
                                                             $available = $ticketEvent ? ($ticketEvent->quantity - $reservedQuantity) : 0;
-                                    
-                                                            $totalTickets = $event->ticketTypes->sum('pivot.quantity');
-                                                            $availableTickets = $event->ticketTypes->sum('pivot.quantity');
-
-                                                            $ticketCount = \App\Models\Ticket::where('event_id', $event->id)->get();
-                                                            $vendidos = 0;
-                                                            \Log::info('=== SIMPLE TEST ===');
-                                                            \Log::info('Datos de prueba: '.json_encode($ticketCount));
-                                                            if ($ticketCount->count() > 0) {
-                                                                foreach ($ticketCount as $ticketCountKey => $value) {
-                                                                    $vendidos++;
-                                                                    \Log::info('Datos de prueba contador: '.$vendidos);
-                                                                }
-                                                            }
-                                                            $disponibles = $availableTickets - $vendidos;
-                                                            $porcentaje = ($disponibles * 100) / $availableTickets;
-
                                                         @endphp
                                                         <p class="text-xs text-green-600 font-medium">
-                                                            Disponibles: {{ $disponibles }} boletos
+                                                            Disponibles: {{ $available }} boletos
                                                         </p>
                                                     </div>
 
@@ -344,6 +327,10 @@
             showCartNotification();
             // Actualizar el contador del carrito inmediatamente
             updateCartCount();
+            // Actualizar el dropdown del carrito
+            if (typeof updateCartDropdown === 'function') {
+                updateCartDropdown();
+            }
         });
 
         // Función para actualizar el contador del carrito
@@ -391,8 +378,57 @@
             });
         }
         
-        // Hacer la función disponible globalmente
+        // Función para actualizar el dropdown del carrito
+        function updateCartDropdown() {
+            fetch('{{ route("cart.dropdown") }}', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Actualizar el contenido del dropdown
+                const cartMenu = document.getElementById('cart-menu');
+                if (cartMenu) {
+                    cartMenu.innerHTML = data.html;
+                }
+                
+                // También actualizar el contador si viene en la respuesta
+                if (data.count !== undefined) {
+                    const cartButton = document.querySelector('#cart-dropdown button');
+                    let cartCount = document.querySelector('#cart-dropdown .bg-red-500');
+                    
+                    if (data.count > 0) {
+                        // Si el badge no existe, crearlo
+                        if (!cartCount && cartButton) {
+                            cartCount = document.createElement('span');
+                            cartCount.className = 'absolute -top-0.5 -right-0.5 inline-flex items-center justify-center bg-red-500 text-white text-xs font-bold min-w-[18px] h-[18px] px-1 rounded-full border-2 border-white shadow-lg';
+                            cartButton.appendChild(cartCount);
+                        }
+                        
+                        // Actualizar el contador
+                        if (cartCount) {
+                            cartCount.textContent = data.count;
+                            cartCount.style.display = 'inline-flex';
+                        }
+                    } else {
+                        // Si el contador es 0, ocultar el badge
+                        if (cartCount) {
+                            cartCount.style.display = 'none';
+                        }
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error updating cart dropdown:', error);
+            });
+        }
+        
+        // Hacer las funciones disponibles globalmente
         window.updateCartCount = updateCartCount;
+        window.updateCartDropdown = updateCartDropdown;
 
         function toggleUserDropdown() {
             const menu = document.getElementById('user-menu');

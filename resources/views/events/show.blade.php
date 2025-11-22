@@ -155,93 +155,83 @@
             @endif
         </div>
 
-        @php
-            // Calcular si hay algún boleto disponible en total
-            $totalAvailableTickets = 0;
-            foreach ($event->ticketTypes as $ticketType) {
-                $totalAsignado = $ticketType->pivot->quantity;
-                $vendidos = \App\Models\Ticket::where('event_id', $event->id)
-                    ->where('ticket_types_id', $ticketType->id)
-                    ->count();
-                $disponibles = max(0, $totalAsignado - $vendidos);
-                $totalAvailableTickets += $disponibles;
-            }
-            // Determinar si debemos mostrar el formulario de compra o el mensaje de agotado
-            $showPurchaseSection = $event->ticketTypes->count() > 0 && $totalAvailableTickets > 0;
-        @endphp
-
-        @if($showPurchaseSection)
-            {{-- TODO: Contenido del Formulario de Compra (Tu código actual de formulario va aquí) --}}
+        @if($event->ticketTypes->count() > 0)
             <div class="bg-white/80 backdrop-blur-lg rounded-2xl p-8 border border-white/30 shadow-xl">
                 <h2 class="text-2xl font-semibold text-gray-900 mb-8 flex items-center">
                     <svg class="w-6 h-6 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
-                    </svg> Compra de Boletos
+                    </svg>
+                    Compra de Boletos
                 </h2>
+
                 <form id="purchaseForm" class="space-y-8">
-                    @csrf
-                    <input type="hidden" name="event_id" value="{{ $event->id }}">
+                @csrf
+                <input type="hidden" name="event_id" value="{{ $event->id }}">
+
                     <div class="grid grid-cols-1 gap-6">
-                        @foreach($event->ticketTypes as $ticketType)
-                            {{-- Recalculamos disponibilidad para cada boleto dentro del loop --}}
-                            @php
-                                // Total asignado desde la tabla pivot
-                                $totalAsignado = $ticketType->pivot->quantity;
-                                // Boletos ya vendidos
-                                $vendidos = \App\Models\Ticket::where('event_id', $event->id)
-                                    ->where('ticket_types_id', $ticketType->id)
-                                    ->count();
-                                // Disponibles reales
-                                $disponibles = max(0, $totalAsignado - $vendidos);
-                            @endphp
+                    @foreach($event->ticketTypes as $ticketType)
                             <div class="bg-white/60 backdrop-blur-sm border-2 border-gray-200 rounded-xl p-6 hover:border-indigo-300 transition-all duration-300 hover:shadow-lg hover:scale-105 flex justify-between">
-                                <div class="flex flex-col items-start justify-center align-middle">
-                                    <h4 class="text-xl font-bold text-gray-900 text-left align-middle mb-2">{{ $ticketType->name }}</h4>
-                                    <div class="flex items-center space-x-4">
-                                        <div class="flex items-center align-middle">
-                                            <svg class="w-4 h-4 text-green-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                            </svg>
-                                            <span class="text-sm font-medium text-green-600">{{ $disponibles }} disponibles</span>
-                                        </div>
-                                        {{-- Etiquetas dinámicas según disponibilidad real --}}
-                                        @if($disponibles <= 5 && $disponibles > 0)
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"> ¡Últimos! </span>
-                                        @elseif($disponibles <= 20 && $disponibles > 0)
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"> Pocos disponibles </span>
-                                        @elseif($disponibles === 0)
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"> Agotado </span>
-                                        @endif
+                                <div class="flex flex-col items-center justify-center align-middle">
+                                    <div class="flex items-center justify-center align-middle">
+                                        <h4 class="text-xl font-bold text-gray-900 text-left align-middle">{{ $ticketType->name }}</h4>
                                     </div>
+                                    <div class="items-center justify-center space-x-4 align-middle">
+                                    <div class="flex items-center align-middle">
+                                        <svg class="w-4 h-4 text-green-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        <span class="text-sm font-medium text-green-600">{{ $ticketType->pivot->quantity }} disponibles</span>
+                                    </div>
+                                    @if($ticketType->pivot->quantity <= 5)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            ¡Últimos!
+                                        </span>
+                                    @elseif($ticketType->pivot->quantity <= 20)
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                            Pocos disponibles
+                                        </span>
+                                    @endif
                                 </div>
-                                <div class="flex items-center justify-center align-middle h-full">
+                                </div>
+                                <div class="flex items-center justify-center align-middle items-center justify-between h-full">
                                     <div class="text-center align-middle">
-                                        <p class="text-3xl font-bold text-green-600 mb-1"> ${{ number_format($ticketType->pivot->price, 2) }} </p>
+                                        <p class="text-3xl font-bold text-green-600 mb-1">${{ number_format($ticketType->pivot->price, 2) }}</p>
                                         <p class="text-sm text-gray-500">por boleto</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center justify-center space-x-4 align-middle">
-                                    {{-- Botón - --}}
-                                    <button type="button" class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors" onclick="decreaseQuantity({{ $ticketType->id }})" @if($disponibles == 0) disabled @endif>
+                                        <button type="button"
+                                            class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors"
+                                                onclick="decreaseQuantity({{ $ticketType->id }})">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
-                                        </svg>
-                                    </button>
-                                    {{-- Input cantidad --}}
-                                    <input type="number" id="quantity_{{ $ticketType->id }}" name="tickets[{{ $loop->index }}][quantity]" value="0" min="0" max="{{ $disponibles }}" @if($disponibles == 0) disabled @endif class="w-16 h-12 text-center text-xl font-bold border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" onchange="updateTotal()">
-                                    {{-- Botón + --}}
-                                    <button type="button" class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors" onclick="increaseQuantity({{ $ticketType->id }}, {{ $disponibles }})" @if($disponibles == 0) disabled @endif>
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <input type="hidden" name="tickets[{{ $loop->index }}][ticket_type_id]" value="{{ $ticketType->id }}">
-                            </div>
-                        @endforeach
-                    </div>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                                            </svg>
+                                        </button>
 
-                    <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
+                                        <input type="number"
+                                               id="quantity_{{ $ticketType->id }}"
+                                               name="tickets[{{ $loop->index }}][quantity]"
+                                               value="0"
+                                               min="0"
+                                               max="{{ $ticketType->pivot->quantity }}"
+                                           class=" text-center text-xl font-bold border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                                               onchange="updateTotal()">
+
+                                        <button type="button"
+                                            class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors"
+                                                onclick="increaseQuantity({{ $ticketType->id }}, {{ $ticketType->pivot->quantity }})">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                            </svg>
+                                        </button>
+                                </div>
+
+                                <input type="hidden" name="tickets[{{ $loop->index }}][ticket_type_id]" value="{{ $ticketType->id }}">
+                        </div>
+                    @endforeach
+                </div>
+
+                <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
                         <h4 class="text-xl font-semibold text-gray-900 mb-6">Resumen de la Orden</h4>
                         <div id="order_summary" class="space-y-4">
                             <div class="flex justify-between text-lg">
@@ -260,48 +250,49 @@
                                 <div class="flex justify-between font-bold text-2xl">
                                     <span>Total:</span>
                                     <span id="total" class="text-green-600">$0.00</span>
-                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
                     <div class="flex flex-col sm:flex-row gap-4">
-                        <button type="button" id="add_to_cart_button" disabled onclick="addToCart()" class="flex-1 bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-8 py-4 rounded-xl hover:from-indigo-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-lg flex items-center justify-center space-x-3">
+            <button type="button"
+                    id="add_to_cart_button"
+                    disabled
+                    onclick="addToCart()"
+                                class="flex-1 bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-8 py-4 rounded-xl hover:from-indigo-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-lg flex items-center justify-center space-x-3">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
                             </svg>
                             <span>Agregar al Carrito</span>
-                        </button>
-                        <button type="button" id="view_cart_button" onclick="window.location.href='{{ config('app.url') }}/cart'" class="flex-1 bg-gray-600 text-white px-8 py-4 rounded-xl hover:bg-gray-700 transition-all duration-300 font-semibold text-lg flex items-center justify-center space-x-3">
+            </button>
+                        
+            <button type="button"
+                    id="view_cart_button"
+                    onclick="window.location.href='{{ config('app.url') }}/cart'"
+                                class="flex-1 bg-gray-600 text-white px-8 py-4 rounded-xl hover:bg-gray-700 transition-all duration-300 font-semibold text-lg flex items-center justify-center space-x-3">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l-1 7a2 2 0 01-2 2H8a2 2 0 01-2-2L5 9z"></path>
                             </svg>
                             <span>Ver Carrito</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        @else
-            {{-- TODO: Mensaje de Agotado o Sin Boletos Configurados --}}
+            </button>
+        </div>
+            </form>
+        </div>
+    @else
             <div class="bg-white/80 backdrop-blur-lg rounded-2xl p-12 text-center border border-white/30 shadow-xl">
-                <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg class="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
-                    </svg>
-                </div>
-                @if ($event->ticketTypes->count() > 0)
-                    <h3 class="text-2xl font-semibold text-gray-900 mb-3">¡Accesos Agotados! 😥</h3>
-                    <p class="text-gray-600">Lamentablemente, todos los tipos de boletos para este evento se han agotado.</p>
-                @else
-                    <h3 class="text-2xl font-semibold text-gray-900 mb-3">Boletos no disponibles</h3>
-                    <p class="text-gray-600">Este evento no tiene tipos de boletos configurados o listados para la venta.</p>
-                @endif
+                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
             </div>
-        @endif
-    </div> 
-</div> 
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+                <h3 class="text-xl font-semibold text-gray-900 mb-3">No hay boletos disponibles</h3>
+            <p class="text-gray-500">Este evento no tiene tipos de boletos configurados.</p>
+        </div>
+    @endif
+    </div> </div> <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 

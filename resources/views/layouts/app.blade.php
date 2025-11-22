@@ -201,7 +201,7 @@
                                         <p class="text-xs text-gray-500">{{ auth()->user()->email }}</p>
                                     </div>
 
-                                    <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                    <a href="{{ config('app.url') }}/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                         <div class="flex items-center">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
@@ -349,6 +349,8 @@
             showCartNotification();
             // Actualizar el contador del carrito inmediatamente
             updateCartCount();
+            // Actualizar el dropdown del carrito
+            updateCartDropdown();
         });
 
         // Función para actualizar el contador del carrito
@@ -411,6 +413,32 @@
                 const cartMenu = document.getElementById('cart-menu');
                 if (cartMenu) {
                     cartMenu.innerHTML = data.html;
+                }
+                
+                // También actualizar el contador si viene en la respuesta
+                if (data.count !== undefined) {
+                    const cartButton = document.querySelector('#cart-dropdown button');
+                    let cartCount = document.querySelector('#cart-dropdown .bg-red-500');
+                    
+                    if (data.count > 0) {
+                        // Si el badge no existe, crearlo
+                        if (!cartCount && cartButton) {
+                            cartCount = document.createElement('span');
+                            cartCount.className = 'absolute -top-0.5 -right-0.5 inline-flex items-center justify-center bg-red-500 text-white text-xs font-bold min-w-[18px] h-[18px] px-1 rounded-full border-2 border-white shadow-lg';
+                            cartButton.appendChild(cartCount);
+                        }
+                        
+                        // Actualizar el contador
+                        if (cartCount) {
+                            cartCount.textContent = data.count;
+                            cartCount.style.display = 'inline-flex';
+                        }
+                    } else {
+                        // Si el contador es 0, ocultar el badge
+                        if (cartCount) {
+                            cartCount.style.display = 'none';
+                        }
+                    }
                 }
             })
             .catch(error => {

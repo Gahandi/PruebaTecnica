@@ -51,6 +51,27 @@ class CheckoutController extends Controller
     }
 
     /**
+     * Obtener el HTML del dropdown del carrito via AJAX
+     */
+    public function getCartDropdown()
+    {
+        $cart = \App\Helpers\CartHelper::getCartWithEventInfo();
+        $cartCount = \App\Helpers\CartHelper::getCartCount();
+        $cartTotal = \App\Helpers\CartHelper::getCartTotal();
+
+        $html = view('partials.cart-dropdown', [
+            'cart' => $cart,
+            'cartCount' => $cartCount,
+            'cartTotal' => $cartTotal
+        ])->render();
+
+        return response()->json([
+            'html' => $html,
+            'count' => $cartCount
+        ]);
+    }
+
+    /**
      * Agregar item al carrito
      */
     public function addToCart(Request $request)
