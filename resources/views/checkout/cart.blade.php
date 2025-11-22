@@ -186,6 +186,23 @@
             const data = await response.json();
             
             if (data.success) {
+                // Actualizar localStorage también
+                if (typeof window.updateCartItem === 'function' && data.cart) {
+                    // Sincronizar localStorage con el carrito del servidor
+                    if (typeof window.syncCartWithServer === 'function') {
+                        // El servidor ya tiene el carrito actualizado, solo necesitamos limpiar localStorage y recargar
+                        const cartKeyParts = cartKey.split('_');
+                        if (cartKeyParts.length === 2) {
+                            const ticketTypeId = cartKeyParts[0];
+                            const eventId = cartKeyParts[1];
+                            if (quantity > 0) {
+                                window.updateCartItem(ticketTypeId, eventId, quantity);
+                            } else {
+                                window.removeFromCart(ticketTypeId, eventId);
+                            }
+                        }
+                    }
+                }
                 // Recargar la página para mostrar los cambios
                 window.location.reload();
             } else {
@@ -215,6 +232,15 @@
             const data = await response.json();
             
             if (data.success) {
+                // Actualizar localStorage también
+                if (typeof window.removeFromCart === 'function') {
+                    const cartKeyParts = cartKey.split('_');
+                    if (cartKeyParts.length === 2) {
+                        const ticketTypeId = cartKeyParts[0];
+                        const eventId = cartKeyParts[1];
+                        window.removeFromCart(ticketTypeId, eventId);
+                    }
+                }
                 // Recargar la página para mostrar los cambios
                 window.location.reload();
             } else {

@@ -638,15 +638,18 @@ class CheckoutController extends Controller
 
         // Limpiar sesión
         session()->forget(['cart', 'applied_coupon', 'openpay_charge_id', 'checkout_customer_email', 'checkout_customer_name']);
+        
+        // Guardar flag en sesión para limpiar localStorage en el frontend
+        session()->put('clear_cart_localstorage', true);
 
         // Si hay usuario, iniciar sesión automáticamente y redirigir a boletos
         if ($user) {
             Auth::login($user);
-            return redirect()->route('tickets.my')->with('success', '¡Compra realizada con éxito! Puedes ver tus boletos aquí.');
+            return redirect()->route('tickets.my')->with('success', '¡Compra realizada con éxito! Puedes ver tus boletos aquí.')->with('clear_cart_localstorage', true);
         }
         
         // Si no hay usuario, redirigir a página de éxito con el ID de la orden
-        return redirect()->route('checkout.success', $order)->with('success', '¡Compra realizada con éxito!');
+        return redirect()->route('checkout.success', $order)->with('success', '¡Compra realizada con éxito!')->with('clear_cart_localstorage', true);
     }
 
     /**

@@ -366,5 +366,27 @@
             }
         });
     </script>
-</body>
+    @if(session('clear_cart_localstorage'))
+        <script>
+            // Limpiar localStorage del carrito después de una compra exitosa
+            if (typeof window.clearCart === 'function') {
+                window.clearCart();
+            } else {
+                // Fallback: limpiar directamente
+                try {
+                    localStorage.removeItem('cart_items');
+                    if (window.CartConfig && window.CartConfig.storageKey) {
+                        localStorage.removeItem(window.CartConfig.storageKey);
+                    }
+                } catch (e) {
+                    console.error('Error clearing cart from localStorage:', e);
+                }
+            }
+            // Actualizar contador del carrito
+            if (typeof window.updateCartCount === 'function') {
+                window.updateCartCount();
+            }
+        </script>
+    @endif
+    </body>
 </html>
