@@ -192,7 +192,7 @@
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label for="banner" class="block text-sm font-medium text-gray-700 mb-3">Banner del Evento</label>
+                                <label for="banner" class="block text-sm font-medium text-gray-700 mb-3">Banner del Evento (debe de ser de 1080 * 920)</label>
                                 <div class="relative">
                                     <input type="file" name="banner" id="banner" accept="image/*"
                                            class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 @error('banner') border-red-500 @enderror">
@@ -216,7 +216,7 @@
                             </div>
                 
                             <div>
-                                <label for="image" class="block text-sm font-medium text-gray-700 mb-3">Imagen Principal</label>
+                                <label for="image" class="block text-sm font-medium text-gray-700 mb-3">Imagen Principal (debe de ser de 1024 * 768 )</label>
                                 <div class="relative">
                                     <input type="file" name="image" id="image" accept="image/*"
                                            class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 @error('image') border-red-500 @enderror">
@@ -241,7 +241,7 @@
                         </div>
 
                         <div class="mt-6">
-                            <label for="icon" class="block text-sm font-medium text-gray-700 mb-3">Icono del Evento</label>
+                            <label for="icon" class="block text-sm font-medium text-gray-700 mb-3">Icono del Evento (debe de ser de 800 * 800)</label>
                             <div class="relative">
                                 <input type="file" name="icon" id="icon" accept="image/*"
                                        class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 @error('icon') border-red-500 @enderror">
@@ -437,13 +437,80 @@ function removeTicketType(button) {
     // Nota: Esto puede dejar huecos en los índices (ej: 0, 1, 3).
     // Laravel PHP manejará esto bien, pero si JS dependiera de índices consecutivos, se necesitaría re-indexar.
 }
+// --- Validación de Fecha y Hora ---
+
+document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.getElementById('date');
+    const form = dateInput.closest('form');
+
+    // 1. Establecer el valor mínimo para evitar fechas pasadas en navegadores modernos (aunque no bloquea el envío)
+    // El formato debe ser 'YYYY-MM-DDTHH:MM' (ISO 8601 local)
+    function setMinDate() {
+        // Obtener la fecha y hora actual, en formato ISO, y recortar los segundos y milisegundos
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); // Convertir a UTC para luego usar la zona horaria local
+        let isoNow = now.toISOString().slice(0, 16); 
+        
+        // Establecer el atributo 'min' en el input datetime-local
+        dateInput.min = isoNow;
+    }
+    
+    setMinDate();
+    
+    // 2. Agregar un listener al formulario para prevenir el envío si la fecha no es válida
+    form.addEventListener('submit', function(event) {
+        // Crear objetos Date para la validación
+        const selectedDate = new Date(dateInput.value);
+        const currentDate = new Date();
+
+        // Limpiar el mensaje de error anterior si existe
+        const existingError = dateInput.parentNode.querySelector('.date-validation-error');
+        if (existingError) {
+            existingError.remove();
+        }
+
+        // Si la fecha seleccionada es anterior o igual a la fecha/hora actual
+        // Añadimos un pequeño margen (ej. 1 minuto) para la validación del lado del cliente
+        // O más sencillo, comparamos el valor del input con el 'min' establecido.
+        // Pero para ser explícitos y seguir tu regla:
+        
+        // Compara si la fecha seleccionada es menor o igual al momento actual
+        // Restamos 1 minuto (60000 ms) para asegurar que el presente inmediato también falle si es necesario.
+        if (selectedDate <= currentDate) {
+            event.preventDefault(); // Detener el envío del formulario
+            
+            // Mostrar el mensaje de error personalizado
+            const errorMessage = document.createElement('p');
+            errorMessage.className = 'mt-2 text-sm text-red-600 flex items-center date-validation-error';
+            errorMessage.innerHTML = `
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                No se puede crear un evento con fecha anterior o igual a la de hoy.
+            `;
+            
+            // Insertar el mensaje justo después del input de fecha
+            dateInput.parentNode.appendChild(errorMessage);
+            
+            // Opcional: enfocar el input para que el usuario sepa dónde está el problema
+            dateInput.focus();
+        }
+    });
+
+    // 3. (Opcional) Limpiar el error cuando el usuario cambie la fecha
+    dateInput.addEventListener('change', function() {
+        const existingError = dateInput.parentNode.querySelector('.date-validation-error');
+        if (existingError) {
+            existingError.remove();
+        }
+    });
+});
+
 </script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        
-        // --- INICIALIZACIÓN DE EASYMDE (Editor Markdown) ---
-        
+        // --- INICIALIZACIÓN DE EASYMDE (Editor Markdown) --- 
         // Instancia para Agenda
         new EasyMDE({
             element: document.getElementById("agenda"),
@@ -540,10 +607,8 @@ function removeTicketType(button) {
             } else {
                 marker = L.marker(e.latlng).addTo(interactiveMap); // Crear nuevo marcador
             }
-
             // Actualizar input oculto
             coordInput.value = `${lat}, ${lng}`;
-
             // Geocodificación inversa (coordenadas -> dirección) con Nominatim
             fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=es`)
                 .then(response => response.json())
@@ -558,7 +623,6 @@ function removeTicketType(button) {
                     addressInput.value = 'Error al obtener dirección';
                 });
         });
-
         // Evento al dejar el input de dirección (Geocodificación)
         addressInput.addEventListener('blur', function() {
             const address = this.value;
@@ -588,7 +652,6 @@ function removeTicketType(button) {
                     });
             }
         });
-
     });
 </script>
 @endsection

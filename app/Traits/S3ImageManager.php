@@ -20,6 +20,14 @@ trait S3ImageManager {
             $awsSecret = trim(env('AWS_SECRET_ACCESS_KEY', ''));
             $awsBucket = trim(env('AWS_BUCKET', ''));
             $awsRegion = trim(env('AWS_DEFAULT_REGION', ''));
+            \Log::info("DEBUG AWS (saveImages):", [
+                'KEY_ID' => $awsKey ? 'Found' : 'EMPTY',
+                'BUCKET' => $awsBucket ? 'Found' : 'EMPTY',
+                'REGION' => $awsRegion ? 'Found' : 'EMPTY',
+                // No mostrar la clave secreta por seguridad
+                'SECRET' => $awsSecret ? 'Found' : 'EMPTY', 
+                'S3_ENV' => env('S3_ENVIRONMENT') 
+            ]);
             
             if (empty($awsKey) || empty($awsSecret) || empty($awsBucket) || empty($awsRegion)) {
                 $missing = [];
@@ -169,6 +177,16 @@ trait S3ImageManager {
             $awsKey = trim(env("AWS_ACCESS_KEY_ID", ''));
             $awsSecret = trim(env("AWS_SECRET_ACCESS_KEY", ''));
             
+            // --- INICIO DEPURACIÓN ---
+            \Log::info("DEBUG AWS (deleteS3Image):", [
+                'KEY_ID' => $awsKey ? 'Found' : 'EMPTY',
+                'BUCKET' => $bucket ? 'Found' : 'EMPTY',
+                'REGION' => $region ? 'Found' : 'EMPTY',
+                // No mostrar la clave secreta por seguridad
+                'SECRET' => $awsSecret ? 'Found' : 'EMPTY',
+                'S3_ENV' => env('S3_ENVIRONMENT') 
+            ]);
+
             if (empty($bucket) || empty($region) || empty($awsKey) || empty($awsSecret)) {
                 Log::error('Credenciales de AWS no configuradas para eliminar archivo');
                 return false;

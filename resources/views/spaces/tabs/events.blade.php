@@ -38,6 +38,14 @@
                 </div>
                 <div class="p-6">
                     <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $event->name }}</h3>
+                    @if($event->ticketTypes->count() > 0)
+                        <div class="flex items-baseline mb-3 text-sm">
+                            <span class="text-gray-600 font-medium mr-2">Entradas Desde:</span>
+                            <span class="text-lg font-bold text-green-600">
+                                ${{ number_format($event->ticketTypes->min('pivot.price'), 2) }}
+                            </span>
+                        </div>
+                    @endif
                     <div class="flex items-center text-gray-600 mb-3">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -75,11 +83,28 @@
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                             {{ $space->name }}
                         </span>
-                        <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}/{{ $event->slug }}"
-                           class="px-6 py-3 rounded-xl text-white font-semibold transition-all duration-200 hover:shadow-lg transform hover:scale-105"
-                           style="background: linear-gradient(135deg, {{ $space->color_primary }}, {{ $space->color_secondary ?? $space->color_primary }});">
-                            Ver Evento
-                        </a>
+                        
+                        <div class="flex space-x-3">
+                            {{-- INICIO: Botón "Editar Evento" (Añadido) --}}
+                            @auth
+                                @if($isAdmin)
+                                    <a href="{{ route('spaces.events.edit', ['subdomain' => $space->subdomain, 'event' => $event->slug]) }}"
+                                       class="px-4 py-3 rounded-xl text-gray-700 font-semibold border border-gray-300 hover:bg-gray-100 transition-all duration-200 hover:shadow-md transform hover:scale-105 flex items-center text-sm">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-7-9l7 7m-7-9v7h7"></path>
+                                        </svg>
+                                        Editar
+                                    </a>
+                                @endif
+                            @endauth
+                            {{-- FIN: Botón "Editar Evento" (Añadido) --}}
+                            
+                            <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}/{{ $event->slug }}"
+                               class="px-6 py-3 rounded-xl text-white font-semibold transition-all duration-200 hover:shadow-lg transform hover:scale-105"
+                               style="background: linear-gradient(135deg, {{ $space->color_primary }}, {{ $space->color_secondary ?? $space->color_primary }});">
+                                Ver Evento
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
