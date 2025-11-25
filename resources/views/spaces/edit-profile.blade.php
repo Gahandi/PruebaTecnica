@@ -57,7 +57,7 @@
                 </div>
                 
                 <div>
-                    <label for="logo" class="block text-sm font-medium text-gray-700 mb-2">Logo del Cajón</label>
+                    <label for="logo" class="block text-sm font-medium text-gray-700 mb-2">Logo del Cajón (debe ser de 800 * 800)</label>
                     <input type="file" name="logo" id="logo" accept="image/*"
                            class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500 @error('logo') border-red-500 @enderror">
                     @if($space->logo)
@@ -72,7 +72,7 @@
                 </div>
                 
                 <div>
-                    <label for="banner" class="block text-sm font-medium text-gray-700 mb-2">Banner del Cajón</label>
+                    <label for="banner" class="block text-sm font-medium text-gray-700 mb-2">Banner del Cajón (debe ser de 1080 * 920)</label>
                     <input type="file" name="banner" id="banner" accept="image/*"
                            class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500 @error('banner') border-red-500 @enderror">
                     @if($space->banner)

@@ -46,47 +46,57 @@
             <div class="overflow-hidden">
                 <div class="flex transition-transform duration-500 ease-in-out" id="carousel">
                     @foreach($featuredEvents as $event)
-                    <div class="w-full md:w-1/2 lg:w-1/3 flex-shrink-0 px-4">
-                        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                            <div class="relative">
-                                @if($event->banner && $event->banner !== 'test.jpg')
-                                    <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}"
-                                         alt="{{ $event->name }}"
-                                         class="w-full h-64 object-cover">
-                                @else
-                                    <div class="w-full h-64 bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                                        <div class="text-center text-white">
-                                            <svg class="w-16 h-16 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
-                                            </svg>
-                                            <p class="text-lg font-semibold">{{ $event->name }}</p>
+                        <div class="w-full md:w-1/2 lg:w-1/3 flex-shrink-0 px-4">
+                            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                                <div class="relative">
+                                    @if($event->banner && $event->banner !== 'test.jpg')
+                                        <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}"
+                                            alt="{{ $event->name }}"
+                                            class="w-full h-64 object-cover">
+                                    @else
+                                        <div class="w-full h-64 bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                                            <div class="text-center text-white">
+                                                <svg class="w-16 h-16 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                <p class="text-lg font-semibold">{{ $event->name }}</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                @endif
-                                <div class="absolute top-4 right-4">
-                                    <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                        Destacado
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="p-6">
-                                <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $event->name }}</h3>
-                                <p class="text-gray-600 mb-4">{{ \Carbon\Carbon::parse($event->date)->format('d M Y, H:i') }}</p>
-                                <p class="text-gray-500 mb-4">{{ $event->address }}</p>
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                            {{ $event->space->name }}
+                                    @endif
+                                    <div class="absolute top-4 right-4">
+                                        <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                                            Destacado
                                         </span>
                                     </div>
-                                    <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}/{{ $event->slug }}"
-                                       class="bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-2 rounded-full font-semibold transition-colors">
-                                        Ver Evento
-                                    </a>
+                                </div>
+                                <div class="p-6">
+                                    <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $event->name }}</h3>
+                                    @if($event->ticketTypes->count() > 0)
+                                        <div class="flex items-baseline mb-3 text-sm">
+                                            <span class="text-gray-600 font-medium mr-2">Entradas Desde:</span>
+                                            <span class="text-lg font-bold text-green-600">
+                                                ${{ number_format($event->ticketTypes->min('pivot.price'), 2) }}
+                                            </span>
+                                        </div>
+                                    @endif
+                                    <p class="text-gray-600 mb-4">{{ \Carbon\Carbon::parse($event->date)->format('d M Y, H:i') }}</p>
+                                    <p class="text-gray-500 mb-4">{{ $event->address }}</p>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}" 
+                                               target="_blank" {{-- Es una buena práctica abrir los enlaces externos en una nueva pestaña --}}
+                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
+                                                    {{ $event->space->name }}
+                                            </a>
+                                        </div>
+                                        <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}/{{ $event->slug }}"
+                                        class="bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-2 rounded-full font-semibold transition-colors">
+                                            Ver Evento
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                     @endforeach
                 </div>
             </div>
@@ -145,13 +155,13 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @foreach($allEvents as $event)
+        @foreach($allEvents as $event)
             <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
                 <div class="relative">
                     @if($event->banner && $event->banner !== 'test.jpg')
                         <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}"
-                             alt="{{ $event->name }}"
-                             class="w-full h-48 object-cover">
+                            alt="{{ $event->name }}"
+                            class="w-full h-48 object-cover">
                     @else
                         <div class="w-full h-48 bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
                             <div class="text-center text-white">
@@ -164,11 +174,18 @@
                     @endif
                 </div>
                 <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $event->name }}</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mb-1">{{ $event->name }}</h3>
+                    @if($event->ticketTypes->count() > 0)
+                        <div class="flex items-baseline mb-3 text-sm">
+                            <span class="text-gray-600 font-medium mr-2">Entradas Desde:</span>
+                            <span class="text-lg font-bold text-green-600">
+                                ${{ number_format($event->ticketTypes->min('pivot.price'), 2) }}
+                            </span>
+                        </div>
+                    @endif
                     <p class="text-gray-600 mb-2">{{ \Carbon\Carbon::parse($event->date)->format('d M Y, H:i') }}</p>
                     <p class="text-gray-500 mb-4">{{ $event->address }}</p>
 
-                    <!-- Ticket Availability -->
                     @if($event->ticketTypes->count() > 0)
                         @php
                             $totalTickets = $event->ticketTypes->sum('pivot.quantity');
@@ -176,16 +193,18 @@
 
                             $ticketCount = \App\Models\Ticket::where('event_id', $event->id)->get();
                             $vendidos = 0;
-                            \Log::info('=== SIMPLE TEST ===');
-                            \Log::info('Datos de prueba: '.json_encode($ticketCount));
+                            // Se ha comentado el log para evitar ruido en producción
+                            // \Log::info('=== SIMPLE TEST ===');
+                            // \Log::info('Datos de prueba: '.json_encode($ticketCount));
                             if ($ticketCount->count() > 0) {
                                 foreach ($ticketCount as $item => $value) {
                                     $vendidos++;
-                                    \Log::info('Datos de prueba contador: '.$vendidos);
+                                    // \Log::info('Datos de prueba contador: '.$vendidos);
                                 }
                             }
                             $disponibles = $availableTickets - $vendidos;
-                            $porcentaje = ($disponibles * 100) / $availableTickets;
+                            // Se asegura que no haya división por cero
+                            $porcentaje = $availableTickets > 0 ? ($disponibles * 100) / $availableTickets : 0;
 
                         @endphp
                         <div class="mb-4">
@@ -194,25 +213,27 @@
                                 <span>{{ $disponibles }} disponibles de {{ $availableTickets }} </span>
                             </div>
                             <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="bg-green-500 h-2 rounded-full" style="width: {{ $availableTickets > 0 ? $porcentaje : 0 }}%"></div>
+                            <div class="bg-green-500 h-2 rounded-full" style="width: {{ $porcentaje }}%"></div>
                             </div>
                         </div>
                     @endif
 
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}" 
+                            target="_blank" {{-- Es una buena práctica abrir los enlaces externos en una nueva pestaña --}}
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
                                 {{ $event->space->name }}
-                            </span>
+                        </a>
                         </div>
                         <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}/{{ $event->slug }}"
-                           class="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-full font-semibold transition-colors text-sm">
+                        class="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-full font-semibold transition-colors text-sm">
                             Ver Evento
                         </a>
                     </div>
                 </div>
             </div>
-            @endforeach
+        @endforeach
         </div>
 
         @if($allEvents->count() > 6)

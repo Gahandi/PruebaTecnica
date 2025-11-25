@@ -47,6 +47,14 @@ Route::domain('{subdomain}.' . config('app.url'))
         Route::post('/events', [SpaceEventController::class, 'store'])
             ->name('spaces.events.store')
             ->middleware('space.member');
+            
+        Route::get('eventos/{event:slug}/editar', [SpaceEventController::class, 'edit'])
+            ->name('spaces.events.edit')
+            ->middleware('space.member'); // Asumiendo que solo los miembros pueden editar
+
+        Route::put('eventos/{event:slug}', [SpaceEventController::class, 'update'])
+            ->name('spaces.events.update')
+            ->middleware('space.member');
         Route::get('/{event:slug}', [SpaceEventController::class, 'show']);
         // Rutas de checkout para subdominio
     });
