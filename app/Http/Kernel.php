@@ -75,5 +75,6 @@ class Kernel extends HttpKernel
         'subdomain.session' => \App\Http\Middleware\SubdomainSession::class,
         'configure.session' => \App\Http\Middleware\ConfigureSessionDomain::class,
         'cart.context' => \App\Http\Middleware\CartContext::class,
+        'email.verified' => \App\Http\Middleware\EnsureEmailVerified::class,
     ];
 }
