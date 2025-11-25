@@ -70,6 +70,13 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
 });
 
+// Rutas de verificación de email
+Route::prefix('verify')->name('verify.')->group(function () {
+    Route::get('/email', [\App\Http\Controllers\Auth\VerificationController::class, 'showVerificationForm'])->name('email');
+    Route::post('/send-code', [\App\Http\Controllers\Auth\VerificationController::class, 'sendVerificationCode'])->name('send-code');
+    Route::post('/code', [\App\Http\Controllers\Auth\VerificationController::class, 'verifyCode'])->name('code');
+});
+
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Rutas públicas

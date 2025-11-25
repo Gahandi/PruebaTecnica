@@ -14,45 +14,45 @@
 @section('content')
 <div class="min-h-screen bg-gray-50">
     <!-- Banner Header -->
-    <div class="mb-8">
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+         <div class="mb-8">
+             <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
             <div class="relative facebook-style-photo">
-                <div class="absolute top-8 right-8 z-30">
-                    @auth
+                     <div class="absolute top-8 right-8 z-30">
+                @auth
                         @if($isAdmin)
-                            <button 
-                                type="button"
+                        <button 
+                            type="button"
                                 onclick="window.location.href='{{ route('spaces.edit', $space->subdomain) }}'"
                                 class="bg-white bg-opacity-90 backdrop-blur-sm rounded-full px-6 py-3 shadow-xl flex items-center space-x-3 hover:bg-opacity-100 transition-all duration-300 hover:scale-105">
-                                <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"></path>
-                                </svg>
-                                <span class="text-sm font-semibold text-gray-800">Editar</span>
-                            </button>
-                        @endif
-                    @endauth
-                </div>
-                @if($space->banner)
-                    <img src="{{ \App\Helpers\ImageHelper::getImageUrl($space->banner) }}" alt="{{ $space->name }}" class="w-full h-96 object-cover">
-                @else
-                    <div class="w-full h-96 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                        <div class="text-center text-gray-500">
-                            <svg class="w-20 h-20 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                             </svg>
-                            <p class="text-xl font-medium">Sin foto</p>
-                        </div>
-                    </div>
-                @endif
-                <div class="photo-overlay">
-                    <div class="text-white">
-                        <h4 class="text-2xl font-bold mb-2">{{ $space->name }}</h4>
-                        <p class="text-gray-200">{{ $space->description }}</p>
-                    </div>
-                </div>
+                            <span class="text-sm font-semibold text-gray-800">Editar</span>
+                        </button>
+                    @endif
+                    @endauth
             </div>
-        </div>
-    </div>
+                     @if($space->banner)
+                    <img src="{{ \App\Helpers\ImageHelper::getImageUrl($space->banner) }}" alt="{{ $space->name }}" class="w-full h-96 object-cover">
+                     @else
+                         <div class="w-full h-96 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                             <div class="text-center text-gray-500">
+                                 <svg class="w-20 h-20 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                 </svg>
+                                 <p class="text-xl font-medium">Sin foto</p>
+                             </div>
+                         </div>
+                     @endif
+                     <div class="photo-overlay">
+                         <div class="text-white">
+                             <h4 class="text-2xl font-bold mb-2">{{ $space->name }}</h4>
+                             <p class="text-gray-200">{{ $space->description }}</p>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+         </div>
 
     <!-- Contenido Principal con Tabs -->
     <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -93,7 +93,7 @@
                             <span>Editar</span>
                         </div>
                     </button>
-                    @endif
+                @endif
                 </nav>
             </div>
 
@@ -102,7 +102,7 @@
                 <!-- Tab: Eventos -->
                 <div id="content-events" class="tab-content">
                     @include('spaces.tabs.events', ['space' => $space, 'isAdmin' => $isAdmin])
-                </div>
+                    </div>
 
                 <!-- Tab: Dashboard -->
                 <div id="content-dashboard" class="tab-content hidden">
@@ -114,12 +114,12 @@
                         'totalTicketsSold' => $totalTicketsSold,
                         'totalRevenue' => $totalRevenue
                     ])
-                </div>
+                                    </div>
 
                 <!-- Tab: Usuarios -->
                 <div id="content-users" class="tab-content hidden">
                     @include('spaces.tabs.users', ['usersWithStats' => $usersWithStats, 'space' => $space])
-                </div>
+                                        </div>
 
                 <!-- Tab: Editar (solo admin) -->
                 @if($isAdmin)
@@ -138,7 +138,7 @@ function switchTab(tabName) {
     document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.add('hidden');
     });
-    
+
     // Remover active de todos los botones
     document.querySelectorAll('.tab-button').forEach(button => {
         button.classList.remove('active', 'border-blue-500', 'text-blue-600');
@@ -149,7 +149,7 @@ function switchTab(tabName) {
     const content = document.getElementById('content-' + tabName);
     if (content) {
         content.classList.remove('hidden');
-    }
+        }
     
     // Activar el botón seleccionado
     const button = document.getElementById('tab-' + tabName);
