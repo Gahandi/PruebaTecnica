@@ -74,9 +74,9 @@
                     name="email" 
                     type="email" 
                     required 
-                    value="{{ $email ?? (auth()->user()->email ?? old('email')) }}"
-                    @if(auth()->check()) readonly @endif
-                    class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm @error('email') border-red-500 @enderror"
+                    value="{{ $email ?? (auth()->user()->email ?? old('email') ?? '') }}"
+                    @if(auth()->check() && auth()->user()->email) readonly @endif
+                    class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm @error('email') border-red-500 @enderror @if(auth()->check() && auth()->user()->email) bg-gray-50 @endif"
                     placeholder="tu@email.com">
                 @error('email')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -120,7 +120,7 @@
             <div class="text-center space-y-2">
                 <form method="POST" action="{{ route('verify.send-code') }}" id="resend-form">
                     @csrf
-                    <input type="hidden" name="email" id="resend-email" value="{{ $email ?? (auth()->user()->email ?? old('email')) }}">
+                    <input type="hidden" name="email" id="resend-email" value="{{ $email ?? (auth()->user()->email ?? old('email') ?? '') }}">
                     <button 
                         type="submit"
                         id="resend-code-btn"
@@ -164,23 +164,45 @@ document.addEventListener('DOMContentLoaded', function() {
     const resendForm = document.getElementById('resend-form');
     if (resendForm) {
         resendForm.addEventListener('submit', function(e) {
-            const email = document.getElementById('email').value || resendEmailInput.value;
+            // Obtener el email del campo visible o del hidden
+            const emailInput = document.getElementById('email');
+            const email = emailInput ? emailInput.value.trim() : '';
+            const hiddenEmail = resendEmailInput.value.trim();
             
-            if (!email) {
+            // Usar el email del campo visible si está disponible, sino el del hidden
+            const finalEmail = email || hiddenEmail;
+            
+            if (!finalEmail) {
                 e.preventDefault();
-                errorMessage.querySelector('p').textContent = 'Por favor ingresa tu correo electrónico';
+                errorMessage.querySelector('p').textContent = 'Por favor ingresa tu correo electrónico en el campo de arriba';
                 errorMessage.classList.remove('hidden');
+                emailInput.focus();
+                return false;
+            }
+            
+            // Validar formato de email básico
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(finalEmail)) {
+                e.preventDefault();
+                errorMessage.querySelector('p').textContent = 'Por favor ingresa un correo electrónico válido';
+                errorMessage.classList.remove('hidden');
+                emailInput.focus();
                 return false;
             }
             
             // Actualizar el email en el formulario antes de enviar
-            resendEmailInput.value = email;
+            resendEmailInput.value = finalEmail;
+            
+            // Ocultar mensajes anteriores
+            errorMessage.classList.add('hidden');
+            successMessage.classList.add('hidden');
             
             // Deshabilitar botón mientras se envía
             const btn = document.getElementById('resend-code-btn');
             if (btn) {
                 btn.disabled = true;
                 btn.textContent = 'Enviando...';
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
             }
         });
     }

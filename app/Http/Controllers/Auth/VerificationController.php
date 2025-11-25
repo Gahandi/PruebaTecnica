@@ -20,6 +20,10 @@ class VerificationController extends Controller
     {
         $request->validate([
             'email' => 'required|email|exists:users,email',
+        ], [
+            'email.required' => 'El correo electrónico es requerido.',
+            'email.email' => 'Debe ser un correo electrónico válido.',
+            'email.exists' => 'No encontramos una cuenta con ese correo electrónico.',
         ]);
 
         $user = User::where('email', $request->email)->first();
