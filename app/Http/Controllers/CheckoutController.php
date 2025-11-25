@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\TicketType;
+use App\Models\TicketsEvent;
 use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -165,33 +166,131 @@ class CheckoutController extends Controller
      */
     public function addToCart(Request $request)
     {
+        // Manejar preflight OPTIONS request
+        if ($request->getMethod() === 'OPTIONS') {
+            return response('', 200)
+                ->header('Access-Control-Allow-Origin', $request->headers->get('Origin'))
+                ->header('Access-Control-Allow-Credentials', 'true')
+                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN');
+        }
+
         $request->validate([
             'ticket_type_id' => 'required|exists:ticket_types,id',
+            'event_id' => 'required|exists:events,id',
             'quantity' => 'required|integer|min:1',
         ]);
 
-        $ticketType = TicketType::findOrFail($request->ticket_type_id);
-        $cart = session()->get('cart', []);
+        // Buscar el ticket_event específico para este evento y tipo de boleto
+        $ticket_event = \App\Models\TicketsEvent::where('ticket_types_id', $request->ticket_type_id)
+            ->where('event_id', $request->event_id)
+            ->with(['event', 'ticket_type'])
+            ->first();
 
-        // Verificar disponibilidad
-        $currentQuantity = isset($cart[$ticketType->id]) ? $cart[$ticketType->id]['quantity'] : 0;
-        $totalQuantity = $currentQuantity + $request->quantity;
-
-        if ($totalQuantity > $ticketType->quantity) {
-            return back()->with('error', 'No hay suficientes boletos disponibles.');
+        if (!$ticket_event) {
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tipo de boleto no encontrado para este evento.'
+                ], 404);
+            }
+            return back()->with('error', 'Tipo de boleto no encontrado para este evento.');
         }
 
-        if (isset($cart[$ticketType->id])) {
-            $cart[$ticketType->id]['quantity'] += $request->quantity;
+        $cart = session()->get('cart', []);
+        $cartKey = $ticket_event->ticket_types_id . '_' . $ticket_event->event_id;
+
+        // Verificar disponibilidad considerando reservas activas
+        $currentQuantity = isset($cart[$cartKey]) ? $cart[$cartKey]['quantity'] : 0;
+        $totalQuantity = $currentQuantity + $request->quantity;
+
+        // Verificar reservas activas de otros usuarios (excluyendo la sesión actual)
+        $reservedByOthers = \App\Models\TicketReservation::where('ticket_types_id', $ticket_event->ticket_types_id)
+            ->where('event_id', $ticket_event->event_id)
+            ->where('reserved_until', '>', now())
+            ->where('is_active', true)
+            ->where('session_id', '!=', session()->getId())
+            ->sum('quantity');
+
+        // Verificar reservas del usuario actual
+        $reservedByCurrentUser = \App\Models\TicketReservation::where('ticket_types_id', $ticket_event->ticket_types_id)
+            ->where('event_id', $ticket_event->event_id)
+            ->where('reserved_until', '>', now())
+            ->where('is_active', true)
+            ->where('session_id', session()->getId())
+            ->sum('quantity');
+
+        // Calcular disponibilidad real
+        $availableQuantity = $ticket_event->quantity - $reservedByOthers - $reservedByCurrentUser;
+
+        if ($totalQuantity > $availableQuantity) {
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No hay suficientes boletos disponibles. Solo quedan ' . $availableQuantity . ' boletos.'
+                ], 400);
+            }
+            return back()->with('error', 'No hay suficientes boletos disponibles. Solo quedan ' . $availableQuantity . ' boletos.');
+        }
+
+        // Crear reserva temporal
+        \App\Helpers\CartHelper::createReservation(
+            $ticket_event->ticket_types_id,
+            $ticket_event->event_id,
+            $totalQuantity,
+            15 // 15 minutos
+        );
+
+        if (isset($cart[$cartKey])) {
+            $cart[$cartKey]['quantity'] = $totalQuantity;
+            // Actualizar precio desde TicketsEvent para asegurar que sea el correcto para este evento
+            $cart[$cartKey]['price'] = $ticket_event->price;
         } else {
-            $cart[$ticketType->id] = [
-                'ticket_type' => $ticketType,
+            $cart[$cartKey] = [
+                'ticket_type_id' => $ticket_event->ticket_types_id,
+                'event_id' => $ticket_event->event_id,
                 'quantity' => $request->quantity,
-                'price' => $ticketType->price,
+                'price' => $ticket_event->price,
+                'ticket_type_name' => $ticket_event->ticket_type->name,
+                'event_name' => $ticket_event->event->name,
+                'event_date' => $ticket_event->event->date,
+                'event_image' => $ticket_event->event->image,
             ];
         }
 
         session()->put('cart', $cart);
+
+        if (request()->ajax()) {
+            // Preparar datos del item para localStorage
+            $itemData = [
+                'ticket_type_id' => $ticket_event->ticket_types_id,
+                'event_id' => $ticket_event->event_id,
+                'price' => $ticket_event->price,
+                'ticket_type_name' => $ticket_event->ticket_type->name,
+                'event_name' => $ticket_event->event->name,
+                'event_date' => $ticket_event->event->date,
+                'event_image' => $ticket_event->event->image,
+            ];
+
+            $origin = $request->headers->get('Origin');
+            $response = response()->json([
+                'success' => true,
+                'message' => 'Boletos agregados al carrito.',
+                'cart_count' => \App\Helpers\CartHelper::getCartCount(),
+                'cart' => $cart,
+                'item_data' => $itemData
+            ]);
+
+            // Agregar headers CORS si hay un origin
+            if ($origin) {
+                $response->header('Access-Control-Allow-Origin', $origin)
+                         ->header('Access-Control-Allow-Credentials', 'true')
+                         ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                         ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN');
+            }
+
+            return $response;
+        }
 
         return back()->with('success', 'Boletos agregados al carrito.');
     }

@@ -82,9 +82,13 @@
                                     <!-- Price and Controls -->
                                     <div class="flex items-center space-x-4">
                                         <div class="text-right">
-                                            <p class="text-lg font-semibold text-gray-900">${{ number_format($item['price'], 2) }}</p>
-                                            <p class="text-sm text-gray-500">por boleto</p>
-                                            <p class="text-sm font-medium text-gray-700">Total: ${{ number_format($item['price'] * $item['quantity'], 2) }}</p>
+                                            @if(isset($item['price']) && isset($item['quantity']))
+                                                <p class="text-lg font-semibold text-gray-900">${{ number_format($item['price'], 2) }}</p>
+                                                <p class="text-sm text-gray-500">por boleto</p>
+                                                <p class="text-sm font-medium text-gray-700">Total: ${{ number_format($item['price'] * $item['quantity'], 2) }}</p>
+                                            @else
+                                                <p class="text-sm text-red-500">Error: Datos incompletos</p>
+                                            @endif
                                         </div>
                                         <div class="flex items-center space-x-2">
                                             <form method="POST" action="{{ route('checkout.update-cart') }}" class="inline" id="update-form-{{ $key }}">
@@ -92,7 +96,7 @@
                                                 <input type="hidden" name="cart_key" value="{{ $key }}">
                                                 <input type="number"
                                                        name="quantity"
-                                                       value="{{ $item['quantity'] }}"
+                                                       value="{{ $item['quantity'] ?? 0 }}"
                                                        min="0"
                                                        max="10"
                                                        class="w-16 px-2 py-1 border border-gray-300 rounded text-center"
@@ -123,8 +127,10 @@
                             $subtotal = 0;
                             $totalItems = 0;
                             foreach($cart as $item) {
-                                $subtotal += $item['price'] * $item['quantity'];
-                                $totalItems += $item['quantity'];
+                                if (isset($item['price']) && isset($item['quantity'])) {
+                                    $subtotal += $item['price'] * $item['quantity'];
+                                    $totalItems += $item['quantity'];
+                                }
                             }
                         @endphp
 
