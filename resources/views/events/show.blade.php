@@ -107,7 +107,7 @@
                         <h3 class="font-semibold text-gray-900 mb-2">Ubicación</h3>
                         <p class="text-gray-700 text-lg">{{ $event->address }}</p>
                         @if($event->coordinates)
-                            <button onclick="showMap()" class="text-sm text-blue-600 hover:text-blue-800 mt-2 flex items-center">
+                            <button onclick="scrollToMapSection()" class="text-sm text-blue-600 hover:text-blue-800 mt-2 flex items-center">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -140,7 +140,7 @@
             @endif
 
             @if($event->coordinates)
-                <div class="bg-gradient-to-r from-green-50 to-emerald-100 rounded-xl p-6">
+                <div id="map-section-container" class="bg-gradient-to-r from-green-50 to-emerald-100 rounded-xl p-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
                         <svg class="w-6 h-6 mr-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
@@ -625,6 +625,16 @@ document.addEventListener('cartUpdated', function() {
 // Initialize
 console.log('JavaScript loaded successfully');
 updateTotal();
+
+function scrollToMapSection() {
+    const mapSection = document.getElementById('map-section-container');
+    if (mapSection) {
+        mapSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start' // Asegura que el elemento se alinee con la parte superior
+        });
+    }
+}
 </script>
 @endpush
 @endsection
