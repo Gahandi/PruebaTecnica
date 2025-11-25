@@ -175,7 +175,12 @@ class VerificationController extends Controller
     public function showVerificationForm()
     {
         // Si el usuario está autenticado, usar su email
-        $email = auth()->check() ? auth()->user()->email : old('email');
+        $email = '';
+        if (auth()->check() && auth()->user()->email) {
+            $email = auth()->user()->email;
+        } else {
+            $email = old('email', '');
+        }
         
         return view('auth.verify-email', compact('email'));
     }
