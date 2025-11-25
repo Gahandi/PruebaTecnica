@@ -72,17 +72,17 @@
         @endif
     </div>
 
-    <div class="relative z-10 -mt-32 max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-8">
+    <div class="relative z-10 -mt-16 sm:-mt-24 lg:-mt-32 max-w-4xl mx-auto px-2 sm:px-4 lg:px-6 py-6 sm:py-8 lg:py-12 space-y-4 sm:space-y-6 lg:space-y-8">
         
-        <div class="bg-white/80 backdrop-blur-lg rounded-2xl p-8 border border-white/30 shadow-xl">
-            <h2 class="text-2xl font-semibold text-gray-900 mb-8 flex items-center">
+        <div class="bg-white/80 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border border-white/30 shadow-xl">
+            <h2 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 sm:mb-6 lg:mb-8 flex items-center">
                 <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 Información del Evento
             </h2>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-4 sm:mb-6 lg:mb-8">
                 <div class="flex items-start space-x-4">
                     <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
                         <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -170,40 +170,42 @@
 
                     <div class="grid grid-cols-1 gap-6">
                     @foreach($event->ticketTypes as $ticketType)
-                            <div class="bg-white/60 backdrop-blur-sm border-2 border-gray-200 rounded-xl p-6 hover:border-indigo-300 transition-all duration-300 hover:shadow-lg hover:scale-105 flex justify-between">
-                                <div class="flex flex-col items-center justify-center align-middle">
-                                    <div class="flex items-center justify-center align-middle">
-                                        <h4 class="text-xl font-bold text-gray-900 text-left align-middle">{{ $ticketType->name }}</h4>
+                            <div class="bg-white/60 backdrop-blur-sm border-2 border-gray-200 rounded-xl p-4 sm:p-6 hover:border-indigo-300 transition-all duration-300 hover:shadow-lg flex flex-col sm:flex-row justify-between gap-4">
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="text-lg sm:text-xl font-bold text-gray-900 mb-2">{{ $ticketType->name }}</h4>
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <div class="flex items-center">
+                                                    <svg class="w-4 h-4 text-green-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                                    </svg>
+                                                    <span class="text-xs sm:text-sm font-medium text-green-600">
+                                                        <span id="available_{{ $ticketType->id }}" data-initial="{{ $ticketType->pivot->quantity }}">{{ $ticketType->pivot->quantity }}</span> disponibles
+                                                    </span>
+                                                </div>
+                                                @if($ticketType->pivot->quantity <= 5)
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                        ¡Últimos!
+                                                    </span>
+                                                @elseif($ticketType->pivot->quantity <= 20)
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                        Pocos disponibles
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <div class="text-left sm:text-center">
+                                            <p class="text-2xl sm:text-3xl font-bold text-green-600 mb-1">${{ number_format($ticketType->pivot->price, 2) }}</p>
+                                            <p class="text-xs sm:text-sm text-gray-500">por boleto</p>
+                                        </div>
                                     </div>
-                                    <div class="items-center justify-center space-x-4 align-middle">
-                                    <div class="flex items-center align-middle">
-                                        <svg class="w-4 h-4 text-green-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                        </svg>
-                                        <span class="text-sm font-medium text-green-600">{{ $ticketType->pivot->quantity }} disponibles</span>
-                                    </div>
-                                    @if($ticketType->pivot->quantity <= 5)
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                            ¡Últimos!
-                                        </span>
-                                    @elseif($ticketType->pivot->quantity <= 20)
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                            Pocos disponibles
-                                        </span>
-                                    @endif
                                 </div>
-                                </div>
-                                <div class="flex items-center justify-center align-middle items-center justify-between h-full">
-                                    <div class="text-center align-middle">
-                                        <p class="text-3xl font-bold text-green-600 mb-1">${{ number_format($ticketType->pivot->price, 2) }}</p>
-                                        <p class="text-sm text-gray-500">por boleto</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-center space-x-4 align-middle">
+                                <div class="flex items-center justify-center sm:justify-end space-x-3 sm:space-x-4 border-t sm:border-t-0 pt-4 sm:pt-0">
                                         <button type="button"
-                                            class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors"
-                                                onclick="decreaseQuantity({{ $ticketType->id }})">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors"
+                                                onclick="decreaseQuantity({{ $ticketType->id }}); updateAvailableCount({{ $ticketType->id }}, {{ $ticketType->pivot->quantity }});">
+                                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
                                             </svg>
                                         </button>
@@ -214,13 +216,13 @@
                                                value="0"
                                                min="0"
                                                max="{{ $ticketType->pivot->quantity }}"
-                                           class=" text-center text-xl font-bold border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
-                                               onchange="updateTotal()">
+                                           class="w-16 sm:w-20 text-center text-lg sm:text-xl font-bold border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                                               onchange="updateTotal(); updateAvailableCount({{ $ticketType->id }}, {{ $ticketType->pivot->quantity }});">
 
                                         <button type="button"
-                                            class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors"
-                                                onclick="increaseQuantity({{ $ticketType->id }}, {{ $ticketType->pivot->quantity }})">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            class="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors"
+                                                onclick="increaseQuantity({{ $ticketType->id }}, {{ $ticketType->pivot->quantity }}); updateAvailableCount({{ $ticketType->id }}, {{ $ticketType->pivot->quantity }});">
+                                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                             </svg>
                                         </button>
@@ -231,8 +233,8 @@
                     @endforeach
                 </div>
 
-                <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
-                        <h4 class="text-xl font-semibold text-gray-900 mb-6">Resumen de la Orden</h4>
+                <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4 sm:p-6 border border-gray-200">
+                        <h4 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">Resumen de la Orden</h4>
                         <div id="order_summary" class="space-y-4">
                             <div class="flex justify-between text-lg">
                                 <span class="text-gray-600">Subtotal:</span>
@@ -255,11 +257,11 @@
                     </div>
                 </div>
 
-                    <div class="flex flex-col sm:flex-row gap-4">
+                    <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <button type="button"
                     id="add_to_cart_button"
                     onclick="addToCart()"
-                                class="flex-1 bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-8 py-4 rounded-xl hover:from-indigo-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-lg flex items-center justify-center space-x-3">
+                                class="flex-1 bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-6 py-3 sm:px-8 sm:py-4 rounded-xl hover:from-indigo-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-base sm:text-lg flex items-center justify-center space-x-2 sm:space-x-3">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
                             </svg>
@@ -322,6 +324,7 @@ function increaseQuantity(ticketTypeId, maxQuantity) {
     if (currentValue < maxQuantity) {
         input.value = currentValue + 1;
         updateTotal();
+        updateAvailableCount(ticketTypeId, maxQuantity);
     }
 }
 
@@ -336,7 +339,68 @@ function decreaseQuantity(ticketTypeId) {
     if (currentValue > 0) {
         input.value = currentValue - 1;
         updateTotal();
+        // Obtener el maxQuantity desde el atributo max del input
+        const maxQuantity = parseInt(input.getAttribute('max')) || 0;
+        updateAvailableCount(ticketTypeId, maxQuantity);
     }
+}
+
+// Función para actualizar el contador de boletos disponibles
+function updateAvailableCount(ticketTypeId, initialQuantity) {
+    const input = document.getElementById(`quantity_${ticketTypeId}`);
+    const availableElement = document.getElementById(`available_${ticketTypeId}`);
+    
+    if (!input || !availableElement) {
+        return;
+    }
+    
+    const selectedQuantity = parseInt(input.value) || 0;
+    const available = Math.max(0, initialQuantity - selectedQuantity);
+    
+    // Actualizar el max del input para reflejar la disponibilidad real
+    input.setAttribute('max', available);
+    
+    // Actualizar el texto con animación
+    availableElement.textContent = available;
+    
+    // Cambiar color según disponibilidad
+    const parentSpan = availableElement.parentElement;
+    if (available <= 0) {
+        parentSpan.classList.remove('text-green-600', 'text-yellow-600');
+        parentSpan.classList.add('text-red-600');
+        availableElement.textContent = '0';
+        // Deshabilitar botón de incrementar si no hay disponibles
+        const increaseBtn = input.nextElementSibling;
+        if (increaseBtn && increaseBtn.tagName === 'BUTTON') {
+            increaseBtn.disabled = true;
+            increaseBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+    } else if (available <= 5) {
+        parentSpan.classList.remove('text-green-600', 'text-red-600');
+        parentSpan.classList.add('text-yellow-600');
+        // Habilitar botón de incrementar
+        const increaseBtn = input.nextElementSibling;
+        if (increaseBtn && increaseBtn.tagName === 'BUTTON') {
+            increaseBtn.disabled = false;
+            increaseBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+    } else {
+        parentSpan.classList.remove('text-red-600', 'text-yellow-600');
+        parentSpan.classList.add('text-green-600');
+        // Habilitar botón de incrementar
+        const increaseBtn = input.nextElementSibling;
+        if (increaseBtn && increaseBtn.tagName === 'BUTTON') {
+            increaseBtn.disabled = false;
+            increaseBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+    }
+    
+    // Animación de cambio
+    availableElement.style.transform = 'scale(1.2)';
+    availableElement.style.transition = 'transform 0.2s ease';
+    setTimeout(() => {
+        availableElement.style.transform = 'scale(1)';
+    }, 200);
 }
 
 function updateTotal() {
@@ -453,6 +517,20 @@ async function addToCart() {
 
         // Mostrar notificación de éxito
         showNotification('¡Boletos agregados al carrito exitosamente!', 'success');
+
+        // Actualizar contadores de disponibilidad después de agregar al carrito
+        @foreach($event->ticketTypes as $ticketType)
+            const quantity{{ $ticketType->id }} = parseInt(document.getElementById('quantity_{{ $ticketType->id }}').value) || 0;
+            if (quantity{{ $ticketType->id }} > 0) {
+                // Resetear el input después de agregar al carrito
+                document.getElementById('quantity_{{ $ticketType->id }}').value = 0;
+                // Actualizar contador de disponibles
+                updateAvailableCount({{ $ticketType->id }}, {{ $ticketType->pivot->quantity }});
+            }
+        @endforeach
+        
+        // Actualizar total después de resetear
+        updateTotal();
 
         // Invalidar cache y actualizar contador y dropdown desde el servidor
         if (typeof window.invalidateCartCache === 'function') {
@@ -603,6 +681,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Inicializar highlight.js para código en markdown
     hljs.highlightAll();
+    
+    // Inicializar contadores de disponibilidad
+    @foreach($event->ticketTypes as $ticketType)
+        updateAvailableCount({{ $ticketType->id }}, {{ $ticketType->pivot->quantity }});
+    @endforeach
     
     updateTotal();
 });

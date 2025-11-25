@@ -24,26 +24,34 @@
     <div class="min-h-screen">
         <!-- Space Header -->
         <header class="bg-white shadow-sm border-b sticky top-0 left-0 right-0 z-50 border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex items-center">
-                        <!-- Space Logo/Name -->
-                        <div class="flex items-center space-x-4">
+            <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <!-- Mobile menu button -->
+                    <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100" onclick="toggleMobileMenu()">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+
+                    <!-- Space Logo/Name -->
+                    <div class="flex items-center flex-1 md:flex-none min-w-0">
+                        <div class="flex items-center space-x-2 sm:space-x-4 min-w-0">
                             @if(isset($space) && $space->logo)
-                                <img src="{{ \App\Helpers\ImageHelper::getImageUrl($space->logo) }}" alt="{{ $space->name }}" class="h-10 w-10 rounded-lg object-cover">
+                                <img src="{{ \App\Helpers\ImageHelper::getImageUrl($space->logo) }}" alt="{{ $space->name }}" class="h-8 w-8 sm:h-10 sm:w-10 rounded-lg object-cover flex-shrink-0">
                             @else
-                                <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                                    <span class="text-white font-bold text-lg">{{ substr($space->name ?? 'S', 0, 1) }}</span>
+                                <div class="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-white font-bold text-sm sm:text-lg">{{ substr($space->name ?? 'S', 0, 1) }}</span>
                                 </div>
                             @endif
-                            <div>
-                                <h1 class="text-xl font-bold text-gray-900">{{ $space->name ?? 'Space' }}</h1>
-                                <p class="text-sm text-gray-500">{{ $space->subdomain ?? '' }}.{{ \App\Helpers\SubdomainHelper::getBaseDomain() }}</p>
+                            <div class="min-w-0">
+                                <h1 class="text-base sm:text-lg lg:text-xl font-bold text-gray-900 truncate">{{ $space->name ?? 'Space' }}</h1>
+                                <p class="text-xs sm:text-sm text-gray-500 truncate hidden sm:block">{{ $space->subdomain ?? '' }}.{{ \App\Helpers\SubdomainHelper::getBaseDomain() }}</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex items-center space-x-4">
+                    <!-- Desktop Navigation -->
+                    <div class="hidden md:flex items-center space-x-2 lg:space-x-4">
                         <!-- Cart Dropdown -->
                         <div class="relative group" id="cart-dropdown">
                             <button class="text-gray-700 hover:text-gray-900 relative p-2 rounded-lg hover:bg-gray-100 transition-colors group" onclick="toggleCartDropdown()">
@@ -60,15 +68,15 @@
                             </button>
 
                             <!-- Cart Dropdown Menu -->
-                            <div class="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-lg shadow-xl z-50 border border-gray-200" id="cart-menu" style="display: none;">
+                            <div class="fixed sm:absolute right-0 top-16 sm:top-auto sm:mt-2 w-full sm:w-80 lg:w-96 max-w-sm bg-white rounded-lg shadow-xl z-50 border border-gray-200 max-h-[calc(100vh-4rem)] overflow-hidden flex flex-col" id="cart-menu" style="display: none;">
                                 <!-- Header -->
-                                <div class="px-4 py-3 border-b border-gray-200 bg-gray-50 rounded-t-lg">
+                                <div class="px-3 py-2 sm:px-4 sm:py-3 border-b border-gray-200 bg-gray-50 rounded-t-lg flex-shrink-0">
                                     <div class="flex items-center justify-between">
-                                        <div>
-                                            <h3 class="text-lg font-semibold text-gray-900">Carrito de Compras</h3>
-                                            <p class="text-sm text-gray-500">{{ \App\Helpers\CartHelper::getCartCount() }} item(s)</p>
+                                        <div class="min-w-0 flex-1">
+                                            <h3 class="text-base sm:text-lg font-semibold text-gray-900 truncate">Carrito de Compras</h3>
+                                            <p class="text-xs sm:text-sm text-gray-500">{{ \App\Helpers\CartHelper::getCartCount() }} item(s)</p>
                                         </div>
-                                        <button onclick="closeCartDropdown()" class="text-gray-400 hover:text-gray-600">
+                                        <button onclick="closeCartDropdown()" class="text-gray-400 hover:text-gray-600 ml-2 flex-shrink-0">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                             </svg>
@@ -77,7 +85,7 @@
                                 </div>
 
                                 <!-- Cart Items with Scroll -->
-                                <div class="max-h-80 overflow-y-auto">
+                                <div class="flex-1 overflow-y-auto max-h-64 sm:max-h-80">
                                     @php
                                         $cart = \App\Helpers\CartHelper::getCartWithEventInfo();
                                     @endphp
@@ -93,18 +101,18 @@
                                         </div>
                                     @else
                                         @foreach($cart as $key => $item)
-                                            <div class="px-4 py-3 border-b border-gray-100 hover:bg-gray-50">
-                                                <div class="flex items-center space-x-3">
+                                            <div class="px-3 py-2 sm:px-4 sm:py-3 border-b border-gray-100 hover:bg-gray-50">
+                                                <div class="flex items-start sm:items-center gap-2 sm:gap-3">
                                                     <!-- Icono de boleto -->
-                                                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
                                                         </svg>
                                                     </div>
 
                                                     <div class="flex-1 min-w-0">
-                                                        <p class="text-sm font-medium text-gray-900">{{ $item['ticket_type_name'] ?? 'Boleto' }}</p>
-                                                        <p class="text-xs text-gray-500">{{ $item['event_name'] ?? 'Evento' }}</p>
+                                                        <p class="text-xs sm:text-sm font-medium text-gray-900 truncate">{{ $item['ticket_type_name'] ?? 'Boleto' }}</p>
+                                                        <p class="text-xs text-gray-500 truncate">{{ $item['event_name'] ?? 'Evento' }}</p>
                                                         @if(isset($item['event_date']))
                                                             <p class="text-xs text-gray-400">{{ \Carbon\Carbon::parse($item['event_date'])->format('d M Y') }}</p>
                                                         @endif
@@ -127,8 +135,8 @@
                                                     </div>
 
                                                     <div class="text-right flex-shrink-0">
-                                                        <p class="text-sm font-medium text-gray-900">{{ $item['quantity'] }}x</p>
-                                                        <p class="text-sm text-gray-500">${{ number_format($item['price'] * $item['quantity'], 2) }}</p>
+                                                        <p class="text-xs sm:text-sm font-medium text-gray-900">{{ $item['quantity'] }}x</p>
+                                                        <p class="text-xs sm:text-sm text-gray-500">${{ number_format($item['price'] * $item['quantity'], 2) }}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -138,19 +146,19 @@
 
                                 @if(!empty($cart))
                                     <!-- Footer with Total and Actions -->
-                                    <div class="px-4 py-3 border-t border-gray-200 bg-gray-50 rounded-b-lg">
-                                        <div class="flex justify-between items-center mb-3">
-                                            <span class="text-sm font-medium text-gray-900">Total:</span>
-                                            <span class="text-lg font-bold text-gray-900">${{ number_format(\App\Helpers\CartHelper::getCartTotal(), 2) }}</span>
+                                    <div class="px-3 py-2 sm:px-4 sm:py-3 border-t border-gray-200 bg-gray-50 rounded-b-lg flex-shrink-0">
+                                        <div class="flex justify-between items-center mb-2 sm:mb-3">
+                                            <span class="text-xs sm:text-sm font-medium text-gray-900">Total:</span>
+                                            <span class="text-base sm:text-lg font-bold text-gray-900">${{ number_format(\App\Helpers\CartHelper::getCartTotal(), 2) }}</span>
                                         </div>
 
-                                        <div class="flex space-x-2">
+                                        <div class="flex flex-col sm:flex-row gap-2">
                                             <a href="{{ \App\Helpers\CartHelper::getCartViewRoute() }}"
-                                               class="flex-1 bg-gray-600 text-white text-center px-3 py-2 rounded-md text-sm hover:bg-gray-700 transition-colors">
+                                               class="flex-1 bg-gray-600 text-white text-center px-3 py-2 rounded-md text-xs sm:text-sm hover:bg-gray-700 transition-colors">
                                                 Ver Carrito
                                             </a>
                                             <a href="{{ \App\Helpers\CartHelper::getCheckoutRoute() }}"
-                                               class="flex-1 bg-blue-600 text-white text-center px-3 py-2 rounded-md text-sm hover:bg-blue-700 transition-colors">
+                                               class="flex-1 bg-blue-600 text-white text-center px-3 py-2 rounded-md text-xs sm:text-sm hover:bg-blue-700 transition-colors">
                                                 Comprar
                                             </a>
                                         </div>
@@ -160,10 +168,10 @@
                         </div>
 
                         <!-- Navigation Links -->
-                        <a href="{{ route('spaces.profile', $space->subdomain ?? '') }}" class="text-gray-700 hover:text-gray-900">
+                        <a href="{{ route('spaces.profile', $space->subdomain ?? '') }}" class="text-gray-700 hover:text-gray-900 text-sm lg:text-base">
                             Inicio
                         </a>
-                        <a href="{{ config('app.url') }}" class="text-gray-700 hover:text-gray-900">
+                        <a href="{{ config('app.url') }}" class="text-gray-700 hover:text-gray-900 text-sm lg:text-base">
                             Todos los Eventos
                         </a>
 
@@ -243,7 +251,64 @@
                                 </div>
                             </div>
                         @else
-                            <a href="{{ config('app.url') }}/login" class="text-gray-700 hover:text-gray-900">
+                            <a href="{{ config('app.url') }}/login" class="text-gray-700 hover:text-gray-900 text-sm lg:text-base">
+                                Iniciar sesión
+                            </a>
+                        @endauth
+                    </div>
+                </div>
+
+                <!-- Mobile Menu -->
+                <div id="mobile-menu" class="hidden md:hidden border-t border-gray-200 bg-white">
+                    <div class="px-2 pt-2 pb-3 space-y-1">
+                        <a href="{{ route('spaces.profile', $space->subdomain ?? '') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                            Inicio
+                        </a>
+                        <a href="{{ config('app.url') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                            Todos los Eventos
+                        </a>
+                        @auth
+                            @if(isset($space))
+                                @php
+                                    $user = auth()->user();
+                                    $isAdmin = $user->spaces()
+                                        ->where('spaces.id', $space->id)
+                                        ->wherePivot('role_space_id', 1)
+                                        ->wherePivotNull('deleted_at')
+                                        ->exists();
+                                    $hasPermission = \App\Models\RoleSpacePermission::hasPermission($space->id, 'create checkins');
+                                    $canSeeScanner = $isAdmin || $hasPermission;
+                                @endphp
+                                @if($canSeeScanner)
+                                    <a href="{{ route('scanner.index', ['subdomain' => $space->subdomain]) }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                        Scanner
+                                    </a>
+                                @endif
+                            @endif
+                            <div class="border-t border-gray-200 pt-2 mt-2">
+                                <p class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Mi Cuenta</p>
+                                <a href="{{ config('app.url') }}/profile" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                    Perfil
+                                </a>
+                                <a href="{{ config('app.url') }}/my-tickets" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                    Mis Boletos
+                                </a>
+                            </div>
+                            <!-- Mobile Cart -->
+                            <div class="border-t border-gray-200 pt-2 mt-2">
+                                <button onclick="toggleCartDropdown()" class="w-full flex items-center justify-between px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                    <span>Carrito</span>
+                                    <span id="mobile-cart-count" class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full" style="display: none;">0</span>
+                                </button>
+                            </div>
+                            <form method="POST" action="{{ config('app.url') }}/logout" class="border-t border-gray-200 pt-2 mt-2">
+                                @csrf
+                                <button type="submit" class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:text-red-900 hover:bg-red-50">
+                                    Cerrar sesión
+                                </button>
+                            </form>
+                        @else
+                            <a href="{{ config('app.url') }}/login" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
                                 Iniciar sesión
                             </a>
                         @endauth
@@ -262,6 +327,18 @@
     @stack('scripts')
 
     <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const button = document.getElementById('mobile-menu-button');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                button.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+            } else {
+                menu.classList.add('hidden');
+                button.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+            }
+        }
+
         // Funciones del carrito - disponibles inmediatamente
         function toggleCartDropdown() {
             const cartMenu = document.getElementById('cart-menu');
@@ -296,7 +373,18 @@
             
             setTimeout(function() {
                 if (typeof window.updateCartCount === 'function') {
-                    window.updateCartCount();
+                    window.updateCartCount().then(count => {
+                        // Actualizar contador móvil también
+                        const mobileCartCount = document.getElementById('mobile-cart-count');
+                        if (mobileCartCount) {
+                            if (count > 0) {
+                                mobileCartCount.textContent = count;
+                                mobileCartCount.style.display = 'inline-block';
+                            } else {
+                                mobileCartCount.style.display = 'none';
+                            }
+                        }
+                    });
                 }
             }, 500);
         }

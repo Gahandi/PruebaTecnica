@@ -3,15 +3,15 @@
 @section('title', 'Checkout')
 
 @section('content')
-        <div class="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto py-4 sm:py-6 lg:py-8 px-2 sm:px-4 lg:px-8">
         <!-- Header -->
-        <div class="flex justify-between items-center mb-8">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900">Finalizar Compra</h1>
-                <p class="text-gray-600 mt-1">Revisa tu orden y completa el pago de forma segura</p>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 lg:mb-8 gap-3 sm:gap-0">
+            <div class="flex-1 min-w-0">
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Finalizar Compra</h1>
+                <p class="text-sm sm:text-base text-gray-600 mt-1">Revisa tu orden y completa el pago de forma segura</p>
             </div>
             <a href="{{ route('checkout.cart') }}"
-                class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors flex items-center gap-2">
+                class="w-full sm:w-auto bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                 </svg>
@@ -149,12 +149,12 @@
 
             <!-- Información del Cliente (siempre visible, no requiere login) -->
             <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200 mb-6">
-                <div class="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
-                    <h2 class="text-xl font-semibold text-gray-900">Información de Contacto</h2>
-                    <p class="text-sm text-gray-600 mt-1">Ingresa tus datos para completar la compra</p>
+                <div class="px-3 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+                    <h2 class="text-lg sm:text-xl font-semibold text-gray-900">Información de Contacto</h2>
+                    <p class="text-xs sm:text-sm text-gray-600 mt-1">Ingresa tus datos para completar la compra</p>
                 </div>
-                <div class="p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="p-3 sm:p-4 lg:p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                         <div>
                             <label for="customer_name" class="block text-sm font-medium text-gray-700 mb-2">
                                 Nombre completo <span class="text-red-500">*</span>
@@ -226,15 +226,15 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 <!-- Payment Form -->
                 <div class="space-y-6">
                     <!-- Order Summary -->
                     <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
-                        <div class="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
-                            <h2 class="text-xl font-semibold text-gray-900">Resumen de la Orden</h2>
+                        <div class="px-3 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+                            <h2 class="text-lg sm:text-xl font-semibold text-gray-900">Resumen de la Orden</h2>
                         </div>
-                        <div class="p-6">
+                        <div class="p-3 sm:p-4 lg:p-6">
                             <div class="space-y-4">
                                 @php
                                     $subtotal = 0;
@@ -294,8 +294,8 @@
 
                     <!-- Coupon Code -->
                     <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
-                        <div class="px-6 py-4 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-gray-200">
-                            <h2 class="text-xl font-semibold text-gray-900">Código de Descuento</h2>
+                        <div class="px-3 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-gray-200">
+                            <h2 class="text-lg sm:text-xl font-semibold text-gray-900">Código de Descuento</h2>
                         </div>
                         <div class="p-6">
                             @if ($appliedCoupon)

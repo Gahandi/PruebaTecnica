@@ -3,30 +3,30 @@
 @section('title', 'Panel de Administración')
 
 @section('content')
-<div class="min-h-screen bg-gray-100 py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="min-h-screen bg-gray-100 py-4 sm:py-6">
+    <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
         <!-- Header -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Panel de Administración</h1>
-            <p class="mt-2 text-gray-600">Gestiona eventos, boletos, cupones y órdenes</p>
+        <div class="mb-4 sm:mb-8">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Panel de Administración Global</h1>
+            <p class="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">Gestiona eventos, boletos, cupones y órdenes de todos los espacios</p>
         </div>
 
         <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
             <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
+                <div class="p-4 sm:p-5">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
-                            <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
-                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-md flex items-center justify-center">
+                                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                 </svg>
                             </div>
                         </div>
-                        <div class="ml-5 w-0 flex-1">
+                        <div class="ml-3 sm:ml-5 w-0 flex-1 min-w-0">
                             <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Eventos</dt>
-                                <dd class="text-lg font-medium text-gray-900">{{ $eventsCount ?? 0 }}</dd>
+                                <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Total Eventos</dt>
+                                <dd class="text-lg sm:text-xl font-medium text-gray-900">{{ $eventsCount ?? 0 }}</dd>
                             </dl>
                         </div>
                     </div>
@@ -95,26 +95,26 @@
         </div>
 
         <!-- Quick Actions -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
             <!-- Management Cards -->
             <div class="bg-white shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Gestión de Contenido</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <a href="{{ route('admin.events.index') }}" class="group relative bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg border border-gray-200 hover:border-gray-300">
+                <div class="px-3 py-4 sm:px-4 sm:py-5 lg:p-6">
+                    <h3 class="text-base sm:text-lg leading-6 font-medium text-gray-900 mb-3 sm:mb-4">Gestión de Contenido</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                        <a href="{{ route('admin.events.index') }}" class="group relative bg-white p-4 sm:p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 rounded-lg border border-gray-200 hover:border-gray-300 transition-all">
                             <div>
-                                <span class="rounded-lg inline-flex p-3 bg-blue-50 text-blue-700 ring-4 ring-white">
-                                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <span class="rounded-lg inline-flex p-2 sm:p-3 bg-blue-50 text-blue-700 ring-2 sm:ring-4 ring-white">
+                                    <svg class="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                     </svg>
                                 </span>
                             </div>
-                            <div class="mt-4">
-                                <h3 class="text-lg font-medium">
+                            <div class="mt-3 sm:mt-4">
+                                <h3 class="text-base sm:text-lg font-medium">
                                     <span class="absolute inset-0" aria-hidden="true"></span>
                                     Eventos
                                 </h3>
-                                <p class="mt-2 text-sm text-gray-500">Gestiona eventos y fechas</p>
+                                <p class="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-500">Gestiona eventos y fechas</p>
                             </div>
                         </a>
 
@@ -174,8 +174,8 @@
 
             <!-- Recent Activity -->
             <div class="bg-white shadow rounded-lg">
-                <div class="px-4 py-5 sm:p-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Actividad Reciente</h3>
+                <div class="px-3 py-4 sm:px-4 sm:py-5 lg:p-6">
+                    <h3 class="text-base sm:text-lg leading-6 font-medium text-gray-900 mb-3 sm:mb-4">Actividad Reciente</h3>
                     <div class="flow-root">
                         <ul class="-mb-8">
                             <li>

@@ -28,14 +28,30 @@
     <div class="min-h-screen">
         <!-- Navigation -->
         <nav class="bg-white shadow-sm border-b sticky top-0 left-0 right-0 z-50 border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex items-center flex-row-reverse gap-6">
-                                                    <!-- Admin Menu -->
-                                                    @if(auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('staff')))
+            <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <!-- Mobile menu button -->
+                    <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100" onclick="toggleMobileMenu()">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    
+                    <!-- Logo/Brand -->
+                    <div class="flex items-center flex-1 md:flex-none justify-center md:justify-start">
+                        <a href="{{ config('app.url') }}/" class="text-lg sm:text-xl font-bold text-gray-900">
+                            {{ config('app.name', 'Boletos') }}
+                        </a>
+                    </div>
+
+                    <!-- Desktop Navigation -->
+                    <div class="hidden md:flex items-center flex-row-reverse gap-4 lg:gap-6">
+                        <!-- Admin Menu -->
+                        @if(auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('staff')))
                             <div class="relative group" id="admin-dropdown">
-                                <button class="text-gray-700 hover:text-gray-900 flex items-center" onclick="toggleAdminDropdown()">
-                                    Administración
+                                <button class="text-gray-700 hover:text-gray-900 flex items-center text-sm lg:text-base" onclick="toggleAdminDropdown()">
+                                    <span class="hidden lg:inline">Administración</span>
+                                    <span class="lg:hidden">Admin</span>
                                     <svg class="w-4 h-4 ml-1 transition-transform duration-200" id="admin-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                     </svg>
@@ -113,11 +129,12 @@
                         </a>
                     </div>
 
-                    <div class="flex items-center space-x-4">
+                    <!-- Desktop Right Menu -->
+                    <div class="hidden md:flex items-center space-x-2 lg:space-x-4">
                         <!-- Cart Dropdown -->
                         <div class="relative group" id="cart-dropdown">
                             <button class="text-gray-700 hover:text-gray-900 relative p-2 rounded-lg hover:bg-gray-100 transition-colors group" onclick="toggleCartDropdown()">
-                            <svg class="w-6 h-6 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 lg:w-6 lg:h-6 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l-1 7a2 2 0 01-2 2H8a2 2 0 01-2-2L5 9z"></path>
                             </svg>
 
@@ -130,7 +147,7 @@
                             </button>
 
                             <!-- Cart Dropdown Menu -->
-                            <div class="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-lg shadow-xl z-50 border border-gray-200" id="cart-menu" style="display: none;">
+                            <div class="fixed sm:absolute right-0 top-16 sm:top-auto sm:mt-2 w-full sm:w-80 lg:w-96 max-w-sm bg-white rounded-lg shadow-xl z-50 border border-gray-200 max-h-[calc(100vh-4rem)] overflow-hidden flex flex-col" id="cart-menu" style="display: none;">
                                 @php
                                     $cart = \App\Helpers\CartHelper::getCartWithEventInfo();
                                     $cartCount = \App\Helpers\CartHelper::getCartCount();
@@ -139,7 +156,7 @@
                                 @include('partials.cart-dropdown', ['cart' => $cart, 'cartCount' => $cartCount, 'cartTotal' => $cartTotal])
                             </div>
                         </div>
-                        <a href="{{ config('app.url') }}/" class="text-gray-700 hover:text-gray-900">
+                        <a href="{{ config('app.url') }}/" class="text-gray-700 hover:text-gray-900 text-sm lg:text-base">
                             Eventos
                         </a>
                         @auth
@@ -234,11 +251,91 @@
                                 </div>
                             </div>
                         @else
-                            <a href="{{ config('app.url') }}/login" class="text-gray-700 hover:text-gray-900">
+                            <a href="{{ config('app.url') }}/login" class="text-gray-700 hover:text-gray-900 text-sm lg:text-base">
                                 Iniciar sesión
                             </a>
                         @endauth
                     </div>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden border-t border-gray-200 bg-white">
+                <div class="px-2 pt-2 pb-3 space-y-1">
+                    <a href="{{ config('app.url') }}/" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                        Eventos
+                    </a>
+                    @if(auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('staff')))
+                        <div class="border-t border-gray-200 pt-2 mt-2">
+                            <p class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Administración</p>
+                            <a href="{{ route('dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                Dashboard
+                            </a>
+                            <a href="{{ route('admin.events.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                Eventos
+                            </a>
+                            <a href="{{ route('admin.ticket-types.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                Tipos de Boletos
+                            </a>
+                            <a href="{{ route('admin.coupons.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                Cupones
+                            </a>
+                            <a href="{{ route('admin.orders.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                Órdenes
+                            </a>
+                            @if(auth()->check() && auth()->user()->hasRole('admin'))
+                                <a href="{{ route('admin.checkins.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                    Check-ins
+                                </a>
+                            @endif
+                            @if(auth()->check() && auth()->user()->hasRole('staff'))
+                                <a href="{{ route('staff.checkins.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                    Check-ins
+                                </a>
+                            @endif
+                        </div>
+                    @endif
+                    @auth
+                        <div class="border-t border-gray-200 pt-2 mt-2">
+                            <p class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Mi Cuenta</p>
+                            <a href="{{ config('app.url') }}/profile" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                Perfil
+                            </a>
+                            <a href="{{ config('app.url') }}/my-tickets" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                Mis Boletos
+                            </a>
+                            @if(auth()->user()->spaces->count() > 0)
+                                <div class="border-t border-gray-200 mt-2 pt-2">
+                                    <p class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Mis Espacios</p>
+                                    @foreach(auth()->user()->spaces as $space)
+                                        <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                            {{ $space->name }}
+                                        </a>
+                                    @endforeach
+                                    <a href="{{ route('user.spaces.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                        Gestionar Espacios
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
+                        <!-- Mobile Cart -->
+                        <div class="border-t border-gray-200 pt-2 mt-2">
+                            <button onclick="toggleCartDropdown()" class="w-full flex items-center justify-between px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                <span>Carrito</span>
+                                <span id="mobile-cart-count" class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full" style="display: none;">0</span>
+                            </button>
+                        </div>
+                        <form method="POST" action="{{ config('app.url') }}/logout" class="border-t border-gray-200 pt-2 mt-2">
+                            @csrf
+                            <button type="submit" class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:text-red-900 hover:bg-red-50">
+                                Cerrar sesión
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ config('app.url') }}/login" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                            Iniciar sesión
+                        </a>
+                    @endauth
                 </div>
             </div>
         </nav>
@@ -253,6 +350,18 @@
     @stack('scripts')
 
     <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const button = document.getElementById('mobile-menu-button');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                button.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+            } else {
+                menu.classList.add('hidden');
+                button.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+            }
+        }
+
         function toggleAdminDropdown() {
             const menu = document.getElementById('admin-menu');
             const arrow = document.getElementById('admin-arrow');
@@ -316,7 +425,18 @@
             
             setTimeout(function() {
                 if (typeof window.updateCartCount === 'function') {
-                    window.updateCartCount();
+                    window.updateCartCount().then(count => {
+                        // Actualizar contador móvil también
+                        const mobileCartCount = document.getElementById('mobile-cart-count');
+                        if (mobileCartCount) {
+                            if (count > 0) {
+                                mobileCartCount.textContent = count;
+                                mobileCartCount.style.display = 'inline-block';
+                            } else {
+                                mobileCartCount.style.display = 'none';
+                            }
+                        }
+                    });
                 }
             }, 500);
         }

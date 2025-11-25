@@ -3,15 +3,15 @@
 @section('title', 'Carrito de Compras')
 
 @section('content')
-<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+<div class="max-w-7xl mx-auto py-4 sm:py-6 px-2 sm:px-4 lg:px-8">
     <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="text-3xl font-bold text-gray-900">Carrito de Compras</h1>
-            <p class="text-gray-600">Revisa tus boletos antes de proceder al pago</p>
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3 sm:gap-0">
+        <div class="flex-1 min-w-0">
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Carrito de Compras</h1>
+            <p class="text-sm sm:text-base text-gray-600 mt-1">Revisa tus boletos antes de proceder al pago</p>
         </div>
         <a href="{{ route('events.public') }}"
-           class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors">
+           class="w-full sm:w-auto bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors text-center text-sm sm:text-base whitespace-nowrap">
             ← Continuar Comprando
         </a>
     </div>
@@ -32,43 +32,43 @@
             </a>
         </div>
     @else
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             <!-- Cart Items -->
-            <div class="lg:col-span-2">
+            <div class="lg:col-span-2 order-2 lg:order-1">
                 <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h2 class="text-xl font-semibold text-gray-900">Boletos en tu carrito</h2>
+                    <div class="px-3 py-3 sm:px-6 sm:py-4 border-b border-gray-200">
+                        <h2 class="text-lg sm:text-xl font-semibold text-gray-900">Boletos en tu carrito</h2>
                     </div>
                     <div class="divide-y divide-gray-200">
                         @foreach($cart as $key => $item)
-                            <div class="p-6">
-                                <div class="flex items-start space-x-4">
+                            <div class="p-3 sm:p-4 lg:p-6">
+                                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                                     <!-- Event Image -->
-                                    @if(isset($item['event_image']) && $item['event_image'])
-                                        <img src="{{ \App\Helpers\ImageHelper::getImageUrl($item['event_image']) }}" alt="{{ $item['event_name'] ?? 'Evento' }}" class="w-20 h-20 rounded-lg object-cover flex-shrink-0">
-                                    @else
-                                        <div class="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                            </svg>
-                                        </div>
-                                    @endif
+                                    <div class="flex items-start gap-3 sm:gap-4 w-full sm:w-auto">
+                                        @if(isset($item['event_image']) && $item['event_image'])
+                                            <img src="{{ \App\Helpers\ImageHelper::getImageUrl($item['event_image']) }}" alt="{{ $item['event_name'] ?? 'Evento' }}" class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover flex-shrink-0">
+                                        @else
+                                            <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                <svg class="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                </svg>
+                                            </div>
+                                        @endif
 
-                                    <div class="flex-1 min-w-0">
-                                        <!-- Event Info -->
-                                        <div class="mb-2">
-                                            <h3 class="text-lg font-medium text-gray-900">{{ $item['event_name'] ?? 'Evento' }}</h3>
-                                            @if(isset($item['event_date']))
-                                                <p class="text-sm text-gray-500">{{ \Carbon\Carbon::parse($item['event_date'])->format('d M Y, H:i') }}</p>
-                                            @endif
-                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <!-- Event Info -->
+                                            <div class="mb-2">
+                                                <h3 class="text-base sm:text-lg font-medium text-gray-900">{{ $item['event_name'] ?? 'Evento' }}</h3>
+                                                @if(isset($item['event_date']))
+                                                    <p class="text-xs sm:text-sm text-gray-500">{{ \Carbon\Carbon::parse($item['event_date'])->format('d M Y, H:i') }}</p>
+                                                @endif
+                                            </div>
 
-                                        <!-- Ticket Type Info -->
-                                        <div class="mb-3">
-                                            <h4 class="text-md font-semibold text-gray-800">{{ $item['ticket_type_name'] ?? 'Tipo de Boleto' }}</h4>
-                                            <div class="mt-1 space-y-1">
-                                                <div class="flex items-center">
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            <!-- Ticket Type Info -->
+                                            <div class="mb-2 sm:mb-3">
+                                                <h4 class="text-sm sm:text-base font-semibold text-gray-800">{{ $item['ticket_type_name'] ?? 'Tipo de Boleto' }}</h4>
+                                                <div class="mt-1">
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                                         <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
                                                         </svg>
@@ -80,14 +80,14 @@
                                     </div>
 
                                     <!-- Price and Controls -->
-                                    <div class="flex items-center space-x-4">
-                                        <div class="text-right">
+                                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full sm:w-auto gap-3 sm:gap-4">
+                                        <div class="text-left sm:text-right">
                                             @if(isset($item['price']) && isset($item['quantity']))
-                                                <p class="text-lg font-semibold text-gray-900">${{ number_format($item['price'], 2) }}</p>
-                                                <p class="text-sm text-gray-500">por boleto</p>
+                                                <p class="text-base sm:text-lg font-semibold text-gray-900">${{ number_format($item['price'], 2) }}</p>
+                                                <p class="text-xs sm:text-sm text-gray-500">por boleto</p>
                                                 <p class="text-sm font-medium text-gray-700">Total: ${{ number_format($item['price'] * $item['quantity'], 2) }}</p>
                                             @else
-                                                <p class="text-sm text-red-500">Error: Datos incompletos</p>
+                                                <p class="text-xs sm:text-sm text-red-500">Error: Datos incompletos</p>
                                             @endif
                                         </div>
                                         <div class="flex items-center space-x-2">
@@ -99,7 +99,7 @@
                                                        value="{{ $item['quantity'] ?? 0 }}"
                                                        min="0"
                                                        max="10"
-                                                       class="w-16 px-2 py-1 border border-gray-300 rounded text-center"
+                                                       class="w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm sm:text-base"
                                                        onchange="updateCartItem('{{ $key }}', this.value)">
                                             </form>
                                             <button type="button" onclick="removeCartItem('{{ $key }}')" class="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50">
@@ -117,12 +117,12 @@
             </div>
 
             <!-- Order Summary -->
-            <div class="lg:col-span-1">
-                <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h2 class="text-xl font-semibold text-gray-900">Resumen de la Orden</h2>
+            <div class="lg:col-span-1 order-1 lg:order-2">
+                <div class="bg-white shadow-lg rounded-lg overflow-hidden sticky top-20">
+                    <div class="px-3 py-3 sm:px-6 sm:py-4 border-b border-gray-200">
+                        <h2 class="text-lg sm:text-xl font-semibold text-gray-900">Resumen de la Orden</h2>
                     </div>
-                    <div class="p-6">
+                    <div class="p-4 sm:p-6">
                         @php
                             $subtotal = 0;
                             $totalItems = 0;
@@ -132,36 +132,21 @@
                                     $totalItems += $item['quantity'];
                                 }
                             }
+                            $taxes = $subtotal * 0.16; // 16% IVA
+                            $total = $subtotal + $taxes;
                         @endphp
 
-                        <dl class="space-y-4">
-                            <div class="flex justify-between">
-                                <dt class="text-sm font-medium text-gray-500">Boletos ({{ $totalItems }})</dt>
-                                <dd class="text-sm text-gray-900">${{ number_format($subtotal, 2) }}</dd>
+                        <div class="text-center">
+                            <div class="mb-4">
+                                <p class="text-xs sm:text-sm text-gray-500 mb-2">Total a pagar</p>
+                                <p class="text-3xl sm:text-4xl font-bold text-gray-900">${{ number_format($total, 2) }}</p>
+                                <p class="text-xs text-gray-400 mt-1">IVA incluido</p>
                             </div>
-                            <div class="flex justify-between">
-                                <dt class="text-sm font-medium text-gray-500">Subtotal</dt>
-                                <dd class="text-sm text-gray-900">${{ number_format($subtotal, 2) }}</dd>
-                            </div>
-                            @php
-                                $taxes = $subtotal * 0.16; // 16% IVA
-                                $total = $subtotal + $taxes;
-                            @endphp
-                            <div class="flex justify-between">
-                                <dt class="text-sm font-medium text-gray-500">IVA (16%)</dt>
-                                <dd class="text-sm text-gray-900">${{ number_format($taxes, 2) }}</dd>
-                            </div>
-                            <div class="border-t border-gray-200 pt-4">
-                                <div class="flex justify-between">
-                                    <dt class="text-base font-medium text-gray-900">Total</dt>
-                                    <dd class="text-base font-medium text-gray-900">${{ number_format($total, 2) }}</dd>
-                                </div>
-                            </div>
-                        </dl>
+                        </div>
 
-                        <div class="mt-6">
+                        <div class="mt-4 sm:mt-6">
                             <a href="{{ route('checkout.checkout') }}"
-                               class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-center block">
+                               class="w-full bg-blue-600 text-white px-4 py-3 rounded-md hover:bg-blue-700 transition-colors text-center block text-sm sm:text-base font-medium">
                                 Proceder al Pago
                             </a>
                         </div>
