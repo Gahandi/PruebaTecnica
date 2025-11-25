@@ -89,4 +89,33 @@ class User extends Authenticatable
         
         return $query->exists();
     }
+
+    /**
+     * Check if user has a specific role (using the role column in users table)
+     * Overrides Spatie Permission's hasRole method
+     * 
+     * @param string|array $role The role name(s) to check
+     * @return bool
+     */
+    public function hasRole($role)
+    {
+        // Si es un array, verificar si tiene alguno de los roles
+        if (is_array($role)) {
+            return in_array($this->role, $role);
+        }
+        
+        // Verificar el rol directamente desde la columna
+        return $this->role === $role;
+    }
+
+    /**
+     * Check if user has any of the given roles
+     * 
+     * @param array $roles The roles to check
+     * @return bool
+     */
+    public function hasAnyRole(array $roles)
+    {
+        return in_array($this->role, $roles);
+    }
 }

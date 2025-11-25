@@ -49,8 +49,8 @@
                         <!-- Admin Menu -->
                         @php
                             $user = auth()->user();
-                            $isAdmin = $user && method_exists($user, 'hasRole') && $user->hasRole('admin');
-                            $isStaff = $user && method_exists($user, 'hasRole') && $user->hasRole('staff');
+                            $isAdmin = $user && ($user->role === 'admin');
+                            $isStaff = $user && ($user->role === 'staff');
                         @endphp
                         @if(auth()->check() && ($isAdmin || $isStaff))
                             <div class="relative group" id="admin-dropdown">
@@ -268,8 +268,8 @@
                     </a>
                     @php
                         $mobileUser = auth()->user();
-                        $mobileIsAdmin = $mobileUser && $mobileUser->hasRole('admin');
-                        $mobileIsStaff = $mobileUser && $mobileUser->hasRole('staff');
+                        $mobileIsAdmin = $mobileUser && ($mobileUser->role === 'admin');
+                        $mobileIsStaff = $mobileUser && ($mobileUser->role === 'staff');
                     @endphp
                     @if(auth()->check() && ($mobileIsAdmin || $mobileIsStaff))
                         <div class="border-t border-gray-200 pt-2 mt-2">
