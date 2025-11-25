@@ -37,6 +37,7 @@ class EventController extends Controller
             ->get()
             ->map(function ($type) {
                 return [
+                    'id' => $type->id,
                     'name' => $type->name,
                     'count' => $type->events_count
                 ];
@@ -184,7 +185,7 @@ class EventController extends Controller
                 'event_date' => $ticket_event->event->date,
                 'event_image' => $ticket_event->event->image,
             ];
-            
+
             $origin = $request->headers->get('Origin');
             $response = response()->json([
                 'success' => true,
@@ -193,7 +194,7 @@ class EventController extends Controller
                 'cart' => $cart,
                 'item_data' => $itemData
             ]);
-            
+
             // Agregar headers CORS si hay un origin
             if ($origin) {
                 $response->header('Access-Control-Allow-Origin', $origin)
@@ -201,7 +202,7 @@ class EventController extends Controller
                          ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
                          ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN');
             }
-            
+
             return $response;
         }
 

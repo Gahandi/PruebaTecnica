@@ -74,31 +74,31 @@
             // Validar que los campos de cliente estén llenos
             const customerName = document.getElementById('customer_name').value;
             const customerEmail = document.getElementById('customer_email').value;
-            
+
             if (!customerName || !customerEmail) {
                 event.preventDefault();
                 alert('Por favor completa tu nombre y correo electrónico antes de proceder al pago.');
                 return;
             }
-            
+
             // Validar contraseña si se marcó crear cuenta
             if (createAccountCheckbox && createAccountCheckbox.checked) {
                 const password = document.getElementById('customer_password').value;
                 const passwordConfirmation = document.getElementById('customer_password_confirmation').value;
-                
+
                 if (!password || password.length < 8) {
                     event.preventDefault();
                     alert('La contraseña debe tener al menos 8 caracteres.');
                     return;
                 }
-                
+
                 if (password !== passwordConfirmation) {
                     event.preventDefault();
                     alert('Las contraseñas no coinciden.');
                     return;
                 }
             }
-            
+
             const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
 
             // Solo intervenimos si el método de pago es OpenPay
@@ -146,7 +146,7 @@
 
         <form id="payment-form" method="POST" action="{{ route('checkout.process-payment') }}">
             @csrf
-            
+
             <!-- Información del Cliente (siempre visible, no requiere login) -->
             <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200 mb-6">
                 <div class="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
@@ -159,9 +159,9 @@
                             <label for="customer_name" class="block text-sm font-medium text-gray-700 mb-2">
                                 Nombre completo <span class="text-red-500">*</span>
                             </label>
-                            <input type="text" 
-                                   name="customer_name" 
-                                   id="customer_name" 
+                            <input type="text"
+                                   name="customer_name"
+                                   id="customer_name"
                                    value="{{ auth()->check() ? auth()->user()->name : '' }}"
                                    required
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -170,23 +170,23 @@
                             <label for="customer_email" class="block text-sm font-medium text-gray-700 mb-2">
                                 Correo electrónico <span class="text-red-500">*</span>
                             </label>
-                            <input type="email" 
-                                   name="customer_email" 
-                                   id="customer_email" 
+                            <input type="email"
+                                   name="customer_email"
+                                   id="customer_email"
                                    value="{{ auth()->check() ? auth()->user()->email : '' }}"
                                    required
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <p class="text-xs text-gray-500 mt-1">Te enviaremos la confirmación de tu compra a este correo</p>
                         </div>
                     </div>
-                    
+
                     @if(!auth()->check())
                     <!-- Opción para crear cuenta (solo si no está logueado) -->
                     <div class="mt-6 pt-6 border-t border-gray-200">
                         <div class="flex items-start">
-                            <input type="checkbox" 
-                                   id="create_account" 
-                                   name="create_account" 
+                            <input type="checkbox"
+                                   id="create_account"
+                                   name="create_account"
                                    value="1"
                                    class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
                             <div class="ml-3">
@@ -196,16 +196,16 @@
                                 <p class="text-xs text-gray-500 mt-1">Podrás ver y descargar tus boletos en cualquier momento</p>
                             </div>
                         </div>
-                        
+
                         <!-- Campos de contraseña (se muestran si se marca crear cuenta) -->
                         <div id="password-fields" class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label for="customer_password" class="block text-sm font-medium text-gray-700 mb-2">
                                     Contraseña <span class="text-red-500">*</span>
                                 </label>
-                                <input type="password" 
-                                       name="customer_password" 
-                                       id="customer_password" 
+                                <input type="password"
+                                       name="customer_password"
+                                       id="customer_password"
                                        minlength="8"
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <p class="text-xs text-gray-500 mt-1">Mínimo 8 caracteres</p>
@@ -214,9 +214,9 @@
                                 <label for="customer_password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">
                                     Confirmar Contraseña <span class="text-red-500">*</span>
                                 </label>
-                                <input type="password" 
-                                       name="customer_password_confirmation" 
-                                       id="customer_password_confirmation" 
+                                <input type="password"
+                                       name="customer_password_confirmation"
+                                       id="customer_password_confirmation"
                                        minlength="8"
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
@@ -225,7 +225,7 @@
                     @endif
                 </div>
             </div>
-            
+
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Payment Form -->
                 <div class="space-y-6">
@@ -376,8 +376,7 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Método de Pago</label>
                                     <div class="space-y-2">
                                         <label class="flex items-center">
-                                            <input type="radio" name="payment_method" value="openpay" checked
-                                                class="mr-2">
+                                            <input type="radio" name="payment_method" value="openpay" checked>
                                             <span class="text-sm text-gray-900">Tarjeta de Crédito/Débito (Openpay)</span>
                                         </label>
                                     </div>
@@ -605,7 +604,7 @@
                     messageDiv.className = 'mt-4 text-sm p-3 rounded bg-green-100 text-green-800';
                     messageDiv.textContent = data.message;
                     messageDiv.classList.remove('hidden');
-                    
+
                     // Redirigir después de 1 segundo
                     setTimeout(() => {
                         window.location.reload();

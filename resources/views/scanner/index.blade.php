@@ -11,16 +11,16 @@
         </div>
         <div class="flex items-center space-x-3">
             <!-- Toggle Button -->
-            <button id="toggle-scanner" 
+            <button id="toggle-scanner"
                     class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center space-x-2">
                 <svg id="toggle-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
                 <span id="toggle-text">Detener Escáner</span>
             </button>
-            
+
             <!-- Switch Camera Button -->
-            <button id="switch-camera" 
+            <button id="switch-camera"
                     class="px-4 py-3 bg-gray-600 text-white rounded-lg font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center space-x-2"
                     title="Cambiar cámara">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -32,7 +32,7 @@
     </div>
 
     <div id="reader" class="mx-auto w-full max-w-md rounded-lg overflow-hidden shadow-md border border-gray-300"></div>
-    
+
     <div id="scanner-status" class="mt-4 text-sm font-medium text-green-600 flex items-center justify-center space-x-2">
         <svg class="w-5 h-5 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const switchCameraButton = document.getElementById('switch-camera');
     const scannerStatus = document.getElementById('scanner-status');
     const readerElement = document.getElementById('reader');
-    
+
     let lock = false;
     let html5QrCode = null;
     let isScanning = false;
@@ -113,6 +113,11 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="text-lg">Evento: <strong>${data.data.event.name}</strong></div>
                         </div>
                     `);
+                    // Detener escaneo temporalmente
+                    stopScanner();
+
+                    // Reiniciar escaneo después de 3 segundos
+                    setTimeout(() => startScanner(), 3000);
                 } else {
                     renderMessage(`
                         <div class="text-red-700">
@@ -177,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function switchCamera() {
         if (!isScanning || cameras.length < 2) return;
-        
+
         await stopScanner();
         currentCameraIndex = (currentCameraIndex + 1) % cameras.length;
         await startScanner(cameras[currentCameraIndex].id);
@@ -198,14 +203,21 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Initialize cameras and start scanner
-    Html5Qrcode.getCameras().then(devices => {
+   Html5Qrcode.getCameras().then(devices => {
         if (devices && devices.length) {
             cameras = devices;
-            // Start with back camera if available, otherwise use first camera
-            const backCamera = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('rear'));
+
+            // 🔍 Buscar una cámara trasera de forma más inteligente
+            const backCamera = devices.find(d =>
+                /back|rear|environment|trás|externa|environment-facing/i.test(d.label)
+            );
+
             if (backCamera) {
                 currentCameraIndex = devices.indexOf(backCamera);
+            } else {
+                currentCameraIndex = 0; // usar la primera disponible
             }
+
             startScanner();
         } else {
             renderMessage('<p class="text-red-500">No se encontraron cámaras disponibles.</p>');

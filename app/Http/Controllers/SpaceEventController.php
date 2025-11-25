@@ -12,7 +12,7 @@ use App\Traits\S3ImageManager;
 
 class SpaceEventController extends Controller
 {
-    use S3ImageManager; 
+    use S3ImageManager;
 
     public function show(Request $request, $subdomain, Event $event)
     {
@@ -30,7 +30,24 @@ class SpaceEventController extends Controller
 
         return view('events.show', compact('event', 'space'));
     }
+    public function showEvents($subdomain, $id)
+    {
+        // Obtener categoría
+        $category = TypeEvent::findOrFail($id);
 
+        // Obtener eventos activos de esa categoría
+        $events = Event::where('type_events_id', $id)
+            ->where('active', true)
+            ->orderBy('date', 'asc')
+            ->with(['ticketTypes', 'space'])
+            ->get();
+
+        return view('categories.events', [
+            'category' => $category,
+            'events' => $events,
+            'subdomain' => $subdomain
+        ]);
+    }
     public function create(Request $request, $subdomain)
     {
         // El espacio ya está disponible en la request por el middleware
@@ -47,7 +64,7 @@ class SpaceEventController extends Controller
 
         try {
             $space = $request->get('space');
-        
+
             $request->validate([
                 'name' => 'required|string|max:255',
                 'description' => 'required|string',
@@ -63,7 +80,7 @@ class SpaceEventController extends Controller
                 'ticket_types.*.price' => 'required|numeric|min:0',
                 'ticket_types.*.quantity' => 'required|integer|min:1',
             ]);
-        
+
             $eventData = [
                 'name' => $request->name,
                 'description' => $request->description,
@@ -78,12 +95,12 @@ class SpaceEventController extends Controller
                 'agenda' => $request->agenda ?? 'N/A',
                 'banner_app' => 'default.jpg',
             ];
-        
+
             // ----- Subir archivos a S3 -----
             if ($request->hasFile('banner')) {
                 $bannerFile = $request->file('banner');
-                $fileContents = file_get_contents($bannerFile->getRealPath());
-                
+                $fileContents = file_get_contents($bannerFile->getPathname());
+
                 // Detectar extensión desde MIME type (igual que saveImages)
                 $finfo = finfo_open(FILEINFO_MIME_TYPE);
                 $mimeType = finfo_buffer($finfo, $fileContents);
@@ -96,11 +113,11 @@ class SpaceEventController extends Controller
                     'image/webp' => 'webp',
                 ];
                 $extension = $extensions[$mimeType] ?? 'jpg';
-                
+
                 $productId = $space->id . '_' . time();
                 $fileName = $productId . '.' . $extension;
                 $bannerPath = env('S3_ENVIRONMENT') . '/events/banners/' . $fileName;
-                
+
                 // Primero guardar la imagen
                 $this->saveImages($fileContents, 'events/banners', $productId);
                 // Guardar la ruta relativa en la DB
@@ -108,11 +125,11 @@ class SpaceEventController extends Controller
             } else {
                 $eventData['banner'] = 'https://via.placeholder.com/1200x400?text=Sin+Banner';
             }
-            
+
             if ($request->hasFile('image')) {
                 $imageFile = $request->file('image');
-                $fileContents = file_get_contents($imageFile->getRealPath());
-                
+                $fileContents = file_get_contents($imageFile->getPathname());
+
                 // Detectar extensión desde MIME type (igual que saveImages)
                 $finfo = finfo_open(FILEINFO_MIME_TYPE);
                 $mimeType = finfo_buffer($finfo, $fileContents);
@@ -125,11 +142,11 @@ class SpaceEventController extends Controller
                     'image/webp' => 'webp',
                 ];
                 $extension = $extensions[$mimeType] ?? 'jpg';
-                
+
                 $productId = $space->id . '_' . time();
                 $fileName = $productId . '.' . $extension;
                 $imagePath = env('S3_ENVIRONMENT') . '/events/images/' . $fileName;
-                
+
                 // Primero guardar la imagen
                 $this->saveImages($fileContents, 'events/images', $productId);
                 // Guardar la ruta relativa en la DB
@@ -139,8 +156,8 @@ class SpaceEventController extends Controller
             }
             if ($request->hasFile('icon')) {
                 $iconFile = $request->file('icon');
-                $fileContents = file_get_contents($iconFile->getRealPath());
-                
+                $fileContents = file_get_contents($iconFile->getPathname());
+
                 // Detectar extensión desde MIME type (igual que saveImages)
                 $finfo = finfo_open(FILEINFO_MIME_TYPE);
                 $mimeType = finfo_buffer($finfo, $fileContents);
@@ -153,11 +170,11 @@ class SpaceEventController extends Controller
                     'image/webp' => 'webp',
                 ];
                 $extension = $extensions[$mimeType] ?? 'jpg';
-                
+
                 $productId = $space->id . '_' . time();
                 $fileName = $productId . '.' . $extension;
                 $iconPath = env('S3_ENVIRONMENT') . '/events/icons/' . $fileName;
-                
+
                 // Primero guardar la imagen
                 $this->saveImages($fileContents, 'events/icons', $productId);
                 // Guardar la ruta relativa en la DB
@@ -165,10 +182,10 @@ class SpaceEventController extends Controller
             } else {
                 $eventData['icon'] = 'https://via.placeholder.com/200x200?text=Sin+Icono';
             }
-        
+
             // Guardar el evento
             $event = Event::create($eventData);
-        
+
             // Crear tipos de boletos y asociarlos al evento
             foreach ($request->ticket_types as $ticketTypeData) {
                 // Determinar si es un tipo existente (ID) o uno nuevo (Name)
@@ -177,7 +194,7 @@ class SpaceEventController extends Controller
                 if(is_numeric($ticketName) && $ticketName > 0){
                     $ticketType = TicketType::find($ticketName);
 
-                    //Si el id no existe loguear o saltar. 
+                    //Si el id no existe loguear o saltar.
                     if (!$ticketType) {
                         \Log::warning("Tipo de Boleto con ID $ticketName no encontrado, saltando.");
                         continue;
@@ -193,7 +210,7 @@ class SpaceEventController extends Controller
                     'quantity' => $ticketTypeData['quantity']
                 ]);
             }
-        
+
             return redirect()
                 ->route('spaces.profile', $space->subdomain)
                 ->with('success', 'Evento creado exitosamente y las imágenes fueron subidas a S3.');
@@ -203,7 +220,7 @@ class SpaceEventController extends Controller
                 'trace' => $e->getTraceAsString(),
                 'exception' => get_class($e)
             ]);
-        
+
             // Mensaje de error más específico si es un error de S3
             $errorMessage = 'Ocurrió un error al crear el evento. ';
             if (strpos($e->getMessage(), 'S3') !== false || strpos($e->getMessage(), 'AWS') !== false) {
@@ -211,12 +228,12 @@ class SpaceEventController extends Controller
             } else {
                 $errorMessage .= 'Por favor, intenta nuevamente.';
             }
-        
+
             // Retornar con mensaje de error
             return back()
                 ->withInput()
                 ->with('error', $errorMessage);
-        } 
+        }
     }
 
         /**
@@ -267,7 +284,7 @@ class SpaceEventController extends Controller
             if ($event->spaces_id !== $space->id) {
                 abort(403, 'Acceso no autorizado para editar este evento.');
             }
-        
+
             // 2. Validar los datos
             $request->validate([
                 'name' => 'required|string|max:255',
@@ -285,7 +302,7 @@ class SpaceEventController extends Controller
                 'ticket_types.*.price' => 'required|numeric|min:0',
                 'ticket_types.*.quantity' => 'required|integer|min:1',
             ]);
-        
+
             // 3. Preparar los datos básicos
             $eventData = [
                 'name' => $request->name,
@@ -295,17 +312,17 @@ class SpaceEventController extends Controller
                 'coordinates' => $request->coordinates,
                 'type_events_id' => $request->type_event_id,
                 // Generar nuevo slug si el nombre cambió
-                'slug' => Str::slug($request->name), 
+                'slug' => Str::slug($request->name),
                 'agenda' => $request->agenda ?? 'N/A',
             ];
 
             // 4. Gestión de Archivos (Subir a S3 y actualizar la DB)
-            
+
             // Función auxiliar para subir y eliminar archivos (basado en tu lógica de store)
             $uploadAndUpdateImage = function ($fileKey, $pathSegment, $dbField, $event, $request) use (&$eventData) {
                 if ($request->hasFile($fileKey)) {
                     $file = $request->file($fileKey);
-                    $fileContents = file_get_contents($file->getRealPath());
+                    $fileContents = file_get_contents($file->getPathname());
 
                     $finfo = finfo_open(FILEINFO_MIME_TYPE);
                     $mimeType = finfo_buffer($finfo, $fileContents);
@@ -315,10 +332,10 @@ class SpaceEventController extends Controller
                         'image/gif' => 'gif', 'image/webp' => 'webp',
                     ];
                     $extension = $extensions[$mimeType] ?? 'jpg';
-                    
+
                     $productId = $event->spaces_id . '_' . time();
                     $fileName = $productId . '.' . $extension; // <-- Crear el nombre del archivo completo
-                    
+
                     // 1. Eliminar la imagen antigua si existe y no es una URL por defecto
                     // La ruta a eliminar debe coincidir con la ruta guardada en la DB
                     if ($event->$dbField && !Str::startsWith($event->$dbField, 'http')) {
@@ -331,16 +348,16 @@ class SpaceEventController extends Controller
                         $folderAndFile = Str::after($fullPath, $envPrefix);
 
                         $folderToDelete = Str::beforeLast($folderAndFile, '/');
-            
+
                         \Log::info("Intentando eliminar la imagen antigua de $dbField. Carpeta: $folderToDelete, Archivo: $fileNameToDelete");
-                        
+
                         // CORRECCIÓN CLAVE: Llamar al método correcto del Trait y pasar los parámetros esperados
                         $this->deleteS3Image($folderToDelete, $fileNameToDelete);
                     }
 
                     // 2. Guardar la nueva imagen. Asumimos que saveImages usa $productId como nombre base.
                     $this->saveImages($fileContents, $pathSegment, $productId);
-                    
+
                     // 3. Guardar la nueva ruta completa en la DB, ¡igual que en store!
                     $eventData[$dbField] = env('S3_ENVIRONMENT') . '/' . $pathSegment . '/' . $fileName; // RUTA COMPLETA
                 }
@@ -349,10 +366,10 @@ class SpaceEventController extends Controller
             $uploadAndUpdateImage('banner', 'events/banners', 'banner', $event, $request);
             $uploadAndUpdateImage('image', 'events/images', 'image', $event, $request);
             $uploadAndUpdateImage('icon', 'events/icons', 'icon', $event, $request);
-        
+
             // 5. Actualizar el evento
             $event->update($eventData);
-        
+
             // 6. Sincronizar tipos de boletos (más complejo ya que hay que manejar nuevos y existentes)
             $newTicketTypes = [];
             $syncData = [];
@@ -393,15 +410,15 @@ class SpaceEventController extends Controller
                 'trace' => $e->getTraceAsString(),
                 'exception' => get_class($e)
             ]);
-        
+
             $errorMessage = 'Ocurrió un error al actualizar el evento. Por favor, intenta nuevamente.';
             if (strpos($e->getMessage(), 'S3') !== false || strpos($e->getMessage(), 'AWS') !== false) {
                 $errorMessage = 'Error al subir/gestionar las imágenes en S3. Verifica la configuración de AWS y los logs.';
             }
-        
+
             return back()
                 ->withInput()
                 ->with('error', $errorMessage);
-        } 
+        }
     }
 }

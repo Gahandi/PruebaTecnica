@@ -32,6 +32,7 @@ class HomeController extends Controller
             ->get()
             ->map(function ($type) {
                 return [
+                    'id' => $type->id,
                     'name' => $type->name,
                     'count' => $type->events_count
                 ];
