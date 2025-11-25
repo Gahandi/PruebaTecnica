@@ -134,7 +134,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         $eventsCount = \App\Models\Event::count();
         $ordersCount = \App\Models\Order::count();
         $usersCount = \App\Models\User::count();
-        $totalRevenue = \App\Models\Order::where('status', 'completed')->sum('total');
+        // El total está en la tabla payments, no en orders
+        $totalRevenue = \App\Models\Payment::whereHas('order', function($query) {
+            $query->where('status', 'completed');
+        })->sum('total');
 
         return view('admin.index', compact('eventsCount', 'ordersCount', 'usersCount', 'totalRevenue'));
     })->name('admin.index');

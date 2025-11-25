@@ -50,7 +50,10 @@ class Payment extends Model
 		'subtotal',
 		'discount_amount',
 		'total',
-		'taxes'
+		'taxes',
+		'payment_gateway',
+		'gateway_transaction_id',
+		'gateway_authorization'
 	];
 
 	public function coupon()

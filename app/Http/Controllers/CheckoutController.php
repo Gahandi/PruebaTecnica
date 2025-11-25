@@ -790,28 +790,26 @@ class CheckoutController extends Controller
 
             try {
                 // --- Crear la Orden ---
+                // Nota: orders NO tiene subtotal, discount_amount, total ni taxes
+                // Esos campos están solo en la tabla payments
                 $order = Order::create([
                     'id' => Str::uuid(),
                     'user_id' => $user ? $user->id : null,
                     'event_id' => json_encode($event_id_json),
-                    'coupon_id' => $couponId,
                     'state_id' => 4, // Asumiendo que 4 es un estado válido
-                    'subtotal' => $subtotal,
-                    'discount_amount' => $discountAmount,
-                    'total' => $total,
-                    'taxes' => $taxes,
                     'status' => 'completed',
                 ]);
 
                 // Registrar el pago
+                // Nota: payments NO tiene state_id, solo tiene los campos financieros
                 $payment = Payment::create([
-                    'state_id' => 4,
                     'coupon_id' => $couponId,
                     'order_id' => $order->id,
                     'subtotal' => $subtotal,
                     'discount_amount' => $discountAmount,
                     'total' => $total,
                     'taxes' => $taxes,
+                    'status' => 'completed',
                     'payment_gateway' => 'openpay',
                     'gateway_transaction_id' => $charge->id,
                     'gateway_authorization' => $charge->authorization ?? null,

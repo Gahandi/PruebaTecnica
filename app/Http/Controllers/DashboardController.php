@@ -18,16 +18,20 @@ class DashboardController extends Controller
         $totalEvents = Event::count();
         $totalOrders = Order::count();
         $totalTickets = Ticket::count();
-        $totalRevenue = Order::sum('total');
+        // El total está en la tabla payments, no en orders
+        $totalRevenue = \App\Models\Payment::whereHas('order', function($query) {
+            $query->where('status', 'completed');
+        })->sum('total');
         $totalCheckins = Checkin::count();
         
-        // Ingresos por mes (últimos 6 meses)
-        $monthlyRevenue = Order::select(
-                DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
-                DB::raw('SUM(total) as revenue')
+        // Ingresos por mes (últimos 6 meses) - desde payments
+        $monthlyRevenue = \App\Models\Payment::select(
+                DB::raw('DATE_FORMAT(payments.created_at, "%Y-%m") as month'),
+                DB::raw('SUM(payments.total) as revenue')
             )
-            ->where('created_at', '>=', now()->subMonths(6))
-            ->where('status', 'completed')
+            ->join('orders', 'payments.order_id', '=', 'orders.id')
+            ->where('payments.created_at', '>=', now()->subMonths(6))
+            ->where('orders.status', 'completed')
             ->groupBy('month')
             ->orderBy('month')
             ->get();
@@ -56,16 +60,20 @@ class DashboardController extends Controller
             ->groupBy('ticket_types.id', 'ticket_types.name')
             ->get();
         
-        // Cupones más usados
-        $couponsUsed = DB::table('orders')
-            ->join('coupons', 'orders.coupon_id', '=', 'coupons.id')
+        // Cupones más usados - desde payments
+        $couponsUsed = DB::table('payments')
+            ->join('coupons', 'payments.coupon_id', '=', 'coupons.id')
+            ->join('orders', 'payments.order_id', '=', 'orders.id')
+            ->where('orders.status', 'completed')
             ->select('coupons.code', 'coupons.discount_percentage', DB::raw('COUNT(*) as times_used'))
             ->groupBy('coupons.id', 'coupons.code', 'coupons.discount_percentage')
             ->orderBy('times_used', 'desc')
             ->get();
         
-        // Eventos más populares
-        $popularEvents = Event::withCount('orders')
+        // Eventos más populares - contar órdenes completadas
+        $popularEvents = Event::withCount(['orders' => function($query) {
+            $query->where('status', 'completed');
+        }])
             ->orderBy('orders_count', 'desc')
             ->limit(5)
             ->get();
