@@ -158,28 +158,28 @@ class CartHelper
             // Si tiene event_id y ticket_type_id, obtener el precio actualizado desde TicketsEvent
             if (isset($item['event_id']) && isset($item['ticket_type_id'])) {
                 try {
-                    $ticketEvent = \App\Models\TicketsEvent::where('ticket_types_id', $item['ticket_type_id'])
-                        ->where('event_id', $item['event_id'])
-                        ->with(['event', 'ticket_type'])
-                        ->first();
+                $ticketEvent = \App\Models\TicketsEvent::where('ticket_types_id', $item['ticket_type_id'])
+                    ->where('event_id', $item['event_id'])
+                    ->with(['event', 'ticket_type'])
+                    ->first();
 
                     if ($ticketEvent && $ticketEvent->event && $ticketEvent->ticket_type) {
-                        // Actualizar precio desde la BD para asegurar que sea el correcto
-                        $item['price'] = $ticketEvent->price;
-                        
-                        // Actualizar información del evento si no está presente
-                        if (!isset($item['event_name'])) {
-                            $item['event'] = $ticketEvent->event;
-                            $item['event_name'] = $ticketEvent->event->name;
-                            $item['event_date'] = $ticketEvent->event->date;
-                            $item['event_image'] = $ticketEvent->event->image;
-                        }
-                        
-                        // Actualizar información del tipo de boleto si no está presente
-                        if (!isset($item['ticket_type_name'])) {
-                            $item['ticket_type_name'] = $ticketEvent->ticket_type->name;
-                        }
+                    // Actualizar precio desde la BD para asegurar que sea el correcto
+                    $item['price'] = $ticketEvent->price;
+                    
+                    // Actualizar información del evento si no está presente
+                    if (!isset($item['event_name'])) {
+                        $item['event'] = $ticketEvent->event;
+                        $item['event_name'] = $ticketEvent->event->name;
+                        $item['event_date'] = $ticketEvent->event->date;
+                        $item['event_image'] = $ticketEvent->event->image;
                     }
+                    
+                    // Actualizar información del tipo de boleto si no está presente
+                    if (!isset($item['ticket_type_name'])) {
+                        $item['ticket_type_name'] = $ticketEvent->ticket_type->name;
+                    }
+                }
                 } catch (\Exception $e) {
                     // Si hay un error, mantener el item con los datos que tiene
                     \Log::warning('Error al obtener información del ticket event: ' . $e->getMessage());
@@ -188,21 +188,21 @@ class CartHelper
                 // Si no tiene event_id, buscar el evento asociado al tipo de boleto
                 try {
                     $ticketEvent = \App\Models\TicketsEvent::where('ticket_types_id', $item['ticket_type_id'])
-                        ->with(['event', 'ticket_type'])
-                        ->first();
+                    ->with(['event', 'ticket_type'])
+                    ->first();
 
                     if ($ticketEvent && $ticketEvent->event && $ticketEvent->ticket_type) {
-                        $item['event_id'] = $ticketEvent->event_id;
-                        $item['event'] = $ticketEvent->event;
-                        $item['event_name'] = $ticketEvent->event->name;
-                        $item['event_date'] = $ticketEvent->event->date;
-                        $item['event_image'] = $ticketEvent->event->image;
-                        // Actualizar precio desde la BD
-                        $item['price'] = $ticketEvent->price;
-                        if (!isset($item['ticket_type_name'])) {
-                            $item['ticket_type_name'] = $ticketEvent->ticket_type->name;
-                        }
+                    $item['event_id'] = $ticketEvent->event_id;
+                    $item['event'] = $ticketEvent->event;
+                    $item['event_name'] = $ticketEvent->event->name;
+                    $item['event_date'] = $ticketEvent->event->date;
+                    $item['event_image'] = $ticketEvent->event->image;
+                    // Actualizar precio desde la BD
+                    $item['price'] = $ticketEvent->price;
+                    if (!isset($item['ticket_type_name'])) {
+                        $item['ticket_type_name'] = $ticketEvent->ticket_type->name;
                     }
+                }
                 } catch (\Exception $e) {
                     // Si hay un error, mantener el item con los datos que tiene
                     \Log::warning('Error al buscar evento para ticket type: ' . $e->getMessage());

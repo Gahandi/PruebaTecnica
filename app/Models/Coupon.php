@@ -39,11 +39,17 @@ class Coupon extends Model
 	protected $fillable = [
 		'code',
 		'discount_percentage',
-		'expires_at'
+		'expires_at',
+		'spaces_id'
 	];
 
 	public function payments()
 	{
 		return $this->hasMany(Payment::class);
+	}
+
+	public function space()
+	{
+		return $this->belongsTo(Space::class, 'spaces_id');
 	}
 }

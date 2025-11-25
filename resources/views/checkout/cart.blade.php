@@ -45,26 +45,26 @@
                                 <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                                     <!-- Event Image -->
                                     <div class="flex items-start gap-3 sm:gap-4 w-full sm:w-auto">
-                                        @if(isset($item['event_image']) && $item['event_image'])
+                                    @if(isset($item['event_image']) && $item['event_image'])
                                             <img src="{{ \App\Helpers\ImageHelper::getImageUrl($item['event_image']) }}" alt="{{ $item['event_name'] ?? 'Evento' }}" class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover flex-shrink-0">
-                                        @else
+                                    @else
                                             <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
                                                 <svg class="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                                </svg>
-                                            </div>
-                                        @endif
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                        </div>
+                                    @endif
 
-                                        <div class="flex-1 min-w-0">
-                                            <!-- Event Info -->
-                                            <div class="mb-2">
+                                    <div class="flex-1 min-w-0">
+                                        <!-- Event Info -->
+                                        <div class="mb-2">
                                                 <h3 class="text-base sm:text-lg font-medium text-gray-900">{{ $item['event_name'] ?? 'Evento' }}</h3>
-                                                @if(isset($item['event_date']))
+                                            @if(isset($item['event_date']))
                                                     <p class="text-xs sm:text-sm text-gray-500">{{ \Carbon\Carbon::parse($item['event_date'])->format('d M Y, H:i') }}</p>
-                                                @endif
-                                            </div>
+                                            @endif
+                                        </div>
 
-                                            <!-- Ticket Type Info -->
+                                        <!-- Ticket Type Info -->
                                             <div class="mb-2 sm:mb-3">
                                                 <h4 class="text-sm sm:text-base font-semibold text-gray-800">{{ $item['ticket_type_name'] ?? 'Tipo de Boleto' }}</h4>
                                                 <div class="mt-1">
@@ -85,7 +85,7 @@
                                             @if(isset($item['price']) && isset($item['quantity']))
                                                 <p class="text-base sm:text-lg font-semibold text-gray-900">${{ number_format($item['price'], 2) }}</p>
                                                 <p class="text-xs sm:text-sm text-gray-500">por boleto</p>
-                                                <p class="text-sm font-medium text-gray-700">Total: ${{ number_format($item['price'] * $item['quantity'], 2) }}</p>
+                                            <p class="text-sm font-medium text-gray-700">Total: ${{ number_format($item['price'] * $item['quantity'], 2) }}</p>
                                             @else
                                                 <p class="text-xs sm:text-sm text-red-500">Error: Datos incompletos</p>
                                             @endif
@@ -128,21 +128,21 @@
                             $totalItems = 0;
                             foreach($cart as $item) {
                                 if (isset($item['price']) && isset($item['quantity'])) {
-                                    $subtotal += $item['price'] * $item['quantity'];
-                                    $totalItems += $item['quantity'];
-                                }
+                                $subtotal += $item['price'] * $item['quantity'];
+                                $totalItems += $item['quantity'];
                             }
-                            $taxes = $subtotal * 0.16; // 16% IVA
-                            $total = $subtotal + $taxes;
-                        @endphp
+                            }
+                                $taxes = $subtotal * 0.16; // 16% IVA
+                                $total = $subtotal + $taxes;
+                            @endphp
 
                         <div class="text-center">
                             <div class="mb-4">
                                 <p class="text-xs sm:text-sm text-gray-500 mb-2">Total a pagar</p>
                                 <p class="text-3xl sm:text-4xl font-bold text-gray-900">${{ number_format($total, 2) }}</p>
                                 <p class="text-xs text-gray-400 mt-1">IVA incluido</p>
+                                </div>
                             </div>
-                        </div>
 
                         <div class="mt-4 sm:mt-6">
                             <a href="{{ route('checkout.checkout') }}"

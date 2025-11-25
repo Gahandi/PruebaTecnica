@@ -162,31 +162,31 @@
                     <div class="overflow-x-auto -mx-4 sm:mx-0">
                         <div class="inline-block min-w-full align-middle">
                             <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-                                <table class="min-w-full divide-y divide-gray-200">
-                                    <thead class="bg-gray-50">
-                                        <tr>
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
                                             <th class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Evento</th>
                                             <th class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Ticket ID</th>
                                             <th class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200">
-                                        @foreach($recentCheckins as $checkin)
-                                        <tr>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @foreach($recentCheckins as $checkin)
+                                <tr>
                                             <td class="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900">
                                                 <div class="font-medium">{{ Str::limit($checkin->ticket->order->event->name ?? 'N/A', 30) }}</div>
                                                 <div class="text-xs text-gray-500 sm:hidden mt-1">{{ substr($checkin->ticket->id, 0, 8) }}...</div>
-                                            </td>
+                                    </td>
                                             <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden sm:table-cell">
-                                                {{ substr($checkin->ticket->id, 0, 8) }}...
-                                            </td>
+                                        {{ substr($checkin->ticket->id, 0, 8) }}...
+                                    </td>
                                             <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
-                                                {{ $checkin->scanned_at->format('d/m/Y H:i') }}
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                        {{ $checkin->scanned_at->format('d/m/Y H:i') }}
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                             </div>
                         </div>
                     </div>

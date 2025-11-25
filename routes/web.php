@@ -1,12 +1,5 @@
 <?php
 
-use App\Http\Controllers\Admin\EventController;
-use App\Http\Controllers\Admin\TicketTypeController;
-use App\Http\Controllers\Admin\CouponController;
-use App\Http\Controllers\Admin\OrderController as AdminOrderController;
-use App\Http\Controllers\Admin\CheckinController;
-use App\Http\Controllers\Staff\CheckinController as StaffCheckinController;
-use App\Http\Controllers\AdminCheckinRedirectController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\AuthController;
@@ -15,6 +8,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserSpacesController;
 use App\Http\Controllers\SpaceController;
 use App\Http\Controllers\SpaceEventController;
+use App\Http\Controllers\SpaceCouponController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ScannerController;
@@ -59,6 +53,20 @@ Route::domain('{subdomain}.' . config('app.url'))
         // Mostrar eventos por categoría
         Route::get('/categories/{id}', [SpaceEventController::class, 'showEvents'])
             ->name('categories.events');
+        
+        // Rutas de cupones por espacio (solo para admins del espacio)
+        Route::prefix('coupons')
+            ->name('spaces.coupons.')
+            ->middleware(['auth', 'space.member'])
+            ->group(function () {
+                Route::get('/', [SpaceCouponController::class, 'index'])->name('index');
+                Route::get('/create', [SpaceCouponController::class, 'create'])->name('create');
+                Route::post('/', [SpaceCouponController::class, 'store'])->name('store');
+                Route::get('/{coupon}', [SpaceCouponController::class, 'show'])->name('show');
+                Route::get('/{coupon}/edit', [SpaceCouponController::class, 'edit'])->name('edit');
+                Route::put('/{coupon}', [SpaceCouponController::class, 'update'])->name('update');
+                Route::delete('/{coupon}', [SpaceCouponController::class, 'destroy'])->name('destroy');
+            });
         // Rutas de checkout para subdominio
     });
 
@@ -130,21 +138,7 @@ Route::middleware(['auth', 'role:admin,staff'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/admin', function () {
-        $eventsCount = \App\Models\Event::count();
-        $ordersCount = \App\Models\Order::count();
-        $usersCount = \App\Models\User::count();
-        // El total está en la tabla payments, no en orders
-        $totalRevenue = \App\Models\Payment::whereHas('order', function($query) {
-            $query->where('status', 'completed');
-        })->sum('total');
-
-        return view('admin.index', compact('eventsCount', 'ordersCount', 'usersCount', 'totalRevenue'));
-    })->name('admin.index');
-    Route::resource('admin/events', EventController::class)->names('admin.events');
-    Route::resource('admin/ticket-types', TicketTypeController::class)->names('admin.ticket-types');
-    Route::resource('admin/coupons', CouponController::class)->names('admin.coupons');
-    Route::resource('admin/orders', AdminOrderController::class)->names('admin.orders');
+    Route::get('/admin', [DashboardController::class, 'index'])->name('admin.index');
 });
 
 // Ruta de prueba sin middleware de roles
@@ -158,16 +152,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/staff/checkins/{checkin}/edit', [StaffCheckinController::class, 'edit'])->name('staff.checkins.edit');
 });
 
-// Ruta especial para redirección de staff a admin/checkins - DEBE IR ANTES de las rutas resource
-Route::middleware(['auth'])->group(function () {
-    Route::get('/admin/checkins', [AdminCheckinRedirectController::class, 'index'])->name('admin.checkins.redirect');
-    Route::get('/admin/checkins/{checkin}', [AdminCheckinRedirectController::class, 'show']);
-    Route::get('/admin/checkins/create', [AdminCheckinRedirectController::class, 'create']);
-});
-
-Route::middleware(['auth', 'role:admin,staff'])->group(function () {
-    Route::resource('admin/checkins', CheckinController::class)->names('admin.checkins');
-});
 
 // Rutas de checkout (sin autenticación requerida)
 Route::prefix('checkout')

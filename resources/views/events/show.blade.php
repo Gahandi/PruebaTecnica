@@ -177,24 +177,24 @@
                                             <h4 class="text-lg sm:text-xl font-bold text-gray-900 mb-2">{{ $ticketType->name }}</h4>
                                             <div class="flex flex-wrap items-center gap-2">
                                                 <div class="flex items-center">
-                                                    <svg class="w-4 h-4 text-green-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                                    </svg>
+                                        <svg class="w-4 h-4 text-green-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                        </svg>
                                                     <span class="text-xs sm:text-sm font-medium text-green-600">
                                                         <span id="available_{{ $ticketType->id }}" data-initial="{{ $ticketType->pivot->quantity }}">{{ $ticketType->pivot->quantity }}</span> disponibles
                                                     </span>
-                                                </div>
-                                                @if($ticketType->pivot->quantity <= 5)
+                                    </div>
+                                    @if($ticketType->pivot->quantity <= 5)
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                                        ¡Últimos!
-                                                    </span>
-                                                @elseif($ticketType->pivot->quantity <= 20)
+                                            ¡Últimos!
+                                        </span>
+                                    @elseif($ticketType->pivot->quantity <= 20)
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                        Pocos disponibles
-                                                    </span>
-                                                @endif
-                                            </div>
-                                        </div>
+                                            Pocos disponibles
+                                        </span>
+                                    @endif
+                                </div>
+                                </div>
                                         <div class="text-left sm:text-center">
                                             <p class="text-2xl sm:text-3xl font-bold text-green-600 mb-1">${{ number_format($ticketType->pivot->price, 2) }}</p>
                                             <p class="text-xs sm:text-sm text-gray-500">por boleto</p>

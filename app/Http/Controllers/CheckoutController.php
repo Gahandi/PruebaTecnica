@@ -482,7 +482,35 @@ class CheckoutController extends Controller
             return redirect()->route('checkout.cart')->with('error', 'Tu carrito está vacío.');
         }
 
-        $coupons = Coupon::where(function($query) {
+        // Obtener el espacio desde los eventos del carrito
+        $spaceId = null;
+        foreach ($cart as $item) {
+            if (isset($item['event_id'])) {
+                $event = \App\Models\Event::find($item['event_id']);
+                if ($event) {
+                    if ($spaceId === null) {
+                        $spaceId = $event->spaces_id;
+                    } elseif ($spaceId !== $event->spaces_id) {
+                        // Si hay eventos de diferentes espacios, no mostrar cupones
+                        $spaceId = null;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Filtrar cupones por espacio o cupones globales
+        $coupons = Coupon::where(function($query) use ($spaceId) {
+            $query->where(function($q) use ($spaceId) {
+                if ($spaceId !== null) {
+                    $q->where('spaces_id', $spaceId)
+                      ->orWhereNull('spaces_id'); // También incluir cupones globales
+                } else {
+                    $q->whereNull('spaces_id'); // Solo cupones globales si no hay espacio definido
+                }
+            });
+        })
+        ->where(function($query) {
             $query->whereNull('expires_at')
                   ->orWhere('expires_at', '>', now());
         })->get();
@@ -789,169 +817,169 @@ class CheckoutController extends Controller
             DB::beginTransaction();
 
             try {
-                // --- Crear la Orden ---
+            // --- Crear la Orden ---
                 // Nota: orders NO tiene subtotal, discount_amount, total ni taxes
                 // Esos campos están solo en la tabla payments
-                $order = Order::create([
-                    'id' => Str::uuid(),
-                    'user_id' => $user ? $user->id : null,
-                    'event_id' => json_encode($event_id_json),
-                    'state_id' => 4, // Asumiendo que 4 es un estado válido
-                    'status' => 'completed',
-                ]);
+            $order = Order::create([
+                'id' => Str::uuid(),
+                'user_id' => $user ? $user->id : null,
+                'event_id' => json_encode($event_id_json),
+                'state_id' => 4, // Asumiendo que 4 es un estado válido
+                'status' => 'completed',
+            ]);
 
-                // Registrar el pago
+            // Registrar el pago
                 // Nota: payments NO tiene state_id, solo tiene los campos financieros
-                $payment = Payment::create([
-                    'coupon_id' => $couponId,
-                    'order_id' => $order->id,
-                    'subtotal' => $subtotal,
-                    'discount_amount' => $discountAmount,
-                    'total' => $total,
-                    'taxes' => $taxes,
+            $payment = Payment::create([
+                'coupon_id' => $couponId,
+                'order_id' => $order->id,
+                'subtotal' => $subtotal,
+                'discount_amount' => $discountAmount,
+                'total' => $total,
+                'taxes' => $taxes,
                     'status' => 'completed',
-                    'payment_gateway' => 'openpay',
-                    'gateway_transaction_id' => $charge->id,
-                    'gateway_authorization' => $charge->authorization ?? null,
+                'payment_gateway' => 'openpay',
+                'gateway_transaction_id' => $charge->id,
+                'gateway_authorization' => $charge->authorization ?? null,
+            ]);
+
+            // Validar que el pago se creó correctamente
+            if (!$payment) {
+                throw new \Exception('Error al registrar el pago');
+            }
+
+            // Crear items de la orden y tickets
+            $ticketsCreated = [];
+            foreach ($cart as $item) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'ticket_type_id' => $item['ticket_type_id'],
+                    'quantity' => $item['quantity'],
                 ]);
 
-                // Validar que el pago se creó correctamente
-                if (!$payment) {
-                    throw new \Exception('Error al registrar el pago');
-                }
-
-                // Crear items de la orden y tickets
-                $ticketsCreated = [];
-                foreach ($cart as $item) {
-                    OrderItem::create([
+                for ($i = 0; $i < $item['quantity']; $i++) {
+                    $ticket = Ticket::create([
+                        'id' => Str::uuid(),
                         'order_id' => $order->id,
-                        'ticket_type_id' => $item['ticket_type_id'],
-                        'quantity' => $item['quantity'],
+                        'ticket_types_id' => $item['ticket_type_id'],
+                        'event_id' => $item['event_id'],
+                        'used' => false,
                     ]);
 
-                    for ($i = 0; $i < $item['quantity']; $i++) {
-                        $ticket = Ticket::create([
-                            'id' => Str::uuid(),
-                            'order_id' => $order->id,
-                            'ticket_types_id' => $item['ticket_type_id'],
-                            'event_id' => $item['event_id'],
-                            'used' => false,
-                        ]);
+                    // Generar QR en memoria (sin archivo local)
+                    $qrBinary = QrCode::format('png')
+                        ->size(300)
+                        ->generate($ticket->id);
 
-                        // Generar QR en memoria (sin archivo local)
-                        $qrBinary = QrCode::format('png')
-                            ->size(300)
-                            ->generate($ticket->id);
+                    // Subir a S3 directamente
+                    $qrS3Url = $this->saveImages($qrBinary, 'tickets_qr', $ticket->id);
 
-                        // Subir a S3 directamente
-                        $qrS3Url = $this->saveImages($qrBinary, 'tickets_qr', $ticket->id);
+                    // Guardar URL de S3 en el ticket
+                    $ticket->qr_url = $qrS3Url;
+                    $ticket->save();
 
-                        // Guardar URL de S3 en el ticket
-                        $ticket->qr_url = $qrS3Url;
-                        $ticket->save();
-
-                        $ticketsCreated[] = $ticket;
-                    }
+                    $ticketsCreated[] = $ticket;
                 }
+            }
 
-                // Validar que se crearon tickets
-                if (empty($ticketsCreated)) {
-                    throw new \Exception('No se pudieron crear los tickets');
+            // Validar que se crearon tickets
+            if (empty($ticketsCreated)) {
+                throw new \Exception('No se pudieron crear los tickets');
+            }
+
+            // Confirmar transacción
+            DB::commit();
+
+            Log::info('Orden finalizada exitosamente', [
+                'order_id' => $order->id,
+                'user_id' => $user?->id,
+                'tickets_count' => count($ticketsCreated),
+                'charge_id' => $charge->id
+            ]);
+
+            // Enviar correo con PDFs de boletos (en background)
+            if ($customerEmail) {
+                try {
+                    SendTicketPurchaseEmail::dispatch($order);
+                    Log::info('Job de envío de correo despachado', [
+                        'order_id' => $order->id,
+                        'email' => $customerEmail
+                    ]);
+                } catch (\Exception $e) {
+                    // No fallar la compra si falla el envío de correo, solo loguear
+                    Log::error('Error al despachar job de envío de correo', [
+                        'order_id' => $order->id,
+                        'error' => $e->getMessage()
+                    ]);
                 }
+            }
 
-                // Confirmar transacción
-                DB::commit();
+            // Limpiar sesión
+            session()->forget([
+                'cart', 
+                'applied_coupon', 
+                'openpay_charge_id', 
+                'checkout_customer_email', 
+                'checkout_customer_name',
+                'checkout_customer_password'
+            ]);
+            
+            // Guardar flag en sesión para limpiar localStorage en el frontend
+            session()->put('clear_cart_localstorage', true);
 
-                Log::info('Orden finalizada exitosamente', [
-                    'order_id' => $order->id,
-                    'user_id' => $user?->id,
-                    'tickets_count' => count($ticketsCreated),
-                    'charge_id' => $charge->id
-                ]);
-
-                // Enviar correo con PDFs de boletos (en background)
-                if ($customerEmail) {
-                    try {
-                        SendTicketPurchaseEmail::dispatch($order);
-                        Log::info('Job de envío de correo despachado', [
-                            'order_id' => $order->id,
-                            'email' => $customerEmail
-                        ]);
-                    } catch (\Exception $e) {
-                        // No fallar la compra si falla el envío de correo, solo loguear
-                        Log::error('Error al despachar job de envío de correo', [
-                            'order_id' => $order->id,
-                            'error' => $e->getMessage()
-                        ]);
-                    }
-                }
-
-                // Limpiar sesión
-                session()->forget([
-                    'cart', 
-                    'applied_coupon', 
-                    'openpay_charge_id', 
-                    'checkout_customer_email', 
-                    'checkout_customer_name',
-                    'checkout_customer_password'
-                ]);
+            // Si hay usuario, iniciar sesión automáticamente
+            if ($user) {
+                Auth::login($user);
                 
-                // Guardar flag en sesión para limpiar localStorage en el frontend
-                session()->put('clear_cart_localstorage', true);
-
-                // Si hay usuario, iniciar sesión automáticamente
-                if ($user) {
-                    Auth::login($user);
-                    
-                    // Si el usuario no está verificado, redirigir a verificación
-                    if (!$user->verified_at) {
-                        return redirect()->route('verify.email')
-                            ->with('success', '¡Compra realizada con éxito! Por favor, verifica tu correo electrónico para recibir tus boletos.')
-                            ->with('clear_cart_localstorage', true);
-                    }
-                    
-                    // Si está verificado, redirigir a boletos
-                    return redirect()->route('tickets.my')
-                        ->with('success', '¡Compra realizada con éxito! Revisa tu correo para descargar tus boletos.')
+                // Si el usuario no está verificado, redirigir a verificación
+                if (!$user->verified_at) {
+                    return redirect()->route('verify.email')
+                        ->with('success', '¡Compra realizada con éxito! Por favor, verifica tu correo electrónico para recibir tus boletos.')
                         ->with('clear_cart_localstorage', true);
                 }
                 
-                // Si no hay usuario, redirigir a página de éxito con el ID de la orden
-                return redirect()->route('checkout.success', $order)
+                // Si está verificado, redirigir a boletos
+                return redirect()->route('tickets.my')
                     ->with('success', '¡Compra realizada con éxito! Revisa tu correo para descargar tus boletos.')
                     ->with('clear_cart_localstorage', true);
+            }
+            
+            // Si no hay usuario, redirigir a página de éxito con el ID de la orden
+            return redirect()->route('checkout.success', $order)
+                ->with('success', '¡Compra realizada con éxito! Revisa tu correo para descargar tus boletos.')
+                ->with('clear_cart_localstorage', true);
 
-            } catch (\Exception $e) {
-                // Rollback en caso de error
-                DB::rollBack();
-                
-                Log::error('Error al finalizar orden y crear tickets', [
-                    'charge_id' => $charge->id,
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
-                ]);
+        } catch (\Exception $e) {
+            // Rollback en caso de error
+            DB::rollBack();
+            
+            Log::error('Error al finalizar orden y crear tickets', [
+                'charge_id' => $charge->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
 
-                // Intentar reembolsar en Openpay si es posible
-                try {
-                    $merchantId = config('services.openpay.merchant_id');
-                    $privateKey = config('services.openpay.private_key');
-                    if ($merchantId && $privateKey) {
-                        $openpay = Openpay::getInstance($merchantId, $privateKey, 'MX');
-                        // Nota: Openpay no permite reembolsos automáticos, esto requeriría intervención manual
-                        Log::warning('Orden falló después de pago exitoso - requiere reembolso manual', [
-                            'charge_id' => $charge->id,
-                            'order_error' => $e->getMessage()
-                        ]);
-                    }
-                } catch (\Exception $refundError) {
-                    Log::error('Error al intentar procesar reembolso', [
+            // Intentar reembolsar en Openpay si es posible
+            try {
+                $merchantId = config('services.openpay.merchant_id');
+                $privateKey = config('services.openpay.private_key');
+                if ($merchantId && $privateKey) {
+                    $openpay = Openpay::getInstance($merchantId, $privateKey, 'MX');
+                    // Nota: Openpay no permite reembolsos automáticos, esto requeriría intervención manual
+                    Log::warning('Orden falló después de pago exitoso - requiere reembolso manual', [
                         'charge_id' => $charge->id,
-                        'error' => $refundError->getMessage()
+                        'order_error' => $e->getMessage()
                     ]);
                 }
+            } catch (\Exception $refundError) {
+                Log::error('Error al intentar procesar reembolso', [
+                    'charge_id' => $charge->id,
+                    'error' => $refundError->getMessage()
+                ]);
+            }
 
-                return redirect()->route('checkout.cart')
-                    ->with('error', 'Ocurrió un error al procesar tu compra. El pago fue procesado pero no se pudieron crear los boletos. Por favor, contacta a soporte con el ID de transacción: ' . $charge->id);
+            return redirect()->route('checkout.cart')
+                ->with('error', 'Ocurrió un error al procesar tu compra. El pago fue procesado pero no se pudieron crear los boletos. Por favor, contacta a soporte con el ID de transacción: ' . $charge->id);
             }
         }
     }
@@ -1048,17 +1076,47 @@ class CheckoutController extends Controller
             'coupon_code' => 'required|string|max:255',
         ]);
 
-        $coupon = Coupon::where('code', $request->coupon_code)
+        // Obtener el espacio desde los eventos del carrito
+        $cart = session()->get('cart', []);
+        $spaceId = null;
+        
+        foreach ($cart as $item) {
+            if (isset($item['event_id'])) {
+                $event = \App\Models\Event::find($item['event_id']);
+                if ($event) {
+                    if ($spaceId === null) {
+                        $spaceId = $event->spaces_id;
+                    } elseif ($spaceId !== $event->spaces_id) {
+                        // Si hay eventos de diferentes espacios, no se puede aplicar cupón
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'No se puede aplicar un cupón cuando hay eventos de diferentes espacios en el carrito.'
+                        ], 400);
+                    }
+                }
+            }
+        }
+
+        $coupon = Coupon::where('code', strtoupper($request->coupon_code))
             ->where(function($query) {
                 $query->whereNull('expires_at')
                       ->orWhere('expires_at', '>', now());
-            })
-            ->first();
+            });
+
+        // Si hay un espacio identificado, validar que el cupón pertenezca a ese espacio
+        if ($spaceId !== null) {
+            $coupon->where('spaces_id', $spaceId);
+        } else {
+            // Si no hay espacio, solo permitir cupones globales (sin spaces_id)
+            $coupon->whereNull('spaces_id');
+        }
+
+        $coupon = $coupon->first();
 
         if (!$coupon) {
             return response()->json([
                 'success' => false,
-                'message' => 'Código de cupón no válido o expirado.'
+                'message' => 'Código de cupón no válido, expirado o no disponible para este espacio.'
             ], 400);
         }
 
