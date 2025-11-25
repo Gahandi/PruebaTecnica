@@ -47,7 +47,12 @@
                     <!-- Desktop Navigation -->
                     <div class="hidden md:flex items-center flex-row-reverse gap-4 lg:gap-6">
                         <!-- Admin Menu -->
-                        @if(auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('staff')))
+                        @php
+                            $user = auth()->user();
+                            $isAdmin = $user && method_exists($user, 'hasRole') && $user->hasRole('admin');
+                            $isStaff = $user && method_exists($user, 'hasRole') && $user->hasRole('staff');
+                        @endphp
+                        @if(auth()->check() && ($isAdmin || $isStaff))
                             <div class="relative group" id="admin-dropdown">
                                 <button class="text-gray-700 hover:text-gray-900 flex items-center text-sm lg:text-base" onclick="toggleAdminDropdown()">
                                     <span class="hidden lg:inline">Administración</span>
@@ -57,7 +62,7 @@
                                     </svg>
                                 </button>
                                 <div class="absolute right-0 mt-2 w-52 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200" id="admin-menu" style="display: none;">
-                                    @if(auth()->check() && auth()->user()->hasRole('admin'))
+                                    @if($isAdmin)
                                         <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors border-b border-gray-100">
                                             <div class="flex items-center">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,7 +105,7 @@
                                         </a>
                                     @endif
 
-                                    @if(auth()->check() && auth()->user()->hasRole('admin'))
+                                    @if(auth()->check() && $isAdmin)
                                     <a href="{{ route('admin.checkins.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                         <div class="flex items-center">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,7 +116,7 @@
                                     </a>
                                     @endif
 
-                                    @if(auth()->check() && auth()->user()->hasRole('staff'))
+                                    @if(auth()->check() && $isStaff)
                                     <a href="{{ route('staff.checkins.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                         <div class="flex items-center">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -124,9 +129,6 @@
                                 </div>
                             </div>
                             @endif
-                        <a href="{{ config('app.url') }}/" class="text-xl font-bold text-gray-900">
-                            {{ config('app.name', 'Boletos') }}
-                        </a>
                     </div>
 
                     <!-- Desktop Right Menu -->
@@ -151,14 +153,13 @@
                                 @php
                                     $cart = \App\Helpers\CartHelper::getCartWithEventInfo();
                                     $cartCount = \App\Helpers\CartHelper::getCartCount();
-                                    $cartTotal = \App\Helpers\CartHelper::getCartTotal();
+                                    $subtotal = \App\Helpers\CartHelper::getCartTotal();
+                                    $taxes = $subtotal * 0.16; // 16% IVA
+                                    $cartTotal = $subtotal + $taxes; // Total con IVA
                                 @endphp
                                 @include('partials.cart-dropdown', ['cart' => $cart, 'cartCount' => $cartCount, 'cartTotal' => $cartTotal])
                             </div>
                         </div>
-                        <a href="{{ config('app.url') }}/" class="text-gray-700 hover:text-gray-900 text-sm lg:text-base">
-                            Eventos
-                        </a>
                         @auth
                             <!-- Spaces Menu Dropdown -->
                             <div class="relative group" id="spaces-dropdown">
@@ -265,7 +266,12 @@
                     <a href="{{ config('app.url') }}/" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
                         Eventos
                     </a>
-                    @if(auth()->check() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('staff')))
+                    @php
+                        $mobileUser = auth()->user();
+                        $mobileIsAdmin = $mobileUser && $mobileUser->hasRole('admin');
+                        $mobileIsStaff = $mobileUser && $mobileUser->hasRole('staff');
+                    @endphp
+                    @if(auth()->check() && ($mobileIsAdmin || $mobileIsStaff))
                         <div class="border-t border-gray-200 pt-2 mt-2">
                             <p class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Administración</p>
                             <a href="{{ route('dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
@@ -283,12 +289,12 @@
                             <a href="{{ route('admin.orders.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
                                 Órdenes
                             </a>
-                            @if(auth()->check() && auth()->user()->hasRole('admin'))
+                            @if($mobileIsAdmin)
                                 <a href="{{ route('admin.checkins.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
                                     Check-ins
                                 </a>
                             @endif
-                            @if(auth()->check() && auth()->user()->hasRole('staff'))
+                            @if($mobileIsStaff)
                                 <a href="{{ route('staff.checkins.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
                                     Check-ins
                                 </a>

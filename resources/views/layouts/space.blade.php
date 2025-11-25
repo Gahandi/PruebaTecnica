@@ -148,8 +148,8 @@
                                     <!-- Footer with Total and Actions -->
                                     <div class="px-3 py-2 sm:px-4 sm:py-3 border-t border-gray-200 bg-gray-50 rounded-b-lg flex-shrink-0">
                                         <div class="flex justify-between items-center mb-2 sm:mb-3">
-                                            <span class="text-xs sm:text-sm font-medium text-gray-900">Total:</span>
-                                            <span class="text-base sm:text-lg font-bold text-gray-900">${{ number_format(\App\Helpers\CartHelper::getCartTotal(), 2) }}</span>
+                                            <span class="text-xs sm:text-sm font-medium text-gray-900">Total (IVA incluido):</span>
+                                            <span class="text-base sm:text-lg font-bold text-gray-900">${{ number_format($cartTotal, 2) }}</span>
                                         </div>
 
                                         <div class="flex flex-col sm:flex-row gap-2">

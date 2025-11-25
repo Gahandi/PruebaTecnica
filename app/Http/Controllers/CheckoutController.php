@@ -147,7 +147,9 @@ class CheckoutController extends Controller
     {
         $cart = \App\Helpers\CartHelper::getCartWithEventInfo();
         $cartCount = \App\Helpers\CartHelper::getCartCount();
-        $cartTotal = \App\Helpers\CartHelper::getCartTotal();
+        $subtotal = \App\Helpers\CartHelper::getCartTotal();
+        $taxes = $subtotal * 0.16; // 16% IVA
+        $cartTotal = $subtotal + $taxes; // Total con IVA
 
         $html = view('partials.cart-dropdown', [
             'cart' => $cart,
