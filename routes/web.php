@@ -47,7 +47,7 @@ Route::domain('{subdomain}.' . config('app.url'))
         Route::post('/events', [SpaceEventController::class, 'store'])
             ->name('spaces.events.store')
             ->middleware('space.member');
-            
+
         Route::get('eventos/{event:slug}/editar', [SpaceEventController::class, 'edit'])
             ->name('spaces.events.edit')
             ->middleware('space.member'); // Asumiendo que solo los miembros pueden editar
@@ -56,6 +56,9 @@ Route::domain('{subdomain}.' . config('app.url'))
             ->name('spaces.events.update')
             ->middleware('space.member');
         Route::get('/{event:slug}', [SpaceEventController::class, 'show']);
+        // Mostrar eventos por categoría
+        Route::get('/categories/{id}', [SpaceEventController::class, 'showEvents'])
+            ->name('categories.events');
         // Rutas de checkout para subdominio
     });
 
@@ -97,27 +100,28 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/events', [PublicEventController::class, 'index'])->name('events.public');
 Route::get('/events/{event}', [PublicEventController::class, 'show'])->name('events.show');
 
+
 // Rutas del carrito (sin autenticación)
 Route::middleware(['cart.context', \App\Http\Middleware\HandleCorsForCart::class])->group(function () {
     Route::options('/cart/{any}', function() { return response('', 200); })->where('any', '.*');
     Route::get('/cart/csrf-token', function(Request $request) {
         $origin = $request->headers->get('Origin');
         $response = response()->json(['token' => csrf_token()]);
-        
+
         if ($origin) {
             $response->header('Access-Control-Allow-Origin', $origin)
                      ->header('Access-Control-Allow-Credentials', 'true')
                      ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
                      ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN');
         }
-        
+
         return $response;
     })->name('cart.csrf-token');
     Route::post('/cart/add', [PublicEventController::class, 'addToCart'])->name('cart.add');
     Route::post('/cart/sync', [App\Http\Controllers\CheckoutController::class, 'syncCart'])->name('cart.sync');
     Route::get('/cart', [App\Http\Controllers\CheckoutController::class, 'cart'])->name('cart');
     Route::get('/cart/count', [App\Http\Controllers\CheckoutController::class, 'getCartCount'])->name('cart.count');
-    Route::get('/cart/dropdown', [App\Http\Controllers\CheckoutController::class, 'getCartDropdown'])->name('cart.dropdown');
+    Route::get('/cart/dropdown', [CheckoutController::class, 'getCartDropdown'])->name('cart.dropdown');
 });
 
 // Rutas protegidas por roles

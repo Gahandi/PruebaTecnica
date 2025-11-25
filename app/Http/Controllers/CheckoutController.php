@@ -31,13 +31,13 @@ class CheckoutController extends Controller
     public function __construct()
     {
         $this->middleware('auth')->except([
-            'addToCart', 
-            'cart', 
-            'checkout', 
+            'addToCart',
+            'cart',
+            'checkout',
             'processPayment',
             'handlePaymentCallback',
-            'quickLoginOrRegister', 
-            'getCartCount', 
+            'quickLoginOrRegister',
+            'getCartCount',
             'getCartDropdown',
             'syncCart',
             'applyCoupon',
@@ -52,10 +52,10 @@ class CheckoutController extends Controller
     {
         // Obtener carrito de la sesión
         $cart = session()->get('cart', []);
-        
+
         // Si el carrito está vacío, intentar sincronizar desde localStorage
         // (esto se hará automáticamente desde el frontend)
-        
+
         // Obtener carrito con información completa
         $cart = \App\Helpers\CartHelper::getCartWithEventInfo();
 
@@ -78,9 +78,9 @@ class CheckoutController extends Controller
                 ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
                 ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN');
         }
-        
+
         $cartData = $request->input('cart', []);
-        
+
         // Validar y limpiar datos del carrito, manteniendo las claves originales
         $validatedCart = [];
         foreach ($cartData as $key => $item) {
@@ -91,7 +91,7 @@ class CheckoutController extends Controller
                     // Si la clave no es del formato correcto, generar una nueva
                     $cartKey = $item['ticket_type_id'] . '_' . $item['event_id'];
                 }
-                
+
                 $validatedCart[$cartKey] = [
                     'ticket_type_id' => (int)$item['ticket_type_id'],
                     'event_id' => (int)$item['event_id'],
@@ -104,10 +104,10 @@ class CheckoutController extends Controller
                 ];
             }
         }
-        
+
         // Guardar en sesión (reemplazar completamente)
         session()->put('cart', $validatedCart);
-        
+
         $origin = $request->headers->get('Origin');
         $response = response()->json([
             'success' => true,
@@ -115,7 +115,7 @@ class CheckoutController extends Controller
             'cart' => $validatedCart,
             'cart_count' => count($validatedCart)
         ]);
-        
+
         // Agregar headers CORS
         if ($origin) {
             $response->header('Access-Control-Allow-Origin', $origin)
@@ -123,7 +123,7 @@ class CheckoutController extends Controller
                      ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
                      ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN');
         }
-        
+
         return $response;
     }
 
@@ -258,7 +258,7 @@ class CheckoutController extends Controller
                 // Si no hay event_id, usar TicketType directamente
                 if (isset($item['ticket_type_id'])) {
                     $ticketType = TicketType::findOrFail($item['ticket_type_id']);
-                    
+
                     if ($request->quantity > $ticketType->quantity) {
                         if (request()->ajax()) {
                             return response()->json([
@@ -312,7 +312,7 @@ class CheckoutController extends Controller
         // Buscar el item por la clave exacta o por ticket_type_id y event_id
         $found = false;
         $removedKey = null;
-        
+
         // Primero intentar por clave exacta
         if (isset($cart[$key])) {
             unset($cart[$key]);
@@ -325,11 +325,11 @@ class CheckoutController extends Controller
             if (count($keyParts) === 2) {
                 $ticketTypeId = (int)$keyParts[0];
                 $eventId = (int)$keyParts[1];
-                
+
                 foreach ($cart as $cartKey => $item) {
                     $itemTicketTypeId = isset($item['ticket_type_id']) ? (int)$item['ticket_type_id'] : null;
                     $itemEventId = isset($item['event_id']) ? (int)$item['event_id'] : null;
-                    
+
                     if ($itemTicketTypeId === $ticketTypeId && $itemEventId === $eventId) {
                         unset($cart[$cartKey]);
                         $found = true;
@@ -405,12 +405,12 @@ class CheckoutController extends Controller
                 'openpay_token' => 'required',
                 'device_session_id' => 'required',
             ];
-            
+
             // Si se solicita crear cuenta, validar contraseña
             if ($request->has('create_account') && $request->create_account == '1') {
                 $validationRules['customer_password'] = 'required|string|min:8|confirmed';
             }
-            
+
             $request->validate($validationRules);
 
             $cart = session()->get('cart', []);
@@ -441,7 +441,7 @@ class CheckoutController extends Controller
             session([
                 'checkout_customer_email' => $request->customer_email,
                 'checkout_customer_name' => $request->customer_name,
-                'checkout_customer_password' => $request->has('customer_password') ? $request->customer_password : null,
+                'checkout_customer_password' => $request->customer_password,
             ]);
 
             // Procesar pago con Openpay
@@ -449,7 +449,7 @@ class CheckoutController extends Controller
                 // Validar que las credenciales de Openpay estén configuradas
                 $merchantId = config('services.openpay.merchant_id');
                 $privateKey = config('services.openpay.private_key');
-                
+
                 if (empty($merchantId) || empty($privateKey)) {
                     \Log::error('Credenciales de Openpay no configuradas');
                     return back()->with('error', 'Error de configuración: Las credenciales de Openpay no están configuradas. Por favor, contacta al administrador.');
@@ -488,8 +488,7 @@ class CheckoutController extends Controller
 
                 // Si no hay URL, fue un cargo directo
                 if ($charge->status === 'completed') {
-                    $customerPassword = $request->has('customer_password') ? $request->customer_password : null;
-                    return $this->finalizeOrderAndCreateTickets($charge, $cart, $couponId, $subtotal, $discountAmount, $total, $taxes, $request->customer_email, $request->customer_name, $customerPassword);
+                    return $this->finalizeOrderAndCreateTickets($charge, $cart, $couponId, $subtotal, $discountAmount, $total, $taxes, $request->customer_email, $request->customer_name, $request);
                 } else {
                     return back()->with('error', 'El pago no fue completado. Estado: ' . $charge->status);
                 }
@@ -532,7 +531,7 @@ class CheckoutController extends Controller
             // Validar que las credenciales de Openpay estén configuradas
             $merchantId = config('services.openpay.merchant_id');
             $privateKey = config('services.openpay.private_key');
-            
+
             if (empty($merchantId) || empty($privateKey)) {
                 \Log::error('❌ Credenciales de Openpay no configuradas en callback', [
                     'merchant_id_set' => !empty($merchantId),
@@ -570,8 +569,7 @@ class CheckoutController extends Controller
                 $taxes = $taxableAmount * 0.16;
                 $total = $taxableAmount + $taxes;
 
-                $customerPassword = session('checkout_customer_password');
-                return $this->finalizeOrderAndCreateTickets($charge, $cart, $couponId, $subtotal, $discountAmount, $total, $taxes, $customerEmail, $customerName, $customerPassword);
+                return $this->finalizeOrderAndCreateTickets($charge, $cart, $couponId, $subtotal, $discountAmount, $total, $taxes, $customerEmail, $customerName, $request);
             } else {
                 \Log::warning('Pago 3DS falló o fue declinado', ['status' => $charge->status]);
                 return redirect()->route('checkout.cart')->with('error', 'La autenticación del pago falló. Por favor, intenta de nuevo.');
@@ -600,7 +598,7 @@ class CheckoutController extends Controller
      * @param string|null $customerPassword Contraseña opcional si se crea cuenta
      * @return \Illuminate\Http\RedirectResponse
      */
-    private function finalizeOrderAndCreateTickets($charge, $cart, $couponId, $subtotal, $discountAmount, $total, $taxes, $customerEmail = null, $customerName = null, $customerPassword = null)
+    private function finalizeOrderAndCreateTickets($charge, $cart, $couponId, $subtotal, $discountAmount, $total, $taxes, $customerEmail = null, $customerName = null, Request $request)
     {
         // Validar que el cargo esté completado
         if ($charge->status !== 'completed') {
@@ -626,57 +624,46 @@ class CheckoutController extends Controller
         if (!$customerName) {
             $customerName = session('checkout_customer_name');
         }
-        if (!$customerPassword) {
-            $customerPassword = session('checkout_customer_password');
-        }
-        
+
+        // Obtener contraseña desde sesión (nunca llega por callback)
+        $sessionPassword = session('checkout_customer_password');
+
         // Si no hay datos, intentar obtener del usuario autenticado
         if (!$customerEmail && auth()->check()) {
             $customerEmail = auth()->user()->email;
             $customerName = auth()->user()->name;
         }
-        
         // Si aún no hay datos, usar datos del charge de Openpay
         if (!$customerEmail && isset($charge->customer)) {
             $customerEmail = $charge->customer->email ?? null;
             $customerName = $charge->customer->name ?? 'Cliente';
         }
+        // Buscar o crear usuario por email
+        $user = null;
+        if ($customerEmail) {
+            $user = User::where('email', $customerEmail)->first();
+            if (!$user) {
+                // Determinar contraseña: formulario → sesión → default
+                if ($sessionPassword) {
+                    $password = Hash::make($sessionPassword);
+                } else {
+                    $password = Hash::make('accesoconcedido123');
+                }
 
-        // Validar que tengamos al menos un email
-        if (!$customerEmail) {
-            Log::error('No se puede finalizar orden sin email de cliente', [
-                'charge_id' => $charge->id
-            ]);
-            return redirect()->route('checkout.cart')->with('error', 'No se pudo identificar el correo del cliente.');
-        }
-
-        // Iniciar transacción DB
-        DB::beginTransaction();
-        
-        try {
-            // Buscar o crear usuario por email
-            $user = null;
-            $isNewUser = false;
-            
-            if ($customerEmail) {
-                $user = User::where('email', $customerEmail)->first();
-                
-                // Si no existe, crear usuario
-                if (!$user) {
-                    $isNewUser = true;
-                    // Si se proporcionó contraseña (crear cuenta), usarla; si no, generar una aleatoria
-                    $password = $customerPassword 
-                        ? Hash::make($customerPassword)
-                        : Hash::make(Str::random(32)); // Password aleatorio si no se proporciona
-                    
-                    $user = User::create([
-                        'name' => $customerName ?? 'Cliente',
-                        'last_name' => '',
-                        'email' => $customerEmail,
-                        'password' => $password,
-                        'role' => 'viewer',
-                        'verified' => false,
-                        'verified_at' => null,
+                // Crear usuario nuevo
+                $user = User::create([
+                    'name' => $customerName ?? 'Cliente',
+                    'last_name' => '',
+                    'email' => $customerEmail,
+                    'password' => $password,
+                    'role' => 'viewer',
+                    'verified' => false,
+                ]);
+            } else {
+                // Si el usuario ya existe pero se proporcionó una contraseña nueva, actualizarla
+                if ($request->has('customer_password') && $request->customer_password) {
+                    $user->update([
+                        'password' => Hash::make($request->customer_password)
                     ]);
 
                     // Generar y enviar código de verificación para nuevo usuario
@@ -865,6 +852,11 @@ class CheckoutController extends Controller
         }
     }
 
+        // Limpiar sesión
+        session()->forget(['cart', 'applied_coupon', 'openpay_charge_id', 'checkout_customer_email', 'checkout_customer_name']);
+
+        // Guardar flag en sesión para limpiar localStorage en el frontend
+        session()->put('clear_cart_localstorage', true);
     /**
      * Enviar código de verificación a un usuario nuevo
      */
@@ -943,6 +935,9 @@ class CheckoutController extends Controller
             ]);
             // No lanzar excepción para no interrumpir el flujo de compra
         }
+
+        // Si no hay usuario, redirigir a página de éxito con el ID de la orden
+        return redirect()->route('checkout.success', $order)->with('success', '¡Compra realizada con éxito!')->with('clear_cart_localstorage', true);
     }
 
     /**

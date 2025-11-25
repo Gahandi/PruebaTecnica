@@ -6,9 +6,12 @@ use App\Models\Space;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Traits\S3ImageManager;
 
 class UserSpacesController extends Controller
 {
+    use S3ImageManager;
+
     public function index()
     {
         $user = Auth::user();
@@ -34,34 +37,48 @@ class UserSpacesController extends Controller
     {
         $user = Auth::user();
 
-        // Verificar si el usuario ya tiene un cajón
+        // Verificar si ya tiene un cajón
         if ($user->spaces()->count() > 0) {
             return redirect()->route('user.spaces.index')
-                            ->with('error', 'Ya tienes un cajón de eventos. Solo puedes tener uno por usuario.');
+                ->with('error', 'Ya tienes un cajón de eventos. Solo puedes tener uno por usuario.');
         }
 
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string|max:1000',
             'subdomain' => 'required|string|max:50|unique:spaces,subdomain|alpha_dash',
+            'logo' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'banner' => 'required|image|mimes:jpeg,png,jpg,webp|max:4096',
         ]);
 
+        // SUBIR LOGO
+        $logoFile = $request->file('logo');
+        $logoContent = file_get_contents($logoFile->getPathname());
+        $logoUrl = $this->saveImages($logoContent, 'spaces/logos', uniqid('logo_'));
+
+        // SUBIR BANNER
+        $bannerFile = $request->file('banner');
+        $bannerContent = file_get_contents($bannerFile->getPathname());
+        $bannerUrl = $this->saveImages($bannerContent, 'spaces/banners', uniqid('banner_'));
+
+        // CREAR SPACE
         $space = Space::create([
             'name' => $request->name,
-            'logo' => 'logo.png',
             'description' => $request->description,
             'subdomain' => $request->subdomain,
-            'openpay_id' => 'temp_' . time(), // Temporal
-            'reference' => 'ref_' . time(), // Temporal
+            'logo' => $logoUrl,
+            'banner' => $bannerUrl,
+            'openpay_id' => 'temp_' . time(),
+            'reference' => 'ref_' . time(),
         ]);
 
-        // Asociar el usuario al espacio como admin
+        // Asociar usuario como admin
         $user->spaces()->attach($space->id, [
-            'role_space_id' => 1, // Asumir que 1 es admin
+            'role_space_id' => 1,
         ]);
 
         return redirect()->route('user.spaces.index')
-                        ->with('success', 'Tu cajón de eventos ha sido creado exitosamente');
+                        ->with('success', 'Tu cajón se creó correctamente con su logo y banner.');
     }
 
     public function join()

@@ -83,7 +83,7 @@
                                     <p class="text-gray-500 mb-4">{{ $event->address }}</p>
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center">
-                                            <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}" 
+                                            <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}"
                                                target="_blank" {{-- Es una buena práctica abrir los enlaces externos en una nueva pestaña --}}
                                                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
                                                     {{ $event->space->name }}
@@ -127,20 +127,33 @@
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            @php
+                // intenta obtener el subdominio desde la ruta (si usas rutas con {subdomain})
+                $subdomain = request()->route('subdomain') ?? null;
+
+                // si no existe, derivarlo del host (ej: miSubdominio.tu-dominio.test)
+                if (!$subdomain) {
+                    $host = request()->getHost(); // puede devolver "subdominio.tu-dominio.test"
+                    $parts = explode('.', $host);
+                    $subdomain = count($parts) ? $parts[0] : null;
+                }
+            @endphp
             @foreach($categories as $category)
-            <div class="group cursor-pointer">
-                <div class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl p-8 text-center hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105">
-                    <div class="text-white">
-                        <div class="w-16 h-16 mx-auto mb-4 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
-                            </svg>
+                <div class="group cursor-pointer">
+                    <a href="{{ route('categories.events', ['subdomain' => $subdomain, 'id' => $category['id']]) }}">
+                        <div class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl p-8 text-center hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105">
+                            <div class="text-white">
+                                <div class="w-16 h-16 mx-auto mb-4 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-lg font-semibold">{{ $category['name'] }}</h3>
+                                <p class="text-sm opacity-90">{{ $category['count'] }} eventos</p>
+                            </div>
                         </div>
-                        <h3 class="text-lg font-semibold">{{ $category['name'] }}</h3>
-                        <p class="text-sm opacity-90">{{ $category['count'] }} eventos</p>
-                    </div>
+                    </a>
                 </div>
-            </div>
             @endforeach
         </div>
     </div>
@@ -220,7 +233,7 @@
 
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
-                        <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}" 
+                        <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}"
                             target="_blank" {{-- Es una buena práctica abrir los enlaces externos en una nueva pestaña --}}
                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
                                 {{ $event->space->name }}
