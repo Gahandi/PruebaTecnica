@@ -79,6 +79,19 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->middleware('redirect.after.login');
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+    
+    // Rutas de restablecimiento de contraseña
+    Route::get('/forgot-password', [\App\Http\Controllers\Auth\PasswordResetController::class, 'showForgotPasswordForm'])->name('password.request');
+    Route::post('/forgot-password', [\App\Http\Controllers\Auth\PasswordResetController::class, 'sendResetLink'])->name('password.email');
+    Route::get('/reset-password/{token}', [\App\Http\Controllers\Auth\PasswordResetController::class, 'showResetForm'])->name('password.reset');
+    Route::post('/reset-password', [\App\Http\Controllers\Auth\PasswordResetController::class, 'reset'])->name('password.update');
+});
+
+// Rutas de verificación de email
+Route::prefix('verify')->name('verify.')->group(function () {
+    Route::get('/email', [\App\Http\Controllers\Auth\VerificationController::class, 'showVerificationForm'])->name('email');
+    Route::post('/send-code', [\App\Http\Controllers\Auth\VerificationController::class, 'sendVerificationCode'])->name('send-code');
+    Route::post('/code', [\App\Http\Controllers\Auth\VerificationController::class, 'verifyCode'])->name('code');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
