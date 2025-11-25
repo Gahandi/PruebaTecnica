@@ -223,28 +223,6 @@
                             <a href="{{ route('dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
                                 Dashboard
                             </a>
-                            <a href="{{ route('admin.events.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                                Eventos
-                            </a>
-                            <a href="{{ route('admin.ticket-types.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                                Tipos de Boletos
-                            </a>
-                            <a href="{{ route('admin.coupons.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                                Cupones
-                            </a>
-                            <a href="{{ route('admin.orders.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                                Órdenes
-                            </a>
-                            @if($mobileIsAdmin)
-                                <a href="{{ route('admin.checkins.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                                    Check-ins
-                                </a>
-                            @endif
-                            @if($mobileIsStaff)
-                                <a href="{{ route('staff.checkins.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                                    Check-ins
-                                </a>
-                            @endif
                         </div>
                     @endif
                     @auth
