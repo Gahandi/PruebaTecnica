@@ -88,6 +88,7 @@
                                 <div class="flex-1 overflow-y-auto max-h-64 sm:max-h-80">
                                     @php
                                         $cart = \App\Helpers\CartHelper::getCartWithEventInfo();
+                                        $cartTotal = \App\Helpers\CartHelper::getCartTotal();
                                     @endphp
 
                                     @if(empty($cart))
