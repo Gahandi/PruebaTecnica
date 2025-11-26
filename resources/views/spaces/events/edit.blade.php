@@ -18,7 +18,7 @@
                     <h1 class="text-3xl font-bold">Editar Evento: {{ $event->name }}</h1>
                     <p class="text-blue-100 mt-2 text-lg">En {{ $space->name }}</p>
                 </div>
-                <a href="{{ route('spaces.profile', $space->subdomain) }}" 
+                <a href="{{ route('spaces.profile', $space->subdomain) }}"
                    class="bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-xl hover:bg-white/30 transition-all duration-300 border border-white/30">
                     <div class="flex items-center space-x-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -29,17 +29,17 @@
                 </a>
             </div>
         </div>
-        
+
         {{-- FORMULARIO DE EDICIÓN --}}
-        <form method="POST" 
-              action="{{ route('spaces.events.update', ['subdomain' => $space->subdomain, 'event' => $event->slug]) }}" 
-              enctype="multipart/form-data" 
+        <form method="POST"
+              action="{{ route('spaces.events.update', ['subdomain' => $space->subdomain, 'event' => $event->slug]) }}"
+              enctype="multipart/form-data"
               class="p-8">
             @csrf
             @method('PUT') {{-- NECESARIO para que Laravel sepa que es una actualización --}}
-            
+
             <div class="grid grid-cols-1 gap-12">
-                
+
                 {{-- Columna 1: Info y Ubicación --}}
                 <div classs="space-y-8">
                     {{-- Bloque: Información del Evento --}}
@@ -50,11 +50,11 @@
                             </svg>
                             Información del Evento
                         </h2>
-                        
+
                         <div class="space-y-6">
                             <div>
                                 <label for="name" class="block text-sm font-medium text-gray-700 mb-3">Nombre del Evento</label>
-                                <input type="text" name="name" id="name" 
+                                <input type="text" name="name" id="name"
                                        value="{{ old('name', $event->name) }}" required
                                        class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 @error('name') border-red-500 @enderror"
                                        placeholder="Ej: Conferencia de Tecnología 2024">
@@ -67,7 +67,7 @@
                                     </p>
                                 @enderror
                             </div>
-                
+
                             <div>
                                 <label for="description" class="block text-sm font-medium text-gray-700 mb-3">Descripción</label>
                                 <textarea name="description" id="description" rows="4" required
@@ -82,12 +82,12 @@
                                     </p>
                                 @enderror
                             </div>
-                
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label for="date" class="block text-sm font-medium text-gray-700 mb-3">Fecha y Hora</label>
                                     {{-- Formatear la fecha para input datetime-local --}}
-                                    <input type="datetime-local" name="date" id="date" 
+                                    <input type="datetime-local" name="date" id="date"
                                            value="{{ old('date', \Carbon\Carbon::parse($event->date)->format('Y-m-d\TH:i')) }}" required
                                            class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 @error('date') border-red-500 @enderror">
                                     @error('date')
@@ -99,14 +99,14 @@
                                         </p>
                                     @enderror
                                 </div>
-                
+
                                 <div>
                                     <label for="type_event_id" class="block text-sm font-medium text-gray-700 mb-3">Tipo de Evento</label>
                                     <select name="type_event_id" id="type_event_id" required
                                             class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 @error('type_event_id') border-red-500 @enderror">
                                         <option value="">Selecciona un tipo</option>
                                         @foreach($typeEvents as $typeEvent)
-                                            <option value="{{ $typeEvent->id }}" 
+                                            <option value="{{ $typeEvent->id }}"
                                                 {{ old('type_event_id', $event->type_events_id) == $typeEvent->id ? 'selected' : '' }}>
                                                 {{ $typeEvent->name }}
                                             </option>
@@ -134,11 +134,11 @@
                             </svg>
                             Ubicación del Evento
                         </h2>
-                        
+
                         <div class="space-y-6">
                             <div>
                                 <label for="address" class="block text-sm font-medium text-gray-700 mb-3">Dirección</label>
-                                <input type="text" name="address" id="address" 
+                                <input type="text" name="address" id="address"
                                        value="{{ old('address', $event->address) }}" required
                                        class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 @error('address') border-red-500 @enderror"
                                        placeholder="Ej: Av. Reforma 123, Ciudad de México">
@@ -157,10 +157,10 @@
                                     </p>
                                 @enderror
                             </div>
-                            
+
                             <div class="hidden">
                                 <label for="coordinates" class="block text-sm font-medium text-gray-700 mb-3">Coordenadas GPS</label>
-                                <input type="text" name="coordinates" id="coordinates" 
+                                <input type="text" name="coordinates" id="coordinates"
                                        value="{{ old('coordinates', $event->coordinates) }}"
                                        class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 @error('coordinates') border-red-500 @enderror"
                                        placeholder="Ej: 19.4326, -99.1332">
@@ -173,14 +173,14 @@
                                     </p>
                                 @enderror
                             </div>
-                
+
                             <div class="rounded-xl overflow-hidden border-2 border-gray-200 shadow-lg">
                                 <div id="map" style="height: 400px; width: 100%;"></div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
                 {{-- Columna 2: Temario, Imágenes y Boletos --}}
                 <div class="space-y-8">
                     {{-- Bloque: Temario del Evento --}}
@@ -191,15 +191,15 @@
                             </svg>
                             Temario del Evento
                         </h2>
-                        
+
                         <div>
-                            <textarea id="agenda" name="agenda" 
-                                      class="w-full rounded-xl border-2 border-gray-200 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" 
-                                      rows="12" 
+                            <textarea id="agenda" name="agenda"
+                                      class="w-full rounded-xl border-2 border-gray-200 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
+                                      rows="12"
                                       placeholder="Escribe el temario aquí (usa Markdown)...">{{ old('agenda', $event->agenda) }}</textarea>
                         </div>
                     </div>
-                
+
                     {{-- Bloque: Imágenes del Evento --}}
                     <div class="bg-gradient-to-r from-orange-50 to-yellow-100 rounded-xl p-6">
                         <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
@@ -208,10 +208,10 @@
                             </svg>
                             Imágenes del Evento
                         </h2>
-                        
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label for="banner" class="block text-sm font-medium text-gray-700 mb-3">Banner del Evento (debe de ser de 1080 * 920)</label>
+                                <label for="banner" class="block text-sm font-medium text-gray-700 mb-3">Banner del Evento (debe de ser de 1024 * 768)</label>
                                 <div class="relative">
                                     <input type="file" name="banner" id="banner" accept="image/*"
                                            class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 @error('banner') border-red-500 @enderror">
@@ -227,15 +227,15 @@
                                 @enderror
                                 <div class="mt-4">
                                     {{-- VISTA PREVIA DEL BANNER ACTUAL --}}
-                                    <img id="preview-banner" 
-                                         src="{{ $event->banner }}" 
-                                         class="w-full h-32 object-cover rounded-xl border-2 border-gray-200 shadow-lg {{ $event->banner ? '' : 'hidden' }}" 
-                                         alt="Vista previa banner">
+                                    <img id="preview-banner"
+                                        src="{{ $event->banner ? Storage::url($event->banner) : '' }}"
+                                        class="w-full h-32 object-cover rounded-xl border-2 border-gray-200 shadow-lg {{ $event->banner ? '' : 'hidden' }}"
+                                        alt="Vista previa del banner">
                                 </div>
                             </div>
-                
+
                             <div>
-                                <label for="image" class="block text-sm font-medium text-gray-700 mb-3">Imagen Principal (debe de ser de 1024 * 768 )</label>
+                                <label for="image" class="block text-sm font-medium text-gray-700 mb-3">Imagen Principal (debe de ser de 736 * 308 )</label>
                                 <div class="relative">
                                     <input type="file" name="image" id="image" accept="image/*"
                                            class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 @error('image') border-red-500 @enderror">
@@ -251,10 +251,10 @@
                                 @enderror
                                 <div class="mt-4">
                                     {{-- VISTA PREVIA DE LA IMAGEN PRINCIPAL ACTUAL --}}
-                                    <img id="preview-image" 
-                                         src="{{ $event->image }}" 
-                                         class="w-full h-32 object-cover rounded-xl border-2 border-gray-200 shadow-lg {{ $event->image ? '' : 'hidden' }}" 
-                                         alt="Vista previa imagen">
+                                    <img id="preview-image"
+                                        src="{{ $event->image ? Storage::url($event->image) : '' }}"
+                                        class="w-full h-32 object-cover rounded-xl border-2 border-gray-200 shadow-lg {{ $event->image ? '' : 'hidden' }}"
+                                        alt="Vista previa de la imagen principal">
                                 </div>
                             </div>
                         </div>
@@ -276,14 +276,14 @@
                             @enderror
                             <div class="mt-4">
                                 {{-- VISTA PREVIA DEL ICONO ACTUAL --}}
-                                <img id="preview-icon" 
-                                     src="{{ $event->icon }}" 
-                                     class="w-24 h-24 object-cover rounded-xl border-2 border-gray-200 shadow-lg {{ $event->icon ? '' : 'hidden' }}" 
-                                     alt="Vista previa icono">
+                                <img id="preview-icon"
+                                    src="{{ $event->icon ? Storage::url($event->icon) : '' }}"
+                                    class="w-20 h-20 rounded-xl border-2 border-gray-200 shadow-lg {{ $event->icon ? '' : 'hidden' }}"
+                                    alt="Vista previa del icono">
                             </div>
                         </div>
                     </div>
-                
+
                     {{-- Bloque: Tipos de Boletos --}}
                     <div class="bg-gradient-to-r from-indigo-50 to-blue-100 rounded-xl p-6">
                         <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
@@ -292,11 +292,11 @@
                             </svg>
                             Tipos de Boletos
                         </h2>
-                        
+
                         <div id="ticket-types" class="space-y-4">
                             {{-- INICIO DEL BUCLE PARA PRECARGAR BOLETOS EXISTENTES O OLD INPUT --}}
                             @php $ticketIndex = 0; @endphp
-                            
+
                             {{-- Combinar old input (si hay errores) con datos de la BD --}}
                             @php
                                 $currentTickets = old('ticket_types', $event->ticketTypes->map(function($ticket) {
@@ -318,7 +318,7 @@
                                     $price = $ticketData->price ?? 0;
                                     $quantity = $ticketData->quantity ?? 0;
                                     $nameOther = $ticketData->name_other ?? null; // Si el usuario escribió un nombre
-                                    
+
                                     // Determinar si el campo "other" debe estar visible
                                     $isOtherSelected = false;
                                     if($nameOther) {
@@ -330,12 +330,12 @@
                                         $ticketId = 'other';
                                     }
                                 @endphp
-                                
+
                                 <div class="ticket-type bg-white border-2 border-gray-200 rounded-xl p-6 shadow-sm relative">
                                     @if($ticketIndex > 0)
                                     <div class="flex justify-between items-start mb-4">
                                         <h3 class="font-semibold text-gray-900 text-lg">Tipo de Boleto {{ $ticketIndex + 1 }}</h3>
-                                        <button type="button" onclick="removeTicketType(this)" 
+                                        <button type="button" onclick="removeTicketType(this)"
                                                 class="text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded-lg transition-all duration-200 absolute top-4 right-4">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -347,11 +347,11 @@
                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700 mb-3">Nombre del Boleto</label>
-                                            <select name="ticket_types[{{ $ticketIndex }}][name]" data-index="{{ $ticketIndex }}" 
+                                            <select name="ticket_types[{{ $ticketIndex }}][name]" data-index="{{ $ticketIndex }}"
                                                     class="ticket-name-select w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 {{ $isOtherSelected ? 'hidden' : '' }}" required>
                                                 <option value="">Selecciona un tipo</option>
                                                 @foreach($ticketTypes as $tt)
-                                                    <option value="{{ $tt->id }}" 
+                                                    <option value="{{ $tt->id }}"
                                                         {{ (string)$ticketId === (string)$tt->id ? 'selected' : '' }}>
                                                         {{ $tt->name }}
                                                     </option>
@@ -359,9 +359,9 @@
                                                 <option value="other" {{ $isOtherSelected ? 'selected' : '' }}>Agregar otro tipo</option>
                                             </select>
 
-                                            <input type="text" name="ticket_types[{{ $ticketIndex }}][name_other]" 
+                                            <input type="text" name="ticket_types[{{ $ticketIndex }}][name_other]"
                                                    value="{{ $nameOther }}"
-                                                   class="ticket-name-input w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 {{ $isOtherSelected ? '' : 'hidden' }}" 
+                                                   class="ticket-name-input w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 {{ $isOtherSelected ? '' : 'hidden' }}"
                                                    placeholder="Escribe el nombre del boleto">
                                         </div>
                                         <div>
@@ -384,8 +384,8 @@
                             @endforeach
                             {{-- FIN DEL BUCLE --}}
                         </div>
-                        
-                        <button type="button" onclick="addTicketType()" 
+
+                        <button type="button" onclick="addTicketType()"
                                 class="mt-6 bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-indigo-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center space-x-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -395,13 +395,13 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="flex justify-end space-x-4 mt-12 pt-6 border-t border-gray-200">
-                <a href="{{ route('spaces.profile', $space->subdomain) }}" 
+                <a href="{{ route('spaces.profile', $space->subdomain) }}"
                    class="px-8 py-3 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 font-medium">
                     Cancelar
                 </a>
-                <button type="submit" 
+                <button type="submit"
                         class="px-8 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-xl hover:from-green-700 hover:to-teal-700 transition-all duration-300 shadow-lg hover:shadow-xl font-medium flex items-center space-x-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -423,7 +423,7 @@
 
     <script>
         // Inicializar el contador de boletos con la cantidad de boletos ya cargados
-        let ticketTypeCount = {{ count($currentTickets) }}; 
+        let ticketTypeCount = {{ count($currentTickets) }};
 
         // -----------------------------------------------------------
         // Lógica para cambiar entre select/input (Nombre del Boleto)
@@ -433,26 +433,26 @@
             const ticketTypeContainer = selectElement.closest('.ticket-type');
             const index = selectElement.dataset.index;
             const inputElement = ticketTypeContainer.querySelector('.ticket-name-input');
-            
+
             if (selectElement.value === 'other') {
                 selectElement.classList.add('hidden');
                 selectElement.removeAttribute('required');
-                
+
                 // Si es 'other', enviamos el texto escrito en el input como 'name'
                 selectElement.name = `ticket_types[${index}][name_id]`; // ID de la DB (se ignorará si no es ID)
                 inputElement.name = `ticket_types[${index}][name]`; // El nombre nuevo
-                
+
                 inputElement.classList.remove('hidden');
                 inputElement.setAttribute('required', 'required');
                 inputElement.focus();
             } else {
                 selectElement.classList.remove('hidden');
                 selectElement.setAttribute('required', 'required');
-                
+
                 // Si es un ID, enviamos el ID seleccionado en el select como 'name'
                 selectElement.name = `ticket_types[${index}][name]`; // El ID del ticketType
                 inputElement.name = `ticket_types[${index}][name_other]`; // Nombre del input (se ignora)
-                
+
                 inputElement.classList.add('hidden');
                 inputElement.removeAttribute('required');
                 inputElement.value = ''; // Limpiar el valor si volvemos al select
@@ -465,13 +465,13 @@
         function addTicketType() {
             const container = document.getElementById('ticket-types');
             const newIndex = ticketTypeCount;
-            
+
             // El HTML debe reflejar la adaptación de los campos name para el nuevo índice
             const ticketHtml = `
                 <div class="ticket-type bg-white border-2 border-gray-200 rounded-xl p-6 shadow-sm relative">
                     <div class="flex justify-between items-start mb-4">
                         <h3 class="font-semibold text-gray-900 text-lg">Tipo de Boleto ${newIndex + 1}</h3>
-                        <button type="button" onclick="removeTicketType(this)" 
+                        <button type="button" onclick="removeTicketType(this)"
                                 class="text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded-lg transition-all duration-200 absolute top-4 right-4">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -481,7 +481,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-3">Nombre del Boleto</label>
-                            <select name="ticket_types[${newIndex}][name]" data-index="${newIndex}" 
+                            <select name="ticket_types[${newIndex}][name]" data-index="${newIndex}"
                                     class="ticket-name-select w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" required>
                                 <option value="">Selecciona un tipo</option>
                                 @foreach($ticketTypes as $ticketType)
@@ -489,7 +489,7 @@
                                 @endforeach
                                 <option value="other">Agregar otro tipo</option>
                             </select>
-                            <input type="text" name="ticket_types[${newIndex}][name_other]" 
+                            <input type="text" name="ticket_types[${newIndex}][name_other]"
                                 class="ticket-name-input hidden w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" placeholder="Escribe el nombre del boleto">
                         </div>
                         <div>
@@ -507,9 +507,9 @@
                     </div>
                 </div>
             `;
-            
+
             container.insertAdjacentHTML('beforeend', ticketHtml);
-            
+
             // Vuelve a añadir event listeners al nuevo select
             const newSelect = container.querySelector(`.ticket-name-select[data-index="${newIndex}"]`);
             if (newSelect) {
@@ -517,10 +517,10 @@
                     handleTicketTypeChange(this);
                 });
             }
-            
+
             ticketTypeCount++;
         }
-        
+
         // -----------------------------------------------------------
         // Lógica de eliminación y re-indexación (No requiere cambios)
         // -----------------------------------------------------------
@@ -558,22 +558,22 @@
         // Lógica principal al cargar el documento (Mapa, EasyMDE, Vistas Previas)
         // -----------------------------------------------------------
         document.addEventListener("DOMContentLoaded", function() {
-            
-            // --- 1. Inicializar EasyMDE --- 
+
+            // --- 1. Inicializar EasyMDE ---
             new EasyMDE({
                 element: document.getElementById("agenda"),
                 spellChecker: false,
                 placeholder: "Escribe el temario aquí (usa Markdown)...",
                 minHeight: "250px",
             });
-        
+
             const easyMDE_description = new EasyMDE({
                 element: document.getElementById("description"),
                 spellChecker: false,
                 placeholder: "Escribe la descripción aquí...",
                 minHeight: "150px",
             });
-            
+
             // Asegurar que el textarea oculto de descripción se actualice
             easyMDE_description.codemirror.on('change', () => {
                 document.getElementById('description').value = easyMDE_description.value();
@@ -584,20 +584,20 @@
             // Inicializar event listeners y el estado 'other' para los boletos existentes
             document.querySelectorAll('.ticket-name-select').forEach((select, index) => {
                 // Asegurar que todos tengan data-index (necesario para handleTicketTypeChange)
-                select.dataset.index = index; 
+                select.dataset.index = index;
                 select.addEventListener('change', function() {
                     handleTicketTypeChange(this);
                 });
                 // Ejecutar para configurar el nombre del campo y ocultar/mostrar el input si es 'other' (caso old() o DB)
                 handleTicketTypeChange(select);
             });
-            
-            
+
+
             // --- 3. Script de Previsualización de Imágenes (No requiere cambios) ---
             const previewImage = (inputId, previewId) => {
                 const input = document.getElementById(inputId);
                 const preview = document.getElementById(previewId);
-                if (!input || !preview) return; 
+                if (!input || !preview) return;
 
                 input.addEventListener("change", (event) => {
                     const file = event.target.files[0];
@@ -620,8 +620,8 @@
             previewImage("icon", "preview-icon");
             previewImage("banner", "preview-banner");
             previewImage("image", "preview-image");
-            
-            
+
+
             // --- 4. Validación de Fecha y Hora (No permite editar a fecha pasada) ---
             const dateInput = document.getElementById('date');
             const form = dateInput.closest('form');
@@ -630,12 +630,12 @@
             function setMinDate() {
                 const now = new Date();
                 now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-                let isoNow = now.toISOString().slice(0, 16); 
+                let isoNow = now.toISOString().slice(0, 16);
                 dateInput.min = isoNow;
             }
-            
+
             setMinDate();
-            
+
             form.addEventListener('submit', function(event) {
                 const selectedDate = new Date(dateInput.value);
                 const currentDate = new Date();
@@ -647,8 +647,8 @@
 
                 // Si la fecha seleccionada es anterior a la fecha/hora actual, detener el envío.
                 if (selectedDate <= currentDate) {
-                    event.preventDefault(); 
-                    
+                    event.preventDefault();
+
                     const errorMessage = document.createElement('p');
                     errorMessage.className = 'mt-2 text-sm text-red-600 flex items-center date-validation-error';
                     errorMessage.innerHTML = `
@@ -657,7 +657,7 @@
                         </svg>
                         La fecha y hora del evento no pueden ser anteriores o iguales al momento actual.
                     `;
-                    
+
                     dateInput.parentNode.appendChild(errorMessage);
                     dateInput.focus();
                 }
@@ -669,12 +669,12 @@
                     existingError.remove();
                 }
             });
-            
-            
+
+
             // --- 5. MAPA INTERACTIVO (LEAFLET / OPENSTREETMAP) ---
             const coordInput = document.getElementById('coordinates');
             const addressInput = document.getElementById('address');
-            
+
             // Usar coordenadas de la DB si existen, si no, usar por defecto
             // La vista de edición ya debe precargar $event->coordinates en el input hidden.
             const defaultLat = 19.2826; // Latitud por defecto (Toluca, MX)
@@ -682,7 +682,7 @@
 
             let initialLat = defaultLat;
             let initialLng = defaultLng;
-            
+
             // Intentar parsear las coordenadas existentes del evento
             if(coordInput.value) {
                 const parts = coordInput.value.split(',').map(s => parseFloat(s.trim()));
@@ -703,16 +703,16 @@
 
             // Colocar marcador inicial (basado en DB o en coordenadas viejas)
             marker = L.marker([initialLat, initialLng]).addTo(interactiveMap);
-            
+
             // Evento al hacer clic en el mapa
             interactiveMap.on('click', function(e) {
                 const lat = e.latlng.lat.toFixed(6);
                 const lng = e.latlng.lng.toFixed(6);
 
                 marker.setLatLng(e.latlng); // Mover marcador existente
-                
+
                 coordInput.value = `${lat}, ${lng}`;
-                
+
                 // Geocodificación inversa (coordenadas -> dirección)
                 fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=es`)
                     .then(response => response.json())
@@ -724,25 +724,25 @@
                         }
                     });
             });
-            
+
             // Evento al dejar el input de dirección (Geocodificación)
             addressInput.addEventListener('blur', function() {
                 const address = this.value;
                 if(address && address.length > 5 && addressInput.value !== 'Dirección no encontrada') {
-                    
+
                     fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&accept-language=es`)
                         .then(response => response.json())
                         .then(data => {
                             if(data && data.length > 0) {
                                 const lat = parseFloat(data[0].lat);
                                 const lng = parseFloat(data[0].lon);
-                                
+
                                 coordInput.value = `${lat}, ${lng}`;
                                 marker.setLatLng([lat, lng]);
                                 interactiveMap.setView([lat, lng], 15);
                             } else {
                                 // Si no encuentra la dirección, limpia el input de coordenadas para evitar errores
-                                coordInput.value = ''; 
+                                coordInput.value = '';
                             }
                         });
                 }

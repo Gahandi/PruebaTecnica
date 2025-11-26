@@ -33,8 +33,50 @@
     </div>
 </div>
 
-<!-- Featured Events Carousel -->
+<!-- Categories Section -->
 <div class="bg-gray-50 py-8 sm:py-12 lg:py-16">
+    <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+        <div class="text-center mb-6 sm:mb-8 lg:mb-12">
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-4">Explora por Categoría</h2>
+            <p class="text-sm sm:text-base lg:text-lg text-gray-600">Encuentra eventos que te interesen</p>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+            @php
+                // intenta obtener el subdominio desde la ruta (si usas rutas con {subdomain})
+                $subdomain = request()->route('subdomain') ?? null;
+
+                // si no existe, derivarlo del host (ej: miSubdominio.tu-dominio.test)
+                if (!$subdomain) {
+                    $host = request()->getHost(); // puede devolver "subdominio.tu-dominio.test"
+                    $parts = explode('.', $host);
+                    $subdomain = count($parts) ? $parts[0] : null;
+                }
+            @endphp
+            @foreach($categories as $category)
+                <div class="group cursor-pointer">
+                    <a href="{{ route('categories.events', ['subdomain' => $subdomain, 'id' => $category['id']]) }}">
+                        <div class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-8 text-center hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105">
+                            <div class="text-white">
+                                <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 mx-auto mb-2 sm:mb-3 lg:mb-4 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                                    <svg class="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-sm sm:text-base lg:text-lg font-semibold mb-1">{{ $category['name'] }}</h3>
+                                <p class="text-xs sm:text-sm opacity-90">{{ $category['count'] }} eventos</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</div>
+
+
+<!-- Featured Events Carousel -->
+<div class="py-8 sm:py-12 lg:py-16 bg-white ">
     <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
         <div class="text-center mb-6 sm:mb-8 lg:mb-12">
             <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-4">Eventos Destacados</h2>
@@ -118,46 +160,7 @@
     </div>
 </div>
 
-<!-- Categories Section -->
-<div class="py-8 sm:py-12 lg:py-16 bg-white">
-    <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
-        <div class="text-center mb-6 sm:mb-8 lg:mb-12">
-            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-4">Explora por Categoría</h2>
-            <p class="text-sm sm:text-base lg:text-lg text-gray-600">Encuentra eventos que te interesen</p>
-        </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-            @php
-                // intenta obtener el subdominio desde la ruta (si usas rutas con {subdomain})
-                $subdomain = request()->route('subdomain') ?? null;
-
-                // si no existe, derivarlo del host (ej: miSubdominio.tu-dominio.test)
-                if (!$subdomain) {
-                    $host = request()->getHost(); // puede devolver "subdominio.tu-dominio.test"
-                    $parts = explode('.', $host);
-                    $subdomain = count($parts) ? $parts[0] : null;
-                }
-            @endphp
-            @foreach($categories as $category)
-                <div class="group cursor-pointer">
-                    <a href="{{ route('categories.events', ['subdomain' => $subdomain, 'id' => $category['id']]) }}">
-                        <div class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-8 text-center hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105">
-                            <div class="text-white">
-                                <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 mx-auto mb-2 sm:mb-3 lg:mb-4 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                                    <svg class="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
-                                    </svg>
-                                </div>
-                                <h3 class="text-sm sm:text-base lg:text-lg font-semibold mb-1">{{ $category['name'] }}</h3>
-                                <p class="text-xs sm:text-sm opacity-90">{{ $category['count'] }} eventos</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            @endforeach
-        </div>
-    </div>
-</div>
 
 <!-- All Events Section -->
 <div class="py-8 sm:py-12 lg:py-16 bg-gray-50">

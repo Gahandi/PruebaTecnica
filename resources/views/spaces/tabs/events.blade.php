@@ -83,7 +83,7 @@
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                             {{ $space->name }}
                         </span>
-                        
+
                         <div class="flex space-x-3">
                             {{-- INICIO: Botón "Editar Evento" (Añadido) --}}
                             @auth
@@ -98,7 +98,7 @@
                                 @endif
                             @endauth
                             {{-- FIN: Botón "Editar Evento" (Añadido) --}}
-                            
+
                             <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}/{{ $event->slug }}"
                                class="px-6 py-3 rounded-xl text-white font-semibold transition-all duration-200 hover:shadow-lg transform hover:scale-105"
                                style="background: linear-gradient(135deg, {{ $space->color_primary }}, {{ $space->color_secondary ?? $space->color_primary }});">
@@ -127,7 +127,7 @@
                     <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
-                    Crear Primer Evento
+                    Crear Evento
                 </a>
             @endif
         @endauth

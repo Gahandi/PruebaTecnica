@@ -14,12 +14,12 @@
     <div class="relative overflow-hidden">
         @if($event->banner)
             <div class="relative h-[60vh] min-h-[500px] overflow-hidden">
-                <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}" alt="{{ $event->name }}" 
+                <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->image) }}" alt="{{ $event->name }}"
                      id="hero-image"
                      class="absolute inset-0 w-full h-full object-cover">
-                
+
                 <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-                
+
                 <div class="absolute inset-0 flex items-center justify-center">
                     <div class="text-center text-white px-6 max-w-4xl">
                         <div class="backdrop-blur-lg bg-black/20 rounded-2xl p-8 border border-white/30 shadow-2xl">
@@ -73,7 +73,7 @@
     </div>
 
     <div class="relative z-10 -mt-16 sm:-mt-24 lg:-mt-32 max-w-4xl mx-auto px-2 sm:px-4 lg:px-6 py-6 sm:py-8 lg:py-12 space-y-4 sm:space-y-6 lg:space-y-8">
-        
+
         <div class="bg-white/80 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border border-white/30 shadow-xl">
             <h2 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 sm:mb-6 lg:mb-8 flex items-center">
                 <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,7 +81,7 @@
                 </svg>
                 Información del Evento
             </h2>
-            
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-4 sm:mb-6 lg:mb-8">
                 <div class="flex items-start space-x-4">
                     <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -267,7 +267,7 @@
                             </svg>
                             <span>Agregar al Carrito</span>
             </button>
-                        
+
             <button type="button"
                     id="view_cart_button"
                     onclick="window.location.href='{{ config('app.url') }}/cart'"
@@ -349,20 +349,20 @@ function decreaseQuantity(ticketTypeId) {
 function updateAvailableCount(ticketTypeId, initialQuantity) {
     const input = document.getElementById(`quantity_${ticketTypeId}`);
     const availableElement = document.getElementById(`available_${ticketTypeId}`);
-    
+
     if (!input || !availableElement) {
         return;
     }
-    
+
     const selectedQuantity = parseInt(input.value) || 0;
     const available = Math.max(0, initialQuantity - selectedQuantity);
-    
+
     // Actualizar el max del input para reflejar la disponibilidad real
     input.setAttribute('max', available);
-    
+
     // Actualizar el texto con animación
     availableElement.textContent = available;
-    
+
     // Cambiar color según disponibilidad
     const parentSpan = availableElement.parentElement;
     if (available <= 0) {
@@ -394,7 +394,7 @@ function updateAvailableCount(ticketTypeId, initialQuantity) {
             increaseBtn.classList.remove('opacity-50', 'cursor-not-allowed');
         }
     }
-    
+
     // Animación de cambio
     availableElement.style.transform = 'scale(1.2)';
     availableElement.style.transition = 'transform 0.2s ease';
@@ -470,7 +470,7 @@ async function addToCart() {
         const currentHost = window.location.host;
         const baseUrl = window.CartConfig?.baseUrl || '{{ config("app.url") }}';
         const baseHost = new URL(baseUrl).host;
-        
+
         // Si estamos en un subdominio, obtener el token del dominio base
         if (currentHost !== baseHost && currentHost.includes('.')) {
             try {
@@ -486,7 +486,7 @@ async function addToCart() {
                 console.warn('Could not fetch CSRF token from base domain, using local token');
             }
         }
-        
+
         // Add each ticket type to cart sequentially
         for (const ticket of tickets) {
             const formData = new FormData();
@@ -506,12 +506,12 @@ async function addToCart() {
             });
 
             const responseData = await response.json();
-            
+
             if (!response.ok) {
                 console.error('Error response:', response.status, responseData);
                 throw new Error(responseData.message || 'Error al agregar al carrito');
             }
-            
+
             // El servidor ya guardó el item en la sesión, solo actualizar UI
         }
 
@@ -528,7 +528,7 @@ async function addToCart() {
                 updateAvailableCount({{ $ticketType->id }}, {{ $ticketType->pivot->quantity }});
             }
         @endforeach
-        
+
         // Actualizar total después de resetear
         updateTotal();
 
@@ -536,11 +536,11 @@ async function addToCart() {
         if (typeof window.invalidateCartCache === 'function') {
             window.invalidateCartCache();
         }
-        
+
         if (typeof window.updateCartCount === 'function') {
             await window.updateCartCount();
         }
-        
+
         if (typeof window.updateCartDropdown === 'function') {
             window.updateCartDropdown();
         }
@@ -562,12 +562,12 @@ async function addToCart() {
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
-    const icon = type === 'success' ? 
+    const icon = type === 'success' ?
         '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>' :
         type === 'error' ?
         '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>' :
         '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
-    
+
     notification.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300`;
     notification.innerHTML = `
         <div class="flex items-center">
@@ -596,7 +596,7 @@ function updateCartCount() {
         window.updateCartCount();
         return;
     }
-    
+
     // Fallback local (siempre dominio base)
     fetch('{{ \App\Helpers\CartHelper::getCartCountRoute() }}', {
         method: 'GET',
@@ -610,7 +610,7 @@ function updateCartCount() {
         // Actualizar el contador visual en el header
         const cartButton = document.querySelector('#cart-dropdown button');
         let cartCount = document.querySelector('#cart-dropdown .bg-red-500');
-        
+
         if (data.count > 0) {
             // Si el badge no existe, crearlo
             if (!cartCount && cartButton) {
@@ -618,7 +618,7 @@ function updateCartCount() {
                 cartCount.className = 'absolute -top-0.5 -right-0.5 inline-flex items-center justify-center bg-red-500 text-white text-xs font-bold min-w-[18px] h-[18px] px-1 rounded-full border-2 border-white shadow-lg';
                 cartButton.appendChild(cartCount);
             }
-            
+
             if (cartCount) {
                 cartCount.textContent = data.count;
                 cartCount.style.display = 'inline-flex';
@@ -642,17 +642,17 @@ function showMap() {
         map.invalidateSize();
         return;
     }
-    
+
     @if($event->coordinates)
         const coordinates = "{{ $event->coordinates }}".split(',').map(Number);
         if (coordinates.length === 2) {
             map = L.map('map').setView(coordinates, 15);
-            
+
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '© OpenStreetMap contributors'
             }).addTo(map);
-            
+
             L.marker(coordinates).addTo(map)
                 .bindPopup('<b>{{ $event->name }}</b><br>{{ $event->address }}')
                 .openPopup();
@@ -678,15 +678,15 @@ document.addEventListener('DOMContentLoaded', function() {
     @if($event->coordinates)
         showMap();
     @endif
-    
+
     // Inicializar highlight.js para código en markdown
     hljs.highlightAll();
-    
+
     // Inicializar contadores de disponibilidad
     @foreach($event->ticketTypes as $ticketType)
         updateAvailableCount({{ $ticketType->id }}, {{ $ticketType->pivot->quantity }});
     @endforeach
-    
+
     updateTotal();
 });
 
@@ -698,7 +698,7 @@ document.addEventListener('cartUpdated', function() {
     } else {
         updateCartCount();
     }
-    
+
     // Actualizar dropdown también
     if (typeof window.updateCartDropdown === 'function') {
         window.updateCartDropdown();

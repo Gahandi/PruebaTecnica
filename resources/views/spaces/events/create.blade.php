@@ -19,7 +19,7 @@
                     <h1 class="text-3xl font-bold">Crear Nuevo Evento</h1>
                     <p class="text-blue-100 mt-2 text-lg">En {{ $space->name }}</p>
                 </div>
-                <a href="{{ route('spaces.profile', $space->subdomain) }}" 
+                <a href="{{ route('spaces.profile', $space->subdomain) }}"
                    class="bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-xl hover:bg-white/30 transition-all duration-300 border border-white/30">
                     <div class="flex items-center space-x-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -30,12 +30,12 @@
                 </a>
             </div>
         </div>
-        
+
         <form method="POST" action="{{ route('spaces.events.store', $space->subdomain) }}" enctype="multipart/form-data" class="p-8">
             @csrf
-            
+
             <div class="grid grid-cols-1 gap-12">
-                
+
                 <div classs="space-y-8">
                     <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6">
                         <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
@@ -44,7 +44,7 @@
                             </svg>
                             Información del Evento
                         </h2>
-                        
+
                         <div class="space-y-6">
                             <div>
                                 <label for="name" class="block text-sm font-medium text-gray-700 mb-3">Nombre del Evento</label>
@@ -60,7 +60,7 @@
                                     </p>
                                 @enderror
                             </div>
-                
+
                             <div>
                                 <label for="description" class="block text-sm font-medium text-gray-700 mb-3">Descripción</label>
                                 <textarea name="description" id="description" rows="4" required
@@ -75,7 +75,7 @@
                                     </p>
                                 @enderror
                             </div>
-                
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label for="date" class="block text-sm font-medium text-gray-700 mb-3">Fecha y Hora</label>
@@ -90,7 +90,7 @@
                                         </p>
                                     @enderror
                                 </div>
-                
+
                                 <div>
                                     <label for="type_event_id" class="block text-sm font-medium text-gray-700 mb-3">Tipo de Evento</label>
                                     <select name="type_event_id" id="type_event_id" required
@@ -123,7 +123,7 @@
                             </svg>
                             Ubicación del Evento
                         </h2>
-                        
+
                         <div class="space-y-6">
                             <div>
                                 <label for="address" class="block text-sm font-medium text-gray-700 mb-3">Dirección</label>
@@ -145,7 +145,7 @@
                                     </p>
                                 @enderror
                             </div>
-                            
+
                             <div class="hidden">
                                 <label for="coordinates" class="block text-sm font-medium text-gray-700 mb-3">Coordenadas GPS</label>
                                 <input type="text" name="coordinates" id="coordinates" value="{{ old('coordinates') }}"
@@ -160,14 +160,14 @@
                                     </p>
                                 @enderror
                             </div>
-                
+
                             <div class="rounded-xl overflow-hidden border-2 border-gray-200 shadow-lg">
                                 <div id="map" style="height: 400px; width: 100%;"></div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="space-y-8">
                     <div class="bg-gradient-to-r from-purple-50 to-pink-100 rounded-xl p-6">
                         <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
@@ -176,12 +176,12 @@
                             </svg>
                             Temario del Evento
                         </h2>
-                        
+
                         <div>
                             <textarea id="agenda" name="agenda" class="w-full rounded-xl border-2 border-gray-200 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" rows="12" placeholder="Escribe el temario aquí (usa Markdown)...">{{ old('agenda') }}</textarea>
                         </div>
                     </div>
-                
+
                     <div class="bg-gradient-to-r from-orange-50 to-yellow-100 rounded-xl p-6">
                         <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
                             <svg class="w-6 h-6 mr-3 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -189,10 +189,10 @@
                             </svg>
                             Imágenes del Evento
                         </h2>
-                        
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label for="banner" class="block text-sm font-medium text-gray-700 mb-3">Banner del Evento (debe de ser de 1080 * 920)</label>
+                                <label for="banner" class="block text-sm font-medium text-gray-700 mb-3">Banner del Evento (debe de ser de 1024 * 768)</label>
                                 <div class="relative">
                                     <input type="file" name="banner" id="banner" accept="image/*"
                                            class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 @error('banner') border-red-500 @enderror">
@@ -214,9 +214,9 @@
                                     <img id="preview-banner" class="hidden w-full h-32 object-cover rounded-xl border-2 border-gray-200 shadow-lg" alt="Vista previa banner">
                                 </div>
                             </div>
-                
+
                             <div>
-                                <label for="image" class="block text-sm font-medium text-gray-700 mb-3">Imagen Principal (debe de ser de 1024 * 768 )</label>
+                                <label for="image" class="block text-sm font-medium text-gray-700 mb-3">Imagen Principal (debe de ser de 736 * 308 )</label>
                                 <div class="relative">
                                     <input type="file" name="image" id="image" accept="image/*"
                                            class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 @error('image') border-red-500 @enderror">
@@ -264,7 +264,7 @@
                             </div>
                         </div>
                     </div>
-                
+
                     <div class="bg-gradient-to-r from-indigo-50 to-blue-100 rounded-xl p-6">
                         <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
                             <svg class="w-6 h-6 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -272,7 +272,7 @@
                             </svg>
                             Tipos de Boletos
                         </h2>
-                        
+
                         <div id="ticket-types" class="space-y-4">
                             <div class="ticket-type bg-white border-2 border-gray-200 rounded-xl p-6 shadow-sm">
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -302,8 +302,8 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <button type="button" onclick="addTicketType()" 
+
+                        <button type="button" onclick="addTicketType()"
                                 class="mt-6 bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-indigo-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center space-x-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -313,13 +313,13 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="flex justify-end space-x-4 mt-12 pt-6 border-t border-gray-200">
-                <a href="{{ route('spaces.profile', $space->subdomain) }}" 
+                <a href="{{ route('spaces.profile', $space->subdomain) }}"
                    class="px-8 py-3 border-2 border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 font-medium">
                     Cancelar
                 </a>
-                <button type="submit" 
+                <button type="submit"
                         class="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl font-medium flex items-center space-x-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -345,11 +345,11 @@ function handleTicketTypeChange(selectElement) {
     const ticketTypeContainer = selectElement.closest('.ticket-type');
     const select = ticketTypeContainer.querySelector('.ticket-name-select');
     const input = ticketTypeContainer.querySelector('.ticket-name-input');
-    
+
     if (select.value === 'other') {
         select.classList.add('hidden');
         // CAMBIO: Asegurarse de que el input tenga el nombre correcto
-        select.name = `ticket_types[${select.dataset.index}][name_id]`; 
+        select.name = `ticket_types[${select.dataset.index}][name_id]`;
         input.name = `ticket_types[${select.dataset.index}][name]`;
         input.classList.remove('hidden');
         input.required = true;
@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const existingSelects = document.querySelectorAll('.ticket-name-select');
     existingSelects.forEach((select, index) => {
         // Añadir data-index para manejo de nombres
-        select.dataset.index = index; 
+        select.dataset.index = index;
         select.addEventListener('change', function() {
             handleTicketTypeChange(this);
         });
@@ -382,13 +382,13 @@ function addTicketType() {
     const container = document.getElementById('ticket-types');
     const newTicketType = document.createElement('div');
     newTicketType.className = 'ticket-type bg-white border-2 border-gray-200 rounded-xl p-6 shadow-sm relative';
-    
+
     const currentIndex = ticketTypeCount; // Capturar el índice actual
-    
+
     newTicketType.innerHTML = `
         <div class="flex justify-between items-start mb-4">
             <h3 class="font-semibold text-gray-900 text-lg">Tipo de Boleto ${currentIndex + 1}</h3>
-            <button type="button" onclick="removeTicketType(this)" 
+            <button type="button" onclick="removeTicketType(this)"
                     class="text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded-lg transition-all duration-200 absolute top-4 right-4">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -422,13 +422,13 @@ function addTicketType() {
         </div>
     `;
     container.appendChild(newTicketType);
-    
+
     // Agregar event listener al nuevo select
     const newSelect = newTicketType.querySelector('.ticket-name-select');
     newSelect.addEventListener('change', function() {
         handleTicketTypeChange(this);
     });
-    
+
     ticketTypeCount++;
 }
 
@@ -449,14 +449,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // Obtener la fecha y hora actual, en formato ISO, y recortar los segundos y milisegundos
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); // Convertir a UTC para luego usar la zona horaria local
-        let isoNow = now.toISOString().slice(0, 16); 
-        
+        let isoNow = now.toISOString().slice(0, 16);
+
         // Establecer el atributo 'min' en el input datetime-local
         dateInput.min = isoNow;
     }
-    
+
     setMinDate();
-    
+
     // 2. Agregar un listener al formulario para prevenir el envío si la fecha no es válida
     form.addEventListener('submit', function(event) {
         // Crear objetos Date para la validación
@@ -473,12 +473,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Añadimos un pequeño margen (ej. 1 minuto) para la validación del lado del cliente
         // O más sencillo, comparamos el valor del input con el 'min' establecido.
         // Pero para ser explícitos y seguir tu regla:
-        
+
         // Compara si la fecha seleccionada es menor o igual al momento actual
         // Restamos 1 minuto (60000 ms) para asegurar que el presente inmediato también falle si es necesario.
         if (selectedDate <= currentDate) {
             event.preventDefault(); // Detener el envío del formulario
-            
+
             // Mostrar el mensaje de error personalizado
             const errorMessage = document.createElement('p');
             errorMessage.className = 'mt-2 text-sm text-red-600 flex items-center date-validation-error';
@@ -488,10 +488,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 </svg>
                 No se puede crear un evento con fecha anterior o igual a la de hoy.
             `;
-            
+
             // Insertar el mensaje justo después del input de fecha
             dateInput.parentNode.appendChild(errorMessage);
-            
+
             // Opcional: enfocar el input para que el usuario sepa dónde está el problema
             dateInput.focus();
         }
@@ -510,7 +510,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // --- INICIALIZACIÓN DE EASYMDE (Editor Markdown) --- 
+        // --- INICIALIZACIÓN DE EASYMDE (Editor Markdown) ---
         // Instancia para Agenda
         new EasyMDE({
             element: document.getElementById("agenda"),
@@ -518,7 +518,7 @@ document.addEventListener('DOMContentLoaded', function() {
             placeholder: "Escribe el temario aquí (usa Markdown)...",
             minHeight: "250px",
         });
-    
+
         // Instancia para Descripción
         const easyMDE_description = new EasyMDE({
             element: document.getElementById("description"),
@@ -526,7 +526,7 @@ document.addEventListener('DOMContentLoaded', function() {
             placeholder: "Escribe la descripción aquí...",
             minHeight: "150px",
         });
-        
+
         // Esto asegura que la validación 'required' de Laravel reciba el texto.
         easyMDE_description.codemirror.on('change', () => {
             document.getElementById('description').value = easyMDE_description.value();
@@ -561,10 +561,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // --- MAPA INTERACTIVO (LEAFLET / OPENSTREETMAP) ---
         // Nota: Un mapa de Google editable CON pin REQUIERE API key.
         // Esta es la mejor alternativa (OpenStreetMap) que permite pines y no tiene costo.
-        
+
         const coordInput = document.getElementById('coordinates');
         const addressInput = document.getElementById('address');
-        
+
         // Coordenadas por defecto (Tu ubicación actual, Toluca)
         const defaultLat = 19.2826;
         const defaultLng = -99.6556;
@@ -628,7 +628,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const address = this.value;
             // Evitar búsquedas innecesarias
             if(address && address.length > 5 && address !== 'Dirección no encontrada' && address !== 'Error al obtener dirección') {
-                
+
                 // Geocodificación (dirección -> coordenadas) con Nominatim
                 fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&accept-language=es`)
                     .then(response => response.json())
@@ -636,9 +636,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         if(data && data.length > 0) {
                             const lat = parseFloat(data[0].lat);
                             const lng = parseFloat(data[0].lon);
-                            
+
                             coordInput.value = `${lat}, ${lng}`;
-                            
+
                             if(marker) {
                                 marker.setLatLng([lat, lng]);
                             } else {
