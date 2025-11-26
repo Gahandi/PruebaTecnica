@@ -72,10 +72,22 @@ class TicketController extends Controller
         $spaceId = $event->spaces_id;
         $user = auth()->user();
 
+        // Debug: verificar autenticación
+        \Log::info('Validando ticket - Usuario autenticado:', [
+            'user_id' => $user?->id,
+            'is_authenticated' => auth()->check(),
+            'session_id' => session()->getId(),
+            'space_id' => $spaceId
+        ]);
+
         if (!$user) {
             return response()->json([
                 'success' => false,
-                'message' => 'Usuario no autenticado'
+                'message' => 'Usuario no autenticado',
+                'debug' => [
+                    'auth_check' => auth()->check(),
+                    'session_id' => session()->getId(),
+                ]
             ], 401);
         }
 

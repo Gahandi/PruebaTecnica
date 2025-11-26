@@ -102,7 +102,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         renderMessage(`<p class="text-gray-500">Validando boleto <strong>${ticketId}</strong>...</p>`);
 
-        fetch(`/api/v1/validate-ticket/${ticketId}`)
+        fetch(`/api/v1/validate-ticket/${ticketId}`, {
+            credentials: 'include',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
             .then(r => r.json())
             .then(data => {
                 if (data.success) 

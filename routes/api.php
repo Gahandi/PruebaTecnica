@@ -33,7 +33,16 @@ Route::prefix('v1')->middleware(['api.security', 'throttle:60,1'])->group(functi
     
     // Tickets
     Route::get('/tickets/{id}', [TicketController::class, 'show']);
-    Route::get('/validate-ticket/{id}', [TicketController::class, 'validateTicket']);
+    
+    // Ruta protegida que requiere autenticación web (sesión)
+    Route::middleware([
+        \App\Http\Middleware\EncryptCookies::class,
+        \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+        \Illuminate\Session\Middleware\StartSession::class,
+        'auth:web'
+    ])->group(function () {
+        Route::get('/validate-ticket/{id}', [TicketController::class, 'validateTicket']);
+    });
     
     // Coupons
     Route::post('/coupons/validate', [CouponController::class, 'validateCoupon']);
