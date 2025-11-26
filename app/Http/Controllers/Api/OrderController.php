@@ -42,11 +42,11 @@ class OrderController extends Controller
                 $ticketType = TicketType::findOrFail($ticketData['ticket_type_id']);
                 
                 if ($ticketType->event_id != $event->id) {
-                    throw new \Exception('Ticket type does not belong to this event');
+                    throw new \Exception('El tipo de boleto no pertenece a este evento');
                 }
 
                 if ($ticketType->quantity < $ticketData['quantity']) {
-                    throw new \Exception('Not enough tickets available for ' . $ticketType->name);
+                    throw new \Exception('No hay suficientes boletos disponibles para ' . $ticketType->name);
                 }
 
                 $subtotal = $ticketType->price * $ticketData['quantity'];
@@ -149,7 +149,7 @@ class OrderController extends Controller
         if (!$order) {
             return response()->json([
                 'success' => false,
-                'message' => 'Order not found'
+                'message' => 'Orden no encontrada'
             ], 404);
         }
         

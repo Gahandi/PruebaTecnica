@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Models\Event;
 use App\Models\Checkin;
+use App\Models\SpacesUser;
 use Illuminate\Support\Facades\Auth;
 
 class TicketController extends Controller
@@ -23,7 +24,7 @@ class TicketController extends Controller
         if (!$ticket) {
             return response()->json([
                 'success' => false,
-                'message' => 'Ticket not found'
+                'message' => 'Boleto no encontrado'
             ], 404);
         }
         
@@ -38,31 +39,79 @@ class TicketController extends Controller
      */
     public function validateTicket(string $id): JsonResponse
     {
-        $ticket = Ticket::with(['order.event.space', 'checkin'])->find($id);
+        // 1. Buscar el ticket por ID
+        $ticket = Ticket::with(['checkin'])->find($id);
 
         if (!$ticket) {
             return response()->json([
                 'success' => false,
-                'message' => 'Ticket not found'
+                'message' => 'Boleto no encontrado'
             ], 404);
         }
 
-        $event = $ticket->order->event;
-        $space = $event->space;
-        $user = Auth::user();
-
-        // 🔐 VALIDACIÓN REAL (usa spaces_users)
-        $userSpacesIds = $user->spaces->pluck('id')->toArray();
-
-        if (!in_array($space->id, $userSpacesIds)) {
+        // 2. Obtener el event_id del ticket
+        $eventId = $ticket->event_id;
+        
+        if (!$eventId) {
             return response()->json([
                 'success' => false,
-                'message' => 'Este boleto NO pertenece a tu espacio',
+                'message' => 'El boleto no tiene un evento asociado'
+            ], 400);
+        }
+
+        // 3. Buscar el evento y su space
+        $event = Event::with('space')->find($eventId);
+        
+        if (!$event) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Evento no encontrado'
+            ], 404);
+        }
+
+        $spaceId = $event->spaces_id;
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Usuario no autenticado'
+            ], 401);
+        }
+
+        // 4. Buscar en spaces_users si el usuario tiene un rol diferente de viewer en ese espacio
+        $spaceUser = SpacesUser::where('user_id', $user->id)
+            ->where('space_id', $spaceId)
+            ->whereNull('deleted_at')
+            ->with('role_space')
+            ->first();
+
+        if (!$spaceUser) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No tienes acceso a este espacio',
                 'data' => [
-                    'ticket' => $ticket,
-                    'event' => $event,
-                    'space_of_ticket' => $space->name,
-                    'your_spaces' => $user->spaces->pluck('name'),
+                    'ticket_id' => $ticket->id,
+                    'event_id' => $eventId,
+                    'space_id' => $spaceId,
+                    'space_name' => $event->space->name ?? 'N/A',
+                ]
+            ], 403);
+        }
+
+        // 5. Verificar que el rol sea diferente de 'viewer'
+        $roleName = $spaceUser->role_space->name ?? null;
+        
+        if ($roleName === 'viewer') {
+            return response()->json([
+                'success' => false,
+                'message' => 'No tienes permisos para escanear boletos. Solo los roles admin y staff pueden escanear.',
+                'data' => [
+                    'ticket_id' => $ticket->id,
+                    'event_id' => $eventId,
+                    'space_id' => $spaceId,
+                    'space_name' => $event->space->name ?? 'N/A',
+                    'your_role' => $roleName,
                 ]
             ], 403);
         }
@@ -70,7 +119,7 @@ class TicketController extends Controller
         if ($ticket->used) {
             return response()->json([
                 'success' => false,
-                'message' => 'Ticket already used',
+                'message' => 'Este boleto ya ha sido utilizado',
                 'data' => [
                     'event'   => $event,
                     'ticket'  => $ticket,
@@ -90,7 +139,7 @@ class TicketController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Ticket valid',
+            'message' => 'Boleto válido',
             'data' => [
                 'ticket' => $ticket,
                 'event' => $event,

@@ -32,7 +32,7 @@ class EventController extends Controller
         if (!$event) {
             return response()->json([
                 'success' => false,
-                'message' => 'Event not found'
+                'message' => 'Evento no encontrado'
             ], 404);
         }
         

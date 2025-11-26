@@ -55,7 +55,7 @@ class CheckinController extends Controller
             ]);
 
             $qrCode = $request->qr_code;
-            \Log::info('Check-in attempt with QR code: ' . $qrCode);
+            \Log::info('Intento de check-in con código QR: ' . $qrCode);
             
             $ticket = null;
             
@@ -63,24 +63,24 @@ class CheckinController extends Controller
             if (strpos($qrCode, '/checkin/') !== false) {
                 // Extraer el ID del ticket de la URL
                 $ticketId = basename(parse_url($qrCode, PHP_URL_PATH));
-                \Log::info('Extracted ticket ID from URL: ' . $ticketId);
+                \Log::info('ID de boleto extraído de la URL: ' . $ticketId);
                 $ticket = Ticket::find($ticketId);
             } else {
                 // Primero intentar buscar por ID del ticket (UUID)
                 if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $qrCode)) {
-                    \Log::info('Searching by ticket ID: ' . $qrCode);
+                    \Log::info('Buscando por ID de boleto: ' . $qrCode);
                     $ticket = Ticket::find($qrCode);
                 }
                 
                 // Si no se encontró por ID, buscar por qr_code
                 if (!$ticket) {
-                    \Log::info('Searching by qr_code: ' . $qrCode);
+                    \Log::info('Buscando por qr_code: ' . $qrCode);
                     $ticket = Ticket::where('qr_code', $qrCode)->first();
                 }
             }
 
             if (!$ticket) {
-                \Log::info('Ticket not found for QR code: ' . $qrCode);
+                \Log::info('Boleto no encontrado para el código QR: ' . $qrCode);
                 return response()->json([
                     'success' => false,
                     'message' => 'Boleto no encontrado. Verifica el código QR.',
@@ -92,7 +92,7 @@ class CheckinController extends Controller
 
             // Verificar si el boleto ya fue usado
             if ($ticket->checkin) {
-                \Log::info('Ticket already used: ' . $ticket->id);
+                \Log::info('Boleto ya utilizado: ' . $ticket->id);
                 return response()->json([
                     'success' => false,
                     'message' => 'Este boleto ya ha sido utilizado.',
@@ -113,7 +113,7 @@ class CheckinController extends Controller
                 'scanned_by' => auth()->id(),
             ]);
 
-            \Log::info('Check-in successful for ticket: ' . $ticket->id);
+            \Log::info('Check-in exitoso para el boleto: ' . $ticket->id);
 
             return response()->json([
                 'success' => true,
@@ -128,8 +128,8 @@ class CheckinController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
-            \Log::error('Check-in error: ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            \Log::error('Error en check-in: ' . $e->getMessage());
+            \Log::error('Traza del error: ' . $e->getTraceAsString());
             
             return response()->json([
                 'success' => false,
