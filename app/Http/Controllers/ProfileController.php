@@ -19,32 +19,41 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         
+        // Validar solo información personal (sin campos de contraseña)
         $request->validate([
             'name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'current_password' => 'nullable|string',
-            'password' => 'nullable|string|min:8|confirmed',
         ]);
 
         $user->name = $request->name;
         $user->last_name = $request->last_name;
         $user->phone = $request->phone;
         $user->email = $request->email;
-
-        // Update password if provided
-        if ($request->filled('password')) {
-            if ($request->filled('current_password')) {
-                if (!Hash::check($request->current_password, $user->password)) {
-                    return back()->withErrors(['current_password' => 'La contraseña actual es incorrecta.']);
-                }
-            }
-            $user->password = Hash::make($request->password);
-        }
-
         $user->save();
 
-        return back()->with('success', 'Perfil actualizado correctamente.');
+        return back()->with('success', 'Información personal actualizada correctamente.');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $user = Auth::user();
+        
+        $request->validate([
+            'current_password' => 'required|string',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        // Verificar contraseña actual
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'La contraseña actual es incorrecta.']);
+        }
+
+        // Actualizar contraseña
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return back()->with('success', 'Contraseña actualizada correctamente.');
     }
 }

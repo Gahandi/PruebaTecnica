@@ -11,21 +11,14 @@
                 <h1 class="text-3xl font-bold text-gray-900">Mi Perfil</h1>
                 <p class="text-gray-600 mt-1">Gestiona tu información personal</p>
             </div>
-            <div class="flex space-x-3">
-                <button id="editBtn" onclick="toggleEdit()" 
-                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                    </svg>
-                    Editar
-                </button>
-                <button id="cancelBtn" onclick="toggleEdit()" 
-                        class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors hidden">
-                    Cancelar
-                </button>
-            </div>
         </div>
     </div>
+
+    @if(session('success'))
+        <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg relative" role="alert">
+            <span class="block sm:inline">{{ session('success') }}</span>
+        </div>
+    @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Profile Information -->
@@ -105,10 +98,29 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-end space-x-4 mt-8">
+                    <!-- Botones de acción dentro del formulario -->
+                    <div class="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
+                        <button type="button" 
+                                id="editBtn" 
+                                onclick="toggleEdit()" 
+                                class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                            Editar Información
+                        </button>
+                        <button type="button" 
+                                id="cancelBtn" 
+                                onclick="toggleEdit()" 
+                                class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors hidden">
+                            Cancelar
+                        </button>
                         <button type="submit" 
                                 id="saveBtn"
-                                class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors hidden">
+                                class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors hidden flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
                             Guardar Cambios
                         </button>
                     </div>
@@ -118,7 +130,7 @@
             <!-- Change Password -->
             <div class="bg-white shadow-xl rounded-xl p-8 mt-6 border border-gray-100">
                 <h2 class="text-2xl font-bold text-gray-900 mb-6">Cambiar Contraseña</h2>
-                <form method="POST" action="{{ route('profile.update') }}">
+                <form method="POST" action="{{ route('profile.password.update') }}" id="passwordForm">
                     @csrf
                     @method('PUT')
                     
@@ -141,10 +153,12 @@
                                    name="password" 
                                    id="password"
                                    required
+                                   minlength="8"
                                    class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500 @error('password') border-red-500 @enderror">
                             @error('password')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
+                            <p class="mt-1 text-xs text-gray-500">Mínimo 8 caracteres</p>
                         </div>
                         
                         <div>
@@ -153,13 +167,19 @@
                                    name="password_confirmation" 
                                    id="password_confirmation"
                                    required
+                                   minlength="8"
                                    class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500">
+                            <p id="passwordMatchMessage" class="mt-1 text-xs"></p>
                         </div>
                     </div>
 
-                    <div class="flex justify-end space-x-4 mt-8">
+                    <div class="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
                         <button type="submit" 
-                                class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
+                                id="changePasswordBtn"
+                                class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                            </svg>
                             Cambiar Contraseña
                         </button>
                     </div>
@@ -256,5 +276,47 @@ function toggleEdit() {
         });
     }
 }
+
+// Validación en tiempo real de contraseñas
+document.addEventListener('DOMContentLoaded', function() {
+    const password = document.getElementById('password');
+    const passwordConfirmation = document.getElementById('password_confirmation');
+    const passwordMatchMessage = document.getElementById('passwordMatchMessage');
+    const changePasswordBtn = document.getElementById('changePasswordBtn');
+    
+    function validatePasswords() {
+        const passwordValue = password.value;
+        const confirmationValue = passwordConfirmation.value;
+        
+        if (confirmationValue.length === 0) {
+            passwordMatchMessage.textContent = '';
+            passwordConfirmation.classList.remove('border-red-500', 'border-green-500');
+            changePasswordBtn.disabled = false;
+            return;
+        }
+        
+        if (passwordValue !== confirmationValue) {
+            passwordMatchMessage.textContent = 'Las contraseñas no coinciden';
+            passwordMatchMessage.classList.remove('text-green-600');
+            passwordMatchMessage.classList.add('text-red-600');
+            passwordConfirmation.classList.remove('border-green-500');
+            passwordConfirmation.classList.add('border-red-500');
+            changePasswordBtn.disabled = true;
+        } else {
+            passwordMatchMessage.textContent = 'Las contraseñas coinciden';
+            passwordMatchMessage.classList.remove('text-red-600');
+            passwordMatchMessage.classList.add('text-green-600');
+            passwordConfirmation.classList.remove('border-red-500');
+            passwordConfirmation.classList.add('border-green-500');
+            changePasswordBtn.disabled = false;
+        }
+    }
+    
+    password.addEventListener('input', validatePasswords);
+    passwordConfirmation.addEventListener('input', validatePasswords);
+    
+    // Validar al cargar si hay valores
+    validatePasswords();
+});
 </script>
 @endsection
