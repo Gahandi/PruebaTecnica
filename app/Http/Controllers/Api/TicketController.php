@@ -70,7 +70,7 @@ class TicketController extends Controller
         }
 
         $spaceId = $event->spaces_id;
-        $user = Auth::user();
+        $user = auth()->user();
 
         if (!$user) {
             return response()->json([
