@@ -30,25 +30,25 @@ use Illuminate\Http\Request;
 Route::domain('{subdomain}.' . config('app.url'))
     ->middleware(['subdomain.session', 'cart.context'])
     ->group(function () {
-        Route::get('/scanner', [ScannerController::class, 'index'])->name('scanner.index');
+        Route::get('/scanner', [ScannerController::class, 'index'])->name('scanner.index')->middleware(['auth', 'email.verified']);
         Route::get('/', [SpaceController::class, 'show'])->name('spaces.profile');
-        Route::get('/edit', [SpaceController::class, 'edit'])->name('spaces.edit');
-        Route::put('/update', [SpaceController::class, 'update'])->name('spaces.update');
-        Route::post('/update-profile', [SpaceController::class, 'updateProfile'])->name('spaces.update-profile');
+        Route::get('/edit', [SpaceController::class, 'edit'])->name('spaces.edit')->middleware(['auth', 'email.verified']);
+        Route::put('/update', [SpaceController::class, 'update'])->name('spaces.update')->middleware(['auth', 'email.verified']);
+        Route::post('/update-profile', [SpaceController::class, 'updateProfile'])->name('spaces.update-profile')->middleware(['auth', 'email.verified']);
         Route::get('/events/create', [SpaceEventController::class, 'create'])
             ->name('spaces.events.create')
-            ->middleware('space.member');
+            ->middleware(['auth', 'email.verified', 'space.member']);
         Route::post('/events', [SpaceEventController::class, 'store'])
             ->name('spaces.events.store')
-            ->middleware('space.member');
+            ->middleware(['auth', 'email.verified', 'space.member']);
 
         Route::get('eventos/{event:slug}/editar', [SpaceEventController::class, 'edit'])
             ->name('spaces.events.edit')
-            ->middleware('space.member'); // Asumiendo que solo los miembros pueden editar
+            ->middleware(['auth', 'email.verified', 'space.member']); // Asumiendo que solo los miembros pueden editar
 
         Route::put('eventos/{event:slug}', [SpaceEventController::class, 'update'])
             ->name('spaces.events.update')
-            ->middleware('space.member');
+            ->middleware(['auth', 'email.verified', 'space.member']);
         Route::get('/{event:slug}', [SpaceEventController::class, 'show']);
         // Mostrar eventos por categoría
         Route::get('/categories/{id}', [SpaceEventController::class, 'showEvents'])
@@ -57,7 +57,7 @@ Route::domain('{subdomain}.' . config('app.url'))
         // Rutas de cupones por espacio (solo para admins del espacio)
         Route::prefix('coupons')
             ->name('spaces.coupons.')
-            ->middleware(['auth', 'space.member'])
+            ->middleware(['auth', 'email.verified', 'space.member'])
             ->group(function () {
                 Route::get('/', [SpaceCouponController::class, 'index'])->name('index');
                 Route::get('/create', [SpaceCouponController::class, 'create'])->name('create');
@@ -133,16 +133,16 @@ Route::middleware(['cart.context', \App\Http\Middleware\HandleCorsForCart::class
 });
 
 // Rutas protegidas por roles
-Route::middleware(['auth', 'role:admin,staff'])->group(function () {
+Route::middleware(['auth', 'email.verified', 'role:admin,staff'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'email.verified', 'role:admin'])->group(function () {
     Route::get('/admin', [DashboardController::class, 'index'])->name('admin.index');
 });
 
 // Ruta de prueba sin middleware de roles
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'email.verified'])->group(function () {
     Route::get('/staff/checkins', [StaffCheckinController::class, 'index'])->name('staff.checkins.index');
     Route::post('/staff/checkins', [StaffCheckinController::class, 'store'])->name('staff.checkins.store');
     Route::get('/staff/checkins/create', [StaffCheckinController::class, 'create'])->name('staff.checkins.create');
@@ -173,7 +173,7 @@ Route::prefix('checkout')
     });
 
 // Rutas para todos los usuarios autenticados
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'email.verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');

@@ -21,9 +21,12 @@ class EnsureEmailVerified
 
         $user = auth()->user();
 
+        // Verificar si el usuario está verificado (verificar ambos campos)
+        $isVerified = $user->verified_at || $user->verified;
+
         // Si el usuario no está verificado, redirigir a verificación
-        // Excluir rutas de verificación para evitar loops
-        if (!$user->verified_at && !$request->routeIs('verify.*')) {
+        // Excluir rutas de verificación, logout y públicas para evitar loops
+        if (!$isVerified && !$request->routeIs('verify.*') && !$request->routeIs('logout') && !$request->routeIs('home') && !$request->routeIs('events.*')) {
             return redirect()->route('verify.email')
                 ->with('warning', 'Por favor, verifica tu correo electrónico para continuar.');
         }

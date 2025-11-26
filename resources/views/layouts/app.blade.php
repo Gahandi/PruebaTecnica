@@ -46,13 +46,14 @@
 
                     <!-- Desktop Navigation -->
                     <div class="hidden md:flex items-center flex-row-reverse gap-4 lg:gap-6">
-                                                    <!-- Admin Menu -->
+                        <!-- Admin Menu -->
                         @php
                             $user = auth()->user();
                             $isAdmin = $user && ($user->role === 'admin');
                             $isStaff = $user && ($user->role === 'staff');
+                            $isVerified = $user && ($user->verified_at || $user->verified);
                         @endphp
-                        @if(auth()->check() && ($isAdmin || $isStaff))
+                        @if(auth()->check() && $isVerified && ($isAdmin || $isStaff))
                             <div class="relative group" id="admin-dropdown">
                                 <button class="text-gray-700 hover:text-gray-900 flex items-center text-sm lg:text-base" onclick="toggleAdminDropdown()">
                                     <span class="hidden lg:inline">Administración</span>
@@ -74,7 +75,7 @@
                                     @endif
                                 </div>
                             </div>
-                            @endif
+                        @endif
                     </div>
 
                     <!-- Desktop Right Menu -->
@@ -107,45 +108,52 @@
                             </div>
                         </div>
                         @auth
-                            <!-- Spaces Menu Dropdown -->
-                            <div class="relative group" id="spaces-dropdown">
-                                <button class="text-gray-700 hover:text-gray-900 flex items-center" onclick="toggleSpacesDropdown()">
-                                    <svg class="w-6 h-6 transition-transform duration-200 hover:scale-110" id="spaces-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                                    </svg>
-                                    <span class="ml-1">Espacios</span>
-                                    <svg class="w-4 h-4 ml-1 transition-transform duration-200" id="spaces-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </button>
-                                <div class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200" id="spaces-menu" style="display: none;">
-                                    @if(auth()->user()->spaces->count() > 0)
-                                        @foreach(auth()->user()->spaces as $space)
-                                            <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                                <div class="flex items-center">
-                                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                                                    </svg>
-                                                    <div>
-                                                        <div class="font-medium">{{ $space->name }}</div>
-                                                        <div class="text-xs text-gray-500">{{ $space->subdomain }}.{{ \App\Helpers\SubdomainHelper::getBaseDomain() }}</div>
+                            @php
+                                $currentUser = auth()->user();
+                                $isUserVerified = $currentUser && ($currentUser->verified_at || $currentUser->verified);
+                            @endphp
+                            
+                            @if($isUserVerified)
+                                <!-- Spaces Menu Dropdown -->
+                                <div class="relative group" id="spaces-dropdown">
+                                    <button class="text-gray-700 hover:text-gray-900 flex items-center" onclick="toggleSpacesDropdown()">
+                                        <svg class="w-6 h-6 transition-transform duration-200 hover:scale-110" id="spaces-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                        </svg>
+                                        <span class="ml-1">Espacios</span>
+                                        <svg class="w-4 h-4 ml-1 transition-transform duration-200" id="spaces-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </button>
+                                    <div class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200" id="spaces-menu" style="display: none;">
+                                        @if($currentUser->spaces->count() > 0)
+                                            @foreach($currentUser->spaces as $space)
+                                                <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                    <div class="flex items-center">
+                                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                                        </svg>
+                                                        <div>
+                                                            <div class="font-medium">{{ $space->name }}</div>
+                                                            <div class="text-xs text-gray-500">{{ $space->subdomain }}.{{ \App\Helpers\SubdomainHelper::getBaseDomain() }}</div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </a>
-                                        @endforeach
-                                        <div class="border-t border-gray-100 my-1"></div>
-                                    @endif
+                                                </a>
+                                            @endforeach
+                                            <div class="border-t border-gray-100 my-1"></div>
+                                        @endif
 
-                                    <a href="{{ route('user.spaces.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                        <div class="flex items-center">
-                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                            </svg>
-                                            Gestionar Mis Espacios
-                                        </div>
-                                    </a>
+                                        <a href="{{ route('user.spaces.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                            <div class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                                </svg>
+                                                Gestionar Mis Espacios
+                                            </div>
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
+                            @endif
 
                             <!-- User Menu Dropdown -->
                             <div class="relative group" id="user-dropdown">
@@ -160,28 +168,29 @@
                                 <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200" id="user-menu" style="display: none;">
                                     <!-- User Info -->
                                     <div class="px-4 py-3 border-b border-gray-100">
-                                        <p class="text-sm font-medium text-gray-900">{{ auth()->user()->name }} {{ auth()->user()->last_name }}</p>
-                                        <p class="text-xs text-gray-500">{{ auth()->user()->email }}</p>
+                                        <p class="text-sm font-medium text-gray-900">{{ $currentUser->name }} {{ $currentUser->last_name }}</p>
+                                        <p class="text-xs text-gray-500">{{ $currentUser->email }}</p>
                                     </div>
 
-                                    <a href="{{ config('app.url') }}/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                        <div class="flex items-center">
-                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                            </svg>
-                                            Perfil
-                                        </div>
-                                    </a>
+                                    @if($isUserVerified)
+                                        <a href="{{ config('app.url') }}/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                            <div class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                                </svg>
+                                                Perfil
+                                            </div>
+                                        </a>
 
-                                    <a href="{{ config('app.url') }}/my-tickets" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                        <div class="flex items-center">
-                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
-                                            </svg>
-                                            Mis Boletos
-                                        </div>
-                                    </a>
-
+                                        <a href="{{ config('app.url') }}/my-tickets" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                            <div class="flex items-center">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
+                                                </svg>
+                                                Mis Boletos
+                                            </div>
+                                        </a>
+                                    @endif
 
                                     <!-- Logout -->
                                     <form method="POST" action="{{ config('app.url') }}/logout" class="block">
@@ -216,8 +225,9 @@
                         $mobileUser = auth()->user();
                         $mobileIsAdmin = $mobileUser && ($mobileUser->role === 'admin');
                         $mobileIsStaff = $mobileUser && ($mobileUser->role === 'staff');
+                        $mobileIsVerified = $mobileUser && ($mobileUser->verified_at || $mobileUser->verified);
                     @endphp
-                    @if(auth()->check() && ($mobileIsAdmin || $mobileIsStaff))
+                    @if(auth()->check() && $mobileIsVerified && ($mobileIsAdmin || $mobileIsStaff))
                         <div class="border-t border-gray-200 pt-2 mt-2">
                             <p class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Administración</p>
                             <a href="{{ route('dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
@@ -226,28 +236,30 @@
                         </div>
                     @endif
                     @auth
-                        <div class="border-t border-gray-200 pt-2 mt-2">
-                            <p class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Mi Cuenta</p>
-                            <a href="{{ config('app.url') }}/profile" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                                Perfil
-                            </a>
-                            <a href="{{ config('app.url') }}/my-tickets" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                                Mis Boletos
-                            </a>
-                            @if(auth()->user()->spaces->count() > 0)
-                                <div class="border-t border-gray-200 mt-2 pt-2">
-                                    <p class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Mis Espacios</p>
-                                    @foreach(auth()->user()->spaces as $space)
-                                        <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                                            {{ $space->name }}
+                        @if($mobileIsVerified)
+                            <div class="border-t border-gray-200 pt-2 mt-2">
+                                <p class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Mi Cuenta</p>
+                                <a href="{{ config('app.url') }}/profile" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                    Perfil
+                                </a>
+                                <a href="{{ config('app.url') }}/my-tickets" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                    Mis Boletos
+                                </a>
+                                @if($mobileUser->spaces->count() > 0)
+                                    <div class="border-t border-gray-200 mt-2 pt-2">
+                                        <p class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Mis Espacios</p>
+                                        @foreach($mobileUser->spaces as $space)
+                                            <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                                {{ $space->name }}
+                                            </a>
+                                        @endforeach
+                                        <a href="{{ route('user.spaces.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                            Gestionar Espacios
                                         </a>
-                                    @endforeach
-                                    <a href="{{ route('user.spaces.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                                        Gestionar Espacios
-                                    </a>
-                                </div>
-                            @endif
-                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
                         <!-- Mobile Cart -->
                         <div class="border-t border-gray-200 pt-2 mt-2">
                             <button onclick="toggleCartDropdown()" class="w-full flex items-center justify-between px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
