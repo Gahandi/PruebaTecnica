@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $deleted_at
  * 
  * @property Collection|ModelHasPermission[] $model_has_permissions
- * @property Collection|Rolespace[] $role_spaces
+ * @property Collection|RoleSpace[] $role_spaces
  * @property Collection|Role[] $roles
  *
  * @package App\Models
@@ -46,7 +46,7 @@ class Permission extends Model
 
 	public function role_spaces()
 	{
-		return $this->belongsToMany(Rolespace::class, 'role_spaces_permissions')
+		return $this->belongsToMany(RoleSpace::class, 'role_spaces_permissions')
 					->withPivot('id', 'deleted_at')
 					->withTimestamps();
 	}

@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon|null $updated_at
  * 
  * @property space $space
- * @property Rolespace $role_space
+ * @property RoleSpace $role_space
  * @property User $user
  *
  * @package App\Models
@@ -51,7 +51,7 @@ class spacesUser extends Model
 
 	public function role_space()
 	{
-		return $this->belongsTo(Rolespace::class);
+		return $this->belongsTo(RoleSpace::class);
 	}
 
 	public function user()

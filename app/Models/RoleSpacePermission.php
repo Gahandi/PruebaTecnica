@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Auth;
  * @property Carbon|null $updated_at
  * 
  * @property Permission $permission
- * @property Rolespace $role_space
+ * @property RoleSpace $role_space
  *
  * @package App\Models
  */
@@ -48,7 +48,7 @@ class RoleSpacePermission extends Model
 
 	public function role_space()
 	{
-		return $this->belongsTo(Rolespace::class);
+		return $this->belongsTo(RoleSpace::class);
 	}
 
 	/**
