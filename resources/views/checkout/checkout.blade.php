@@ -20,129 +20,124 @@
         </div>
 
         <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // --- 1. Inicialización de OpenPay ---
-        OpenPay.setId('{{ config('services.openpay.merchant_id') }}');
-        OpenPay.setApiKey('{{ config('services.openpay.public_key') }}');
-        OpenPay.setSandboxMode({{ config('services.openpay.sandbox_mode', false) ? 'true' : 'false' }});
+            document.addEventListener('DOMContentLoaded', function() {
+                // --- 1. Inicialización de OpenPay ---
+                OpenPay.setId('{{ config('services.openpay.merchant_id') }}');
+                OpenPay.setApiKey('{{ config('services.openpay.public_key') }}');
+                OpenPay.setSandboxMode({{ config('services.openpay.sandbox_mode', false) ? 'true' : 'false' }});
 
-        // --- 2. Configurar Device Session ID (SOLO UNA VEZ al cargar la página) ---
-        var deviceSessionId = OpenPay.deviceData.setup("payment-form", "device_session_id");
+                // --- 2. Configurar Device Session ID (SOLO UNA VEZ al cargar la página) ---
+                var deviceSessionId = OpenPay.deviceData.setup("payment-form", "device_session_id");
 
-        // --- 3. Referencias a elementos del DOM ---
-        const form = document.getElementById('payment-form');
-        const payButton = document.getElementById('pay-button');
-        const methodRadios = document.querySelectorAll('input[name="payment_method"]');
+                // --- 3. Referencias a elementos del DOM ---
+                const form = document.getElementById('payment-form');
+                const payButton = document.getElementById('pay-button');
+                const methodRadios = document.querySelectorAll('input[name="payment_method"]');
 
-        // --- 4. Lógica para mostrar/ocultar los campos de pago ---
-        methodRadios.forEach(radio => {
-            radio.addEventListener('change', function() {
-                const selectedValue = this.value;
-                document.getElementById('openpay-card-info').classList.toggle('hidden', selectedValue !== 'openpay');
-                document.getElementById('card-info').classList.toggle('hidden', selectedValue !== 'card');
-                document.getElementById('paypal-info').classList.toggle('hidden', selectedValue !== 'paypal');
+                // --- 4. Lógica para mostrar/ocultar los campos de pago ---
+                methodRadios.forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        const selectedValue = this.value;
+                        document.getElementById('openpay-card-info').classList.toggle('hidden', selectedValue !== 'openpay');
+                        document.getElementById('card-info').classList.toggle('hidden', selectedValue !== 'card');
+                        document.getElementById('paypal-info').classList.toggle('hidden', selectedValue !== 'paypal');
+                    });
+                });
+                // Para asegurar que al cargar la página se muestre el método correcto
+                const checkedMethod = document.querySelector('input[name="payment_method"]:checked');
+                if (checkedMethod) {
+                    checkedMethod.dispatchEvent(new Event('change'));
+                }
+
+                // --- 5. Manejador del envío del formulario (SOLO UNO) ---
+                form.addEventListener('submit', function(event) {
+                     // Obtener valores actualizados de contraseña
+                    const passwordInput = document.getElementById('customer_password');
+                    const passwordConfirmationInput = document.getElementById('customer_password_confirmation');
+                    // Validar que los campos de cliente estén llenos
+                    const customerName = document.getElementById('customer_name').value;
+                    const customerEmail = document.getElementById('customer_email').value;
+
+                    if (!customerName || !customerEmail) {
+                        event.preventDefault();
+                        alert('Por favor completa tu nombre y correo electrónico antes de proceder al pago.');
+                        return;
+                    }
+
+                    // Solo validar contraseña si los campos existen (usuario NO autenticado)
+                    if (passwordInput && passwordConfirmationInput) {
+                        const password = passwordInput.value || '';
+                        const passwordConfirmation = passwordConfirmationInput.value || '';
+
+                        if (!password || password.length < 8) {
+                            event.preventDefault();
+                            alert('La contraseña debe tener al menos 8 caracteres.');
+                            return;
+                        }
+
+                        if (password !== passwordConfirmation) {
+                            event.preventDefault();
+                            alert('Las contraseñas no coinciden.');
+                            return;
+                        }
+                    }
+
+                    const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
+
+                    // Solo intervenimos si el método de pago es OpenPay
+                    if (selectedMethod === 'openpay') {
+                        // Prevenimos el envío automático para generar el token primero
+                        event.preventDefault();
+                        payButton.disabled = true;
+                        payButton.innerText = 'Procesando...'; // Feedback para el usuario
+
+                        OpenPay.token.create({
+                                "card_number": document.querySelector('[data-openpay-card="card_number"]').value,
+                                "holder_name": document.querySelector('[data-openpay-card="holder_name"]').value,
+                                "expiration_year": document.querySelector('[data-openpay-card="expiration_year"]').value,
+                                "expiration_month": document.querySelector('[data-openpay-card="expiration_month"]').value,
+                                "cvv2": document.querySelector('[data-openpay-card="cvv2"]').value,
+                            },
+                            success_callback, // Función si se crea el token
+                            error_callback    // Función si hay un error
+                        );
+                    }
+                    // Si el método no es 'openpay', el formulario se envía de forma normal.
+                });
+
+                // --- 6. Callbacks para la creación del token ---
+                function success_callback(response) {
+                    console.log("Token creado exitosamente:", response.data.id);
+                    // Asignamos el token al campo oculto
+                    document.getElementById('openpay_token').value = response.data.id;
+
+                    // Ahora sí, enviamos el formulario al backend
+                    form.submit();
+                }
+
+                function error_callback(response) {
+                    console.error("Error creando el token:", response);
+                    // Mostramos el error al usuario
+                    alert('Error: ' + response.data.description);
+
+                    // Reactivamos el botón para que el usuario pueda corregir los datos
+                    payButton.disabled = false;
+                    payButton.innerText = 'Completar Compra';
+                }
             });
-        });
-        // Para asegurar que al cargar la página se muestre el método correcto
-        const checkedMethod = document.querySelector('input[name="payment_method"]:checked');
-        if (checkedMethod) {
-            checkedMethod.dispatchEvent(new Event('change'));
-        }
+            // Poder ver la contraseña
+            function togglePassword(id, btn) {
+                const input = document.getElementById(id);
 
-
-        // Mostrar/ocultar campos de contraseña según checkbox
-        const createAccountCheckbox = document.getElementById('create_account');
-        const passwordFields = document.getElementById('password-fields');
-        if (createAccountCheckbox && passwordFields) {
-            createAccountCheckbox.addEventListener('change', function() {
-                if (this.checked) {
-                    passwordFields.classList.remove('hidden');
-                    document.getElementById('customer_password').required = true;
-                    document.getElementById('customer_password_confirmation').required = true;
+                if (input.type === "password") {
+                    input.type = "text";
+                    btn.textContent = "🙈"; // Cambia el icono
                 } else {
-                    passwordFields.classList.add('hidden');
-                    document.getElementById('customer_password').required = false;
-                    document.getElementById('customer_password_confirmation').required = false;
-                    document.getElementById('customer_password').value = '';
-                    document.getElementById('customer_password_confirmation').value = '';
-                }
-            });
-        }
-
-        // --- 5. Manejador del envío del formulario (SOLO UNO) ---
-        form.addEventListener('submit', function(event) {
-            // Validar que los campos de cliente estén llenos
-            const customerName = document.getElementById('customer_name').value;
-            const customerEmail = document.getElementById('customer_email').value;
-
-            if (!customerName || !customerEmail) {
-                event.preventDefault();
-                alert('Por favor completa tu nombre y correo electrónico antes de proceder al pago.');
-                return;
-            }
-
-            // Validar contraseña si se marcó crear cuenta
-            if (createAccountCheckbox && createAccountCheckbox.checked) {
-                const password = document.getElementById('customer_password').value;
-                const passwordConfirmation = document.getElementById('customer_password_confirmation').value;
-
-                if (!password || password.length < 8) {
-                    event.preventDefault();
-                    alert('La contraseña debe tener al menos 8 caracteres.');
-                    return;
-                }
-
-                if (password !== passwordConfirmation) {
-                    event.preventDefault();
-                    alert('Las contraseñas no coinciden.');
-                    return;
+                    input.type = "password";
+                    btn.textContent = "👁️";
                 }
             }
-
-            const selectedMethod = document.querySelector('input[name="payment_method"]:checked').value;
-
-            // Solo intervenimos si el método de pago es OpenPay
-            if (selectedMethod === 'openpay') {
-                // Prevenimos el envío automático para generar el token primero
-                event.preventDefault();
-                payButton.disabled = true;
-                payButton.innerText = 'Procesando...'; // Feedback para el usuario
-
-                OpenPay.token.create({
-                        "card_number": document.querySelector('[data-openpay-card="card_number"]').value,
-                        "holder_name": document.querySelector('[data-openpay-card="holder_name"]').value,
-                        "expiration_year": document.querySelector('[data-openpay-card="expiration_year"]').value,
-                        "expiration_month": document.querySelector('[data-openpay-card="expiration_month"]').value,
-                        "cvv2": document.querySelector('[data-openpay-card="cvv2"]').value,
-                    },
-                    success_callback, // Función si se crea el token
-                    error_callback    // Función si hay un error
-                );
-            }
-            // Si el método no es 'openpay', el formulario se envía de forma normal.
-        });
-
-        // --- 6. Callbacks para la creación del token ---
-        function success_callback(response) {
-            console.log("Token creado exitosamente:", response.data.id);
-            // Asignamos el token al campo oculto
-            document.getElementById('openpay_token').value = response.data.id;
-
-            // Ahora sí, enviamos el formulario al backend
-            form.submit();
-        }
-
-        function error_callback(response) {
-            console.error("Error creando el token:", response);
-            // Mostramos el error al usuario
-            alert('Error: ' + response.data.description);
-
-            // Reactivamos el botón para que el usuario pueda corregir los datos
-            payButton.disabled = false;
-            payButton.innerText = 'Completar Compra';
-        }
-    });
-</script>
+        </script>
 
         <form id="payment-form" method="POST" action="{{ route('checkout.process-payment') }}">
             @csrf
@@ -183,23 +178,9 @@
                     @if(!auth()->check())
                     <!-- Opción para crear cuenta (solo si no está logueado) -->
                     <div class="mt-6 pt-6 border-t border-gray-200">
-                        <div class="flex items-start">
-                            <input type="checkbox"
-                                   id="create_account"
-                                   name="create_account"
-                                   value="1"
-                                   class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                            <div class="ml-3">
-                                <label for="create_account" class="text-sm font-medium text-gray-700">
-                                    Crear una cuenta para acceder a tus boletos más rápido
-                                </label>
-                                <p class="text-xs text-gray-500 mt-1">Podrás ver y descargar tus boletos en cualquier momento</p>
-                            </div>
-                        </div>
-
-                        <!-- Campos de contraseña (se muestran si se marca crear cuenta) -->
-                        <div id="password-fields" class="hidden mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
+                        <!-- Campos de contraseña  -->
+                        <div id="password-fields" class=" mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="relative">
                                 <label for="customer_password" class="block text-sm font-medium text-gray-700 mb-2">
                                     Contraseña <span class="text-red-500">*</span>
                                 </label>
@@ -208,9 +189,15 @@
                                        id="customer_password"
                                        minlength="8"
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <button type="button"
+                                        onclick="togglePassword('customer_password', this)"
+                                        class="absolute right-3 top-9 text-gray-500">
+                                    👁️
+                                </button>
+
                                 <p class="text-xs text-gray-500 mt-1">Mínimo 8 caracteres</p>
                             </div>
-                            <div>
+                            <div class="relative">
                                 <label for="customer_password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">
                                     Confirmar Contraseña <span class="text-red-500">*</span>
                                 </label>
@@ -219,6 +206,11 @@
                                        id="customer_password_confirmation"
                                        minlength="8"
                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                       <button type="button"
+                                               onclick="togglePassword('customer_password_confirmation', this)"
+                                               class="absolute right-3 top-9 text-gray-500">
+                                           👁️
+                                       </button>
                             </div>
                         </div>
                     </div>

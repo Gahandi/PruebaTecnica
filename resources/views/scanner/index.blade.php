@@ -105,29 +105,47 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch(`/api/v1/validate-ticket/${ticketId}`)
             .then(r => r.json())
             .then(data => {
-                if (data.success) {
-                    renderMessage(`
-                        <div class="text-green-700">
-                            <div class="text-2xl font-bold mb-2">✅ Acceso Concedido</div>
-                            <div class="text-lg">Boleto: <strong>${data.data.ticket.id}</strong></div>
-                            <div class="text-lg">Evento: <strong>${data.data.event.name}</strong></div>
-                        </div>
-                    `);
-                    // Detener escaneo temporalmente
-                    stopScanner();
-
-                    // Reiniciar escaneo después de 3 segundos
-                    setTimeout(() => startScanner(), 3000);
-                } else {
-                    renderMessage(`
-                        <div class="text-red-700">
-                            <div class="text-2xl font-bold mb-2">❌ Acceso Denegado</div>
-                            <div class="text-lg">Este boleto ya ha sido escaneado</div>
-                            <div class="mt-2 text-lg">
-                                Evento: <strong>${data.data?.event?.name ?? 'No disponible'}</strong>
+                if (data.success) 
+                {
+                        // ACCESO PERMITIDO
+                        renderMessage(`
+                            <div class="text-green-700">
+                                <div class="text-2xl font-bold mb-2">✅ Acceso Concedido</div>
+                                <div class="text-lg">Boleto: <strong>${data.data.ticket.id}</strong></div>
+                                <div class="text-lg">Evento: <strong>${data.data.event.name}</strong></div>
                             </div>
-                        </div>
-                    `);
+                        `);
+
+                        stopScanner();
+                        setTimeout(() => startScanner(), 3000);
+                    } 
+                    else {
+                        // 🔍 REVISAMOS SI ES ERROR DE ESPACIO
+                        if (data.message.includes("NO pertenece a tu espacio")) {
+                            renderMessage(`
+                                <div class="text-red-700">
+                                    <div class="text-2xl font-bold mb-2">🚫 Acceso Denegado</div>
+                                    <div class="text-lg">Este boleto <strong>NO pertenece a tu espacio</strong>.</div>
+
+                                    <div class="mt-3 text-gray-700">
+                                        <div>Espacio del boleto: <strong>${data.data.space_of_ticket}</strong></div>
+                                        <div>Tu espacio: <strong>${data.data.your_space}</strong></div>
+                                    </div>
+                                </div>
+                            `);
+                        } 
+                        else {
+                            // Boleto ya escaneado u otro error
+                            renderMessage(`
+                                <div class="text-red-700">
+                                    <div class="text-2xl font-bold mb-2">❌ Acceso Denegado</div>
+                                    <div class="text-lg">${data.message}</div>
+                                    <div class="mt-2 text-lg">
+                                        Evento: <strong>${data.data?.event?.name ?? 'No disponible'}</strong>
+                                    </div>
+                                </div>
+                            `);
+                        }
                 }
             })
             .catch(() => {

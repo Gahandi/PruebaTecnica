@@ -38,16 +38,35 @@ class TicketController extends Controller
      */
     public function validateTicket(string $id): JsonResponse
     {
-        $ticket = Ticket::with(['order.event', 'checkin'])->find($id);
-        
+        $ticket = Ticket::with(['order.event.space', 'checkin'])->find($id);
+
         if (!$ticket) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ticket not found'
             ], 404);
         }
-        $event = Event::find($ticket->event_id);
-        
+
+        $event = $ticket->order->event;
+        $space = $event->space;
+        $user = Auth::user();
+
+        // 🔐 VALIDACIÓN REAL (usa spaces_users)
+        $userSpacesIds = $user->spaces->pluck('id')->toArray();
+
+        if (!in_array($space->id, $userSpacesIds)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Este boleto NO pertenece a tu espacio',
+                'data' => [
+                    'ticket' => $ticket,
+                    'event' => $event,
+                    'space_of_ticket' => $space->name,
+                    'your_spaces' => $user->spaces->pluck('name'),
+                ]
+            ], 403);
+        }
+
         if ($ticket->used) {
             return response()->json([
                 'success' => false,
@@ -60,13 +79,13 @@ class TicketController extends Controller
             ], 400);
         }
 
-        //Marcar como usado
+        // ✔ Marcar como usado
         $ticket->update(['used' => true]);
 
         Checkin::create([
             'ticket_id'  => $ticket->id,
             'scanned_at' => now(),
-            'scanned_by' => Auth::id() ?? null, 
+            'scanned_by' => $user->id,
         ]);
 
         return response()->json([
@@ -79,4 +98,5 @@ class TicketController extends Controller
             ]
         ]);
     }
+
 }
