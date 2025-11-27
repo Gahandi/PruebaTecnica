@@ -129,9 +129,23 @@
                                                                 ->where('session_id', '!=', session()->getId())
                                                                 ->sum('quantity');
                                                             $available = $ticketEvent ? ($ticketEvent->quantity - $reservedQuantity) : 0;
+                                                        
+                                                            // Total asignado desde la tabla pivot
+                                                            $totalAsignado = $ticketType->pivot->quantity;
+
+                                                            // Boletos ya vendidos
+                                                            $vendidos = \App\Models\Ticket::where('event_id', $event->id)
+                                                                        ->where('ticket_types_id', $ticketType->id)
+                                                                        ->count();
+
+                                                            // Disponibles reales
+                                                            $disponibles = $totalAsignado - $vendidos;
+
+                                                            if ($disponibles < 0) $disponibles = 0; // seguridad
                                                         @endphp
+
                                                         <p class="text-xs text-green-600 font-medium">
-                                                            Disponibles: {{ $available }} boletos
+                                                            Disponibles: {{ $disponibles}} boletos
                                                         </p>
                                                     </div>
 
