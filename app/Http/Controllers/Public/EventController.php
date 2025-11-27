@@ -147,24 +147,6 @@ class EventController extends Controller
             return back()->with('error', 'No hay suficientes boletos disponibles. Solo quedan ' . $availableQuantity . ' boletos.');
         }
 
-        // Descontar disponibilidad directamente
-        $quantityToDeduct = isset($cart[$cartKey]) ? $request->quantity : $request->quantity;
-        
-        // Verificar que haya suficiente disponibilidad antes de descontar
-        if ($ticket_event->quantity < $quantityToDeduct) {
-            if (request()->ajax()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No hay suficientes boletos disponibles. Solo quedan ' . $ticket_event->quantity . ' boletos.'
-                ], 400);
-            }
-            return back()->with('error', 'No hay suficientes boletos disponibles. Solo quedan ' . $ticket_event->quantity . ' boletos.');
-        }
-
-        // Descontar de la disponibilidad
-        $ticket_event->quantity -= $quantityToDeduct;
-        $ticket_event->save();
-
         // Crear reserva temporal
         \App\Helpers\CartHelper::createReservation(
             $ticket_event->ticket_types_id,
