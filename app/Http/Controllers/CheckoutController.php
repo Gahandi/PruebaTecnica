@@ -42,7 +42,9 @@ class CheckoutController extends Controller
             'getCartDropdown',
             'syncCart',
             'applyCoupon',
-            'removeCoupon'
+            'removeCoupon',
+            'updateCart',
+            'removeFromCart'
         ]);
     }
 
@@ -235,6 +237,24 @@ class CheckoutController extends Controller
             return back()->with('error', 'No hay suficientes boletos disponibles. Solo quedan ' . $availableQuantity . ' boletos.');
         }
 
+        // Descontar disponibilidad directamente
+        $quantityToDeduct = isset($cart[$cartKey]) ? $request->quantity : $request->quantity;
+        
+        // Verificar que haya suficiente disponibilidad antes de descontar
+        if ($ticket_event->quantity < $quantityToDeduct) {
+            if (request()->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No hay suficientes boletos disponibles. Solo quedan ' . $ticket_event->quantity . ' boletos.'
+                ], 400);
+            }
+            return back()->with('error', 'No hay suficientes boletos disponibles. Solo quedan ' . $ticket_event->quantity . ' boletos.');
+        }
+
+        // Descontar de la disponibilidad
+        $ticket_event->quantity -= $quantityToDeduct;
+        $ticket_event->save();
+
         // Crear reserva temporal
         \App\Helpers\CartHelper::createReservation(
             $ticket_event->ticket_types_id,
@@ -321,8 +341,20 @@ class CheckoutController extends Controller
         }
 
         $item = $cart[$cartKey];
+        $oldQuantity = $item['quantity'] ?? 0;
 
         if ($request->quantity == 0) {
+            // Restaurar disponibilidad cuando se elimina el item
+            if (isset($item['event_id']) && isset($item['ticket_type_id'])) {
+                $ticketEvent = \App\Models\TicketsEvent::where('ticket_types_id', $item['ticket_type_id'])
+                    ->where('event_id', $item['event_id'])
+                    ->first();
+
+                if ($ticketEvent) {
+                    $ticketEvent->quantity += $oldQuantity;
+                    $ticketEvent->save();
+                }
+            }
             unset($cart[$cartKey]);
         } else {
             // Obtener el precio desde TicketsEvent si hay event_id
@@ -341,15 +373,27 @@ class CheckoutController extends Controller
                     return back()->with('error', 'No se encontró la relación del boleto con el evento.');
                 }
 
-                // Verificar disponibilidad
-                if ($request->quantity > $ticketEvent->quantity) {
-                    if (request()->ajax()) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'No hay suficientes boletos disponibles. Solo quedan ' . $ticketEvent->quantity . ' boletos.'
-                        ], 400);
+                // Calcular diferencia de cantidad
+                $quantityDifference = $request->quantity - $oldQuantity;
+
+                // Si se está aumentando la cantidad, verificar disponibilidad y descontar
+                if ($quantityDifference > 0) {
+                    if ($quantityDifference > $ticketEvent->quantity) {
+                        if (request()->ajax()) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'No hay suficientes boletos disponibles. Solo quedan ' . $ticketEvent->quantity . ' boletos.'
+                            ], 400);
+                        }
+                        return back()->with('error', 'No hay suficientes boletos disponibles. Solo quedan ' . $ticketEvent->quantity . ' boletos.');
                     }
-                    return back()->with('error', 'No hay suficientes boletos disponibles. Solo quedan ' . $ticketEvent->quantity . ' boletos.');
+                    // Descontar la diferencia
+                    $ticketEvent->quantity -= $quantityDifference;
+                    $ticketEvent->save();
+                } elseif ($quantityDifference < 0) {
+                    // Si se está disminuyendo la cantidad, restaurar disponibilidad
+                    $ticketEvent->quantity += abs($quantityDifference);
+                    $ticketEvent->save();
                 }
 
                 // Actualizar precio desde TicketsEvent para asegurar que sea el correcto
@@ -413,12 +457,14 @@ class CheckoutController extends Controller
         // Buscar el item por la clave exacta o por ticket_type_id y event_id
         $found = false;
         $removedKey = null;
+        $removedItem = null;
 
         // Primero intentar por clave exacta
         if (isset($cart[$key])) {
+            $removedItem = $cart[$key]; // Guardar el item antes de eliminarlo
+            $removedKey = $key;
             unset($cart[$key]);
             $found = true;
-            $removedKey = $key;
         } else {
             // Si no se encuentra por clave, buscar por ticket_type_id y event_id
             // La clave puede venir como "ticket_type_id_event_id"
@@ -432,16 +478,29 @@ class CheckoutController extends Controller
                     $itemEventId = isset($item['event_id']) ? (int)$item['event_id'] : null;
 
                     if ($itemTicketTypeId === $ticketTypeId && $itemEventId === $eventId) {
+                        $removedItem = $item; // Guardar el item antes de eliminarlo
+                        $removedKey = $cartKey;
                         unset($cart[$cartKey]);
                         $found = true;
-                        $removedKey = $cartKey;
                         break;
                     }
                 }
             }
         }
 
-        if ($found) {
+        if ($found && $removedItem) {
+            // Restaurar disponibilidad cuando se elimina el item
+            if (isset($removedItem['event_id']) && isset($removedItem['ticket_type_id'])) {
+                $ticketEvent = \App\Models\TicketsEvent::where('ticket_types_id', $removedItem['ticket_type_id'])
+                    ->where('event_id', $removedItem['event_id'])
+                    ->first();
+
+                if ($ticketEvent && isset($removedItem['quantity'])) {
+                    $ticketEvent->quantity += $removedItem['quantity'];
+                    $ticketEvent->save();
+                }
+            }
+
             session()->put('cart', $cart);
 
             if (request()->ajax()) {
