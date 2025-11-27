@@ -169,9 +169,9 @@ Route::prefix('checkout')
         Route::get('/callback', [App\Http\Controllers\CheckoutController::class, 'handlePaymentCallback'])->name('callback');
         
         // Rutas de pago que requieren autenticación y verificación de email
+        Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'checkout'])->name('checkout');
+        Route::post('/process-payment', [App\Http\Controllers\CheckoutController::class, 'processPayment'])->name('process-payment');
         Route::middleware(['auth', 'email.verified'])->group(function () {
-            Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'checkout'])->name('checkout');
-            Route::post('/process-payment', [App\Http\Controllers\CheckoutController::class, 'processPayment'])->name('process-payment');
             Route::get('/success/{order}', [App\Http\Controllers\CheckoutController::class, 'success'])->name('success');
             Route::get('/order/{order}', [App\Http\Controllers\CheckoutController::class, 'showOrder'])->name('order');
         });
