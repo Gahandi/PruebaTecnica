@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="base-url" content="{{ config('app.url') }}">
 
-    <title>@yield('title', $space->name ?? config('app.name', 'Laravel'))</title>
+    <title>@yield('title', isset($space) && $space ? $space->name : config('app.name', 'Laravel'))</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -36,16 +36,16 @@
                         <!-- Space Logo/Name -->
                     <div class="flex items-center flex-1 md:flex-none min-w-0">
                         <div class="flex items-center space-x-2 sm:space-x-4 min-w-0">
-                            @if(isset($space) && $space->logo)
-                                <img src="{{ \App\Helpers\ImageHelper::getImageUrl($space->logo) }}" alt="{{ $space->name }}" class="h-8 w-8 sm:h-10 sm:w-10 rounded-lg object-cover flex-shrink-0">
+                            @if(isset($space) && $space && $space->logo)
+                                <img src="{{ \App\Helpers\ImageHelper::getImageUrl($space->logo) }}" alt="{{ $space->name ?? 'Space' }}" class="h-8 w-8 sm:h-10 sm:w-10 rounded-lg object-cover flex-shrink-0">
                             @else
                                 <div class="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-                                    <span class="text-white font-bold text-sm sm:text-lg">{{ substr($space->name ?? 'S', 0, 1) }}</span>
+                                    <span class="text-white font-bold text-sm sm:text-lg">{{ substr(isset($space) && $space ? $space->name : 'S', 0, 1) }}</span>
                                 </div>
                             @endif
                             <div class="min-w-0">
-                                <h1 class="text-base sm:text-lg lg:text-xl font-bold text-gray-900 truncate">{{ $space->name ?? 'Space' }}</h1>
-                                <p class="text-xs sm:text-sm text-gray-500 truncate hidden sm:block">{{ $space->subdomain ?? '' }}.{{ \App\Helpers\SubdomainHelper::getBaseDomain() }}</p>
+                                <h1 class="text-base sm:text-lg lg:text-xl font-bold text-gray-900 truncate">{{ isset($space) && $space ? $space->name : 'Space' }}</h1>
+                                <p class="text-xs sm:text-sm text-gray-500 truncate hidden sm:block">{{ (isset($space) && $space ? $space->subdomain : '') }}.{{ \App\Helpers\SubdomainHelper::getBaseDomain() }}</p>
                             </div>
                         </div>
                     </div>
@@ -183,7 +183,7 @@
                         </div>
 
                         <!-- Navigation Links -->
-                        <a href="{{ route('spaces.profile', $space->subdomain ?? '') }}" class="text-gray-700 hover:text-gray-900 text-sm lg:text-base">
+                        <a href="{{ route('spaces.profile', isset($space) && $space ? $space->subdomain : '') }}" class="text-gray-700 hover:text-gray-900 text-sm lg:text-base">
                             Inicio
                         </a>
                         <a href="{{ config('app.url') }}" class="text-gray-700 hover:text-gray-900 text-sm lg:text-base">
@@ -191,7 +191,7 @@
                         </a>
 
                         @auth
-                            @if(isset($space))
+                            @if(isset($space) && $space)
                                 @php
                                     $user = auth()->user();
                                     // Verificar si es admin del space (role_space_id = 1)
@@ -207,7 +207,7 @@
                                     $canSeeScanner = $isAdmin || $hasPermission;
                                 @endphp
                                 @if($canSeeScanner)
-                                    <a href="{{ route('scanner.index', ['subdomain' => $space->subdomain]) }}" class="text-gray-700 hover:text-gray-900 flex items-center gap-1">
+                                    <a href="{{ route('scanner.index', ['subdomain' => isset($space) && $space ? $space->subdomain : '']) }}" class="text-gray-700 hover:text-gray-900 flex items-center gap-1">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
                                         </svg>
@@ -215,7 +215,7 @@
                                     </a>
                                 @endif
                                 @if($isAdmin)
-                                    <a href="{{ route('spaces.coupons.index', $space->subdomain) }}" class="text-gray-700 hover:text-gray-900 flex items-center gap-1">
+                                    <a href="{{ route('spaces.coupons.index', isset($space) && $space ? $space->subdomain : '') }}" class="text-gray-700 hover:text-gray-900 flex items-center gap-1">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                                         </svg>
@@ -284,14 +284,14 @@
                 <!-- Mobile Menu -->
                 <div id="mobile-menu" class="hidden md:hidden border-t border-gray-200 bg-white">
                     <div class="px-2 pt-2 pb-3 space-y-1">
-                        <a href="{{ route('spaces.profile', $space->subdomain ?? '') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                        <a href="{{ route('spaces.profile', isset($space) && $space ? $space->subdomain : '') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
                             Inicio
                         </a>
                         <a href="{{ config('app.url') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
                             Todos los Eventos
                         </a>
                         @auth
-                            @if(isset($space))
+                            @if(isset($space) && $space)
                                 @php
                                     $user = auth()->user();
                                     $isAdmin = $user->spaces()
@@ -303,12 +303,12 @@
                                     $canSeeScanner = $isAdmin || $hasPermission;
                                 @endphp
                                 @if($canSeeScanner)
-                                    <a href="{{ route('scanner.index', ['subdomain' => $space->subdomain]) }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                    <a href="{{ route('scanner.index', ['subdomain' => isset($space) && $space ? $space->subdomain : '']) }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
                                         Scanner
                                     </a>
                                 @endif
                                 @if($isAdmin)
-                                    <a href="{{ route('spaces.coupons.index', $space->subdomain) }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                    <a href="{{ route('spaces.coupons.index', isset($space) && $space ? $space->subdomain : '') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
                                         Cupones
                                     </a>
                                 @endif

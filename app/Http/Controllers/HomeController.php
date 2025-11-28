@@ -12,9 +12,9 @@ class HomeController extends Controller
     public function index(Request $request)
     {
         // Obtener parámetros de búsqueda y filtrado
-        $search = $request->get('search', '');
-        $tagId = $request->get('tag', null);
-        $categoryId = $request->get('category', null);
+        $search = $request->get('search', '') ?? '';
+        $tagId = $request->get('tag', null) ?? null;
+        $categoryId = $request->get('category', null) ?? null;
 
         // Query base para eventos
         $eventsQuery = Event::with(['space', 'ticketTypes', 'tags', 'type_event'])

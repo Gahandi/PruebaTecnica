@@ -58,12 +58,12 @@
                     </h3>
                     <div class="flex flex-wrap gap-2 justify-center">
                         <a href="{{ route('events.search', array_merge(request()->except('tag'), ['tag' => null])) }}" 
-                           class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105 {{ !$tagId ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black shadow-xl scale-105' : 'bg-white/20 text-white hover:bg-white/30 shadow-md' }}">
+                           class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105 {{ !isset($tagId) || !$tagId ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black shadow-xl scale-105' : 'bg-white/20 text-white hover:bg-white/30 shadow-md' }}">
                             Todas
                         </a>
                         @foreach($tags as $tag)
                             <a href="{{ route('events.search', array_merge(request()->except('tag'), ['tag' => $tag->id])) }}" 
-                               class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105 {{ $tagId == $tag->id ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black shadow-xl scale-105' : 'bg-white/20 text-white hover:bg-white/30 shadow-md' }}">
+                               class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105 {{ (isset($tagId) && $tagId == $tag->id) ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black shadow-xl scale-105' : 'bg-white/20 text-white hover:bg-white/30 shadow-md' }}">
                                 {{ $tag->name }} <span class="ml-1 opacity-75">({{ $tag->events_count }})</span>
                             </a>
                         @endforeach
@@ -87,7 +87,7 @@
         @if($categories && $categories->count() > 0)
         <div class="mb-8 flex flex-wrap gap-3 justify-center">
             <a href="{{ route('events.search', array_merge(request()->except('category'), ['category' => null])) }}" 
-               class="px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 transform hover:scale-105 {{ !$categoryId ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl scale-105' : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md hover:shadow-lg' }}">
+               class="px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 transform hover:scale-105 {{ !isset($categoryId) || !$categoryId ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl scale-105' : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md hover:shadow-lg' }}">
                 <span class="flex items-center">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
@@ -97,7 +97,7 @@
             </a>
             @foreach($categories as $category)
                 <a href="{{ route('events.search', array_merge(request()->except('category'), ['category' => $category['id']])) }}" 
-                   class="px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 transform hover:scale-105 {{ $categoryId == $category['id'] ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl scale-105' : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md hover:shadow-lg' }}">
+                   class="px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 transform hover:scale-105 {{ (isset($categoryId) && $categoryId == $category['id']) ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl scale-105' : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md hover:shadow-lg' }}">
                     {{ $category['name'] }} <span class="ml-1 opacity-75">({{ $category['count'] }})</span>
                 </a>
             @endforeach
@@ -358,7 +358,7 @@
                 </div>
                 <h3 class="text-2xl font-bold text-gray-900 mb-3">No se encontraron eventos</h3>
                 <p class="text-lg text-gray-600 mb-6">
-                    @if($search || $tagId || $categoryId)
+                    @if((isset($search) && $search) || (isset($tagId) && $tagId) || (isset($categoryId) && $categoryId))
                         Intenta ajustar tus filtros de búsqueda o 
                         <a href="{{ route('home') }}" class="text-blue-600 hover:text-blue-800 font-semibold">ver todos los eventos</a>
                     @else
