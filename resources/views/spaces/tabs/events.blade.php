@@ -1,5 +1,5 @@
 <!-- Tab: Eventos -->
-<div class="flex items-center justify-between mb-8">
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
     <div>
         <h2 class="text-3xl font-bold text-gray-900">Eventos de {{ $space->name }}</h2>
         <p class="text-gray-600 mt-2">Descubre los próximos eventos de este espacio</p>
@@ -20,9 +20,77 @@
     </div>
 </div>
 
-@if($space->events->count() > 0)
+<!-- Filtros Simples -->
+@if(isset($allTags) && $allTags->count() > 0 || isset($allCategories) && $allCategories->count() > 0)
+<div class="mb-8 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-6 border border-gray-200">
+    <form method="GET" action="{{ route('spaces.profile', $space->subdomain) }}" id="spaceFilterForm" class="space-y-4">
+        <div class="flex flex-col md:flex-row gap-4">
+            <!-- Filtro por Tags -->
+            @if(isset($allTags) && $allTags->count() > 0)
+            <div class="flex-1">
+                <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                    </svg>
+                    Filtrar por Etiquetas
+                </label>
+                <select name="tag" onchange="document.getElementById('spaceFilterForm').submit()" 
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm font-medium bg-white transition-all">
+                    <option value="">Todas las etiquetas</option>
+                    @foreach($allTags as $tag)
+                        <option value="{{ $tag->id }}" {{ (isset($tagFilter) && $tagFilter == $tag->id) ? 'selected' : '' }}>
+                            {{ $tag->name }} ({{ $tag->events_count }})
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            @endif
+
+            <!-- Filtro por Categorías -->
+            @if(isset($allCategories) && $allCategories->count() > 0)
+            <div class="flex-1">
+                <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                    </svg>
+                    Filtrar por Categoría
+                </label>
+                <select name="category" onchange="document.getElementById('spaceFilterForm').submit()" 
+                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm font-medium bg-white transition-all">
+                    <option value="">Todas las categorías</option>
+                    @foreach($allCategories as $category)
+                        <option value="{{ $category->id }}" {{ (isset($categoryFilter) && $categoryFilter == $category->id) ? 'selected' : '' }}>
+                            {{ $category->name }} ({{ $category->events_count }})
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            @endif
+
+            <!-- Botón Limpiar -->
+            @if((isset($tagFilter) && $tagFilter) || (isset($categoryFilter) && $categoryFilter))
+            <div class="flex items-end">
+                <a href="{{ route('spaces.profile', $space->subdomain) }}" 
+                   class="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center whitespace-nowrap">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Limpiar
+                </a>
+            </div>
+            @endif
+        </div>
+    </form>
+</div>
+@endif
+
+@php
+    $eventsToShow = isset($filteredEvents) && $filteredEvents->count() > 0 ? $filteredEvents : (isset($space->events) ? $space->events->where('active', true)->where('date', '>=', now()) : collect());
+@endphp
+
+@if($eventsToShow->count() > 0)
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        @foreach($space->events as $event)
+        @foreach($eventsToShow as $event)
             <div class="bg-white border-2 border-gray-100 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:border-gray-200 transform hover:-translate-y-1">
                 <div class="relative">
                     <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}"
@@ -132,10 +200,23 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
             </svg>
         </div>
-        <h3 class="text-2xl font-bold text-gray-900 mb-4">No hay eventos aún</h3>
-        <p class="text-lg text-gray-600 mb-8 max-w-md mx-auto">Este espacio aún no tiene eventos programados.</p>
+        <h3 class="text-2xl font-bold text-gray-900 mb-4">
+            @if((isset($tagFilter) && $tagFilter) || (isset($categoryFilter) && $categoryFilter))
+                No se encontraron eventos con estos filtros
+            @else
+                No hay eventos aún
+            @endif
+        </h3>
+        <p class="text-lg text-gray-600 mb-8 max-w-md mx-auto">
+            @if((isset($tagFilter) && $tagFilter) || (isset($categoryFilter) && $categoryFilter))
+                Intenta cambiar los filtros o 
+                <a href="{{ route('spaces.profile', $space->subdomain) }}" class="text-indigo-600 hover:text-indigo-800 font-semibold">ver todos los eventos</a>
+            @else
+                Este espacio aún no tiene eventos programados.
+            @endif
+        </p>
         @auth
-            @if($isAdmin)
+            @if($isAdmin && !((isset($tagFilter) && $tagFilter) || (isset($categoryFilter) && $categoryFilter)))
                 <a href="{{ route('spaces.events.create', $space->subdomain) }}"
                    class="inline-flex items-center px-8 py-4 rounded-xl text-white font-semibold transition-all duration-200 hover:shadow-lg transform hover:scale-105"
                    style="background: linear-gradient(135deg, {{ $space->color_primary }}, {{ $space->color_secondary ?? $space->color_primary }});">
@@ -148,4 +229,3 @@
         @endauth
     </div>
 @endif
-

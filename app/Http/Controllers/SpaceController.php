@@ -23,8 +23,44 @@ class SpaceController extends Controller
         // Verificar si el usuario es admin del espacio
         $isAdmin = auth()->check() && auth()->user()->isAdminOfSpace($space->id);
 
+        // Obtener filtros de la request
+        $tagFilter = $request->get('tag', null);
+        $categoryFilter = $request->get('category', null);
+
         // Cargar relaciones necesarias
-        $space->load(['events.ticketTypes', 'events.tags', 'users']);
+        $space->load(['events.ticketTypes', 'events.tags', 'events.type_event', 'users']);
+
+        // Filtrar eventos si hay filtros
+        $eventsQuery = Event::where('spaces_id', $space->id)
+            ->where('active', true)
+            ->where('date', '>=', now())
+            ->with(['ticketTypes', 'tags', 'type_event']);
+        
+        if ($tagFilter) {
+            $eventsQuery->whereHas('tags', function($query) use ($tagFilter) {
+                $query->where('tags.id', $tagFilter);
+            });
+        }
+        
+        if ($categoryFilter) {
+            $eventsQuery->where('type_events_id', $categoryFilter);
+        }
+
+        $filteredEvents = $eventsQuery->get();
+        
+        // Obtener tags únicos de los eventos del espacio
+        $allTags = \App\Models\Tag::whereHas('events', function($query) use ($space) {
+            $query->where('spaces_id', $space->id)->where('active', true);
+        })->withCount(['events' => function($query) use ($space) {
+            $query->where('spaces_id', $space->id)->where('active', true);
+        }])->get();
+
+        // Obtener categorías únicas de los eventos del espacio
+        $allCategories = \App\Models\TypeEvent::whereHas('events', function($query) use ($space) {
+            $query->where('spaces_id', $space->id)->where('active', true);
+        })->withCount(['events' => function($query) use ($space) {
+            $query->where('spaces_id', $space->id)->where('active', true);
+        }])->get();
 
         // Estadísticas generales del espacio
         $totalEvents = $space->events->count();
@@ -133,7 +169,12 @@ class SpaceController extends Controller
             'totalTicketsAvailable',
             'totalTicketsSold',
             'totalRevenue',
-            'usersWithStats'
+            'usersWithStats',
+            'filteredEvents',
+            'allTags',
+            'allCategories',
+            'tagFilter',
+            'categoryFilter'
         ));
     }
 
