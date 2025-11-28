@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Space;
+use App\Models\Tag;
 use App\Models\TicketType;
 use App\Models\TypeEvent;
 use Illuminate\Http\Request;
@@ -55,8 +56,9 @@ class SpaceEventController extends Controller
 
         $ticketTypes = TicketType::all();
         $typeEvents = TypeEvent::all();
+        $tags = Tag::all();
 
-        return view('spaces.events.create', compact('space', 'ticketTypes', 'typeEvents'));
+        return view('spaces.events.create', compact('space', 'ticketTypes', 'typeEvents', 'tags'));
     }
 
     public function store(Request $request, $subdomain)
@@ -71,6 +73,9 @@ class SpaceEventController extends Controller
                 'date' => 'required|date|after:now',
                 'address' => 'required|string|max:255',
                 'coordinates' => 'nullable|string|max:255',
+                'keywords' => 'nullable|string|max:1000',
+                'tags' => 'nullable|array',
+                'tags.*' => 'nullable|string|max:255',
                 'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -87,6 +92,7 @@ class SpaceEventController extends Controller
                 'date' => $request->date,
                 'address' => $request->address,
                 'coordinates' => $request->coordinates,
+                'keywords' => $request->keywords,
                 'spaces_id' => $space->id,
                 'type_events_id' => $request->type_event_id,
                 'state_id' => 1, // Estado "Activo"
@@ -211,6 +217,21 @@ class SpaceEventController extends Controller
                 ]);
             }
 
+            // Procesar tags
+            if ($request->has('tags') && is_array($request->tags)) {
+                $tagIds = [];
+                foreach ($request->tags as $tagName) {
+                    if (!empty(trim($tagName))) {
+                        $tag = Tag::firstOrCreate(
+                            ['name' => trim($tagName)],
+                            ['slug' => Str::slug(trim($tagName))]
+                        );
+                        $tagIds[] = $tag->id;
+                    }
+                }
+                $event->tags()->sync($tagIds);
+            }
+
             return redirect()
                 ->route('spaces.profile', $space->subdomain)
                 ->with('success', 'Evento creado exitosamente y las imágenes fueron subidas a S3.');
@@ -262,9 +283,13 @@ class SpaceEventController extends Controller
 
         $ticketTypes = TicketType::all();
         $typeEvents = TypeEvent::all();
+        $tags = Tag::all();
+        
+        // Cargar tags del evento
+        $event->load('tags');
 
         // 3. Retornar la vista de edición con los datos
-        return view('spaces.events.edit', compact('space', 'event', 'ticketTypes', 'typeEvents'));
+        return view('spaces.events.edit', compact('space', 'event', 'ticketTypes', 'typeEvents', 'tags'));
     }
 
     /**
@@ -292,6 +317,9 @@ class SpaceEventController extends Controller
                 'date' => 'required|date|after:now',
                 'address' => 'required|string|max:255',
                 'coordinates' => 'nullable|string|max:255',
+                'keywords' => 'nullable|string|max:1000',
+                'tags' => 'nullable|array',
+                'tags.*' => 'nullable|string|max:255',
                 // Los archivos son nullable para que no sean obligatorios si ya existen
                 'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
@@ -310,6 +338,7 @@ class SpaceEventController extends Controller
                 'date' => $request->date,
                 'address' => $request->address,
                 'coordinates' => $request->coordinates,
+                'keywords' => $request->keywords,
                 'type_events_id' => $request->type_event_id,
                 // Generar nuevo slug si el nombre cambió
                 'slug' => Str::slug($request->name),
@@ -399,6 +428,24 @@ class SpaceEventController extends Controller
 
             // Sincronizar: Adjunta/Actualiza solo los IDs pasados y elimina los que faltan
             $event->ticketTypes()->sync($syncData);
+
+            // Procesar tags
+            if ($request->has('tags') && is_array($request->tags)) {
+                $tagIds = [];
+                foreach ($request->tags as $tagName) {
+                    if (!empty(trim($tagName))) {
+                        $tag = Tag::firstOrCreate(
+                            ['name' => trim($tagName)],
+                            ['slug' => Str::slug(trim($tagName))]
+                        );
+                        $tagIds[] = $tag->id;
+                    }
+                }
+                $event->tags()->sync($tagIds);
+            } else {
+                // Si no se enviaron tags, eliminar todas las relaciones
+                $event->tags()->sync([]);
+            }
 
             return redirect()
                 ->route('spaces.profile', $space->subdomain)

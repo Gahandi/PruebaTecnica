@@ -69,7 +69,8 @@ class Event extends Model
 		'banner',
 		'banner_app',
 		'icon',
-		'agenda'
+		'agenda',
+		'keywords'
 	];
 
 	public function space()
@@ -102,5 +103,10 @@ class Event extends Model
 		return $this->belongsToMany(TicketType::class, 'tickets_events', 'event_id', 'ticket_types_id')
 			->withPivot('quantity', 'price')
 			->withTimestamps();
+	}
+
+	public function tags()
+	{
+		return $this->belongsToMany(Tag::class, 'event_tag');
 	}
 }

@@ -12,6 +12,7 @@ use App\Http\Controllers\SpaceCouponController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ScannerController;
+use App\Http\Controllers\GoogleMerchantController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -107,6 +108,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Rutas públicas
 Route::get('/events', [PublicEventController::class, 'index'])->name('events.public');
 Route::get('/events/{event}', [PublicEventController::class, 'show'])->name('events.show');
+
+// Google Merchant Feed
+Route::get('/feeds/google-merchant.xml', [GoogleMerchantController::class, 'feed'])->name('feeds.google-merchant');
+Route::get('/feeds/{subdomain}/google-merchant.xml', [GoogleMerchantController::class, 'feedBySpace'])->name('feeds.google-merchant.space');
 
 
 // Rutas del carrito (sin autenticación)
