@@ -27,7 +27,7 @@ class SpaceEventController extends Controller
         // Cargar la relación ticketTypes con información de la tabla intermedia
         $event->load(['ticketTypes' => function($query) {
             $query->withPivot('quantity', 'price');
-        }]);
+        }, 'tags', 'space']);
 
         return view('events.show', compact('event', 'space'));
     }
@@ -73,7 +73,6 @@ class SpaceEventController extends Controller
                 'date' => 'required|date|after:now',
                 'address' => 'required|string|max:255',
                 'coordinates' => 'nullable|string|max:255',
-                'keywords' => 'nullable|string|max:1000',
                 'tags' => 'nullable|array',
                 'tags.*' => 'nullable|string|max:255',
                 'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -92,7 +91,6 @@ class SpaceEventController extends Controller
                 'date' => $request->date,
                 'address' => $request->address,
                 'coordinates' => $request->coordinates,
-                'keywords' => $request->keywords,
                 'spaces_id' => $space->id,
                 'type_events_id' => $request->type_event_id,
                 'state_id' => 1, // Estado "Activo"
@@ -317,7 +315,6 @@ class SpaceEventController extends Controller
                 'date' => 'required|date|after:now',
                 'address' => 'required|string|max:255',
                 'coordinates' => 'nullable|string|max:255',
-                'keywords' => 'nullable|string|max:1000',
                 'tags' => 'nullable|array',
                 'tags.*' => 'nullable|string|max:255',
                 // Los archivos son nullable para que no sean obligatorios si ya existen
@@ -338,7 +335,6 @@ class SpaceEventController extends Controller
                 'date' => $request->date,
                 'address' => $request->address,
                 'coordinates' => $request->coordinates,
-                'keywords' => $request->keywords,
                 'type_events_id' => $request->type_event_id,
                 // Generar nuevo slug si el nombre cambió
                 'slug' => Str::slug($request->name),

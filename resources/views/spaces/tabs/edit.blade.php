@@ -52,6 +52,22 @@
                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">{{ old('about', $space->about) }}</textarea>
                 </div>
 
+                <!-- Keywords -->
+                <div>
+                    <label for="keywords" class="block text-sm font-medium text-gray-700 mb-2">Palabras Clave (Keywords)</label>
+                    <textarea name="keywords" 
+                              id="keywords" 
+                              rows="3"
+                              placeholder="Ej: música, conciertos, entretenimiento, eventos en vivo"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">{{ old('keywords', $space->keywords) }}</textarea>
+                    <p class="mt-2 text-sm text-gray-500 flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        Separa las palabras clave con comas. Estas ayudan a mejorar la búsqueda y SEO del espacio.
+                    </p>
+                </div>
+
                 <!-- Colores -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>

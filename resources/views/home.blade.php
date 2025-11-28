@@ -5,7 +5,10 @@
 @section('content')
 <!-- Hero Section -->
 <div class="relative bg-gradient-to-r from-purple-900 via-blue-900 to-indigo-900 overflow-hidden">
-    <div class="absolute inset-0 bg-black opacity-50"></div>
+    <div class="absolute inset-0">
+        <div class="absolute inset-0 bg-black opacity-50"></div>
+        <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+    </div>
     <div class="relative max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-12 sm:py-16 lg:py-24">
         <div class="text-center">
             <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6">
@@ -18,28 +21,88 @@
                 Descubre conciertos, deportes, teatro, comedia y más. Compra boletos de forma segura y fácil.
             </p>
 
-            <!-- Search Bar -->
-            <!-- <div class="max-w-2xl mx-auto mb-12">
-                <div class="relative">
-                    <input type="text"
-                           placeholder="¿Qué evento buscas?"
-                           class="w-full px-6 py-4 text-lg rounded-full border-0 shadow-lg focus:ring-4 focus:ring-yellow-400 focus:outline-none bg-gray-100">
-                    <button class="absolute right-2 top-2 bg-yellow-400 hover:bg-yellow-500 text-black px-8 py-2 rounded-full font-semibold transition-colors">
-                        Buscar
-                    </button>
+            <!-- Search Bar Mejorado -->
+            <div class="max-w-4xl mx-auto mb-8">
+                <form method="GET" action="{{ route('home') }}" class="relative">
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <div class="flex-1 relative">
+                            <input type="text" 
+                                   name="search" 
+                                   value="{{ $search ?? '' }}"
+                                   placeholder="¿Qué evento buscas? Ej: concierto, rock, teatro..."
+                                   class="w-full px-6 py-4 text-lg rounded-2xl border-0 shadow-xl focus:ring-4 focus:ring-yellow-400 focus:outline-none bg-white text-gray-900 placeholder-gray-400">
+                            <svg class="absolute right-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <button type="submit" 
+                                class="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black px-8 py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <span>Buscar</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Filtros por Tags -->
+            @if($tags && $tags->count() > 0)
+            <div class="max-w-6xl mx-auto mb-8">
+                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-2xl">
+                    <h3 class="text-white font-bold mb-4 text-center text-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                        </svg>
+                        Filtrar por Etiquetas
+                    </h3>
+                    <div class="flex flex-wrap gap-2 justify-center">
+                        <a href="{{ route('home', array_merge(request()->except('tag'), ['tag' => null])) }}" 
+                           class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105 {{ !$tagId ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black shadow-xl scale-105' : 'bg-white/20 text-white hover:bg-white/30 shadow-md' }}">
+                            Todas
+                        </a>
+                        @foreach($tags as $tag)
+                            <a href="{{ route('home', array_merge(request()->except('tag'), ['tag' => $tag->id])) }}" 
+                               class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105 {{ $tagId == $tag->id ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black shadow-xl scale-105' : 'bg-white/20 text-white hover:bg-white/30 shadow-md' }}">
+                                {{ $tag->name }} <span class="ml-1 opacity-75">({{ $tag->events_count }})</span>
+                            </a>
+                        @endforeach
+                    </div>
                 </div>
-            </div> -->
+            </div>
+            @endif
         </div>
     </div>
 </div>
 
 <!-- Categories Section -->
-<div class="bg-gray-50 py-8 sm:py-12 lg:py-16">
+<div class="bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 py-8 sm:py-12 lg:py-16">
     <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
         <div class="text-center mb-6 sm:mb-8 lg:mb-12">
             <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-4">Explora por Categoría</h2>
             <p class="text-sm sm:text-base lg:text-lg text-gray-600">Encuentra eventos que te interesen</p>
         </div>
+
+        <!-- Filtro por Categoría -->
+        @if($categories && $categories->count() > 0)
+        <div class="mb-8 flex flex-wrap gap-3 justify-center">
+            <a href="{{ route('home', array_merge(request()->except('category'), ['category' => null])) }}" 
+               class="px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 transform hover:scale-105 {{ !$categoryId ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl scale-105' : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md hover:shadow-lg' }}">
+                <span class="flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                    </svg>
+                    Todas las Categorías
+                </span>
+            </a>
+            @foreach($categories as $category)
+                <a href="{{ route('home', array_merge(request()->except('category'), ['category' => $category['id']])) }}" 
+                   class="px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 transform hover:scale-105 {{ $categoryId == $category['id'] ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl scale-105' : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md hover:shadow-lg' }}">
+                    {{ $category['name'] }} <span class="ml-1 opacity-75">({{ $category['count'] }})</span>
+                </a>
+            @endforeach
+        </div>
+        @endif
 
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
             @php
@@ -55,8 +118,8 @@
             @endphp
             @foreach($categories as $category)
                 <div class="group cursor-pointer">
-                    <a href="{{ route('categories.events', ['subdomain' => $subdomain, 'id' => $category['id']]) }}">
-                        <div class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-8 text-center hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105">
+                    <a href="{{ route('home', ['category' => $category['id']]) }}">
+                        <div class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-8 text-center hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-110 hover:shadow-2xl">
                             <div class="text-white">
                                 <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 mx-auto mb-2 sm:mb-3 lg:mb-4 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
                                     <svg class="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" fill="currentColor" viewBox="0 0 20 20">
@@ -76,7 +139,8 @@
 
 
 <!-- Featured Events Carousel -->
-<div class="py-8 sm:py-12 lg:py-16 bg-white ">
+@if($featuredEvents->count() > 0)
+<div class="py-8 sm:py-12 lg:py-16 bg-gradient-to-br from-white via-blue-50 to-indigo-50">
     <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
         <div class="text-center mb-6 sm:mb-8 lg:mb-12">
             <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-4">Eventos Destacados</h2>
@@ -89,25 +153,26 @@
                 <div class="flex transition-transform duration-500 ease-in-out" id="carousel">
                     @foreach($featuredEvents as $event)
                         <div class="w-full sm:w-1/2 lg:w-1/3 flex-shrink-0 px-2 sm:px-4">
-                            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                                <div class="relative">
+                            <div class="bg-white rounded-xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-purple-200">
+                                <div class="relative overflow-hidden">
                                     @if($event->banner && $event->banner !== 'test.jpg')
                                         <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}"
                                             alt="{{ $event->name }}"
-                                            class="w-full h-64 object-cover">
+                                            class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110">
                                     @else
-                                        <div class="w-full h-64 bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                                            <div class="text-center text-white">
-                                                <svg class="w-16 h-16 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <div class="w-full h-64 bg-gradient-to-br from-purple-500 via-pink-500 to-indigo-500 flex items-center justify-center relative overflow-hidden">
+                                            <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml,%3Csvg width=\"40\" height=\"40\" viewBox=\"0 0 40 40\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.4\"%3E%3Cpath d=\"M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h2V0h2v20h2V0h2v20h2V0h2v20h2V0h2v22H20v-1.5zM0 20h2v20H0V20zm4 0h2v20H4V20zm4 0h2v20H8V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2z\"/%3E%3C/g%3E%3C/svg%3E');"></div>
+                                            <div class="text-center text-white relative z-10">
+                                                <svg class="w-16 h-16 mx-auto mb-4 drop-shadow-lg" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
                                                 </svg>
-                                                <p class="text-lg font-semibold">{{ $event->name }}</p>
+                                                <p class="text-lg font-bold drop-shadow-lg">{{ $event->name }}</p>
                                             </div>
                                         </div>
                                     @endif
                                     <div class="absolute top-4 right-4">
-                                        <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                            Destacado
+                                        <span class="bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg backdrop-blur-sm">
+                                            ⭐ Destacado
                                         </span>
                                     </div>
                                 </div>
@@ -123,16 +188,32 @@
                                     @endif
                                     <p class="text-gray-600 mb-4">{{ \Carbon\Carbon::parse($event->date)->format('d M Y, H:i') }}</p>
                                     <p class="text-gray-500 mb-4">{{ $event->address }}</p>
+                                    
+                                    <!-- Tags del Evento -->
+                                    @if($event->tags && $event->tags->count() > 0)
+                                        <div class="flex flex-wrap gap-2 mb-4">
+                                            @foreach($event->tags as $tag)
+                                                <a href="{{ route('home', ['tag' => $tag->id]) }}" 
+                                                   class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 hover:bg-purple-200 transition-colors">
+                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                                    </svg>
+                                                    {{ $tag->name }}
+                                                </a>
+                                            @endforeach
+                                        </div>
+                                    @endif
+
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center">
                                             <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}"
-                                               target="_blank" {{-- Es una buena práctica abrir los enlaces externos en una nueva pestaña --}}
+                                               target="_blank"
                                                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
                                                     {{ $event->space->name }}
                                             </a>
                                         </div>
                                         <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}/{{ $event->slug }}"
-                                        class="bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-2 rounded-full font-semibold transition-colors">
+                                        class="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black px-6 py-2 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
                                             Ver Evento
                                         </a>
                                     </div>
@@ -159,8 +240,7 @@
         </div>
     </div>
 </div>
-
-
+@endif
 
 <!-- All Events Section -->
 <div class="py-8 sm:py-12 lg:py-16 bg-gray-50">
@@ -170,21 +250,23 @@
             <p class="text-sm sm:text-base lg:text-lg text-gray-600">Descubre todos los eventos disponibles</p>
         </div>
 
+        @if($allEvents->count() > 0)
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         @foreach($allEvents as $event)
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                <div class="relative">
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-blue-200 group">
+                <div class="relative overflow-hidden">
                     @if($event->banner && $event->banner !== 'test.jpg')
                         <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}"
                             alt="{{ $event->name }}"
-                            class="w-full h-48 object-cover">
+                            class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110">
                     @else
-                        <div class="w-full h-48 bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
-                            <div class="text-center text-white">
-                                <svg class="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                        <div class="w-full h-48 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-500 flex items-center justify-center relative overflow-hidden">
+                            <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml,%3Csvg width=\"40\" height=\"40\" viewBox=\"0 0 40 40\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.4\"%3E%3Cpath d=\"M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h2V0h2v20h2V0h2v20h2V0h2v20h2V0h2v22H20v-1.5zM0 20h2v20H0V20zm4 0h2v20H4V20zm4 0h2v20H8V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2z\"/%3E%3C/g%3E%3C/svg%3E');"></div>
+                            <div class="text-center text-white relative z-10">
+                                <svg class="w-12 h-12 mx-auto mb-2 drop-shadow-lg" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
                                 </svg>
-                                <p class="font-semibold">{{ $event->name }}</p>
+                                <p class="font-bold drop-shadow-lg">{{ $event->name }}</p>
                             </div>
                         </div>
                     @endif
@@ -201,6 +283,21 @@
                     @endif
                     <p class="text-gray-600 mb-2">{{ \Carbon\Carbon::parse($event->date)->format('d M Y, H:i') }}</p>
                     <p class="text-gray-500 mb-4">{{ $event->address }}</p>
+
+                    <!-- Tags del Evento -->
+                    @if($event->tags && $event->tags->count() > 0)
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            @foreach($event->tags as $tag)
+                                <a href="{{ route('home', ['tag' => $tag->id]) }}" 
+                                   class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 hover:bg-purple-200 transition-colors">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                    </svg>
+                                    {{ $tag->name }}
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
 
                     @if($event->ticketTypes->count() > 0)
                         @php
@@ -243,7 +340,7 @@
                         </a>
                         </div>
                         <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}/{{ $event->slug }}"
-                        class="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-full font-semibold transition-colors text-sm">
+                        class="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black px-4 py-2 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm">
                             Ver Evento
                         </a>
                     </div>
@@ -251,6 +348,25 @@
             </div>
         @endforeach
         </div>
+        @else
+            <!-- Mensaje cuando no hay eventos -->
+            <div class="text-center py-16 bg-white rounded-2xl shadow-lg">
+                <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+                    <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-3">No se encontraron eventos</h3>
+                <p class="text-lg text-gray-600 mb-6">
+                    @if($search || $tagId || $categoryId)
+                        Intenta ajustar tus filtros de búsqueda o 
+                        <a href="{{ route('home') }}" class="text-blue-600 hover:text-blue-800 font-semibold">ver todos los eventos</a>
+                    @else
+                        No hay eventos disponibles en este momento.
+                    @endif
+                </p>
+            </div>
+        @endif
 
         @if($allEvents->count() > 6)
         <div class="text-center mt-12">

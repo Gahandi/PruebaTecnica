@@ -69,8 +69,7 @@ class Event extends Model
 		'banner',
 		'banner_app',
 		'icon',
-		'agenda',
-		'keywords'
+		'agenda'
 	];
 
 	public function space()

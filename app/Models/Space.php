@@ -28,7 +28,8 @@ class Space extends Model
         'contact_phone',
         'social_facebook',
         'social_instagram',
-        'social_twitter'
+        'social_twitter',
+        'keywords'
     ];
 
     public function users()

@@ -50,6 +50,17 @@
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
+
+                <div class="md:col-span-2">
+                    <label for="keywords" class="block text-sm font-medium text-gray-700 mb-2">Palabras Clave (Keywords)</label>
+                    <textarea name="keywords" id="keywords" rows="3"
+                              class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500 @error('keywords') border-red-500 @enderror"
+                              placeholder="Ej: música, conciertos, entretenimiento, eventos en vivo">{{ old('keywords', $space->keywords) }}</textarea>
+                    <p class="mt-1 text-sm text-gray-500">Separa las palabras clave con comas. Estas ayudan a mejorar la búsqueda y SEO del espacio.</p>
+                    @error('keywords')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
                 
                 <!-- Imágenes -->
                 <div class="md:col-span-2">

@@ -72,7 +72,7 @@ class EventController extends Controller
         // Cargar la relación ticketTypes con información de la tabla intermedia
         $event->load(['ticketTypes' => function($query) {
             $query->withPivot('quantity', 'price');
-        }]);
+        }, 'tags', 'space']);
 
         return view('events.show', compact('event', 'space'));
     }

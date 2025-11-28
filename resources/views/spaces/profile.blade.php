@@ -47,7 +47,23 @@
                      <div class="photo-overlay">
                          <div class="text-white">
                              <h4 class="text-2xl font-bold mb-2">{{ $space->name }}</h4>
-                             <p class="text-gray-200">{{ $space->description }}</p>
+                             <p class="text-gray-200 mb-3">{{ $space->description }}</p>
+                             
+                             <!-- Keywords del Space -->
+                             @if($space->keywords)
+                                 <div class="flex flex-wrap gap-2 mt-3">
+                                     @foreach(explode(',', $space->keywords) as $keyword)
+                                         @if(trim($keyword))
+                                             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/20 backdrop-blur-sm text-white border border-white/30">
+                                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                                 </svg>
+                                                 {{ trim($keyword) }}
+                                             </span>
+                                         @endif
+                                     @endforeach
+                                 </div>
+                             @endif
                          </div>
                      </div>
                  </div>

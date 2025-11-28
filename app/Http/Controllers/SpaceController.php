@@ -24,7 +24,7 @@ class SpaceController extends Controller
         $isAdmin = auth()->check() && auth()->user()->isAdminOfSpace($space->id);
 
         // Cargar relaciones necesarias
-        $space->load(['events.ticketTypes', 'users']);
+        $space->load(['events.ticketTypes', 'events.tags', 'users']);
 
         // Estadísticas generales del espacio
         $totalEvents = $space->events->count();
@@ -170,6 +170,7 @@ class SpaceController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'about' => 'nullable|string',
+            'keywords' => 'nullable|string|max:1000',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
             'color_primary' => 'nullable|string|max:7',
@@ -185,6 +186,7 @@ class SpaceController extends Controller
             'name' => $request->name,
             'description' => $request->description,
             'about' => $request->about,
+            'keywords' => $request->keywords,
             'color_primary' => $request->color_primary,
             'color_secondary' => $request->color_secondary,
             'location' => $request->location,
@@ -284,6 +286,9 @@ class SpaceController extends Controller
         if ($request->has('color_secondary')) {
             $validationRules['color_secondary'] = 'nullable|string|max:7';
         }
+        if ($request->has('keywords')) {
+            $validationRules['keywords'] = 'nullable|string|max:1000';
+        }
 
         $request->validate($validationRules);
 
@@ -322,6 +327,9 @@ class SpaceController extends Controller
         }
         if ($request->has('color_secondary')) {
             $updateData['color_secondary'] = $request->color_secondary;
+        }
+        if ($request->has('keywords')) {
+            $updateData['keywords'] = $request->keywords;
         }
 
         $space->update($updateData);
