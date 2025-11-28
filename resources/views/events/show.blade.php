@@ -4,10 +4,6 @@
 
 @section('content')
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-      crossorigin=""/>
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
 
 <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -148,8 +144,26 @@
                         </svg>
                         Ubicación del Evento
                     </h2>
-                    <div class="rounded-xl overflow-hidden border-2 border-gray-200 shadow-lg">
+                    <div class="rounded-xl overflow-hidden border-2 border-gray-200 shadow-lg relative">
                         <div id="map" style="height: 400px; width: 100%;"></div>
+                        <!-- Botones de control del mapa -->
+                        <div class="absolute top-4 right-4 flex flex-col gap-2 z-10">
+                            <button id="center-map-btn" onclick="centerMap()" 
+                                    class="bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg shadow-lg border border-gray-200 flex items-center space-x-2 transition-all duration-200 hover:shadow-xl">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                <span class="text-sm font-medium">Centrar</span>
+                            </button>
+                            <button id="directions-btn" onclick="showDirections()" 
+                                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2 transition-all duration-200 hover:shadow-xl">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                                </svg>
+                                <span class="text-sm font-medium">Rutas</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             @endif
@@ -305,11 +319,15 @@
                 @endif
             </div>
         @endif
-    </div> </div> <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossorigin=""></script>
+    </div> </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+@if($event->coordinates)
+<script async
+    src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.api_key') }}&loading=async&libraries=places,directions&callback=initGoogleMap">
+</script>
+@endif
 
 @push('scripts')
 <script>
@@ -325,6 +343,10 @@ console.log('Ticket prices:', ticketPrices);
 
 let appliedCoupon = null;
 let map = null;
+let marker = null;
+let directionsService = null;
+let directionsRenderer = null;
+let eventLocation = null;
 
 // Funciones para manejo de cantidades
 function increaseQuantity(ticketTypeId, maxQuantity) {
@@ -650,28 +672,142 @@ function updateCartCount() {
     });
 }
 
-// Función para mostrar el mapa
-function showMap() {
-    if (map) {
-        map.invalidateSize();
-        return;
-    }
-
+// Función para inicializar Google Maps
+window.initGoogleMap = function() {
     @if($event->coordinates)
         const coordinates = "{{ $event->coordinates }}".split(',').map(Number);
         if (coordinates.length === 2) {
-            map = L.map('map').setView(coordinates, 15);
+            eventLocation = { lat: coordinates[0], lng: coordinates[1] };
+            
+            // Inicializar el mapa
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: eventLocation,
+                zoom: 15,
+                mapTypeControl: true,
+                streetViewControl: true,
+                fullscreenControl: true
+            });
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
+            // Crear marcador
+            const eventName = @json($event->name);
+            const eventAddress = @json($event->address);
+            
+            marker = new google.maps.Marker({
+                position: eventLocation,
+                map: map,
+                title: eventName,
+                animation: google.maps.Animation.DROP
+            });
 
-            L.marker(coordinates).addTo(map)
-                .bindPopup('<b>{{ $event->name }}</b><br>{{ $event->address }}')
-                .openPopup();
+            // Info window con información del evento
+            const infoWindow = new google.maps.InfoWindow({
+                content: `
+                    <div class="p-2">
+                        <h3 class="font-bold text-lg mb-1">${eventName}</h3>
+                        <p class="text-gray-600 text-sm">${eventAddress}</p>
+                    </div>
+                `
+            });
+
+            marker.addListener('click', function() {
+                infoWindow.open(map, marker);
+            });
+
+            // Abrir info window automáticamente
+            infoWindow.open(map, marker);
+
+            // Inicializar servicios de direcciones
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({
+                map: map,
+                suppressMarkers: false
+            });
         }
     @endif
+}
+
+// Función para centrar el mapa en la ubicación del evento
+function centerMap() {
+    if (map && eventLocation) {
+        map.setCenter(eventLocation);
+        map.setZoom(15);
+        
+        // Animación suave
+        if (marker) {
+            marker.setAnimation(google.maps.Animation.BOUNCE);
+            setTimeout(() => {
+                marker.setAnimation(null);
+            }, 2000);
+        }
+    }
+}
+
+// Función para mostrar rutas
+function showDirections() {
+    if (!map || !eventLocation) return;
+
+    // Intentar obtener la ubicación actual del usuario
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                const userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+                // Calcular ruta
+                directionsService.route({
+                    origin: userLocation,
+                    destination: eventLocation,
+                    travelMode: google.maps.TravelMode.DRIVING
+                }, function(response, status) {
+                    if (status === 'OK') {
+                        directionsRenderer.setDirections(response);
+                        
+                        // Cambiar el botón para ocultar rutas
+                        const btn = document.getElementById('directions-btn');
+                        btn.onclick = hideDirections;
+                        btn.innerHTML = `
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            <span class="text-sm font-medium">Ocultar Rutas</span>
+                        `;
+                        btn.className = 'bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2 transition-all duration-200 hover:shadow-xl';
+                    } else {
+                        alert('No se pudo calcular la ruta: ' + status);
+                    }
+                });
+            },
+            function(error) {
+                // Si no se puede obtener la ubicación, abrir Google Maps en nueva pestaña
+                const url = `https://www.google.com/maps/dir/?api=1&destination=${eventLocation.lat},${eventLocation.lng}`;
+                window.open(url, '_blank');
+            }
+        );
+    } else {
+        // Si el navegador no soporta geolocalización, abrir Google Maps
+        const url = `https://www.google.com/maps/dir/?api=1&destination=${eventLocation.lat},${eventLocation.lng}`;
+        window.open(url, '_blank');
+    }
+}
+
+// Función para ocultar rutas
+function hideDirections() {
+    if (directionsRenderer) {
+        directionsRenderer.setDirections({ routes: [] });
+        
+        // Restaurar el botón
+        const btn = document.getElementById('directions-btn');
+        btn.onclick = showDirections;
+        btn.innerHTML = `
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+            </svg>
+            <span class="text-sm font-medium">Rutas</span>
+        `;
+        btn.className = 'bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2 transition-all duration-200 hover:shadow-xl';
+    }
 }
 
 // --- ¡NUEVO! ---
@@ -689,10 +825,8 @@ document.addEventListener('scroll', function() {
 
 // Inicializar mapa automáticamente
 document.addEventListener('DOMContentLoaded', function() {
-    @if($event->coordinates)
-        showMap();
-    @endif
-
+    // El mapa se inicializa automáticamente cuando Google Maps API carga (callback initGoogleMap)
+    
     // Inicializar highlight.js para código en markdown
     hljs.highlightAll();
 
