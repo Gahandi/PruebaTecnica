@@ -838,22 +838,6 @@ class CheckoutController extends Controller
             // CREAR ITEMS Y TICKETS
             $ticketsCreated = [];
             foreach ($cart as $item) {
-                // Descontar disponibilidad cuando se finaliza la orden
-                if (isset($item['event_id']) && isset($item['ticket_type_id'])) {
-                    $ticketEvent = \App\Models\TicketsEvent::where('ticket_types_id', $item['ticket_type_id'])
-                        ->where('event_id', $item['event_id'])
-                        ->first();
-
-                    if ($ticketEvent) {
-                        // Verificar disponibilidad antes de descontar
-                        if ($ticketEvent->quantity < $item['quantity']) {
-                            throw new \Exception('No hay suficientes boletos disponibles. Solo quedan ' . $ticketEvent->quantity . ' boletos.');
-                        }
-                        // Descontar de la disponibilidad
-                        $ticketEvent->quantity -= $item['quantity'];
-                        $ticketEvent->save();
-                    }
-                }
 
                 OrderItem::create([
                     'order_id' => $order->id,
