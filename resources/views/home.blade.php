@@ -47,7 +47,7 @@
             </div>
 
             <!-- Filtros por Tags -->
-            @if($tags && $tags->count() > 0)
+            @if(isset($tags) && $tags && $tags->count() > 0)
             <div class="max-w-6xl mx-auto mb-8">
                 <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-2xl">
                     <h3 class="text-white font-bold mb-4 text-center text-lg flex items-center justify-center">

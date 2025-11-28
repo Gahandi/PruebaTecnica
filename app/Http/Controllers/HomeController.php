@@ -75,11 +75,20 @@ class HomeController extends Controller
             });
 
         // Obtener todos los tags con conteo de eventos
-        $tags = Tag::withCount('events')
-            ->having('events_count', '>', 0)
-            ->orderBy('events_count', 'desc')
-            ->limit(20)
-            ->get();
+        try {
+            $tags = Tag::withCount('events')
+                ->having('events_count', '>', 0)
+                ->orderBy('events_count', 'desc')
+                ->limit(20)
+                ->get();
+        } catch (\Exception $e) {
+            $tags = collect([]);
+        }
+
+        // Asegurar que tags siempre sea una colección
+        if (!isset($tags) || !$tags) {
+            $tags = collect([]);
+        }
 
         // Si no hay categorías, crear algunas por defecto
         if ($categories->isEmpty()) {
@@ -104,6 +113,9 @@ class HomeController extends Controller
         $search = $request->get('q', '');
         $tagId = $request->get('tag', null);
         $categoryId = $request->get('category', null);
+        $minPrice = $request->get('min_price', null);
+        $maxPrice = $request->get('max_price', null);
+        $sortBy = $request->get('sort', 'date_asc'); // date_asc, date_desc, price_asc, price_desc
 
         // Query base para eventos
         $eventsQuery = Event::with(['space', 'ticketTypes', 'tags', 'type_event'])
@@ -138,9 +150,44 @@ class HomeController extends Controller
             $eventsQuery->where('type_events_id', $categoryId);
         }
 
+        // Aplicar filtro por precio
+        if ($minPrice !== null || $maxPrice !== null) {
+            $eventsQuery->whereHas('ticketTypes', function($query) use ($minPrice, $maxPrice) {
+                if ($minPrice !== null) {
+                    $query->where('tickets_events.price', '>=', $minPrice);
+                }
+                if ($maxPrice !== null) {
+                    $query->where('tickets_events.price', '<=', $maxPrice);
+                }
+            });
+        }
+
+        // Aplicar ordenamiento
+        switch ($sortBy) {
+            case 'date_desc':
+                $eventsQuery->orderBy('date', 'desc');
+                break;
+            case 'price_asc':
+                // Ordenar por precio mínimo usando subquery para evitar problemas con paginación
+                $eventsQuery->select('events.*')
+                    ->selectRaw('(SELECT MIN(price) FROM tickets_events WHERE tickets_events.event_id = events.id) as min_price')
+                    ->orderBy('min_price', 'asc')
+                    ->orderBy('date', 'asc');
+                break;
+            case 'price_desc':
+                $eventsQuery->select('events.*')
+                    ->selectRaw('(SELECT MIN(price) FROM tickets_events WHERE tickets_events.event_id = events.id) as min_price')
+                    ->orderBy('min_price', 'desc')
+                    ->orderBy('date', 'asc');
+                break;
+            case 'date_asc':
+            default:
+                $eventsQuery->orderBy('date', 'asc');
+                break;
+        }
+
         // Obtener eventos
         $events = $eventsQuery
-            ->orderBy('date', 'asc')
             ->paginate(12);
 
         // Cargar tags en todos los eventos
@@ -159,12 +206,25 @@ class HomeController extends Controller
             });
 
         // Obtener todos los tags con conteo de eventos
-        $tags = Tag::withCount('events')
-            ->having('events_count', '>', 0)
-            ->orderBy('events_count', 'desc')
-            ->limit(20)
-            ->get();
+        try {
+            $tags = Tag::withCount('events')
+                ->having('events_count', '>', 0)
+                ->orderBy('events_count', 'desc')
+                ->limit(50)
+                ->get();
+        } catch (\Exception $e) {
+            $tags = collect([]);
+        }
 
-        return view('events.search', compact('events', 'categories', 'tags', 'search', 'tagId', 'categoryId'));
+        // Calcular rangos de precio
+        $priceRanges = [
+            ['min' => 0, 'max' => 500, 'label' => 'Menos de $500'],
+            ['min' => 500, 'max' => 1000, 'label' => '$500 - $1,000'],
+            ['min' => 1000, 'max' => 2000, 'label' => '$1,000 - $2,000'],
+            ['min' => 2000, 'max' => 5000, 'label' => '$2,000 - $5,000'],
+            ['min' => 5000, 'max' => null, 'label' => 'Más de $5,000'],
+        ];
+
+        return view('events.search', compact('events', 'categories', 'tags', 'search', 'tagId', 'categoryId', 'minPrice', 'maxPrice', 'sortBy', 'priceRanges'));
     }
 }

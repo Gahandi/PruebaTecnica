@@ -158,26 +158,49 @@
                             </div>
 
                             <div>
-                                <label for="tags-input" class="block text-sm font-medium text-gray-700 mb-3">Etiquetas (Tags)</label>
-                                <div id="tags-container" class="flex flex-wrap gap-2 mb-2 min-h-[50px] p-3 border-2 border-gray-200 rounded-xl bg-white">
-                                    <!-- Los tags se agregarán aquí dinámicamente -->
-                                </div>
-                                <div class="flex gap-2">
+                                <label for="tags-input" class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
+                                    <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                    </svg>
+                                    Etiquetas (Tags)
+                                </label>
+                                
+                                <!-- Input de texto con botón de agregar -->
+                                <div class="flex gap-2 mb-3">
                                     <input type="text" id="tags-input" 
-                                           class="flex-1 border-2 bg-white border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
-                                           placeholder="Escribe una etiqueta y presiona Enter">
-                                    <select id="tags-select" class="border-2 bg-white border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200">
-                                        <option value="">Seleccionar tag existente</option>
+                                           class="flex-1 border-2 bg-white border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 text-sm"
+                                           placeholder="Escribe una etiqueta...">
+                                    <button type="button" id="add-tag-btn" onclick="addTagFromInput()"
+                                            class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 flex items-center space-x-2 whitespace-nowrap">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                        </svg>
+                                        <span>Agregar</span>
+                                    </button>
+                                </div>
+
+                                <!-- Select de tags existentes -->
+                                <div class="mb-4">
+                                    <select id="tags-select" 
+                                            class="w-full border-2 bg-white border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 text-sm">
+                                        <option value="">O selecciona un tag existente</option>
                                         @foreach($tags ?? [] as $tag)
                                             <option value="{{ $tag->name }}">{{ $tag->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
-                                <p class="mt-2 text-sm text-gray-500 flex items-center">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+
+                                <!-- Tags agregadas -->
+                                <div id="tags-container" class="flex flex-wrap gap-2 min-h-[60px] p-4 border-2 border-gray-200 rounded-xl bg-gradient-to-br from-gray-50 to-white">
+                                    <span class="text-sm text-gray-400 italic" id="tags-empty-message">No hay etiquetas agregadas aún</span>
+                                    <!-- Los tags se agregarán aquí dinámicamente -->
+                                </div>
+
+                                <p class="mt-2 text-xs text-gray-500 flex items-center">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
-                                    Agrega etiquetas para categorizar tu evento. Presiona Enter para agregar.
+                                    Las etiquetas ayudan a que tu evento sea más fácil de encontrar.
                                 </p>
                                 <!-- Inputs ocultos para enviar los tags -->
                                 <div id="tags-hidden-inputs"></div>
@@ -532,15 +555,27 @@ document.addEventListener('DOMContentLoaded', function() {
     const tagsInput = document.getElementById('tags-input');
     const tagsSelect = document.getElementById('tags-select');
     const tagsHiddenInputs = document.getElementById('tags-hidden-inputs');
+    const tagsEmptyMessage = document.getElementById('tags-empty-message');
     let selectedTags = [];
 
     function addTag(tagName) {
         tagName = tagName.trim();
-        if (!tagName || selectedTags.includes(tagName)) return;
+        if (!tagName || selectedTags.includes(tagName)) {
+            // Mostrar feedback visual si el tag ya existe
+            if (selectedTags.includes(tagName)) {
+                tagsInput.classList.add('border-red-500');
+                setTimeout(() => {
+                    tagsInput.classList.remove('border-red-500');
+                }, 1000);
+            }
+            return;
+        }
 
         selectedTags.push(tagName);
         renderTags();
         updateHiddenInputs();
+        tagsInput.value = '';
+        tagsInput.focus();
     }
 
     function removeTag(tagName) {
@@ -551,12 +586,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderTags() {
         tagsContainer.innerHTML = '';
+        
+        if (selectedTags.length === 0) {
+            tagsContainer.innerHTML = '<span class="text-sm text-gray-400 italic" id="tags-empty-message">No hay etiquetas agregadas aún</span>';
+            return;
+        }
+
         selectedTags.forEach(tag => {
             const tagElement = document.createElement('span');
-            tagElement.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200';
+            tagElement.className = 'inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-300 shadow-sm hover:shadow-md transition-all duration-200 transform hover:scale-105';
             tagElement.innerHTML = `
+                <svg class="w-3 h-3 mr-1.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
                 ${tag}
-                <button type="button" onclick="removeTagFromEvent('${tag}')" class="ml-2 text-green-600 hover:text-green-800">
+                <button type="button" onclick="removeTagFromEvent('${tag.replace(/'/g, "\\'")}')" 
+                        class="ml-2 text-green-700 hover:text-red-600 hover:bg-red-50 rounded-full p-0.5 transition-all duration-200">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
@@ -577,20 +622,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Función para agregar tag desde el botón
+    window.addTagFromInput = function() {
+        const tagValue = tagsInput.value.trim();
+        if (tagValue) {
+            addTag(tagValue);
+        }
+    };
+
     window.removeTagFromEvent = function(tagName) {
         removeTag(tagName);
     };
 
+    // Agregar tag con Enter
     tagsInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
-            if (this.value.trim()) {
-                addTag(this.value);
-                this.value = '';
-            }
+            addTagFromInput();
         }
     });
 
+    // Agregar tag desde el select
     tagsSelect.addEventListener('change', function() {
         if (this.value) {
             addTag(this.value);
