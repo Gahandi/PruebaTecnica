@@ -124,7 +124,7 @@
                             <div>
                                 <label for="address" class="block text-sm font-medium text-gray-700 mb-3">Dirección</label>
                                 <input type="text" name="address" id="address" value="{{ old('address') }}" required
-                                       class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 @error('address') border-red-500 @enderror"
+                                       class="w-full border-2 bg-white border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 @error('address') border-red-500 @enderror"
                                        placeholder="Ej: Av. Reforma 123, Ciudad de México">
                                 <p class="mt-2 text-sm text-gray-500 flex items-center">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
