@@ -330,7 +330,7 @@
 <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
 
 <script async
-    src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.api_key', '{{ config('services.google_maps.api_key') }}') }}&loading=async&libraries=places&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.api_key') }}&loading=async&libraries=places&callback=initMap">
 </script>
 
 <script>
