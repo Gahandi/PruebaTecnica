@@ -45,32 +45,40 @@ class OrderController extends Controller
     {
         $userId = auth()->id();
 
-        // 1. Obtenemos los pedidos paginados SIN intentar cargar la relación 'event'
+        // 1. Obtenemos los pedidos paginados con todas las relaciones necesarias
         $orders = Order::where('user_id', $userId)
             ->with([
-                // 'event', <-- LO QUITAMOS DE AQUÍ
                 'tickets.ticketType',
                 'tickets.checkin',
+                'tickets.eventTicket.space',
                 'payments.coupon'
             ])
             ->latest()
             ->paginate(10);
 
-        // 2. Extraemos todos los IDs de eventos de los pedidos que ya tenemos en esta página.
-        // ->pluck('event_id') extrae el array, ->flatten() los une todos en una sola lista.
+        // 2. Extraemos todos los IDs de eventos de los pedidos
         $eventIds = $orders->pluck('event_id')->flatten()->unique()->filter();
 
-        // 3. Buscamos todos los eventos necesarios en UNA SOLA consulta para ser eficientes.
-        // ->keyBy('id') convierte la colección para que podamos buscar eventos por su ID fácilmente.
-        $events = Event::whereIn('id', $eventIds)->get()->keyBy('id');
+        // 3. Buscamos todos los eventos necesarios con sus relaciones
+        $events = Event::whereIn('id', $eventIds)
+            ->with(['space', 'ticketTypes'])
+            ->get()
+            ->keyBy('id');
 
-        // 4. Asignamos manualmente cada evento a su orden correspondiente.
+        // 4. Asignamos manualmente cada evento a su orden correspondiente
         foreach ($orders as $order) {
-            // Obtenemos el primer ID del array de event_id de la orden
-            $eventId = $order->event_id[0] ?? null;
-
-            // Creamos una propiedad 'event' en el objeto order y le asignamos el evento que encontramos.
+            $eventId = is_array($order->event_id) ? ($order->event_id[0] ?? null) : $order->event_id;
             $order->event = $events->get($eventId);
+        }
+
+        // 5. Para cada ticket, obtener el precio real desde TicketsEvent
+        foreach ($orders as $order) {
+            foreach ($order->tickets as $ticket) {
+                $ticketEvent = \App\Models\TicketsEvent::where('ticket_types_id', $ticket->ticket_types_id)
+                    ->where('event_id', $ticket->event_id)
+                    ->first();
+                $ticket->real_price = $ticketEvent ? $ticketEvent->price : 0;
+            }
         }
 
         return view('tickets.my', compact('orders'));

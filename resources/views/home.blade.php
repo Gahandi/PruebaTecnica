@@ -23,7 +23,7 @@
 
             <!-- Search Bar Mejorado -->
             <div class="max-w-4xl mx-auto mb-8">
-                <form method="GET" action="{{ route('home') }}" class="relative">
+                <form method="GET" action="{{ route('events.search') }}" class="relative">
                     <div class="flex flex-col sm:flex-row gap-3">
                         <div class="flex-1 relative">
                             <input type="text" 
@@ -57,12 +57,12 @@
                         Filtrar por Etiquetas
                     </h3>
                     <div class="flex flex-wrap gap-2 justify-center">
-                        <a href="{{ route('home', array_merge(request()->except('tag'), ['tag' => null])) }}" 
+                        <a href="{{ route('events.search', array_merge(request()->except('tag'), ['tag' => null])) }}" 
                            class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105 {{ !$tagId ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black shadow-xl scale-105' : 'bg-white/20 text-white hover:bg-white/30 shadow-md' }}">
                             Todas
                         </a>
                         @foreach($tags as $tag)
-                            <a href="{{ route('home', array_merge(request()->except('tag'), ['tag' => $tag->id])) }}" 
+                            <a href="{{ route('events.search', array_merge(request()->except('tag'), ['tag' => $tag->id])) }}" 
                                class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105 {{ $tagId == $tag->id ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-black shadow-xl scale-105' : 'bg-white/20 text-white hover:bg-white/30 shadow-md' }}">
                                 {{ $tag->name }} <span class="ml-1 opacity-75">({{ $tag->events_count }})</span>
                             </a>
@@ -86,7 +86,7 @@
         <!-- Filtro por Categoría -->
         @if($categories && $categories->count() > 0)
         <div class="mb-8 flex flex-wrap gap-3 justify-center">
-            <a href="{{ route('home', array_merge(request()->except('category'), ['category' => null])) }}" 
+            <a href="{{ route('events.search', array_merge(request()->except('category'), ['category' => null])) }}" 
                class="px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 transform hover:scale-105 {{ !$categoryId ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl scale-105' : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md hover:shadow-lg' }}">
                 <span class="flex items-center">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,7 +96,7 @@
                 </span>
             </a>
             @foreach($categories as $category)
-                <a href="{{ route('home', array_merge(request()->except('category'), ['category' => $category['id']])) }}" 
+                <a href="{{ route('events.search', array_merge(request()->except('category'), ['category' => $category['id']])) }}" 
                    class="px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 transform hover:scale-105 {{ $categoryId == $category['id'] ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl scale-105' : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md hover:shadow-lg' }}">
                     {{ $category['name'] }} <span class="ml-1 opacity-75">({{ $category['count'] }})</span>
                 </a>
@@ -118,7 +118,7 @@
             @endphp
             @foreach($categories as $category)
                 <div class="group cursor-pointer">
-                    <a href="{{ route('home', ['category' => $category['id']]) }}">
+                    <a href="{{ route('events.search', ['category' => $category['id']]) }}">
                         <div class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-8 text-center hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-110 hover:shadow-2xl">
                             <div class="text-white">
                                 <div class="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 mx-auto mb-2 sm:mb-3 lg:mb-4 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
@@ -193,7 +193,7 @@
                                     @if($event->tags && $event->tags->count() > 0)
                                         <div class="flex flex-wrap gap-2 mb-4">
                                             @foreach($event->tags as $tag)
-                                                <a href="{{ route('home', ['tag' => $tag->id]) }}" 
+                                                <a href="{{ route('events.search', ['tag' => $tag->id]) }}" 
                                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 hover:bg-purple-200 transition-colors">
                                                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
@@ -288,7 +288,7 @@
                     @if($event->tags && $event->tags->count() > 0)
                         <div class="flex flex-wrap gap-2 mb-4">
                             @foreach($event->tags as $tag)
-                                <a href="{{ route('home', ['tag' => $tag->id]) }}" 
+                                <a href="{{ route('events.search', ['tag' => $tag->id]) }}" 
                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 hover:bg-purple-200 transition-colors">
                                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>

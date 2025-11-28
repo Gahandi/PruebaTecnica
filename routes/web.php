@@ -72,6 +72,7 @@ Route::domain('{subdomain}.' . config('app.url'))
     });
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/search', [HomeController::class, 'search'])->name('events.search');
 
 // Ruta para refrescar token CSRF
 Route::get('/refresh-csrf', function () {
