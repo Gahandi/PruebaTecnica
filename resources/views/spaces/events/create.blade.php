@@ -4,10 +4,6 @@
 
 @section('content')
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-     crossorigin=""/>
-
 <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
 
 
@@ -331,11 +327,11 @@
     </div>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-     crossorigin=""></script>
-
 <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+
+<script async
+    src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.api_key', '{{ config('services.google_maps.api_key') }}') }}&loading=async&libraries=places&callback=initMap">
+</script>
 
 <script>
 let ticketTypeCount = 1;
@@ -558,100 +554,155 @@ document.addEventListener('DOMContentLoaded', function() {
         previewImage("banner", "preview-banner");
         previewImage("image", "preview-image");
 
-        // --- MAPA INTERACTIVO (LEAFLET / OPENSTREETMAP) ---
-        // Nota: Un mapa de Google editable CON pin REQUIERE API key.
-        // Esta es la mejor alternativa (OpenStreetMap) que permite pines y no tiene costo.
+        // --- MAPA INTERACTIVO (GOOGLE MAPS) ---
+        // Esta función será llamada cuando Google Maps API esté cargado
+        window.initMap = function() {
+            const coordInput = document.getElementById('coordinates');
+            const addressInput = document.getElementById('address');
 
-        const coordInput = document.getElementById('coordinates');
-        const addressInput = document.getElementById('address');
+            // Coordenadas por defecto (Toluca, México)
+            const defaultLat = 19.2826;
+            const defaultLng = -99.6556;
 
-        // Coordenadas por defecto (Tu ubicación actual, Toluca)
-        const defaultLat = 19.2826;
-        const defaultLng = -99.6556;
+            let initialLat = defaultLat;
+            let initialLng = defaultLng;
 
-        let initialLat = defaultLat;
-        let initialLng = defaultLng;
-
-        // Revisar si hay coordenadas viejas (por validación de Laravel)
-        if(coordInput.value) {
-            const parts = coordInput.value.split(',').map(s => parseFloat(s.trim()));
-            if(parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
-                initialLat = parts[0];
-                initialLng = parts[1];
+            // Revisar si hay coordenadas viejas (por validación de Laravel)
+            if(coordInput.value) {
+                const parts = coordInput.value.split(',').map(s => parseFloat(s.trim()));
+                if(parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+                    initialLat = parts[0];
+                    initialLng = parts[1];
+                }
             }
-        }
 
-        // Inicializar el mapa
-        const interactiveMap = L.map('map').setView([initialLat, initialLng], 15);
+            // Inicializar el mapa de Google Maps
+            const map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: initialLat, lng: initialLng },
+                zoom: 15,
+                mapTypeControl: true,
+                streetViewControl: true,
+                fullscreenControl: true
+            });
 
-        // Capa de teselas de OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(interactiveMap);
+            let marker = null;
+            let geocoder = new google.maps.Geocoder();
 
-        let marker;
+            // Función helper para crear o actualizar marcador y agregar listener de dragend
+            function createOrUpdateMarker(lat, lng) {
+                if (marker) {
+                    marker.setPosition({ lat: lat, lng: lng });
+                } else {
+                    marker = new google.maps.Marker({
+                        position: { lat: lat, lng: lng },
+                        map: map,
+                        draggable: true
+                    });
+                    
+                    // Agregar listener de dragend cuando se crea el marcador
+                    marker.addListener('dragend', function(e) {
+                        const dragLat = e.latLng.lat();
+                        const dragLng = e.latLng.lng();
+                        coordInput.value = `${dragLat.toFixed(6)}, ${dragLng.toFixed(6)}`;
 
-        // Colocar marcador inicial si había coordenadas
-        if(coordInput.value) {
-            marker = L.marker([initialLat, initialLng]).addTo(interactiveMap);
-        }
-
-        // Evento al hacer clic en el mapa
-        interactiveMap.on('click', function(e) {
-            const lat = e.latlng.lat.toFixed(6);
-            const lng = e.latlng.lng.toFixed(6);
-
-            if(marker) {
-                marker.setLatLng(e.latlng); // Mover marcador existente
-            } else {
-                marker = L.marker(e.latlng).addTo(interactiveMap); // Crear nuevo marcador
+                        // Geocodificación inversa
+                        geocoder.geocode({ location: { lat: dragLat, lng: dragLng } }, function(results, status) {
+                            if (status === 'OK' && results[0]) {
+                                addressInput.value = results[0].formatted_address;
+                            }
+                        });
+                    });
+                }
             }
-            // Actualizar input oculto
-            coordInput.value = `${lat}, ${lng}`;
-            // Geocodificación inversa (coordenadas -> dirección) con Nominatim
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=es`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data && data.display_name){
-                        addressInput.value = data.display_name;
+
+            // Colocar marcador inicial si había coordenadas
+            if(coordInput.value) {
+                createOrUpdateMarker(initialLat, initialLng);
+            }
+
+            // Configurar autocompletado de direcciones de Google Places
+            const autocomplete = new google.maps.places.Autocomplete(addressInput, {
+                componentRestrictions: { country: ['mx'] }, // Restringir a México
+                fields: ['formatted_address', 'geometry', 'name']
+            });
+
+            // Cuando se selecciona una dirección del autocompletado
+            autocomplete.addListener('place_changed', function() {
+                const place = autocomplete.getPlace();
+                
+                if (!place.geometry) {
+                    console.log('No se encontró información de ubicación para la dirección seleccionada.');
+                    return;
+                }
+
+                const lat = place.geometry.location.lat();
+                const lng = place.geometry.location.lng();
+
+                // Actualizar coordenadas
+                coordInput.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+                // Actualizar marcador
+                createOrUpdateMarker(lat, lng);
+
+                // Centrar el mapa en la ubicación seleccionada
+                map.setCenter({ lat: lat, lng: lng });
+                map.setZoom(15);
+
+                // Actualizar el input de dirección con la dirección formateada
+                addressInput.value = place.formatted_address;
+            });
+
+            // Evento al hacer clic en el mapa
+            map.addListener('click', function(e) {
+                const lat = e.latLng.lat();
+                const lng = e.latLng.lng();
+
+                // Actualizar marcador
+                createOrUpdateMarker(lat, lng);
+
+                // Actualizar coordenadas
+                coordInput.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+                // Geocodificación inversa (coordenadas -> dirección) con Google Geocoding
+                geocoder.geocode({ location: { lat: lat, lng: lng } }, function(results, status) {
+                    if (status === 'OK' && results[0]) {
+                        addressInput.value = results[0].formatted_address;
                     } else {
                         addressInput.value = 'Dirección no encontrada';
                     }
-                })
-                .catch(() => {
-                    addressInput.value = 'Error al obtener dirección';
                 });
-        });
-        // Evento al dejar el input de dirección (Geocodificación)
-        addressInput.addEventListener('blur', function() {
-            const address = this.value;
-            // Evitar búsquedas innecesarias
-            if(address && address.length > 5 && address !== 'Dirección no encontrada' && address !== 'Error al obtener dirección') {
+            });
 
-                // Geocodificación (dirección -> coordenadas) con Nominatim
-                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&accept-language=es`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if(data && data.length > 0) {
-                            const lat = parseFloat(data[0].lat);
-                            const lng = parseFloat(data[0].lon);
+            // Evento al escribir manualmente en el input de dirección (geocodificación)
+            let geocodeTimeout;
+            addressInput.addEventListener('input', function() {
+                clearTimeout(geocodeTimeout);
+                const address = this.value;
 
-                            coordInput.value = `${lat}, ${lng}`;
+                // Esperar 500ms después de que el usuario deje de escribir
+                geocodeTimeout = setTimeout(function() {
+                    if (address && address.length > 5 && 
+                        address !== 'Dirección no encontrada' && 
+                        address !== 'Error al obtener dirección') {
+                        
+                        geocoder.geocode({ address: address }, function(results, status) {
+                            if (status === 'OK' && results[0]) {
+                                const lat = results[0].geometry.location.lat();
+                                const lng = results[0].geometry.location.lng();
 
-                            if(marker) {
-                                marker.setLatLng([lat, lng]);
-                            } else {
-                                marker = L.marker([lat, lng]).addTo(interactiveMap);
+                                coordInput.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+                                // Actualizar marcador usando la función helper
+                                createOrUpdateMarker(lat, lng);
+
+                                map.setCenter({ lat: lat, lng: lng });
+                                map.setZoom(15);
                             }
-                            interactiveMap.setView([lat, lng], 15);
-                        }
-                    })
-                    .catch(() => {
-                        console.log('Error al geocodificar dirección');
-                    });
-            }
-        });
+                        });
+                    }
+                }, 500);
+            });
+        };
     });
 </script>
 @endsection

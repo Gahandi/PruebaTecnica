@@ -38,4 +38,8 @@ return [
         'sandbox_mode' => env('OPENPAY_SANDBOX_MODE', false),
     ],
 
+    'google_maps' => [
+        'api_key' => env('GOOGLE_MAPS_API_KEY'),
+    ],
+
 ];
