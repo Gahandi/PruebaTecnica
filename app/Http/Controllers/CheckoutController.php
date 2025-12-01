@@ -567,11 +567,13 @@ class CheckoutController extends Controller
             if (empty($cart)) {
                 return redirect()->route('checkout.cart')->with('error', 'Tu carrito está vacío.');
             }
+
             // Calcular totales
             $subtotal = 0;
             foreach ($cart as $item) {
                 $subtotal += $item['price'] * $item['quantity'];
             }
+
             $appliedCoupon = session()->get('applied_coupon');
             $discountAmount = 0;
             $couponId = null;
@@ -579,15 +581,18 @@ class CheckoutController extends Controller
                 $discountAmount = ($subtotal * $appliedCoupon->discount_percentage) / 100;
                 $couponId = $appliedCoupon->id;
             }
+
             $taxableAmount = $subtotal - $discountAmount;
             $taxes = $taxableAmount * 0.16; // 16% IVA
             $total = $taxableAmount + $taxes;
-            // Guardar datos del cliente en sesión para usar después
+
+            // Guardar datos del cliente en sesión para usar después (por si hay 3DS/callback)
             session([
                 'checkout_customer_email' => $request->customer_email,
                 'checkout_customer_name' => $request->customer_name,
                 'checkout_customer_password' => $request->customer_password,
             ]);
+
             // Procesar pago con Openpay
             if ($request->payment_method === 'openpay') {
                 // Validar que las credenciales de Openpay estén configuradas
@@ -598,6 +603,7 @@ class CheckoutController extends Controller
                     \Log::error('Credenciales de Openpay no configuradas');
                     return back()->with('error', 'Error de configuración: Las credenciales de Openpay no están configuradas. Por favor, contacta al administrador.');
                 }
+
                 $ip_user = $request->ip();
                 $openpay = Openpay::getInstance($merchantId, $privateKey, 'MX', $ip_user);
                 Openpay::setSandboxMode(config('services.openpay.sandbox_mode', false));
@@ -620,29 +626,100 @@ class CheckoutController extends Controller
                     'redirect_url' => $redirectUrl,
                 ];
 
+                \Log::info('Iniciando cargo Openpay', [
+                    'amount' => $chargeRequest['amount'],
+                    'customer_email' => $customer['email'],
+                ]);
+
                 $charge = $openpay->charges->create($chargeRequest);
+
                 // Si la respuesta contiene una URL, es un cargo 3DS
                 if (isset($charge->payment_method->url)) {
                     session(['openpay_charge_id' => $charge->id]);
+                    \Log::info('Cargo Openpay requiere 3DS, redirigiendo a banco', [
+                        'charge_id' => $charge->id,
+                        'status' => $charge->status,
+                    ]);
                     return redirect()->away($charge->payment_method->url);
                 }
+
                 // Si no hay URL, fue un cargo directo
                 if ($charge->status === 'completed') {
-                    return $this->finalizeOrderAndCreateTickets($charge, $cart, $couponId, $subtotal, $discountAmount, $total, $taxes, $request->customer_email, $request->customer_name, $request);
-                } else {
-                    return back()->with('error', 'El pago no fue completado. Estado: ' . $charge->status);
+                    \Log::info('Cargo Openpay completado sin 3DS, finalizando orden', [
+                        'charge_id' => $charge->id,
+                    ]);
+                    return $this->finalizeOrderAndCreateTickets(
+                        $charge,
+                        $cart,
+                        $couponId,
+                        $subtotal,
+                        $discountAmount,
+                        $total,
+                        $taxes,
+                        $request->customer_email,
+                        $request->customer_name,
+                        $request
+                    );
                 }
+
+                \Log::warning('Cargo Openpay no completado', [
+                    'charge_id' => $charge->id ?? null,
+                    'status' => $charge->status ?? null,
+                ]);
+
+                return back()->with('error', 'El pago no fue completado. Estado: ' . ($charge->status ?? 'desconocido'));
             }
+
             return back()->with('error', 'Método de pago no válido.');
         } catch (\OpenpayApiTransactionError $e) {
+            // Errores de transacción (fondos insuficientes, fraude, etc.)
             \Log::error('Error de transacción Openpay', [
-                'description' => $e->getDescription(),
-                'error_code' => $e->getErrorCode(),
+                'message' => $e->getMessage(),
+                'description' => method_exists($e, 'getDescription') ? $e->getDescription() : null,
+                'error_code' => method_exists($e, 'getErrorCode') ? $e->getErrorCode() : null,
+                'category' => method_exists($e, 'getCategory') ? $e->getCategory() : null,
+                'http_code' => method_exists($e, 'getHttpCode') ? $e->getHttpCode() : null,
+                'request_id' => method_exists($e, 'getRequestId') ? $e->getRequestId() : null,
             ]);
-            return back()->with('error', 'Error con la tarjeta: ' . $e->getDescription());
+
+            $description = method_exists($e, 'getDescription') ? $e->getDescription() : $e->getMessage();
+
+            // Caso específico de riesgo de fraude
+            if (stripos($description, 'fraud risk') !== false) {
+                return back()->with('error', 'Por seguridad, tu banco o el sistema antifraude ha rechazado el pago. Por favor intenta con otra tarjeta o contacta a tu banco.');
+            }
+
+            return back()->with('error', 'Error con la tarjeta: ' . $description);
+        } catch (\OpenpayApiRequestError $e) {
+            // Errores de validación o petición mal formada
+            \Log::error('Error de petición Openpay', [
+                'message' => $e->getMessage(),
+                'description' => method_exists($e, 'getDescription') ? $e->getDescription() : null,
+                'error_code' => method_exists($e, 'getErrorCode') ? $e->getErrorCode() : null,
+            ]);
+
+            return back()->with('error', 'No se pudo procesar la petición de pago. Por favor intenta de nuevo.');
+        } catch (\OpenpayApiConnectionError $e) {
+            // Problemas de conexión con Openpay
+            \Log::error('Error de conexión con Openpay', [
+                'message' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'No pudimos conectarnos con la pasarela de pago. Intenta de nuevo en unos minutos.');
+        } catch (\OpenpayApiError $e) {
+            // Otros errores generales de Openpay
+            \Log::error('Error general de Openpay', [
+                'message' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Ocurrió un error al comunicarse con la pasarela de pago. Intenta nuevamente.');
         } catch (\Exception $e) {
-            \Log::error('Error al procesar pago: ' . $e->getMessage());
-            return back()->with('error', 'Ocurrió un error inesperado al procesar tu pago.');
+            \Log::error('Error al procesar pago', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return back()->with('error', 'Ocurrió un error inesperado al procesar tu pago. Si el problema persiste, contacta a soporte.');
         }
     }
 
