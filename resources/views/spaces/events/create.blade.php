@@ -111,8 +111,8 @@
                         </div>
                     </div>
 
-                    <div class="bg-gradient-to-r from-green-50 to-emerald-100 rounded-xl p-6 mt-8">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                    <div class="bg-gradient-to-r from-green-50 to-emerald-100 rounded-xl p-4 sm:p-6 mt-8">
+                        <h2 class="text-lg sm:text-xl font-semibold text-gray-900 mb-6 flex items-center">
                             <svg class="w-6 h-6 mr-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -166,12 +166,12 @@
                                 </label>
                                 
                                 <!-- Input de texto con botón de agregar -->
-                                <div class="flex gap-2 mb-3">
+                                <div class="flex flex-col sm:flex-row gap-2 mb-3">
                                     <input type="text" id="tags-input" 
-                                           class="flex-1 border-2 bg-white border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 text-sm"
+                                           class="w-full sm:flex-1 border-2 bg-white border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 text-sm"
                                            placeholder="Escribe una etiqueta...">
                                     <button type="button" id="add-tag-btn" onclick="addTagFromInput()"
-                                            class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 flex items-center space-x-2 whitespace-nowrap">
+                                            class="w-full sm:w-auto justify-center bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 flex items-center space-x-2 whitespace-nowrap">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                         </svg>

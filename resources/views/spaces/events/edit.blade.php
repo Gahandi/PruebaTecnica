@@ -122,8 +122,8 @@
                     </div>
 
                     {{-- Bloque: Ubicación del Evento --}}
-                    <div class="bg-gradient-to-r from-green-50 to-emerald-100 rounded-xl p-6 mt-8">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                    <div class="bg-gradient-to-r from-green-50 to-emerald-100 rounded-xl p-4 sm:p-6 mt-8"> 
+                        <h2 class="text-lg sm:text-xl font-semibold text-gray-900 mb-6 flex items-center">
                             <svg class="w-6 h-6 mr-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -135,9 +135,9 @@
                             <div>
                                 <label for="address" class="block text-sm font-medium text-gray-700 mb-3">Dirección</label>
                                 <input type="text" name="address" id="address"
-                                       value="{{ old('address', $event->address) }}" required
-                                       class="w-full border-2 bg-white border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 @error('address') border-red-500 @enderror"
-                                       placeholder="Ej: Av. Reforma 123, Ciudad de México">
+                                    value="{{ old('address', $event->address) }}" required
+                                    class="w-full border-2 bg-white border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 @error('address') border-red-500 @enderror"
+                                    placeholder="Ej: Av. Reforma 123, Ciudad de México">
                                 <p class="mt-2 text-sm text-gray-500 flex items-center">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -157,9 +157,9 @@
                             <div class="hidden">
                                 <label for="coordinates" class="block text-sm font-medium text-gray-700 mb-3">Coordenadas GPS</label>
                                 <input type="text" name="coordinates" id="coordinates"
-                                       value="{{ old('coordinates', $event->coordinates) }}"
-                                       class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 @error('coordinates') border-red-500 @enderror"
-                                       placeholder="Ej: 19.4326, -99.1332">
+                                    value="{{ old('coordinates', $event->coordinates) }}"
+                                    class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 @error('coordinates') border-red-500 @enderror"
+                                    placeholder="Ej: 19.4326, -99.1332">
                                 @error('coordinates')
                                     <p class="mt-2 text-sm text-red-600 flex items-center">
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -178,13 +178,14 @@
                                     Etiquetas (Tags)
                                 </label>
                                 
-                                <!-- Input de texto con botón de agregar -->
-                                <div class="flex gap-2 mb-3">
+                                <div class="flex flex-col sm:flex-row gap-2 mb-3">
+                                    
                                     <input type="text" id="tags-input" 
-                                           class="flex-1 border-2 bg-white border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 text-sm"
-                                           placeholder="Escribe una etiqueta...">
+                                        class="w-full sm:flex-1 border-2 bg-white border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 text-sm"
+                                        placeholder="Escribe una etiqueta...">
+                                    
                                     <button type="button" id="add-tag-btn" onclick="addTagFromInput()"
-                                            class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 flex items-center space-x-2 whitespace-nowrap">
+                                            class="w-full sm:w-auto justify-center bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 flex items-center space-x-2 whitespace-nowrap">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                         </svg>
@@ -192,7 +193,6 @@
                                     </button>
                                 </div>
 
-                                <!-- Select de tags existentes -->
                                 <div class="mb-4">
                                     <select id="tags-select" 
                                             class="w-full border-2 bg-white border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 text-sm">
@@ -203,11 +203,9 @@
                                     </select>
                                 </div>
 
-                                <!-- Tags agregadas -->
                                 <div id="tags-container" class="flex flex-wrap gap-2 min-h-[60px] p-4 border-2 border-gray-200 rounded-xl bg-gradient-to-br from-gray-50 to-white">
                                     <span class="text-sm text-gray-400 italic" id="tags-empty-message">No hay etiquetas agregadas aún</span>
-                                    <!-- Los tags se agregarán aquí dinámicamente -->
-                                </div>
+                                    </div>
 
                                 <p class="mt-2 text-xs text-gray-500 flex items-center">
                                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -215,7 +213,6 @@
                                     </svg>
                                     Las etiquetas ayudan a que tu evento sea más fácil de encontrar.
                                 </p>
-                                <!-- Inputs ocultos para enviar los tags -->
                                 <div id="tags-hidden-inputs"></div>
                             </div>
 

@@ -119,29 +119,37 @@
                                                         @endif
                                                         <!-- Mostrar disponibilidad -->
                                                         @php
-                                                            $ticketEvent = \App\Models\TicketsEvent::where('ticket_types_id', $item['ticket_type_id'])
-                                                                ->where('event_id', $item['event_id'])
-                                                                ->first();
-                                                            $reservedQuantity = \App\Models\TicketReservation::where('ticket_types_id', $item['ticket_type_id'])
-                                                                ->where('event_id', $item['event_id'])
+                                                            $ticket_type_id = $item['ticket_type_id'] ?? null;
+                                                            $event_id = $item['event_id'] ?? null;
+
+                                                            $ticketType = null;
+                                                            if ($ticket_type_id) {
+                                                                $ticketType = \App\Models\TicketType::find($ticket_type_id);
+                                                            }
+
+                                                            // total asignado: si tu pivot está en TicketsEvent u otra tabla, usa esa tabla
+                                                            $totalAsignado = 0;
+                                                            if ($ticketType && $event_id) {
+                                                                $ticketEvent = \App\Models\TicketsEvent::where('ticket_types_id', $ticket_type_id)
+                                                                    ->where('event_id', $event_id)
+                                                                    ->first();
+                                                                $totalAsignado = $ticketEvent ? $ticketEvent->quantity : 0;
+                                                            }
+
+                                                            $vendidos = ($ticket_type_id && $event_id)
+                                                                ? \App\Models\Ticket::where('event_id', $event_id)
+                                                                    ->where('ticket_types_id', $ticket_type_id)
+                                                                    ->count()
+                                                                : 0;
+
+                                                            $reservedQuantity = \App\Models\TicketReservation::where('ticket_types_id', $ticket_type_id)
+                                                                ->where('event_id', $event_id)
                                                                 ->where('reserved_until', '>', now())
                                                                 ->where('is_active', true)
                                                                 ->where('session_id', '!=', session()->getId())
                                                                 ->sum('quantity');
-                                                            $available = $ticketEvent ? ($ticketEvent->quantity - $reservedQuantity) : 0;
-                                                        
-                                                            // Total asignado desde la tabla pivot
-                                                            $totalAsignado = $ticketType->pivot->quantity;
 
-                                                            // Boletos ya vendidos
-                                                            $vendidos = \App\Models\Ticket::where('event_id', $event->id)
-                                                                        ->where('ticket_types_id', $ticketType->id)
-                                                                        ->count();
-
-                                                            // Disponibles reales
-                                                            $disponibles = $totalAsignado - $vendidos;
-
-                                                            if ($disponibles < 0) $disponibles = 0; // seguridad
+                                                            $disponibles = max(0, $totalAsignado - $vendidos - $reservedQuantity);
                                                         @endphp
 
                                                         <p class="text-xs text-green-600 font-medium">
@@ -324,10 +332,10 @@
                             </div>
                             <!-- Mobile Cart -->
                             <div class="border-t border-gray-200 pt-2 mt-2">
-                                <button onclick="toggleCartDropdown()" class="w-full flex items-center justify-between px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                <a href="{{ \App\Helpers\CartHelper::getCartViewRoute() }}"  class="w-full flex items-center justify-between px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
                                     <span>Carrito</span>
                                     <span id="mobile-cart-count" class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full" style="display: none;">0</span>
-                                </button>
+                                </a>
                             </div>
                             <form method="POST" action="{{ config('app.url') }}/logout" class="border-t border-gray-200 pt-2 mt-2">
                                 @csrf

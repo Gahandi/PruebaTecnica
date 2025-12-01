@@ -676,33 +676,51 @@ class CheckoutController extends Controller
 
             return back()->with('error', 'Método de pago no válido.');
         } catch (OpenpayApiTransactionError $e) {
-            // Errores de transacción (fondos insuficientes, fraude, etc.)
-            \Log::error('Error de transacción Openpay', [
-                'message' => $e->getMessage(),
-                'description' => method_exists($e, 'getDescription') ? $e->getDescription() : null,
-                'error_code' => method_exists($e, 'getErrorCode') ? $e->getErrorCode() : null,
-                'category' => method_exists($e, 'getCategory') ? $e->getCategory() : null,
-                'http_code' => method_exists($e, 'getHttpCode') ? $e->getHttpCode() : null,
-                'request_id' => method_exists($e, 'getRequestId') ? $e->getRequestId() : null,
-            ]);
+            // 1. Capturamos el código de error
+            $errorCode = $e->getErrorCode();
+            $errorMessage = '';
 
-            $description = method_exists($e, 'getDescription') ? $e->getDescription() : $e->getMessage();
-
-            // Caso específico de riesgo de fraude
-            if (stripos($description, 'fraud risk') !== false) {
-                return back()->with('error', 'Por seguridad, tu banco o el sistema antifraude ha rechazado el pago. Por favor intenta con otra tarjeta o contacta a tu banco.');
+            // 2. Asignamos el mensaje según tus requerimientos
+            switch ($errorCode) {
+                case 3001:
+                    $errorMessage = 'La tarjeta fue rechazada.';
+                    break;
+                case 3002:
+                    $errorMessage = 'La tarjeta ha expirado.';
+                    break;
+                case 3003:
+                    $errorMessage = 'La tarjeta no tiene fondos suficientes.';
+                    break;
+                case 3004:
+                    $errorMessage = 'La tarjeta ha sido identificada como una tarjeta robada.';
+                    break;
+                case 3005:
+                    $errorMessage = 'La tarjeta ha sido rechazada por el sistema antifraudes.';
+                    break;
+                default:
+                    // Si es otro error de transacción (ej. 3006, etc), usamos la descripción original o un genérico
+                    $desc = method_exists($e, 'getDescription') ? $e->getDescription() : $e->getMessage();
+                    $errorMessage = 'Error con la tarjeta: ' . $desc;
+                    break;
             }
 
-            return back()->with('error', 'Error con la tarjeta: ' . $description);
-        } catch (OpenpayApiRequestError $e) {
-            // Errores de validación o petición mal formada
-            \Log::error('Error de petición Openpay', [
+            // 3. Logueamos el error original para el administrador
+            \Log::error('Error de transacción Openpay', [
+                'code' => $errorCode,
                 'message' => $e->getMessage(),
-                'description' => method_exists($e, 'getDescription') ? $e->getDescription() : null,
-                'error_code' => method_exists($e, 'getErrorCode') ? $e->getErrorCode() : null,
+                'user_msg' => $errorMessage
             ]);
 
-            return back()->with('error', 'No se pudo procesar la petición de pago. Por favor intenta de nuevo.');
+            // 4. Regresamos con una variable de sesión específica 'openpay_error'
+            // Usamos withInput() para que no tengan que volver a escribir su nombre/email
+            return back()->with('openpay_error', $errorMessage)->withInput();
+
+        } catch (OpenpayApiRequestError $e) {
+            // ... resto de tus catchs (sin cambios, solo asegúrate de usar withInput) ...
+            return back()->with('error', 'Error en la solicitud.')->withInput();
+        } catch (\Exception $e) {
+            \Log::error('Error general', ['msg' => $e->getMessage()]);
+            return back()->with('error', 'Error inesperado.')->withInput();
         } catch (OpenpayApiConnectionError $e) {
             // Problemas de conexión con Openpay
             \Log::error('Error de conexión con Openpay', [
