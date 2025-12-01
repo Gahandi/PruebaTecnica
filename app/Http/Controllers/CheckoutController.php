@@ -24,6 +24,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use App\Jobs\SendTicketPurchaseEmail;
 use Carbon\Carbon;
+use Openpay\Data\OpenpayApiError;
+use Openpay\Data\OpenpayApiTransactionError;
+use Openpay\Data\OpenpayApiRequestError;
+use Openpay\Data\OpenpayApiConnectionError;
 
 class CheckoutController extends Controller
 {
@@ -671,7 +675,7 @@ class CheckoutController extends Controller
             }
 
             return back()->with('error', 'Método de pago no válido.');
-        } catch (\OpenpayApiTransactionError $e) {
+        } catch (OpenpayApiTransactionError $e) {
             // Errores de transacción (fondos insuficientes, fraude, etc.)
             \Log::error('Error de transacción Openpay', [
                 'message' => $e->getMessage(),
@@ -690,7 +694,7 @@ class CheckoutController extends Controller
             }
 
             return back()->with('error', 'Error con la tarjeta: ' . $description);
-        } catch (\OpenpayApiRequestError $e) {
+        } catch (OpenpayApiRequestError $e) {
             // Errores de validación o petición mal formada
             \Log::error('Error de petición Openpay', [
                 'message' => $e->getMessage(),
@@ -699,14 +703,14 @@ class CheckoutController extends Controller
             ]);
 
             return back()->with('error', 'No se pudo procesar la petición de pago. Por favor intenta de nuevo.');
-        } catch (\OpenpayApiConnectionError $e) {
+        } catch (OpenpayApiConnectionError $e) {
             // Problemas de conexión con Openpay
             \Log::error('Error de conexión con Openpay', [
                 'message' => $e->getMessage(),
             ]);
 
             return back()->with('error', 'No pudimos conectarnos con la pasarela de pago. Intenta de nuevo en unos minutos.');
-        } catch (\OpenpayApiError $e) {
+        } catch (OpenpayApiError $e) {
             // Otros errores generales de Openpay
             \Log::error('Error general de Openpay', [
                 'message' => $e->getMessage(),
