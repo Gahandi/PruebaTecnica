@@ -30,7 +30,8 @@ class TypeEvent extends Model
 	protected $table = 'type_events';
 
 	protected $fillable = [
-		'name'
+		'name',
+		'image'
 	];
 
 	public function events()

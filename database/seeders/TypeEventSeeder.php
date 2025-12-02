@@ -14,62 +14,27 @@ class TypeEventSeeder extends Seeder
     {
         $typeEvents = [
             [
-                'name' => 'Concierto',
+                'name' => 'Makeup',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'name' => 'Conferencia',
+                'name' => 'Barbershop',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'name' => 'Workshop',
+                'name' => 'Estilismo y Modas',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'name' => 'Festival',
+                'name' => 'Curso de Uñas',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'name' => 'Deportivo',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'Cultural',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'Networking',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'Gastronómico',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'Tecnología',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'Familiar',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'Religioso',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'name' => 'Benéfico',
+                'name' => 'Redes Sociales y Generación de Contenido',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

@@ -156,13 +156,14 @@
                                 Rango de Precio
                             </h3>
                             <div class="space-y-3">
-                                <div class="flex gap-2">
+                                <div class="flex flex-col gap-2"> 
                                     <input type="number" name="min_price" value="{{ $minPrice ?? '' }}" placeholder="Mín" 
-                                           class="flex-1 px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm font-medium transition-all"
-                                           onchange="document.getElementById('filterForm').submit()">
+                                        class="flex-1 px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm font-medium transition-all"
+                                        onchange="document.getElementById('filterForm').submit()">
+
                                     <input type="number" name="max_price" value="{{ $maxPrice ?? '' }}" placeholder="Máx" 
-                                           class="flex-1 px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm font-medium transition-all"
-                                           onchange="document.getElementById('filterForm').submit()">
+                                        class="flex-1 px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm font-medium transition-all"
+                                        onchange="document.getElementById('filterForm').submit()">
                                 </div>
                                 <div class="space-y-2">
                                     @foreach($priceRanges as $range)
@@ -220,7 +221,7 @@
                 </div>
 
                 @if($events->count() > 0)
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                         @foreach($events as $event)
                             <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-indigo-200 group">
                                 <div class="relative overflow-hidden">
