@@ -4,20 +4,16 @@
 
 @section('content')
 <!-- Hero Section -->
-<div class="relative bg-gradient-to-r from-purple-900 via-blue-900 to-indigo-900 overflow-hidden">
-    <div class="absolute inset-0">
-        <div class="absolute inset-0 bg-black opacity-50"></div>
-        <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.05\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
-    </div>
+<div class="relative bg-gradient-to-r from-pink-500 to-pink-600 overflow-hidden">
     <div class="relative max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-12 sm:py-16 lg:py-24">
         <div class="text-center">
-            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6">
+            <h1 class="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6">
                Eventos para cursos de 
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
+               <span class="text-transparent bg-clip-text bg-pink-300">
                     Belleza
                 </span>
             </h1>
-            <p class="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-200 mb-6 sm:mb-8 max-w-3xl mx-auto px-2">
+            <p class="text-base sm:text-lg md:text-xl lg:text-2xl text-white mb-6 sm:mb-8 max-w-3xl mx-auto px-2">
                 Descubre conciertos, deportes, teatro, comedia y más. Compra boletos de forma segura y fácil.
             </p>
 
@@ -30,13 +26,13 @@
                                    name="search" 
                                    value="{{ $search ?? '' }}"
                                    placeholder="¿Qué evento buscas? Ej: concierto, rock, teatro..."
-                                   class="w-full px-6 py-4 text-lg rounded-2xl border-0 shadow-xl focus:ring-4 focus:ring-yellow-400 focus:outline-none bg-white text-gray-900 placeholder-gray-400">
+                                   class="w-full px-6 py-4 text-lg rounded-2xl border-0 shadow-xl focus:ring-4 focus:ring-pink-300 focus:outline-none bg-white text-gray-900 placeholder-gray-400">
                             <svg class="absolute right-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
                         </div>
                         <button type="submit" 
-                                class="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black px-8 py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2">
+                                class="bg-gradient-to-r from-pink-500 to-pink-400 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
@@ -79,7 +75,7 @@
 <div class="bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 py-8 sm:py-12 lg:py-16">
     <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
         <div class="text-center mb-6 sm:mb-8 lg:mb-12">
-            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-4">Explora por Categoría</h2>
+            <h2 class="font-serif  text-2xl sm:text-3xl md:text-4xl font-bold text-[#e24972] mb-2 sm:mb-4">Explora por Categoría</h2>
             <p class="text-sm sm:text-base lg:text-lg text-gray-600">Encuentra eventos que te interesen</p>
         </div>
 
@@ -87,7 +83,7 @@
         @if($categories && $categories->count() > 0)
         <div class="mb-8 flex flex-wrap gap-3 justify-center">
             <a href="{{ route('events.search', array_merge(request()->except('category'), ['category' => null])) }}" 
-               class="px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 transform hover:scale-105 {{ !isset($categoryId) || !$categoryId ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl scale-105' : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md hover:shadow-lg' }}">
+               class="px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 transform hover:scale-105 {{ !isset($categoryId) || !$categoryId ? 'bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 text-white shadow-xl scale-105' : 'bg-white text-gray-700 hover:bg-gray-100 shadow-md hover:shadow-lg' }}">
                 <span class="flex items-center">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
@@ -122,14 +118,14 @@
                                 >
 
                                 {{-- Degradado oscuro encima --}}
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                                <div class="absolute inset-0 bg-gradient-to-r from-[rgba(255,105,180,0.70)] to-[rgba(255,105,180,0.90)]"></div>
 
                                 {{-- Texto --}}
                                 <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6 lg:p-8 text-white">
-                                    <h3 class="text-sm sm:text-base lg:text-lg font-semibold mb-1">
+                                    <h3 class="font-serif text-sm sm:text-base lg:text-lg font-semibold mb-1">
                                         {{ $category['name'] }}
                                     </h3>
-                                    <p class="text-xs sm:text-sm opacity-90">
+                                    <p class="text-xs sm:text-sm ">
                                         {{ $category['count'] }} eventos
                                     </p>
                                 </div>
@@ -153,7 +149,7 @@
 <div class="py-8 sm:py-12 lg:py-16 bg-gradient-to-br from-white via-blue-50 to-indigo-50">
     <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
         <div class="text-center mb-6 sm:mb-8 lg:mb-12">
-            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-4">Eventos Próximos</h2>
+            <h2 class="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#e24972] mb-2 sm:mb-4">Eventos Próximos</h2>
             <p class="text-sm sm:text-base lg:text-lg text-gray-600">Los eventos más populares del momento</p>
         </div>
 
@@ -163,7 +159,7 @@
                 <div class="flex transition-transform duration-500 ease-in-out" id="carousel">
                     @foreach($featuredEvents as $event)
                         <div class="w-full sm:w-1/2 lg:w-1/3 flex-shrink-0 px-2 sm:px-4">
-                            <div class="bg-white rounded-xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-purple-200">
+                            <div class="bg-white rounded-xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-pink-200">
                                 <div class="relative overflow-hidden">
                                     @if($event->banner && $event->banner !== 'test.jpg')
                                         <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}"
@@ -187,7 +183,7 @@
                                     </div>
                                 </div>
                                 <div class="p-6">
-                                    <h3 class="text-xl font-bold text-gray-900 mb-2">{{ $event->name }}</h3>
+                                    <h3 class="text-xl font-bold text-[#e24972] mb-2">{{ $event->name }}</h3>
                                     @if($event->ticketTypes->count() > 0)
                                         <div class="flex items-baseline mb-3 text-sm">
                                             <span class="text-gray-600 font-medium mr-2">Entradas Desde:</span>
@@ -218,12 +214,12 @@
                                         <div class="flex items-center">
                                             <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}"
                                                target="_blank"
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
+                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800 hover:bg-pink-200 transition-colors">
                                                     {{ $event->space->name }}
                                             </a>
                                         </div>
                                         <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}/{{ $event->slug }}"
-                                        class="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black px-6 py-2 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+                                        class="bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 text-white px-6 py-2 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
                                             Ver Evento
                                         </a>
                                     </div>
@@ -256,14 +252,14 @@
 <div class="py-8 sm:py-12 lg:py-16 bg-gray-50">
     <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
         <div class="text-center mb-6 sm:mb-8 lg:mb-12">
-            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2 sm:mb-4">Todos los Eventos</h2>
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-[#e24972] mb-2 sm:mb-4">Todos los Eventos</h2>
             <p class="text-sm sm:text-base lg:text-lg text-gray-600">Descubre todos los eventos disponibles</p>
         </div>
 
         @if($allEvents->count() > 0)
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         @foreach($allEvents as $event)
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-blue-200 group">
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-pink-200 group">
                 <div class="relative overflow-hidden">
                     @if($event->banner && $event->banner !== 'test.jpg')
                         <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}"
@@ -282,7 +278,7 @@
                     @endif
                 </div>
                 <div class="p-4 sm:p-5 lg:p-6">
-                    <h3 class="text-lg sm:text-xl font-bold text-gray-900 mb-1">{{ $event->name }}</h3>
+                    <h3 class="text-lg sm:text-xl font-bold text-[#e24972] mb-1">{{ $event->name }}</h3>
                     @if($event->ticketTypes->count() > 0)
                         <div class="flex items-baseline mb-3 text-sm">
                             <span class="text-gray-600 font-medium mr-2">Entradas Desde:</span>
@@ -344,13 +340,13 @@
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
                         <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}"
-                            target="_blank" {{-- Es una buena práctica abrir los enlaces externos en una nueva pestaña --}}
-                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors">
+                            target="_blank"
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800 hover:bg-pink-200 transition-colors">
                                 {{ $event->space->name }}
                         </a>
                         </div>
                         <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}/{{ $event->slug }}"
-                        class="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black px-4 py-2 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm">
+                        class="bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 to-pink-500 text-white px-4 py-2 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm">
                             Ver Evento
                         </a>
                     </div>
@@ -390,7 +386,7 @@
 </div>
 
 <!-- CTA Section -->
-<div class="bg-gradient-to-r from-yellow-400 to-orange-500 py-16">
+<div class="bg-gradient-to-r from-pink-500 to-pink-600 py-16">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
             ¿Tienes un evento que promocionar?

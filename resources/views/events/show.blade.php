@@ -71,8 +71,8 @@
     <div class="relative z-10 -mt-16 sm:-mt-24 lg:-mt-32 max-w-4xl mx-auto px-2 sm:px-4 lg:px-6 py-6 sm:py-8 lg:py-12 space-y-4 sm:space-y-6 lg:space-y-8">
 
         <div class="bg-white/80 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 border border-white/30 shadow-xl">
-            <h2 class="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 sm:mb-6 lg:mb-8 flex items-center">
-                <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <h2 class="text-xl sm:text-2xl font-semibold text-pink-600 mb-4 sm:mb-6 lg:mb-8 flex items-center">
+                <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 Información del Evento
@@ -80,8 +80,8 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mb-4 sm:mb-6 lg:mb-8">
                 <div class="flex items-start space-x-4">
-                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
                     </div>
@@ -93,8 +93,8 @@
                 </div>
 
                 <div class="flex items-start space-x-4">
-                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
@@ -103,7 +103,7 @@
                         <h3 class="font-semibold text-gray-900 mb-2">Ubicación</h3>
                         <p class="text-gray-700 text-lg">{{ $event->address }}</p>
                         @if($event->coordinates)
-                            <button onclick="scrollToMapSection()" class="text-sm text-blue-600 hover:text-blue-800 mt-2 flex items-center">
+                            <button onclick="scrollToMapSection()" class="text-sm text-pink-600 hover:text-pink-800 mt-2 flex items-center">
                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -180,9 +180,9 @@
             @endif
 
             @if($event->coordinates)
-                <div id="map-section-container" class="bg-gradient-to-r from-green-50 to-emerald-100 rounded-xl p-6">
+                <div id="map-section-container" class="bg-gradient-to-r from-pink-50 to-pink-100 rounded-xl p-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
-                        <svg class="w-6 h-6 mr-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
@@ -230,7 +230,7 @@
             {{-- TODO: Contenido del Formulario de Compra (Tu código actual de formulario va aquí) --}}
             <div class="bg-white/80 backdrop-blur-lg rounded-2xl p-8 border border-white/30 shadow-xl">
                 <h2 class="text-2xl font-semibold text-gray-900 mb-8 flex items-center">
-                    <svg class="w-6 h-6 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
                     </svg> Compra de Boletos
                 </h2>
@@ -251,7 +251,7 @@
                                 $disponibles = max(0, $totalAsignado - $vendidos);
                             @endphp
                             <div class="bg-white/60 backdrop-blur-sm border-2 border-gray-200 rounded-xl p-6 
-                                        hover:border-indigo-300 transition-all duration-300 hover:shadow-lg hover:scale-105 
+                                        hover:border-pink-300 transition-all duration-300 hover:shadow-lg hover:scale-105 
                                         flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 
                                 <!-- Columna de nombre y disponibilidad -->
@@ -350,7 +350,7 @@
                     </div>
 
                     <div class="flex flex-col sm:flex-row gap-4">
-                        <button type="button" id="add_to_cart_button" disabled onclick="addToCart()" class="flex-1 bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-8 py-4 rounded-xl hover:from-indigo-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-lg flex items-center justify-center space-x-3">
+                        <button type="button" id="add_to_cart_button" disabled onclick="addToCart()" class="flex-1 bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 to-pink-500 text-white px-8 py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-lg flex items-center justify-center space-x-3">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
                             </svg>

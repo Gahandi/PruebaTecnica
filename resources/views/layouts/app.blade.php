@@ -40,7 +40,9 @@
                         <!-- Logo/Brand -->
                         <div class="flex items-center flex-1 md:flex-none justify-center md:justify-start">
                             <a href="{{ config('app.url') }}/" class="text-lg sm:text-xl font-bold text-gray-900">
-                                {{ config('app.name', 'Boletos') }}
+                            <img src="{{ asset('images/logo/Logo_merrycolor.png') }}" 
+                                 alt="Logo Merrycolor"
+                                 class="h-12 w-auto">
                             </a>
                         </div>
 

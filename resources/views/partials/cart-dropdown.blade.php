@@ -2,7 +2,7 @@
 <div class="px-3 py-2 sm:px-4 sm:py-3 border-b border-gray-200 bg-gray-50 rounded-t-lg">
     <div class="flex items-center justify-between">
         <div class="min-w-0 flex-1">
-            <h3 class="text-base sm:text-lg font-semibold text-gray-900 truncate">Carrito de Compras</h3>
+            <h3 class="text-base sm:text-lg font-semibold text-[#e24972] truncate">Carrito de Compras</h3>
             <p class="text-xs sm:text-sm text-gray-500">{{ $cartCount }} item(s)</p>
         </div>
         <button onclick="closeCartDropdown()" class="text-gray-400 hover:text-gray-600 ml-2 flex-shrink-0">
@@ -29,8 +29,8 @@
             <div class="px-3 py-2 sm:px-4 sm:py-3 border-b border-gray-100 hover:bg-gray-50">
                 <div class="flex items-start sm:items-center gap-2 sm:gap-3">
                     <!-- Icono de boleto -->
-                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
                         </svg>
                     </div>
@@ -83,7 +83,7 @@
                 Ver Carrito
             </a>
             <a href="{{ \App\Helpers\CartHelper::getCheckoutRoute() }}"
-               class="flex-1 bg-blue-600 text-white text-center px-3 py-2 rounded-md text-xs sm:text-sm hover:bg-blue-700 transition-colors">
+               class="flex-1 bg-gradient-to-r from-pink-500 to-pink-400 text-white text-center px-3 py-2 rounded-md text-xs sm:text-sm transition-colors">
                 Comprar
             </a>
         </div>

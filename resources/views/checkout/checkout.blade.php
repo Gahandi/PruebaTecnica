@@ -7,7 +7,7 @@
         <!-- Header -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 lg:mb-8 gap-3 sm:gap-0">
             <div class="flex-1 min-w-0">
-                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Finalizar Compra</h1>
+                <h1 class="text-2xl sm:text-3xl font-bold text-[#e24972]">Finalizar Compra</h1>
                 <p class="text-sm sm:text-base text-gray-600 mt-1">Revisa tu orden y completa el pago de forma segura</p>
             </div>
             <a href="{{ route('checkout.cart') }}"
@@ -286,7 +286,7 @@
 
                     <!-- Coupon Code -->
                     <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
-                        <div class="px-3 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-gray-200">
+                        <div class="px-3 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
                             <h2 class="text-lg sm:text-xl font-semibold text-gray-900">Código de Descuento</h2>
                         </div>
                         <div class="p-6">
@@ -358,7 +358,7 @@
                 <div class="space-y-6">
                     <!-- Payment Method -->
                     <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
-                        <div class="px-6 py-4 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-gray-200">
+                        <div class="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
                             <h2 class="text-xl font-semibold text-gray-900">Información de Pago</h2>
                         </div>
                         <div class="p-6">

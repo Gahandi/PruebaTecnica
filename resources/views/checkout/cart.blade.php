@@ -7,8 +7,8 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3 sm:gap-0">
         <div class="flex-1 min-w-0">
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Carrito de Compras</h1>
-            <p class="text-sm sm:text-base text-gray-600 mt-1">Revisa tus boletos antes de proceder al pago</p>
+            <h1 class="text-2xl sm:text-3xl font-bold text-[#e24972]">Carrito de Compras</h1>
+            <p class="text-sm sm:text-base text-gray-800 mt-1">Revisa tus boletos antes de proceder al pago</p>
         </div>
         <a href="{{ route('events.public') }}"
            class="w-full sm:w-auto bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors text-center text-sm sm:text-base whitespace-nowrap">
@@ -27,7 +27,7 @@
             <h3 class="text-lg font-medium text-gray-900 mb-2">Tu carrito está vacío</h3>
             <p class="text-gray-500 mb-4">Agrega algunos boletos para comenzar tu compra.</p>
             <a href="{{ route('events.public') }}"
-               class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+               class="bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-400 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
                 Ver Eventos
             </a>
         </div>
@@ -37,7 +37,7 @@
             <div class="lg:col-span-2 order-2 lg:order-1">
                 <div class="bg-white shadow-lg rounded-lg overflow-hidden">
                     <div class="px-3 py-3 sm:px-6 sm:py-4 border-b border-gray-200">
-                        <h2 class="text-lg sm:text-xl font-semibold text-gray-900">Boletos en tu carrito</h2>
+                        <h2 class="text-lg sm:text-xl font-semibold text-[#e24972]">Boletos en tu carrito</h2>
                     </div>
                     <div class="divide-y divide-gray-200">
                         @foreach($cart as $key => $item)
@@ -68,7 +68,7 @@
                                             <div class="mb-2 sm:mb-3">
                                                 <h4 class="text-sm sm:text-base font-semibold text-gray-800">{{ $item['ticket_type_name'] ?? 'Tipo de Boleto' }}</h4>
                                                 <div class="mt-1">
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800">
                                                         <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
                                                         </svg>
@@ -146,7 +146,7 @@
 
                         <div class="mt-4 sm:mt-6">
                             <a href="{{ route('checkout.checkout') }}"
-                               class="w-full bg-blue-600 text-white px-4 py-3 rounded-md hover:bg-blue-700 transition-colors text-center block text-sm sm:text-base font-medium">
+                               class="w-full bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink:500 text-white px-4 py-3 rounded-md hover:bg-blue-700 transition-colors text-center block text-sm sm:text-base font-medium">
                                 Proceder al Pago
                             </a>
                         </div>

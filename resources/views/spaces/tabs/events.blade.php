@@ -1,7 +1,7 @@
 <!-- Tab: Eventos -->
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
     <div>
-        <h2 class="text-3xl font-bold text-gray-900">Eventos de {{ $space->name }}</h2>
+        <h2 class="text-3xl font-bold text-[#e24972]">Eventos de {{ $space->name }}</h2>
         <p class="text-gray-600 mt-2">Descubre los próximos eventos de este espacio</p>
     </div>
     <div class="flex space-x-3">

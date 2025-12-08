@@ -4,15 +4,12 @@
 
 @section('content')
 <!-- Hero Section -->
-<div class="relative bg-gradient-to-r from-purple-900 via-blue-900 to-indigo-900 overflow-hidden">
-    <div class="absolute inset-0">
-        <div class="absolute inset-0 bg-black opacity-50"></div>
-    </div>
+<div class="relative bg-gradient-to-r from-pink-500 to-pink-600 overflow-hidden">
     <div class="relative max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-8 sm:py-12">
         <div class="text-center">
             <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
                 Búsqueda de
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
+                <span class="text-transparent bg-clip-text bg-pink-300">
                     Eventos
                 </span>
             </h1>
@@ -26,7 +23,7 @@
                                    name="q" 
                                    value="{{ $search ?? '' }}"
                                    placeholder="¿Qué evento buscas? Ej: concierto, rock, teatro..."
-                                   class="w-full px-6 py-4 text-lg rounded-2xl border-0 shadow-xl focus:ring-4 focus:ring-yellow-400 focus:outline-none bg-white text-gray-900 placeholder-gray-400">
+                                   class="w-full px-6 py-4 text-lg rounded-2xl border-0 shadow-xl focus:ring-4 focus:ring-pink-300 focus:outline-none bg-white text-gray-900 placeholder-gray-400">
                             <svg class="absolute right-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
@@ -47,7 +44,7 @@
                             @endif
                         </div>
                         <button type="submit" 
-                                class="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-black px-8 py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2">
+                                class="bg-gradient-to-r from-pink-500 to-pink-400 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
@@ -69,14 +66,14 @@
                 <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 sticky top-4">
                     <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
                         <h2 class="text-xl font-bold text-gray-900 flex items-center">
-                            <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-6 h-6 mr-2 text-[#e24972]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
                             </svg>
                             Filtros
                         </h2>
                         @if($tagId || $categoryId || $minPrice || $maxPrice)
                             <a href="{{ route('events.search', ['q' => $search]) }}" 
-                               class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+                               class="text-xs text-[#e24972] hover:text-indigo-800 font-medium">
                                 Limpiar
                             </a>
                         @endif
@@ -90,27 +87,27 @@
                         <!-- Categorías -->
                         <div class="mb-6">
                             <h3 class="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wider flex items-center">
-                                <svg class="w-4 h-4 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 mr-2 text-[#e24972]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
                                 </svg>
                                 Categorías
                             </h3>
                             <div class="space-y-2 max-h-56 overflow-y-auto custom-scrollbar">
-                                <label class="flex items-center p-3 rounded-xl hover:bg-indigo-50 cursor-pointer transition-all duration-200 {{ !$categoryId ? 'bg-indigo-50 border-2 border-indigo-200' : 'border-2 border-transparent' }}">
+                                <label class="flex items-center p-3 rounded-xl hover:bg-pink-50 cursor-pointer transition-all duration-200 {{ !$categoryId ? 'bg-pink-50 border-2 border-pink-200' : 'border-2 border-transparent' }}">
                                     <input type="radio" name="category" value="" {{ !$categoryId ? 'checked' : '' }} 
                                            onchange="document.getElementById('filterForm').submit()"
-                                           class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                                           class="w-4 h-4 text-[#e24972] focus:ring-[#e24972]">
                                     <span class="ml-3 text-sm font-medium text-gray-700">Todas las categorías</span>
                                 </label>
                                 @foreach($categories as $category)
-                                    <label class="flex items-center justify-between p-3 rounded-xl hover:bg-indigo-50 cursor-pointer transition-all duration-200 {{ $categoryId == $category['id'] ? 'bg-indigo-50 border-2 border-indigo-200' : 'border-2 border-transparent' }}">
+                                    <label class="flex items-center justify-between p-3 rounded-xl hover:bg-pink-50 cursor-pointer transition-all duration-200 {{ $categoryId == $category['id'] ? 'bg-pink-50 border-2 border-pink-200' : 'border-2 border-transparent' }}">
                                         <div class="flex items-center">
                                             <input type="radio" name="category" value="{{ $category['id'] }}" {{ $categoryId == $category['id'] ? 'checked' : '' }}
                                                    onchange="document.getElementById('filterForm').submit()"
-                                                   class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                                                   class="w-4 h-4 text-[#e24972] focus:ring-indigo-500">
                                             <span class="ml-3 text-sm font-medium text-gray-700">{{ $category['name'] }}</span>
                                         </div>
-                                        <span class="text-xs font-semibold text-indigo-600 bg-indigo-100 px-2.5 py-1 rounded-full">{{ $category['count'] }}</span>
+                                        <span class="text-xs font-semibold text-[#e24972] bg-indigo-100 px-2.5 py-1 rounded-full">{{ $category['count'] }}</span>
                                     </label>
                                 @endforeach
                             </div>
@@ -158,20 +155,20 @@
                             <div class="space-y-3">
                                 <div class="flex flex-col gap-2"> 
                                     <input type="number" name="min_price" value="{{ $minPrice ?? '' }}" placeholder="Mín" 
-                                        class="flex-1 px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm font-medium transition-all"
+                                        class="flex-1 px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#e24972] focus:border-[#e24972] text-sm font-medium transition-all"
                                         onchange="document.getElementById('filterForm').submit()">
 
                                     <input type="number" name="max_price" value="{{ $maxPrice ?? '' }}" placeholder="Máx" 
-                                        class="flex-1 px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm font-medium transition-all"
+                                        class="flex-1 px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#e24972] focus:border-[#e24972] text-sm font-medium transition-all"
                                         onchange="document.getElementById('filterForm').submit()">
                                 </div>
                                 <div class="space-y-2">
                                     @foreach($priceRanges as $range)
-                                        <label class="flex items-center p-3 rounded-xl hover:bg-green-50 cursor-pointer transition-all duration-200 {{ ($minPrice == $range['min'] && $maxPrice == $range['max']) ? 'bg-green-50 border-2 border-green-200' : 'border-2 border-transparent' }}">
+                                        <label class="flex items-center p-3 rounded-xl hover:bg-pink-50 cursor-pointer transition-all duration-200 {{ ($minPrice == $range['min'] && $maxPrice == $range['max']) ? 'bg-pink-50 border-2 border-pink-200' : 'border-2 border-transparent' }}">
                                             <input type="radio" name="price_range" value="{{ $range['min'] }}_{{ $range['max'] ?? '999999' }}"
                                                    {{ ($minPrice == $range['min'] && $maxPrice == $range['max']) ? 'checked' : '' }}
                                                    onchange="setPriceRange({{ $range['min'] }}, {{ $range['max'] ?? '999999' }})"
-                                                   class="w-4 h-4 text-green-600 focus:ring-green-500">
+                                                   class="w-4 h-4 text-[#e24972] focus:ring-pink-500">
                                             <span class="ml-3 text-sm font-medium text-gray-700">{{ $range['label'] }}</span>
                                         </label>
                                     @endforeach
@@ -212,7 +209,7 @@
                         </h2>
                         <p class="text-gray-600 mt-2 text-sm sm:text-base">
                             @if($events->total() > 0)
-                                <span class="font-semibold text-indigo-600">{{ $events->total() }}</span> evento(s) encontrado(s)
+                                <span class="font-semibold text-[#e24972]">{{ $events->total() }}</span> evento(s) encontrado(s)
                             @else
                                 No se encontraron eventos
                             @endif
@@ -223,7 +220,7 @@
                 @if($events->count() > 0)
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                         @foreach($events as $event)
-                            <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-indigo-200 group">
+                            <div class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-pink-200 group">
                                 <div class="relative overflow-hidden">
                                     @if($event->banner && $event->banner !== 'test.jpg')
                                         <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}"
@@ -249,16 +246,16 @@
                                     </div>
                                 </div>
                                 <div class="p-6">
-                                    <h3 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-indigo-600 transition-colors">{{ $event->name }}</h3>
+                                    <h3 class="text-xl font-bold text-[#e24972] mb-3 line-clamp-2 group-hover:text-[#e24972] transition-colors">{{ $event->name }}</h3>
                                     
                                     <div class="flex items-center text-gray-600 mb-3 text-sm">
-                                        <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5 mr-2 text-[#e24972]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                         </svg>
                                         <span class="font-medium">{{ \Carbon\Carbon::parse($event->date)->format('d M Y, H:i') }}</span>
                                     </div>
                                     <div class="flex items-start text-gray-600 mb-4 text-sm">
-                                        <svg class="w-5 h-5 mr-2 text-indigo-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5 mr-2 text-[#e24972] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                         </svg>
@@ -281,11 +278,11 @@
 
                                     <div class="flex items-center justify-between pt-4 border-t border-gray-100">
                                         <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}"
-                                           class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold transition-colors">
+                                           class="text-xs text-[#e24972] font-semibold transition-colors">
                                             {{ $event->space->name }}
                                         </a>
                                         <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}/{{ $event->slug }}"
-                                           class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 shadow-md hover:shadow-xl transform hover:scale-105">
+                                           class="bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 shadow-md hover:shadow-xl transform hover:scale-105">
                                             Ver Evento
                                         </a>
                                     </div>
@@ -309,7 +306,7 @@
                         <h3 class="text-3xl font-bold text-gray-900 mb-3">No se encontraron eventos</h3>
                         <p class="text-lg text-gray-600 mb-8">
                             Intenta ajustar tus filtros de búsqueda o 
-                            <a href="{{ route('home') }}" class="text-indigo-600 hover:text-indigo-800 font-semibold underline">ver todos los eventos</a>
+                            <a href="{{ route('home') }}" class="text-[#e24972] hover:text-[#e24972] font-semibold underline">ver todos los eventos</a>
                         </p>
                     </div>
                 @endif
