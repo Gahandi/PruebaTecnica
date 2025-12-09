@@ -25,7 +25,7 @@
 
         <!-- Header -->
         <div class="mb-8">
-            <h1 class="text-4xl font-bold text-gray-900 mb-2">Mis Boletos</h1>
+            <h1 class="text-4xl font-bold text-[#e24972] mb-2">Mis Boletos</h1>
             <p class="text-gray-600 text-lg">Gestiona y descarga tus boletos</p>
         </div>
 
@@ -35,7 +35,7 @@
                 @foreach($orders as $order)
                     <div class="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-gray-100 hover:shadow-2xl transition-all duration-300">
                         <!-- Order Header -->
-                        <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 px-6 py-6 text-white relative overflow-hidden">
+                        <div class="bg-gradient-to-r from-pink-600  to-pink-500 px-6 py-6 text-white relative overflow-hidden">
                             <div class="absolute inset-0 opacity-10" style="background-image: url('data:image/svg+xml,%3Csvg width=\"40\" height=\"40\" viewBox=\"0 0 40 40\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.4\"%3E%3Cpath d=\"M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h2V0h2v20h2V0h2v20h2V0h2v20h2V0h2v22H20v-1.5zM0 20h2v20H0V20zm4 0h2v20H4V20zm4 0h2v20H8V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2z\"/%3E%3C/g%3E%3C/svg%3E');"></div>
                             <div class="relative z-10 flex justify-between items-start">
                                 <div>
@@ -118,15 +118,15 @@
 
                             <!-- Tickets Grid -->
                             <div class="mb-6">
-                                <h4 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                                    <svg class="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <h4 class="text-xl font-bold text-[#e24972] mb-4 flex items-center">
+                                    <svg class="w-6 h-6 mr-2 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
                                     </svg>
                                     Tus Boletos
                                 </h4>
                                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     @foreach($order->tickets as $ticket)
-                                        <div class="bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-xl p-5 hover:shadow-xl hover:border-indigo-300 transition-all duration-300 transform hover:-translate-y-1">
+                                        <div class="bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-xl p-5 hover:shadow-xl hover:border-pink-300 transition-all duration-300 transform hover:-translate-y-1">
                                             <!-- Ticket Header -->
                                             <div class="flex justify-between items-start mb-4">
                                                 <div class="flex-1">
@@ -150,7 +150,7 @@
                                                         <div class="mb-2">
                                                             <p class="text-sm font-semibold text-gray-700 mb-1">Evento:</p>
                                                             <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($ticket->eventTicket->space->subdomain ?? '') }}/{{ $ticket->eventTicket->slug }}" 
-                                                               class="text-blue-600 hover:text-blue-800 font-medium text-sm underline">
+                                                               class="text-pink-600 hover:text-pink-800 font-medium text-sm">
                                                                 {{ $ticket->eventTicket->name }}
                                                             </a>
                                                         </div>
@@ -190,7 +190,7 @@
                                             </div>
 
                                             <!-- QR Code Preview -->
-                                            <div class="mb-4 text-center bg-white p-3 rounded-lg border-2 border-gray-200">
+                                            <div class="mb-4 text-center bg-white p-3 rounded-lg border-2 border-pink-200">
                                                 <div id="qrcode-{{ $ticket->id }}" class="inline-block"></div>
                                             </div>
                                             
@@ -221,7 +221,7 @@
                                             <!-- Event Link -->
                                             @if($ticket->eventTicket)
                                                 <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($ticket->eventTicket->space->subdomain ?? '') }}/{{ $ticket->eventTicket->slug }}" 
-                                                   class="mt-2 w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white text-center px-4 py-2.5 rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-200 font-semibold text-sm block">
+                                                   class="mt-2 w-full bg-gradient-to-r from-pink-500 to-pink-400  hover:from-pink-600 hover:to-pink-500 text-white text-white text-center px-4 py-2.5 rounded-lg transition-all duration-200 font-semibold text-sm block">
                                                     Ver Evento Completo
                                                 </a>
                                             @endif

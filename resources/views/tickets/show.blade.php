@@ -27,7 +27,7 @@
         <!-- Ticket Card -->
         <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
             <!-- Event Header -->
-            <div class="h-32 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white">
+            <div class="h-32 bg-gradient-to-r from-pink-500 to-pink-600 flex items-center justify-center text-white">
                 <div class="text-center">
                     <h2 class="text-2xl font-bold">{{ $ticket->eventTicket->name }}</h2>
                     <p class="text-sm opacity-90">{{ \Carbon\Carbon::parse($ticket->eventTicket->date)->format('d/m/Y H:i') }}</p>
@@ -87,7 +87,7 @@
         <div class="space-y-6">
             <!-- Event Info -->
             <div class="bg-white rounded-lg shadow-lg p-6">
-                <h3 class="text-xl font-semibold mb-4">Información del Evento</h3>
+                <h3 class="text-xl font-semibold mb-4 text-[#e24972]">Información del Evento</h3>
                 <div class="space-y-3">
                     <div>
                         <span class="text-gray-600 font-medium">Fecha y Hora:</span>
@@ -108,7 +108,7 @@
 
             <!-- Order Info -->
             <div class="bg-white rounded-lg shadow-lg p-6">
-                <h3 class="text-xl font-semibold mb-4">Información de la Compra</h3>
+                <h3 class="text-xl font-semibold mb-4 text-[#e24972]">Información de la Compra</h3>
                 <div class="space-y-3">
                     <div class="flex justify-between">
                         <span class="text-gray-600">Orden #:</span>

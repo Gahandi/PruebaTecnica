@@ -49,14 +49,14 @@
             <!-- Filtro por Categorías -->
             @if(isset($allCategories) && $allCategories->count() > 0)
             <div class="flex-1">
-                <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                    <svg class="w-4 h-4 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <label class="block text-sm font-semibold text-pink-600 mb-2 flex items-center">
+                    <svg class="w-4 h-4 mr-2 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
                     </svg>
                     Filtrar por Categoría
                 </label>
                 <select name="category" onchange="document.getElementById('spaceFilterForm').submit()" 
-                        class="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm font-medium bg-white transition-all">
+                        class="w-full px-4 py-2.5 border-2 border-pink-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-pink-500 text-sm font-medium bg-white transition-all">
                     <option value="">Todas las categorías</option>
                     @foreach($allCategories as $category)
                         <option value="{{ $category->id }}" {{ (isset($categoryFilter) && $categoryFilter == $category->id) ? 'selected' : '' }}>
@@ -91,7 +91,7 @@
 @if($eventsToShow->count() > 0)
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         @foreach($eventsToShow as $event)
-            <div class="bg-white border-2 border-gray-100 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:border-gray-200 transform hover:-translate-y-1">
+            <div class="bg-white border-2 border-gray-100 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:border-pink-200 transform hover:-translate-y-1">
                 <div class="relative">
                     <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}"
                         alt="{{ $event->name }}"
@@ -105,7 +105,7 @@
                     </div>
                 </div>
                 <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-3">{{ $event->name }}</h3>
+                    <h3 class="text-xl font-bold mb-3 text-[#e24972]">{{ $event->name }}</h3>
                     @if($event->ticketTypes->count() > 0)
                         <div class="flex items-baseline mb-3 text-sm">
                             <span class="text-gray-600 font-medium mr-2">Entradas Desde:</span>
@@ -115,13 +115,13 @@
                         </div>
                     @endif
                     <div class="flex items-center text-gray-600 mb-3">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 mr-2 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
                         <span class="font-medium">{{ \Carbon\Carbon::parse($event->date)->format('d M Y, H:i') }}</span>
                     </div>
                     <div class="flex items-center text-gray-600 mb-4">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 mr-2 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
@@ -163,7 +163,7 @@
                         </div>
                     @endif
                     <div class="flex items-center justify-between">
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-pink-100 text-pink-800 hover:bg-pink-200">
                             {{ $space->name }}
                         </span>
 
@@ -183,8 +183,7 @@
                             {{-- FIN: Botón "Editar Evento" (Añadido) --}}
 
                             <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}/{{ $event->slug }}"
-                               class="px-6 py-3 rounded-xl text-white font-semibold transition-all duration-200 hover:shadow-lg transform hover:scale-105"
-                               style="background: linear-gradient(135deg, {{ $space->color_primary }}, {{ $space->color_secondary ?? $space->color_primary }});">
+                               class="px-6 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 text-white font-semibold transition-all duration-200 hover:shadow-lg transform hover:scale-105">
                                 Ver Evento
                             </a>
                         </div>

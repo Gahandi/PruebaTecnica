@@ -9,7 +9,7 @@
 
 <div class="max-w-6xl mx-auto py-8 sm:px-6 lg:px-8">
     <div class="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-100">
-        <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 px-8 py-6 text-white">
+        <div class="bg-gradient-to-r from-pink-500 to-pink-600 px-8 py-6 text-white">
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold">Crear Nuevo Evento</h1>

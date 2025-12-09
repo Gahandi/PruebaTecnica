@@ -8,7 +8,7 @@
     <div class="mb-8">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">Mi Perfil</h1>
+                <h1 class="text-3xl font-bold text-[#e24972]">Mi Perfil</h1>
                 <p class="text-gray-600 mt-1">Gestiona tu información personal</p>
             </div>
         </div>
@@ -25,7 +25,7 @@
         <div class="lg:col-span-2">
             <div class="bg-white shadow-xl rounded-xl p-8 border border-gray-100">
                 <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-bold text-gray-900">Información Personal</h2>
+                    <h2 class="text-2xl font-bold text-[#e24972]">Información Personal</h2>
                     <div class="flex items-center space-x-2">
                         <div class="w-3 h-3 bg-green-500 rounded-full"></div>
                         <span class="text-sm text-gray-600">Activo</span>
@@ -103,7 +103,7 @@
                         <button type="button" 
                                 id="editBtn" 
                                 onclick="toggleEdit()" 
-                                class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
+                                class="bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 text-white px-6 py-3 rounded-lg transition-colors flex items-center">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                             </svg>
@@ -129,7 +129,7 @@
 
             <!-- Change Password -->
             <div class="bg-white shadow-xl rounded-xl p-8 mt-6 border border-gray-100">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Cambiar Contraseña</h2>
+                <h2 class="text-2xl font-bold text-[#e24972] mb-6">Cambiar Contraseña</h2>
                 <form method="POST" action="{{ route('profile.password.update') }}" id="passwordForm">
                     @csrf
                     @method('PUT')
@@ -191,7 +191,7 @@
         <div class="space-y-6">
             <!-- User Stats -->
             <div class="bg-white shadow-xl rounded-xl p-6 border border-gray-100">
-                <h3 class="text-xl font-bold text-gray-900 mb-6">Estadísticas</h3>
+                <h3 class="text-xl font-bold text-[#e24972] mb-6">Estadísticas</h3>
                 <div class="space-y-4">
                     <div class="flex justify-between items-center py-2">
                         <span class="text-gray-600">Miembro desde:</span>
@@ -218,10 +218,10 @@
 
             <!-- Quick Actions -->
             <div class="bg-white shadow-xl rounded-xl p-6 border border-gray-100">
-                <h3 class="text-xl font-bold text-gray-900 mb-6">Acciones Rápidas</h3>
+                <h3 class="text-xl font-bold text-[#e24972] mb-6">Acciones Rápidas</h3>
                 <div class="space-y-3">
                     <a href="{{ route('events.public') }}" 
-                       class="block w-full bg-green-600 text-white text-center py-3 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
+                       class="block w-full bg-gradient-to-r from-pink-500 to-pink-400  hover:from-pink-600 hover:to-pink-500 text-white text-center py-3 px-4 rounded-lg transition-colors flex items-center justify-center">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
