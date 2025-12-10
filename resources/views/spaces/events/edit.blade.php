@@ -8,7 +8,7 @@
 <div class="max-w-6xl mx-auto py-8 sm:px-6 lg:px-8">
     <div class="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-100">
         {{-- Encabezado de la vista --}}
-        <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 px-8 py-6 text-white">
+        <div class="bg-gradient-to-r from-pink-500 to-pink-600 px-8 py-6 text-white">
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold">Editar Evento: {{ $event->name }}</h1>
@@ -39,9 +39,9 @@
                 {{-- Columna 1: Info y Ubicación --}}
                 <div classs="space-y-8">
                     {{-- Bloque: Información del Evento --}}
-                    <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
-                            <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-6">
+                        <h2 class="text-xl font-semibold text-[#e24972] mb-6 flex items-center">
+                            <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                             Información del Evento
@@ -52,7 +52,7 @@
                                 <label for="name" class="block text-sm font-medium text-gray-700 mb-3">Nombre del Evento</label>
                                 <input type="text" name="name" id="name"
                                        value="{{ old('name', $event->name) }}" required
-                                       class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 @error('name') border-red-500 @enderror"
+                                       class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('name') border-red-500 @enderror"
                                        placeholder="Ej: Conferencia de Tecnología 2024">
                                 @error('name')
                                     <p class="mt-2 text-sm text-red-600 flex items-center">
@@ -67,7 +67,7 @@
                             <div>
                                 <label for="description" class="block text-sm font-medium text-gray-700 mb-3">Descripción</label>
                                 <textarea name="description" id="description" rows="4" required
-                                          class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 @error('description') border-red-500 @enderror"
+                                          class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('description') border-red-500 @enderror"
                                           placeholder="Describe tu evento...">{{ old('description', $event->description) }}</textarea>
                                 @error('description')
                                     <p class="mt-2 text-sm text-red-600 flex items-center">
@@ -85,7 +85,7 @@
                                     {{-- Formatear la fecha para input datetime-local --}}
                                     <input type="datetime-local" name="date" id="date"
                                            value="{{ old('date', \Carbon\Carbon::parse($event->date)->format('Y-m-d\TH:i')) }}" required
-                                           class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 @error('date') border-red-500 @enderror">
+                                           class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('description') border-red-500 @enderror">
                                     @error('date')
                                         <p class="mt-2 text-sm text-red-600 flex items-center">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -99,7 +99,7 @@
                                 <div>
                                     <label for="type_event_id" class="block text-sm font-medium text-gray-700 mb-3">Tipo de Evento</label>
                                     <select name="type_event_id" id="type_event_id" required
-                                            class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 @error('type_event_id') border-red-500 @enderror">
+                                    class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('description') border-red-500 @enderror">
                                         <option value="">Selecciona un tipo</option>
                                         @foreach($typeEvents as $typeEvent)
                                             <option value="{{ $typeEvent->id }}"
@@ -122,9 +122,9 @@
                     </div>
 
                     {{-- Bloque: Ubicación del Evento --}}
-                    <div class="bg-gradient-to-r from-green-50 to-emerald-100 rounded-xl p-4 sm:p-6 mt-8"> 
-                        <h2 class="text-lg sm:text-xl font-semibold text-gray-900 mb-6 flex items-center">
-                            <svg class="w-6 h-6 mr-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-4 sm:p-6 mt-8"> 
+                        <h2 class="text-lg sm:text-xl font-semibold text-[#e24972] mb-6 flex items-center">
+                            <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
@@ -136,7 +136,7 @@
                                 <label for="address" class="block text-sm font-medium text-gray-700 mb-3">Dirección</label>
                                 <input type="text" name="address" id="address"
                                     value="{{ old('address', $event->address) }}" required
-                                    class="w-full border-2 bg-white border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 @error('address') border-red-500 @enderror"
+                                    class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('address') border-red-500 @enderror"
                                     placeholder="Ej: Av. Reforma 123, Ciudad de México">
                                 <p class="mt-2 text-sm text-gray-500 flex items-center">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -172,7 +172,7 @@
 
                             <div>
                                 <label for="tags-input" class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
-                                    <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 mr-2 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                                     </svg>
                                     Etiquetas (Tags)
@@ -181,11 +181,11 @@
                                 <div class="flex flex-col sm:flex-row gap-2 mb-3">
                                     
                                     <input type="text" id="tags-input" 
-                                        class="w-full sm:flex-1 border-2 bg-white border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 text-sm"
+                                        class="w-full sm:flex-1 border-2 border-pink-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 text-sm"
                                         placeholder="Escribe una etiqueta...">
                                     
                                     <button type="button" id="add-tag-btn" onclick="addTagFromInput()"
-                                            class="w-full sm:w-auto justify-center bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 flex items-center space-x-2 whitespace-nowrap">
+                                    class="w-full sm:w-auto justify-center bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 flex items-center space-x-2 whitespace-nowrap">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                         </svg>
@@ -195,7 +195,7 @@
 
                                 <div class="mb-4">
                                     <select id="tags-select" 
-                                            class="w-full border-2 bg-white border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 text-sm">
+                                    class="w-full border-2 border-pink-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 text-sm">
                                         <option value="">O selecciona un tag existente</option>
                                         @foreach($tags ?? [] as $tag)
                                             <option value="{{ $tag->name }}">{{ $tag->name }}</option>
@@ -203,7 +203,7 @@
                                     </select>
                                 </div>
 
-                                <div id="tags-container" class="flex flex-wrap gap-2 min-h-[60px] p-4 border-2 border-gray-200 rounded-xl bg-gradient-to-br from-gray-50 to-white">
+                                <div id="tags-container" class="flex flex-wrap gap-2 min-h-[60px] p-4 border-2 border-pink-200 rounded-xl ">
                                     <span class="text-sm text-gray-400 italic" id="tags-empty-message">No hay etiquetas agregadas aún</span>
                                     </div>
 
@@ -216,7 +216,7 @@
                                 <div id="tags-hidden-inputs"></div>
                             </div>
 
-                            <div class="rounded-xl overflow-hidden border-2 border-gray-200 shadow-lg">
+                            <div class="rounded-xl overflow-hidden border-2 border-pink-200 shadow-lg">
                                 <div id="map" style="height: 400px; width: 100%;"></div>
                             </div>
                         </div>
@@ -226,8 +226,8 @@
                 {{-- Columna 2: Temario, Imágenes y Boletos --}}
                 <div class="space-y-8">
                     {{-- Bloque: Temario del Evento --}}
-                    <div class="bg-gradient-to-r from-purple-50 to-pink-100 rounded-xl p-6">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                    <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-6">
+                        <h2 class="text-xl font-semibold text-[#e24972] mb-6 flex items-center">
                             <svg class="w-6 h-6 mr-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                             </svg>
@@ -236,16 +236,16 @@
 
                         <div>
                             <textarea id="agenda" name="agenda"
-                                      class="w-full rounded-xl border-2 border-gray-200 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
+                                      class="w-full rounded-xl border-2 border-pink-200 shadow-sm focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
                                       rows="12"
                                       placeholder="Escribe el temario aquí (usa Markdown)...">{{ old('agenda', $event->agenda) }}</textarea>
                         </div>
                     </div>
 
                     {{-- Bloque: Imágenes del Evento --}}
-                    <div class="bg-gradient-to-r from-orange-50 to-yellow-100 rounded-xl p-6">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
-                            <svg class="w-6 h-6 mr-3 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-6">
+                        <h2 class="text-xl font-semibold text-[#e24972] mb-6 flex items-center">
+                            <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                             </svg>
                             Imágenes del Evento
@@ -256,7 +256,7 @@
                                 <label for="banner" class="block text-sm font-medium text-gray-700 mb-3">Banner del Evento (debe de ser de 1024 * 768)</label>
                                 <div class="relative">
                                     <input type="file" name="banner" id="banner" accept="image/*"
-                                           class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 @error('banner') border-red-500 @enderror">
+                                           class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('banner') border-red-500 @enderror">
                                     {{-- ... icon ... --}}
                                 </div>
                                 @error('banner')
@@ -280,7 +280,7 @@
                                 <label for="image" class="block text-sm font-medium text-gray-700 mb-3">Imagen Principal (debe de ser de 736 * 308 )</label>
                                 <div class="relative">
                                     <input type="file" name="image" id="image" accept="image/*"
-                                           class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 @error('image') border-red-500 @enderror">
+                                           class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('image') border-red-500 @enderror">
                                     {{-- ... icon ... --}}
                                 </div>
                                 @error('image')
@@ -305,7 +305,7 @@
                             <label for="icon" class="block text-sm font-medium text-gray-700 mb-3">Icono del Evento (debe de ser de 800 * 800)</label>
                             <div class="relative">
                                 <input type="file" name="icon" id="icon" accept="image/*"
-                                       class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 @error('icon') border-red-500 @enderror">
+                                       class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('icon') border-red-500 @enderror">
                                 {{-- ... icon ... --}}
                             </div>
                             @error('icon')
@@ -327,9 +327,9 @@
                     </div>
 
                     {{-- Bloque: Tipos de Boletos --}}
-                    <div class="bg-gradient-to-r from-indigo-50 to-blue-100 rounded-xl p-6">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
-                            <svg class="w-6 h-6 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-6">
+                        <h2 class="text-xl font-semibold text-[#e24972] mb-6 flex items-center">
+                            <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
                             </svg>
                             Tipos de Boletos
@@ -373,7 +373,7 @@
                                     }
                                 @endphp
 
-                                <div class="ticket-type bg-white border-2 border-gray-200 rounded-xl p-6 shadow-sm relative">
+                                <div class="ticket-type border-2 border-pink-200 rounded-xl p-6 shadow-sm">
                                     @if($ticketIndex > 0)
                                     <div class="flex justify-between items-start mb-4">
                                         <h3 class="font-semibold text-gray-900 text-lg">Tipo de Boleto {{ $ticketIndex + 1 }}</h3>
@@ -390,7 +390,7 @@
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700 mb-3">Nombre del Boleto</label>
                                             <select name="ticket_types[{{ $ticketIndex }}][name]" data-index="{{ $ticketIndex }}"
-                                                    class="ticket-name-select w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 {{ $isOtherSelected ? 'hidden' : '' }}" required>
+                                                    class="ticket-name-select w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 {{ $isOtherSelected ? 'hidden' : '' }}" required>
                                                 <option value="">Selecciona un tipo</option>
                                                 @foreach($ticketTypes as $tt)
                                                     <option value="{{ $tt->id }}"
@@ -410,14 +410,14 @@
                                             <label class="block text-sm font-medium text-gray-700 mb-3">Precio ($)</label>
                                             <input type="number" name="ticket_types[{{ $ticketIndex }}][price]" step="0.01" min="0" required
                                                    value="{{ $price }}"
-                                                   class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                                                   class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
                                                    placeholder="0.00">
                                         </div>
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700 mb-3">Cantidad</label>
                                             <input type="number" name="ticket_types[{{ $ticketIndex }}][quantity]" min="1" required
                                                    value="{{ $quantity }}"
-                                                   class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:focus:border-indigo-500 transition-all duration-200"
+                                                   class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:focus:border-pink-500 transition-all duration-200"
                                                    placeholder="100">
                                         </div>
                                     </div>
@@ -428,7 +428,7 @@
                         </div>
 
                         <button type="button" onclick="addTicketType()"
-                                class="mt-6 bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-indigo-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center space-x-2">
+                                class="mt-6 bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 text-white px-6 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center space-x-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                             </svg>
@@ -444,7 +444,7 @@
                     Cancelar
                 </a>
                 <button type="submit"
-                        class="px-8 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-xl hover:from-green-700 hover:to-teal-700 transition-all duration-300 shadow-lg hover:shadow-xl font-medium flex items-center space-x-2">
+                        class="px-8 bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 py-3 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl font-medium flex items-center space-x-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                     </svg>
@@ -510,7 +510,7 @@
 
             // El HTML debe reflejar la adaptación de los campos name para el nuevo índice
             const ticketHtml = `
-                <div class="ticket-type bg-white border-2 border-gray-200 rounded-xl p-6 shadow-sm relative">
+                <div class="ticket-type border-2 border-gray-200 rounded-xl p-6 shadow-sm relative">
                     <div class="flex justify-between items-start mb-4">
                         <h3 class="font-semibold text-gray-900 text-lg">Tipo de Boleto ${newIndex + 1}</h3>
                         <button type="button" onclick="removeTicketType(this)"
@@ -524,7 +524,7 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-3">Nombre del Boleto</label>
                             <select name="ticket_types[${newIndex}][name]" data-index="${newIndex}"
-                                    class="ticket-name-select w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" required>
+                                    class="ticket-name-select w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200" required>
                                 <option value="">Selecciona un tipo</option>
                                 @foreach($ticketTypes as $ticketType)
                                     <option value="{{ $ticketType->id }}">{{ $ticketType->name }}</option>
@@ -537,13 +537,13 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-3">Precio ($)</label>
                             <input type="number" name="ticket_types[${newIndex}][price]" step="0.01" min="0" required
-                                class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                                class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
                                 placeholder="0.00">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-3">Cantidad</label>
                             <input type="number" name="ticket_types[${newIndex}][quantity]" min="1" required
-                                class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:focus:border-indigo-500 transition-all duration-200"
+                                class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:focus:border-pink-500 transition-all duration-200"
                                 placeholder="100">
                         </div>
                     </div>

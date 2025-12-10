@@ -6,7 +6,7 @@
 <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
         <div>
-            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-[#e24972]">
                 Verificar tu Email
             </h2>
             <p class="mt-2 text-center text-sm text-gray-600">
@@ -76,7 +76,7 @@
                     required 
                     value="{{ $email }}"
                     @if(auth()->check() && !empty($email)) readonly @endif
-                    class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm @error('email') border-red-500 @enderror @if(auth()->check() && !empty($email)) bg-gray-50 @endif"
+                    class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-pink-500 focus:border-pink-500 focus:z-10 sm:text-sm @error('email') border-red-500 @enderror @if(auth()->check() && !empty($email)) bg-gray-50 @endif"
                     placeholder="tu@email.com">
                 @error('email')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -94,7 +94,7 @@
                     required 
                     maxlength="6"
                     pattern="[0-9]{6}"
-                    class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm text-center text-2xl font-mono tracking-widest @error('code') border-red-500 @enderror"
+                    class="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-pink-500 focus:border-pink-500 focus:z-10 sm:text-sm text-center text-2xl font-mono tracking-widest @error('code') border-red-500 @enderror"
                     placeholder="000000">
                 @error('code')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -112,7 +112,7 @@
             <div>
                 <button 
                     type="submit"
-                    class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
                     Verificar Código
                 </button>
             </div>
@@ -121,7 +121,7 @@
                 <button 
                     type="button"
                     id="resend-code-btn"
-                    class="text-sm text-indigo-600 hover:text-indigo-500 underline">
+                    class="text-sm text-pink-600 hover:text-pink-500 underline">
                     Reenviar código
                 </button>
             </div>

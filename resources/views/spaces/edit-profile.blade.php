@@ -5,7 +5,7 @@
 @section('content')
 <div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
     <div class="bg-white shadow-xl rounded-xl p-8 border border-gray-100">
-        <h1 class="text-3xl font-bold text-gray-900 mb-6">Editar Perfil del Cajón</h1>
+        <h1 class="text-3xl font-bold text-[#e24972] mb-6">Editar Perfil del Cajón</h1>
         
         <form method="POST" action="{{ route('spaces.update', ['subdomain' => $space->subdomain]) }}" enctype="multipart/form-data">
             @csrf
@@ -168,7 +168,7 @@
                     Cancelar
                 </a>
                 <button type="submit" 
-                        class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        class="px-6 py-3 bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 text-white rounded-lg transition-colors">
                     Guardar Cambios
                 </button>
             </div>

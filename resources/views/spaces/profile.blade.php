@@ -24,7 +24,7 @@
                             type="button"
                                 onclick="window.location.href='{{ route('spaces.edit', $space->subdomain) }}'"
                                 class="bg-white bg-opacity-90 backdrop-blur-sm rounded-full px-6 py-3 shadow-xl flex items-center space-x-3 hover:bg-opacity-100 transition-all duration-300 hover:scale-105">
-                            <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="w-5 h-5 text-pink-600" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"></path>
                             </svg>
                             <span class="text-sm font-semibold text-gray-800">Editar</span>
@@ -158,7 +158,7 @@ function switchTab(tabName) {
 
     // Remover active de todos los botones
     document.querySelectorAll('.tab-button').forEach(button => {
-        button.classList.remove('active', 'border-blue-500', 'text-blue-600');
+        button.classList.remove('active', 'border-pink-500', 'text-pink-600');
         button.classList.add('border-transparent', 'text-gray-500');
     });
     
@@ -171,7 +171,7 @@ function switchTab(tabName) {
     // Activar el botón seleccionado
     const button = document.getElementById('tab-' + tabName);
     if (button) {
-        button.classList.add('active', 'border-blue-500', 'text-blue-600');
+        button.classList.add('active', 'border-pink-500', 'text-pink-600');
         button.classList.remove('border-transparent', 'text-gray-500');
     }
 }
@@ -179,8 +179,8 @@ function switchTab(tabName) {
 
 <style>
 .tab-button.active {
-    border-bottom-color: #3b82f6;
-    color: #2563eb;
+    border-bottom-color: #fc2eb3ff;
+    color: #fc2eb3ff;
 }
 
 .photo-overlay {

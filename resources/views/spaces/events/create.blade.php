@@ -33,9 +33,9 @@
             <div class="grid grid-cols-1 gap-12">
 
                 <div classs="space-y-8">
-                    <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
-                            <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-6">
+                        <h2 class="text-xl font-semibold text-[#e24972] mb-6 flex items-center">
+                            <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                             Información del Evento
@@ -45,7 +45,7 @@
                             <div>
                                 <label for="name" class="block text-sm font-medium text-gray-700 mb-3">Nombre del Evento</label>
                                 <input type="text" name="name" id="name" value="{{ old('name') }}" required
-                                       class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 @error('name') border-red-500 @enderror"
+                                       class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('name') border-red-500 @enderror"
                                        placeholder="Ej: Conferencia de Tecnología 2024">
                                 @error('name')
                                     <p class="mt-2 text-sm text-red-600 flex items-center">
@@ -60,7 +60,7 @@
                             <div>
                                 <label for="description" class="block text-sm font-medium text-gray-700 mb-3">Descripción</label>
                                 <textarea name="description" id="description" rows="4" required
-                                          class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 @error('description') border-red-500 @enderror"
+                                          class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('description') border-red-500 @enderror"
                                           placeholder="Describe tu evento...">{{ old('description') }}</textarea>
                                 @error('description')
                                     <p class="mt-2 text-sm text-red-600 flex items-center">
@@ -76,7 +76,7 @@
                                 <div>
                                     <label for="date" class="block text-sm font-medium text-gray-700 mb-3">Fecha y Hora</label>
                                     <input type="datetime-local" name="date" id="date" value="{{ old('date') }}" required
-                                           class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 @error('date') border-red-500 @enderror">
+                                           class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('date') border-red-500 @enderror">
                                     @error('date')
                                         <p class="mt-2 text-sm text-red-600 flex items-center">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -90,7 +90,7 @@
                                 <div>
                                     <label for="type_event_id" class="block text-sm font-medium text-gray-700 mb-3">Tipo de Evento</label>
                                     <select name="type_event_id" id="type_event_id" required
-                                            class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 @error('type_event_id') border-red-500 @enderror">
+                                            class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('type_event_id') border-red-500 @enderror">
                                         <option value="">Selecciona un tipo</option>
                                         @foreach($typeEvents as $typeEvent)
                                             <option value="{{ $typeEvent->id }}" {{ old('type_event_id') == $typeEvent->id ? 'selected' : '' }}>
@@ -111,9 +111,9 @@
                         </div>
                     </div>
 
-                    <div class="bg-gradient-to-r from-green-50 to-emerald-100 rounded-xl p-4 sm:p-6 mt-8">
-                        <h2 class="text-lg sm:text-xl font-semibold text-gray-900 mb-6 flex items-center">
-                            <svg class="w-6 h-6 mr-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-4 sm:p-6 mt-8">
+                        <h2 class="text-lg sm:text-xl font-semibold text-[#e24972] mb-6 flex items-center">
+                            <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
@@ -124,7 +124,7 @@
                             <div>
                                 <label for="address" class="block text-sm font-medium text-gray-700 mb-3">Dirección</label>
                                 <input type="text" name="address" id="address" value="{{ old('address') }}" required
-                                       class="w-full border-2 bg-white border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 @error('address') border-red-500 @enderror"
+                                       class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('address') border-red-500 @enderror"
                                        placeholder="Ej: Av. Reforma 123, Ciudad de México">
                                 <p class="mt-2 text-sm text-gray-500 flex items-center">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -145,7 +145,7 @@
                             <div class="hidden">
                                 <label for="coordinates" class="block text-sm font-medium text-gray-700 mb-3">Coordenadas GPS</label>
                                 <input type="text" name="coordinates" id="coordinates" value="{{ old('coordinates') }}"
-                                       class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 @error('coordinates') border-red-500 @enderror"
+                                       class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('coordinates') border-red-500 @enderror"
                                        placeholder="Ej: 19.4326, -99.1332">
                                 @error('coordinates')
                                     <p class="mt-2 text-sm text-red-600 flex items-center">
@@ -159,7 +159,7 @@
 
                             <div>
                                 <label for="tags-input" class="block text-sm font-medium text-gray-700 mb-3 flex items-center">
-                                    <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 mr-2 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                                     </svg>
                                     Etiquetas (Tags)
@@ -168,10 +168,10 @@
                                 <!-- Input de texto con botón de agregar -->
                                 <div class="flex flex-col sm:flex-row gap-2 mb-3">
                                     <input type="text" id="tags-input" 
-                                           class="w-full sm:flex-1 border-2 bg-white border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 text-sm"
+                                           class="w-full sm:flex-1 border-2 border-pink-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 text-sm"
                                            placeholder="Escribe una etiqueta...">
                                     <button type="button" id="add-tag-btn" onclick="addTagFromInput()"
-                                            class="w-full sm:w-auto justify-center bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 flex items-center space-x-2 whitespace-nowrap">
+                                            class="w-full sm:w-auto justify-center bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 flex items-center space-x-2 whitespace-nowrap">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                         </svg>
@@ -182,7 +182,7 @@
                                 <!-- Select de tags existentes -->
                                 <div class="mb-4">
                                     <select id="tags-select" 
-                                            class="w-full border-2 bg-white border-gray-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 text-sm">
+                                            class="w-full border-2 border-pink-200 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 text-sm">
                                         <option value="">O selecciona un tag existente</option>
                                         @foreach($tags ?? [] as $tag)
                                             <option value="{{ $tag->name }}">{{ $tag->name }}</option>
@@ -191,7 +191,7 @@
                                 </div>
 
                                 <!-- Tags agregadas -->
-                                <div id="tags-container" class="flex flex-wrap gap-2 min-h-[60px] p-4 border-2 border-gray-200 rounded-xl bg-gradient-to-br from-gray-50 to-white">
+                                <div id="tags-container" class="flex flex-wrap gap-2 min-h-[60px] p-4 border-2 border-pink-200 rounded-xl ">
                                     <span class="text-sm text-gray-400 italic" id="tags-empty-message">No hay etiquetas agregadas aún</span>
                                     <!-- Los tags se agregarán aquí dinámicamente -->
                                 </div>
@@ -206,7 +206,7 @@
                                 <div id="tags-hidden-inputs"></div>
                             </div>
 
-                            <div class="rounded-xl overflow-hidden border-2 border-gray-200 shadow-lg">
+                            <div class="rounded-xl overflow-hidden border-2 border-pink-200 shadow-lg">
                                 <div id="map" style="height: 400px; width: 100%;"></div>
                             </div>
                         </div>
@@ -214,22 +214,22 @@
                 </div>
 
                 <div class="space-y-8">
-                    <div class="bg-gradient-to-r from-purple-50 to-pink-100 rounded-xl p-6">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
-                            <svg class="w-6 h-6 mr-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-6">
+                        <h2 class="text-xl font-semibold text-[#e24972] mb-6 flex items-center">
+                            <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                             </svg>
                             Temario del Evento
                         </h2>
 
                         <div>
-                            <textarea id="agenda" name="agenda" class="w-full rounded-xl border-2 border-gray-200 shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200" rows="12" placeholder="Escribe el temario aquí (usa Markdown)...">{{ old('agenda') }}</textarea>
+                            <textarea id="agenda" name="agenda" class="w-full rounded-xl border-2 border-pink-200 shadow-sm focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200" rows="12" placeholder="Escribe el temario aquí (usa Markdown)...">{{ old('agenda') }}</textarea>
                         </div>
                     </div>
 
-                    <div class="bg-gradient-to-r from-orange-50 to-yellow-100 rounded-xl p-6">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
-                            <svg class="w-6 h-6 mr-3 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-6">
+                        <h2 class="text-xl font-semibold text-[#e24972] mb-6 flex items-center">
+                            <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                             </svg>
                             Imágenes del Evento
@@ -240,7 +240,7 @@
                                 <label for="banner" class="block text-sm font-medium text-gray-700 mb-3">Banner del Evento (debe de ser de 1024 * 768)</label>
                                 <div class="relative">
                                     <input type="file" name="banner" id="banner" accept="image/*"
-                                           class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 @error('banner') border-red-500 @enderror">
+                                           class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('banner') border-red-500 @enderror">
                                     <div class="absolute inset-y-0 right-0 flex items-center pr-3">
                                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -264,7 +264,7 @@
                                 <label for="image" class="block text-sm font-medium text-gray-700 mb-3">Imagen Principal (debe de ser de 736 * 308 )</label>
                                 <div class="relative">
                                     <input type="file" name="image" id="image" accept="image/*"
-                                           class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 @error('image') border-red-500 @enderror">
+                                           class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('image') border-red-500 @enderror">
                                     <div class="absolute inset-y-0 right-0 flex items-center pr-3">
                                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -289,7 +289,7 @@
                             <label for="icon" class="block text-sm font-medium text-gray-700 mb-3">Icono del Evento (debe de ser de 800 * 800)</label>
                             <div class="relative">
                                 <input type="file" name="icon" id="icon" accept="image/*"
-                                       class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 @error('icon') border-red-500 @enderror">
+                                       class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('icon') border-red-500 @enderror">
                                 <div class="absolute inset-y-0 right-0 flex items-center pr-3">
                                     <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -310,20 +310,20 @@
                         </div>
                     </div>
 
-                    <div class="bg-gradient-to-r from-indigo-50 to-blue-100 rounded-xl p-6">
-                        <h2 class="text-xl font-semibold text-gray-900 mb-6 flex items-center">
-                            <svg class="w-6 h-6 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-6">
+                        <h2 class="text-xl font-semibold text-[#e24972] mb-6 flex items-center">
+                            <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
                             </svg>
                             Tipos de Boletos
                         </h2>
 
                         <div id="ticket-types" class="space-y-4">
-                            <div class="ticket-type bg-white border-2 border-gray-200 rounded-xl p-6 shadow-sm">
+                            <div class="ticket-type border-2 border-pink-200 rounded-xl p-6 shadow-sm">
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-3">Nombre del Boleto</label>
-                                        <select name="ticket_types[0][name]" class="ticket-name-select w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" required>
+                                        <select name="ticket_types[0][name]" class="ticket-name-select w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200" required>
                                             <option value="">Selecciona un tipo</option>
                                             @foreach($ticketTypes as $ticketType)
                                                 <option value="{{ $ticketType->id }}">{{ $ticketType->name }}</option>
@@ -335,13 +335,13 @@
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-3">Precio ($)</label>
                                         <input type="number" name="ticket_types[0][price]" step="0.01" min="0" required
-                                               class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                                               class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
                                                placeholder="0.00">
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-3">Cantidad</label>
                                         <input type="number" name="ticket_types[0][quantity]" min="1" required
-                                               class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                                               class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
                                                placeholder="100">
                                     </div>
                                 </div>
@@ -349,7 +349,7 @@
                         </div>
 
                         <button type="button" onclick="addTicketType()"
-                                class="mt-6 bg-gradient-to-r from-indigo-600 to-blue-600 text-white px-6 py-3 rounded-xl hover:from-indigo-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center space-x-2">
+                                class="mt-6 bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 text-white px-6 py-3 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center space-x-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                             </svg>
@@ -365,7 +365,7 @@
                     Cancelar
                 </a>
                 <button type="submit"
-                        class="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl font-medium flex items-center space-x-2">
+                        class="px-8 bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 py-3 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl font-medium flex items-center space-x-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                     </svg>
@@ -426,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function addTicketType() {
     const container = document.getElementById('ticket-types');
     const newTicketType = document.createElement('div');
-    newTicketType.className = 'ticket-type bg-white border-2 border-gray-200 rounded-xl p-6 shadow-sm relative';
+    newTicketType.className = 'ticket-type border-2 border-pink-200 rounded-xl p-6 shadow-sm relative';
 
     const currentIndex = ticketTypeCount; // Capturar el índice actual
 
@@ -443,25 +443,25 @@ function addTicketType() {
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-3">Nombre del Boleto</label>
-                <select name="ticket_types[${currentIndex}][name]" data-index="${currentIndex}" class="ticket-name-select w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" required>
+                <select name="ticket_types[${currentIndex}][name]" data-index="${currentIndex}" class="ticket-name-select w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200" required>
                     <option value="">Selecciona un tipo</option>
                     @foreach($ticketTypes as $ticketType)
                         <option value="{{ $ticketType->id }}">{{ $ticketType->name }}</option>
                     @endforeach
                     <option value="other">Agregar otro tipo</option>
                 </select>
-                <input type="text" name="ticket_types[${currentIndex}][name_other]" class="ticket-name-input hidden w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200" placeholder="Escribe el nombre del boleto">
+                <input type="text" name="ticket_types[${currentIndex}][name_other]" class="ticket-name-input hidden w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200" placeholder="Escribe el nombre del boleto">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-3">Precio ($)</label>
                 <input type="number" name="ticket_types[${currentIndex}][price]" step="0.01" min="0" required
-                       class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                       class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
                        placeholder="0.00">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-3">Cantidad</label>
                 <input type="number" name="ticket_types[${currentIndex}][quantity]" min="1" required
-                       class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                       class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
                        placeholder="50">
             </div>
         </div>
@@ -594,14 +594,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
         selectedTags.forEach(tag => {
             const tagElement = document.createElement('span');
-            tagElement.className = 'inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-300 shadow-sm hover:shadow-md transition-all duration-200 transform hover:scale-105';
+            tagElement.className = 'inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-gradient-to-r from-pink-100 to-emerald-100 text-pink-800 border border-pink-300 shadow-sm hover:shadow-md transition-all duration-200 transform hover:scale-105';
             tagElement.innerHTML = `
-                <svg class="w-3 h-3 mr-1.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-3 h-3 mr-1.5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                 </svg>
                 ${tag}
                 <button type="button" onclick="removeTagFromEvent('${tag.replace(/'/g, "\\'")}')" 
-                        class="ml-2 text-green-700 hover:text-red-600 hover:bg-red-50 rounded-full p-0.5 transition-all duration-200">
+                        class="ml-2 text-pink-700 hover:text-red-600 hover:bg-red-50 rounded-full p-0.5 transition-all duration-200">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
