@@ -382,8 +382,30 @@
                                 </div>
 
                                 <!-- OpenPay Information -->
-                                <div id="openpay-card-info">
-
+                                <div id="openpay-card-info" class="mt-6">
+                                    <h1 class="text-lg font-semibold mb-3">Tarjetas aceptadas<h1>
+                                    <div class="flex justify-center gap-4 items-center bg-gray-50 border border-gray-200 p-4 rounded-lg shadow-sm">
+                                        <img 
+                                            src="{{ asset('images/marcas_aceptacion/americanExpress.png') }}" 
+                                            alt="Card 1"
+                                            class="h-8 sm:h-10 w-auto object-contain"
+                                        >
+                                        <img 
+                                            src="{{ asset('images/marcas_aceptacion/carnet.png') }}" 
+                                            alt="Card 2"
+                                            class="h-8 sm:h-10 w-auto object-contain"
+                                        >
+                                        <img 
+                                            src="{{ asset('images/marcas_aceptacion/masterCard.png') }}" 
+                                            alt="Card 2"
+                                            class="h-8 sm:h-10 w-auto object-contain"
+                                        >
+                                        <img 
+                                            src="{{ asset('images/marcas_aceptacion/visa.png') }}" 
+                                            alt="Card 2"
+                                            class="h-8 sm:h-10 w-auto object-contain"
+                                        >
+                                    </div>
                                     <input type="hidden" name="openpay_token" id="openpay_token">
                                     <input type="hidden" name="device_session_id" id="device_session_id">
 

@@ -8,7 +8,7 @@
     <div class="mb-8">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">Crear Mi Cajón</h1>
+                <h1 class="text-3xl font-bold text-[#e24972]">Crear Mi Cajón</h1>
                 <p class="text-gray-600 mt-1">Crea tu cajón de eventos personalizado</p>
             </div>
             <a href="{{ route('user.spaces.index') }}"
@@ -132,7 +132,7 @@
                 </a>
 
                 <button type="submit"
-                        class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                        class="bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 to-pink-500 text-white px-6 py-3 rounded-lg transition-colors">
                     Crear Mi Cajón
                 </button>
             </div>
