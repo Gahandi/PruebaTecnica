@@ -117,27 +117,27 @@
                         @if(isset($tags) && $tags && $tags->count() > 0)
                         <div class="mb-6">
                             <h3 class="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wider flex items-center">
-                                <svg class="w-4 h-4 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 mr-2 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                                 </svg>
                                 Etiquetas
                             </h3>
                             <div class="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
-                                <label class="flex items-center p-3 rounded-xl hover:bg-purple-50 cursor-pointer transition-all duration-200 {{ !$tagId ? 'bg-purple-50 border-2 border-purple-200' : 'border-2 border-transparent' }}">
+                                <label class="flex items-center p-3 rounded-xl hover:bg-pink-50 cursor-pointer transition-all duration-200 {{ !$tagId ? 'bg-pink-50 border-2 border-pink-200' : 'border-2 border-transparent' }}">
                                     <input type="radio" name="tag" value="" {{ !$tagId ? 'checked' : '' }}
                                            onchange="document.getElementById('filterForm').submit()"
-                                           class="w-4 h-4 text-purple-600 focus:ring-purple-500">
+                                           class="w-4 h-4 text-purple-600 focus:ring-pink-500">
                                     <span class="ml-3 text-sm font-medium text-gray-700">Todas las etiquetas</span>
                                 </label>
                                 @foreach($tags as $tag)
-                                    <label class="flex items-center justify-between p-3 rounded-xl hover:bg-purple-50 cursor-pointer transition-all duration-200 {{ $tagId == $tag->id ? 'bg-purple-50 border-2 border-purple-200' : 'border-2 border-transparent' }}">
+                                    <label class="flex items-center justify-between p-3 rounded-xl hover:bg-pink-50 cursor-pointer transition-all duration-200 {{ $tagId == $tag->id ? 'bg-pink-50 border-2 border-pink-200' : 'border-2 border-transparent' }}">
                                         <div class="flex items-center">
                                             <input type="radio" name="tag" value="{{ $tag->id }}" {{ $tagId == $tag->id ? 'checked' : '' }}
                                                    onchange="document.getElementById('filterForm').submit()"
                                                    class="w-4 h-4 text-purple-600 focus:ring-purple-500">
                                             <span class="ml-3 text-sm font-medium text-gray-700">{{ $tag->name }}</span>
                                         </div>
-                                        <span class="text-xs font-semibold text-purple-600 bg-purple-100 px-2.5 py-1 rounded-full">{{ $tag->events_count }}</span>
+                                        <span class="text-xs font-semibold text-pink-600 bg-pink-100 px-2.5 py-1 rounded-full">{{ $tag->events_count }}</span>
                                     </label>
                                 @endforeach
                             </div>
