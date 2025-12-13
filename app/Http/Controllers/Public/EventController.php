@@ -32,7 +32,11 @@ class EventController extends Controller
             ->get();
 
         // Obtener categorías con conteo de eventos
-        $categories = TypeEvent::withCount('events')
+        $categories = TypeEvent::withCount([
+            'events as events_count' => function ($query) {
+                $query->whereDate('date', '>=', now()); 
+            }
+        ])
             ->having('events_count', '>', 0)
             ->get()
             ->map(function ($type) {
