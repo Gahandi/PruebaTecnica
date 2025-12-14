@@ -12,7 +12,7 @@ class HomeController extends Controller
     public function index(Request $request)
     {
         // Obtener parámetros de búsqueda y filtrado
-        $search = $request->get('search', '') ?? '';
+        $search = $request->get('q', '') ?? '';
         $tagId = $request->get('tag', null) ?? null;
         $categoryId = $request->get('category', null) ?? null;
 
@@ -23,20 +23,20 @@ class HomeController extends Controller
 
         // Aplicar búsqueda por texto
         if (!empty($search)) {
-            $eventsQuery->where(function($query) use ($search) {
+            $eventsQuery->where(function ($query) use ($search) {
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%")
                     ->orWhere('address', 'like', "%{$search}%")
-                    ->orWhereHas('space', function($q) use ($search) {
+                    ->orWhereHas('space', function ($q) use ($search) {
                         $q->where('name', 'like', "%{$search}%")
-                          ->orWhere('keywords', 'like', "%{$search}%");
+                            ->orWhere('keywords', 'like', "%{$search}%");
                     });
             });
         }
 
         // Aplicar filtro por tag
         if ($tagId) {
-            $eventsQuery->whereHas('tags', function($query) use ($tagId) {
+            $eventsQuery->whereHas('tags', function ($query) use ($tagId) {
                 $query->where('tags.id', $tagId);
             });
         }
@@ -65,9 +65,9 @@ class HomeController extends Controller
         // Obtener categorías con conteo de eventos
         $categories = TypeEvent::withCount([
             'events as events_count' => function ($query) {
-                $query->whereDate('date', '>=', now()); 
+                $query->whereDate('date', '>=', now());
             }
-        ])        
+        ])
             ->having('events_count', '>', 0)
             ->get()
             ->map(function ($type) {
@@ -79,12 +79,22 @@ class HomeController extends Controller
             });
 
         // Obtener todos los tags con conteo de eventos
+        // Si hay una categoría seleccionada, filtrar tags solo de esa categoría
         try {
-            $tags = Tag::withCount('events')
+            $tagsQuery = Tag::withCount([
+                'events' => function ($query) use ($categoryId) {
+                    $query->where('active', true)
+                        ->where('date', '>=', now());
+                    if ($categoryId) {
+                        $query->where('type_events_id', $categoryId);
+                    }
+                }
+            ])
                 ->having('events_count', '>', 0)
                 ->orderBy('events_count', 'desc')
-                ->limit(20)
-                ->get();
+                ->limit(20);
+
+            $tags = $tagsQuery->get();
         } catch (\Exception $e) {
             $tags = collect([]);
         }
@@ -128,15 +138,15 @@ class HomeController extends Controller
 
         // Aplicar búsqueda por texto
         if (!empty($search)) {
-            $eventsQuery->where(function($query) use ($search) {
+            $eventsQuery->where(function ($query) use ($search) {
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('description', 'like', "%{$search}%")
                     ->orWhere('address', 'like', "%{$search}%")
-                    ->orWhereHas('space', function($q) use ($search) {
+                    ->orWhereHas('space', function ($q) use ($search) {
                         $q->where('name', 'like', "%{$search}%")
-                          ->orWhere('keywords', 'like', "%{$search}%");
+                            ->orWhere('keywords', 'like', "%{$search}%");
                     })
-                    ->orWhereHas('tags', function($q) use ($search) {
+                    ->orWhereHas('tags', function ($q) use ($search) {
                         $q->where('name', 'like', "%{$search}%");
                     });
             });
@@ -144,7 +154,7 @@ class HomeController extends Controller
 
         // Aplicar filtro por tag
         if ($tagId) {
-            $eventsQuery->whereHas('tags', function($query) use ($tagId) {
+            $eventsQuery->whereHas('tags', function ($query) use ($tagId) {
                 $query->where('tags.id', $tagId);
             });
         }
@@ -156,7 +166,7 @@ class HomeController extends Controller
 
         // Aplicar filtro por precio
         if ($minPrice !== null || $maxPrice !== null) {
-            $eventsQuery->whereHas('ticketTypes', function($query) use ($minPrice, $maxPrice) {
+            $eventsQuery->whereHas('ticketTypes', function ($query) use ($minPrice, $maxPrice) {
                 if ($minPrice !== null) {
                     $query->where('tickets_events.price', '>=', $minPrice);
                 }
@@ -203,7 +213,7 @@ class HomeController extends Controller
                 $query->whereDate('date', '>=', now());
             }
         ])
-        
+
             ->having('events_count', '>', 0)
             ->get()
             ->map(function ($type) {
@@ -215,12 +225,22 @@ class HomeController extends Controller
             });
 
         // Obtener todos los tags con conteo de eventos
+        // Si hay una categoría seleccionada, filtrar tags solo de esa categoría
         try {
-            $tags = Tag::withCount('events')
+            $tagsQuery = Tag::withCount([
+                'events' => function ($query) use ($categoryId) {
+                    $query->where('active', true)
+                        ->where('date', '>=', now());
+                    if ($categoryId) {
+                        $query->where('type_events_id', $categoryId);
+                    }
+                }
+            ])
                 ->having('events_count', '>', 0)
                 ->orderBy('events_count', 'desc')
-                ->limit(50)
-                ->get();
+                ->limit(50);
+
+            $tags = $tagsQuery->get();
         } catch (\Exception $e) {
             $tags = collect([]);
         }
