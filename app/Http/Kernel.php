@@ -41,7 +41,7 @@ class Kernel extends HttpKernel
 
         'api' => [
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
+            \Illuminate\Routing\Middleware\ThrottleRequests::class . ':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
@@ -76,5 +76,6 @@ class Kernel extends HttpKernel
         'configure.session' => \App\Http\Middleware\ConfigureSessionDomain::class,
         'cart.context' => \App\Http\Middleware\CartContext::class,
         'email.verified' => \App\Http\Middleware\EnsureEmailVerified::class,
+        'admin' => \App\Http\Middleware\AdminMiddleware::class,
     ];
 }

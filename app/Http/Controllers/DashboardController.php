@@ -9,6 +9,8 @@ use App\Models\Coupon;
 use App\Models\Checkin;
 use App\Models\User;
 use App\Models\Payment;
+use App\Models\TicketType;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -128,14 +130,19 @@ class DashboardController extends Controller
         ];
 
         // ========== BOLETOS POR TIPO ==========
-        $ticketsByType = DB::table('order_items')
-            ->join('ticket_types', 'order_items.ticket_type_id', '=', 'ticket_types.id')
-            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+        // Usar la tabla tickets con join a tickets_events para obtener el precio
+        $ticketsByType = DB::table('tickets')
+            ->join('orders', 'tickets.order_id', '=', 'orders.id')
+            ->join('ticket_types', 'tickets.ticket_types_id', '=', 'ticket_types.id')
+            ->join('tickets_events', function ($join) {
+                $join->on('tickets.ticket_types_id', '=', 'tickets_events.ticket_types_id')
+                    ->on('tickets.event_id', '=', 'tickets_events.event_id');
+            })
             ->where('orders.status', 'completed')
             ->select(
                 'ticket_types.name',
-                DB::raw('SUM(order_items.quantity) as total_sold'),
-                DB::raw('SUM(order_items.price * order_items.quantity) as total_revenue')
+                DB::raw('COUNT(tickets.id) as total_sold'),
+                DB::raw('SUM(tickets_events.price) as total_revenue')
             )
             ->groupBy('ticket_types.id', 'ticket_types.name')
             ->orderBy('total_sold', 'desc')
@@ -147,25 +154,15 @@ class DashboardController extends Controller
                 $query->where('status', 'completed');
             }
         ])
-            ->with([
-                'ticketTypes' => function ($query) {
-                    $query->select('ticket_types.id', 'ticket_types.event_id')
-                        ->join('order_items', 'ticket_types.id', '=', 'order_items.ticket_type_id')
-                        ->join('orders', 'order_items.order_id', '=', 'orders.id')
-                        ->where('orders.status', 'completed')
-                        ->selectRaw('SUM(order_items.price * order_items.quantity) as revenue');
-                }
-            ])
             ->orderBy('orders_count', 'desc')
             ->limit(5)
             ->get()
             ->map(function ($event) {
-                $revenue = DB::table('order_items')
-                    ->join('orders', 'order_items.order_id', '=', 'orders.id')
-                    ->join('ticket_types', 'order_items.ticket_type_id', '=', 'ticket_types.id')
-                    ->where('ticket_types.event_id', $event->id)
-                    ->where('orders.status', 'completed')
-                    ->sum(DB::raw('order_items.price * order_items.quantity'));
+                // Calcular revenue desde payments
+                $revenue = Payment::whereHas('order', function ($query) use ($event) {
+                    $query->where('event_id', $event->id)
+                        ->where('status', 'completed');
+                })->sum('total');
 
                 $event->revenue = $revenue;
                 return $event;
@@ -176,7 +173,7 @@ class DashboardController extends Controller
             ->join('orders', 'users.id', '=', 'orders.user_id')
             ->join('payments', 'orders.id', '=', 'payments.order_id')
             ->where('orders.status', 'completed')
-            ->groupBy('users.id', 'users.name', 'users.email', 'users.created_at', 'users.updated_at', 'users.email_verified_at', 'users.password', 'users.remember_token', 'users.last_name', 'users.phone')
+            ->groupBy('users.id', 'users.name', 'users.email', 'users.created_at', 'users.updated_at', 'users.email_verified_at', 'users.password', 'users.remember_token', 'users.last_name', 'users.phone', 'users.deleted_at', 'users.image', 'users.verified', 'users.verified_at', 'users.verification_code', 'users.role')
             ->selectRaw('users.*, COUNT(DISTINCT orders.id) as orders_count, SUM(payments.total) as total_spent')
             ->orderBy('total_spent', 'desc')
             ->limit(5)
@@ -191,7 +188,7 @@ class DashboardController extends Controller
                 'coupons.code',
                 'coupons.discount_percentage',
                 DB::raw('COUNT(*) as times_used'),
-                DB::raw('SUM(payments.total * coupons.discount_percentage / 100) as total_discount')
+                DB::raw('SUM(payments.discount_amount) as total_discount')
             )
             ->groupBy('coupons.id', 'coupons.code', 'coupons.discount_percentage')
             ->orderBy('times_used', 'desc')
@@ -221,6 +218,74 @@ class DashboardController extends Controller
         // ========== ESTADÍSTICAS DE CHECK-IN ==========
         $checkinRate = $totalTickets > 0 ? ($totalCheckins / $totalTickets) * 100 : 0;
 
+        // ========== ESTADÍSTICAS DE USUARIOS ==========
+        $userStats = [
+            'total' => User::count(),
+            'admins' => User::where('role', 'admin')->count(),
+            'staff' => User::where('role', 'staff')->count(),
+            'regular' => User::where('role', 'user')->count(),
+            'verified' => User::whereNotNull('verified_at')->count(),
+            'new_today' => User::whereDate('created_at', today())->count(),
+            'new_this_week' => User::where('created_at', '>=', now()->startOfWeek())->count(),
+            'new_this_month' => User::whereMonth('created_at', now()->month)->count(),
+        ];
+
+        // User growth chart (last 7 days)
+        $userGrowthData = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $userGrowthData['labels'][] = $date->format('D');
+            $userGrowthData['data'][] = User::whereDate('created_at', $date->format('Y-m-d'))->count();
+        }
+
+        // ========== ACTIVITY LOG ==========
+        $recentActivity = ActivityLog::with('user')
+            ->latest()
+            ->limit(15)
+            ->get();
+
+        // Activity by action (last 7 days)
+        $activityByAction = ActivityLog::select('action', DB::raw('count(*) as count'))
+            ->where('created_at', '>=', now()->subDays(7))
+            ->groupBy('action')
+            ->orderBy('count', 'desc')
+            ->get();
+
+        // ========== ALERTAS Y NOTIFICACIONES ==========
+        $alerts = [];
+
+        // Eventos próximos a iniciar (próximas 24 horas)
+        $upcomingEventsAlert = Event::where('active', true)
+            ->whereBetween('date', [now(), now()->addDay()])
+            ->count();
+        if ($upcomingEventsAlert > 0) {
+            $alerts[] = [
+                'type' => 'info',
+                'message' => "{$upcomingEventsAlert} evento(s) comenzarán en las próximas 24 horas",
+                'icon' => '📅'
+            ];
+        }
+
+        // Usuarios sin verificar
+        $unverifiedUsers = User::whereNull('verified_at')->count();
+        if ($unverifiedUsers > 10) {
+            $alerts[] = [
+                'type' => 'warning',
+                'message' => "{$unverifiedUsers} usuarios pendientes de verificación",
+                'icon' => '⚠️'
+            ];
+        }
+
+        // Órdenes pendientes
+        $pendingOrders = Order::where('status', 'pending')->count();
+        if ($pendingOrders > 0) {
+            $alerts[] = [
+                'type' => 'warning',
+                'message' => "{$pendingOrders} órdenes pendientes de procesar",
+                'icon' => '🔔'
+            ];
+        }
+
         return view('dashboard', compact(
             // Métricas principales
             'totalEvents',
@@ -249,7 +314,13 @@ class DashboardController extends Controller
             // Actividad
             'recentCheckins',
             'recentOrders',
-            'upcomingEvents'
+            'upcomingEvents',
+            // Nuevas métricas
+            'userStats',
+            'userGrowthData',
+            'recentActivity',
+            'activityByAction',
+            'alerts'
         ));
     }
 }

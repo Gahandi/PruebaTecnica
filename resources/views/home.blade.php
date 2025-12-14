@@ -159,14 +159,14 @@
                 </div>
 
                 {{-- Carousel --}}
-                <div class="relative">
-                    <div class="overflow-x-auto overflow-y-hidden scrollbar-hide scroll-smooth snap-x snap-mandatory" 
+                <div class="relative -mx-2 sm:-mx-4 lg:-mx-8 px-2 sm:px-4 lg:px-8">
+                    <div class="overflow-x-auto overflow-y-visible scrollbar-hide scroll-smooth snap-x snap-mandatory py-4" 
                          id="carouselContainer"
                          style="scrollbar-width: none; -ms-overflow-style: none;">
                         <div class="flex gap-4 px-2" id="carousel">
                             @foreach($featuredEvents as $event)
                                 <div class="w-full sm:w-1/2 lg:w-1/3 flex-shrink-0 snap-start">
-                                    <div class="bg-white rounded-xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-pink-200 h-full flex flex-col">
+                                    <div class="bg-white rounded-xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 border-2 border-transparent hover:border-pink-200 h-full flex flex-col">
                                         <div class="relative overflow-hidden flex-shrink-0">
                                             @if($event->banner && $event->banner !== 'test.jpg')
                                                 <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}"
@@ -458,12 +458,13 @@
         const carouselContainer = document.getElementById('carouselContainer');
         const carousel = document.getElementById('carousel');
         let autoScrollInterval;
+        let isScrolling = false;
 
         // Función para hacer scroll del carousel
         function scrollCarousel(direction) {
             if (!carouselContainer) return;
             
-            const scrollAmount = carouselContainer.offsetWidth * 0.9; // Scroll casi todo el ancho visible
+            const scrollAmount = carouselContainer.offsetWidth * 0.9;
             
             if (direction === 'next') {
                 carouselContainer.scrollBy({
@@ -484,7 +485,7 @@
         function startAutoScroll() {
             stopAutoScroll();
             autoScrollInterval = setInterval(() => {
-                if (!carouselContainer) return;
+                if (!carouselContainer || isScrolling) return;
                 
                 const maxScroll = carouselContainer.scrollWidth - carouselContainer.clientWidth;
                 
@@ -507,41 +508,60 @@
         }
 
         function resetAutoScroll() {
+            isScrolling = true;
             stopAutoScroll();
             setTimeout(() => {
+                isScrolling = false;
                 startAutoScroll();
             }, 3000);
         }
 
         // Detectar scroll manual del usuario
         if (carouselContainer) {
+            let scrollTimeout;
             carouselContainer.addEventListener('scroll', () => {
-                resetAutoScroll();
+                isScrolling = true;
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                    resetAutoScroll();
+                }, 150);
             }, { passive: true });
 
-            // Prevenir scroll vertical
+            // Manejar rueda del mouse - SIMPLIFICADO
             carouselContainer.addEventListener('wheel', (e) => {
+                // Solo interceptar si es scroll horizontal nativo (shift+scroll o trackpad horizontal)
                 if (Math.abs(e.deltaX) > 0) {
-                    e.preventDefault();
-                    carouselContainer.scrollLeft += e.deltaX;
-                } else if (Math.abs(e.deltaY) > 0) {
-                    e.preventDefault();
-                    carouselContainer.scrollLeft += e.deltaY;
+                    // Dejar que el navegador maneje el scroll horizontal nativo
+                    resetAutoScroll();
                 }
-                resetAutoScroll();
-            }, { passive: false });
+                // Para scroll vertical, NO hacer nada - dejar que la página haga scroll normalmente
+            }, { passive: true });
         }
 
         // Iniciar auto-scroll al cargar
-        startAutoScroll();
+        if (carouselContainer) {
+            startAutoScroll();
+        }
 
         // Navegación con teclado
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowLeft') {
-                scrollCarousel('prev');
-            } else if (e.key === 'ArrowRight') {
-                scrollCarousel('next');
+            // Solo si el carousel está visible en viewport
+            if (!carouselContainer) return;
+            
+            const rect = carouselContainer.getBoundingClientRect();
+            const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+            
+            if (isVisible) {
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    scrollCarousel('prev');
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    scrollCarousel('next');
+                }
             }
         });
     </script>
 @endpush
+```

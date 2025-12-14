@@ -47,7 +47,7 @@
                         </div>
 
                         <!-- Desktop Navigation -->
-                        <div class="hidden md:flex items-center flex-row-reverse gap-4 lg:gap-6">
+                        <div class="hidden md:flex items-center gap-4 lg:gap-6">
                             <!-- Admin Menu -->
                             @php
                                 $user = auth()->user();

@@ -46,7 +46,7 @@ Route::domain('{subdomain}.' . config('app.url'))
         Route::get('eventos/{event:slug}/editar', [SpaceEventController::class, 'edit'])
             ->name('spaces.events.edit')
             ->middleware(['auth', 'email.verified', 'space.member']); // Asumiendo que solo los miembros pueden editar
-
+    
         Route::put('eventos/{event:slug}', [SpaceEventController::class, 'update'])
             ->name('spaces.events.update')
             ->middleware(['auth', 'email.verified', 'space.member']);
@@ -54,20 +54,20 @@ Route::domain('{subdomain}.' . config('app.url'))
         // Mostrar eventos por categoría
         Route::get('/categories/{id}', [SpaceEventController::class, 'showEvents'])
             ->name('categories.events');
-        
+
         // Rutas de cupones por espacio (solo para admins del espacio)
         Route::prefix('coupons')
             ->name('spaces.coupons.')
             ->middleware(['auth', 'email.verified', 'space.member'])
             ->group(function () {
-                Route::get('/', [SpaceCouponController::class, 'index'])->name('index');
-                Route::get('/create', [SpaceCouponController::class, 'create'])->name('create');
-                Route::post('/', [SpaceCouponController::class, 'store'])->name('store');
-                Route::get('/{coupon}', [SpaceCouponController::class, 'show'])->name('show');
-                Route::get('/{coupon}/edit', [SpaceCouponController::class, 'edit'])->name('edit');
-                Route::put('/{coupon}', [SpaceCouponController::class, 'update'])->name('update');
-                Route::delete('/{coupon}', [SpaceCouponController::class, 'destroy'])->name('destroy');
-            });
+            Route::get('/', [SpaceCouponController::class, 'index'])->name('index');
+            Route::get('/create', [SpaceCouponController::class, 'create'])->name('create');
+            Route::post('/', [SpaceCouponController::class, 'store'])->name('store');
+            Route::get('/{coupon}', [SpaceCouponController::class, 'show'])->name('show');
+            Route::get('/{coupon}/edit', [SpaceCouponController::class, 'edit'])->name('edit');
+            Route::put('/{coupon}', [SpaceCouponController::class, 'update'])->name('update');
+            Route::delete('/{coupon}', [SpaceCouponController::class, 'destroy'])->name('destroy');
+        });
         // Rutas de checkout para subdominio
     });
 
@@ -89,7 +89,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->middleware('redirect.after.login');
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
-    
+
     // Rutas de restablecimiento de contraseña
     Route::get('/forgot-password', [\App\Http\Controllers\Auth\PasswordResetController::class, 'showForgotPasswordForm'])->name('password.request');
     Route::post('/forgot-password', [\App\Http\Controllers\Auth\PasswordResetController::class, 'sendResetLink'])->name('password.email');
@@ -117,16 +117,18 @@ Route::get('/feeds/{subdomain}/google-merchant.xml', [GoogleMerchantController::
 
 // Rutas del carrito (sin autenticación)
 Route::middleware(['cart.context', \App\Http\Middleware\HandleCorsForCart::class])->group(function () {
-    Route::options('/cart/{any}', function() { return response('', 200); })->where('any', '.*');
-    Route::get('/cart/csrf-token', function(Request $request) {
+    Route::options('/cart/{any}', function () {
+        return response('', 200);
+    })->where('any', '.*');
+    Route::get('/cart/csrf-token', function (Request $request) {
         $origin = $request->headers->get('Origin');
         $response = response()->json(['token' => csrf_token()]);
 
         if ($origin) {
             $response->header('Access-Control-Allow-Origin', $origin)
-                     ->header('Access-Control-Allow-Credentials', 'true')
-                     ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-                     ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN');
+                ->header('Access-Control-Allow-Credentials', 'true')
+                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN');
         }
 
         return $response;
@@ -173,7 +175,7 @@ Route::prefix('checkout')
         Route::delete('/remove-coupon', [App\Http\Controllers\CheckoutController::class, 'removeCoupon'])->name('remove-coupon');
         Route::post('/quick-login-register', [App\Http\Controllers\CheckoutController::class, 'quickLoginOrRegister'])->name('quick-login-register');
         Route::get('/callback', [App\Http\Controllers\CheckoutController::class, 'handlePaymentCallback'])->name('callback');
-        
+
         // Rutas de pago que requieren autenticación y verificación de email
         Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'checkout'])->name('checkout');
         Route::post('/process-payment', [App\Http\Controllers\CheckoutController::class, 'processPayment'])->name('process-payment');
@@ -214,3 +216,43 @@ Route::middleware(['auth', 'email.verified'])->group(function () {
         });
 });
 
+
+// ========== ADMIN ROUTES ==========
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+
+    // User Management
+    Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+    Route::post('users/{user}/role', [\App\Http\Controllers\Admin\UserController::class, 'updateRole'])->name('users.update-role');
+    Route::post('users/{user}/spaces', [\App\Http\Controllers\Admin\UserController::class, 'assignSpace'])->name('users.assign-space');
+    Route::delete('users/{user}/spaces', [\App\Http\Controllers\Admin\UserController::class, 'removeSpace'])->name('users.remove-space');
+    Route::post('users/{user}/toggle-verification', [\App\Http\Controllers\Admin\UserController::class, 'toggleVerification'])->name('users.toggle-verification');
+
+    // Activity Log
+    Route::get('activity-log', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-log.index');
+    Route::get('activity-log/{activityLog}', [\App\Http\Controllers\Admin\ActivityLogController::class, 'show'])->name('activity-log.show');
+    Route::get('activity-log-export', [\App\Http\Controllers\Admin\ActivityLogController::class, 'export'])->name('activity-log.export');
+    Route::delete('activity-log/clear', [\App\Http\Controllers\Admin\ActivityLogController::class, 'clear'])->name('activity-log.clear');
+
+    // Check-ins Management
+    Route::get('checkins', [\App\Http\Controllers\Admin\CheckinController::class, 'index'])->name('checkins.index');
+    Route::get('checkins/stats', [\App\Http\Controllers\Admin\CheckinController::class, 'stats'])->name('checkins.stats');
+    Route::get('checkins/export', [\App\Http\Controllers\Admin\CheckinController::class, 'export'])->name('checkins.export');
+    Route::get('checkins/{checkin}', [\App\Http\Controllers\Admin\CheckinController::class, 'show'])->name('checkins.show');
+
+    // Reports
+    Route::get('reports', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
+    Route::get('reports/sales', [\App\Http\Controllers\Admin\ReportController::class, 'sales'])->name('reports.sales');
+    Route::get('reports/users', [\App\Http\Controllers\Admin\ReportController::class, 'users'])->name('reports.users');
+    Route::get('reports/checkins', [\App\Http\Controllers\Admin\ReportController::class, 'checkins'])->name('reports.checkins');
+    Route::get('reports/sales/pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportSalesPdf'])->name('reports.sales.pdf');
+    Route::get('reports/sales/excel', [\App\Http\Controllers\Admin\ReportController::class, 'exportSalesExcel'])->name('reports.sales.excel');
+    Route::get('reports/users/excel', [\App\Http\Controllers\Admin\ReportController::class, 'exportUsersExcel'])->name('reports.users.excel');
+    Route::get('reports/checkins/excel', [\App\Http\Controllers\Admin\ReportController::class, 'exportCheckinsExcel'])->name('reports.checkins.excel');
+
+    // Settings
+    Route::get('settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
+    Route::put('settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
+    Route::post('settings', [\App\Http\Controllers\Admin\SettingsController::class, 'store'])->name('settings.store');
+    Route::delete('settings/{setting}', [\App\Http\Controllers\Admin\SettingsController::class, 'destroy'])->name('settings.destroy');
+    Route::post('settings/initialize', [\App\Http\Controllers\Admin\SettingsController::class, 'initializeDefaults'])->name('settings.initialize');
+});

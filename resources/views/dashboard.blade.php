@@ -205,6 +205,98 @@
                 </div>
             </div>
 
+            {{-- Admin Quick Actions --}}
+            @if(auth()->user()->hasRole('admin'))
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <a href="{{ route('admin.users.index') }}" class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all transform hover:scale-105">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-purple-100">Gestión de Usuarios</p>
+                                <p class="text-3xl font-bold mt-2">{{ number_format($userStats['total']) }}</p>
+                                <p class="text-sm mt-1 text-purple-100">{{ $userStats['new_today'] }} nuevos hoy</p>
+                            </div>
+                            <svg class="w-12 h-12 text-purple-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                        </div>
+                    </a>
+
+                    <a href="{{ route('admin.activity-log.index') }}" class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all transform hover:scale-105">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-blue-100">Activity Log</p>
+                                <p class="text-3xl font-bold mt-2">{{ number_format($recentActivity->count()) }}</p>
+                                <p class="text-sm mt-1 text-blue-100">Actividades recientes</p>
+                            </div>
+                            <svg class="w-12 h-12 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                        </div>
+                    </a>
+
+                    <a href="{{ route('admin.checkins.index') }}" class="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all transform hover:scale-105">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-green-100">Check-ins</p>
+                                <p class="text-3xl font-bold mt-2">{{ number_format($totalCheckins) }}</p>
+                                <p class="text-sm mt-1 text-green-100">Ver estadísticas</p>
+                            </div>
+                            <svg class="w-12 h-12 text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </a>
+                </div>
+
+                {{-- Alerts Section --}}
+                @if(count($alerts) > 0)
+                    <div class="mb-8">
+                        <h3 class="text-lg font-bold text-gray-900 mb-4">Alertas y Notificaciones</h3>
+                        <div class="space-y-3">
+                            @foreach($alerts as $alert)
+                                <div class="bg-white rounded-lg shadow-md p-4 border-l-4 
+                                    @if($alert['type'] === 'warning') border-yellow-500
+                                    @elseif($alert['type'] === 'error') border-red-500
+                                    @else border-blue-500
+                                    @endif">
+                                    <div class="flex items-center">
+                                        <span class="text-2xl mr-3">{{ $alert['icon'] }}</span>
+                                        <p class="text-sm text-gray-900">{{ $alert['message'] }}</p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Activity Log Widget --}}
+                <div class="bg-white rounded-2xl shadow-xl p-6 mb-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-bold text-gray-900">Actividad Reciente</h3>
+                        <a href="{{ route('admin.activity-log.index') }}" class="text-sm text-pink-600 hover:text-pink-700 font-medium">
+                            Ver todo →
+                        </a>
+                    </div>
+                    <div class="space-y-4">
+                        @foreach($recentActivity->take(5) as $activity)
+                            <div class="flex items-start space-x-3 pb-4 border-b border-gray-100 last:border-0">
+                                <span class="text-xl flex-shrink-0">{{ $activity->icon }}</span>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm text-gray-900">{{ $activity->description }}</p>
+                                    <div class="flex items-center mt-1 space-x-2">
+                                        @if($activity->user)
+                                            <span class="text-xs text-gray-500">{{ $activity->user->name }}</span>
+                                            <span class="text-xs text-gray-400">•</span>
+                                        @endif
+                                        <span class="text-xs text-gray-500">{{ $activity->created_at->diffForHumans() }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
             {{-- Charts Section --}}
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                 {{-- Revenue Chart --}}
@@ -362,16 +454,16 @@
                         @forelse($recentOrders as $order)
                             <div class="flex items-center justify-between p-3 border-l-4 border-pink-500 bg-gray-50 rounded">
                                 <div>
-                                    <p class="font-semibold text-gray-900 text-sm">{{ $order->user->name }}</p>
-                                    <p class="text-xs text-gray-500">{{ $order->event->name }}</p>
+                                    <p class="font-semibold text-gray-900 text-sm">{{ $order->user->name ?? 'Usuario' }}</p>
+                                    <p class="text-xs text-gray-500">{{ $order->event->name ?? 'Evento no disponible' }}</p>
                                 </div>
                                 <div class="text-right">
-                                    <p class="font-bold text-green-600 text-sm">${{ number_format($order->total, 2) }}</p>
+                                    <p class="font-bold text-green-600 text-sm">${{ number_format($order->payments->sum('total') ?? 0, 2) }}</p>
                                     <p class="text-xs text-gray-500">{{ $order->created_at->diffForHumans() }}</p>
                                 </div>
                             </div>
                         @empty
-                            <p class="text-gray-500 text-center py-8">No hay órdenes recientes</p>
+                            <p class="text-gray-500 text-center py-4">No hay órdenes recientes</p>
                         @endforelse
                     </div>
                 </div>
