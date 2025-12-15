@@ -1,8 +1,8 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Dashboard Profesional')
 
-@section('content')
+@section('admin-content')
     <div class="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200">
         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
 
@@ -17,14 +17,14 @@
                         <p class="mt-2 text-gray-600">Aquí está el resumen completo de tu plataforma de eventos</p>
                     </div>
                     <div class="mt-4 md:mt-0 flex space-x-3">
-                        <button
+                        <a href="{{ route('dashboard.export.pdf') }}"
                             class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                             </svg>
-                            Exportar
-                        </button>
+                            Exportar PDF
+                        </a>
                         <button
                             class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg shadow-lg text-sm font-medium text-white hover:from-pink-600 hover:to-purple-700 transition-all transform hover:scale-105">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -208,7 +208,8 @@
             {{-- Admin Quick Actions --}}
             @if(auth()->user()->hasRole('admin'))
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <a href="{{ route('admin.users.index') }}" class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all transform hover:scale-105">
+                    <a href="{{ route('admin.users.index') }}"
+                        class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all transform hover:scale-105">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-purple-100">Gestión de Usuarios</p>
@@ -216,12 +217,15 @@
                                 <p class="text-sm mt-1 text-purple-100">{{ $userStats['new_today'] }} nuevos hoy</p>
                             </div>
                             <svg class="w-12 h-12 text-purple-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                                </path>
                             </svg>
                         </div>
                     </a>
 
-                    <a href="{{ route('admin.activity-log.index') }}" class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all transform hover:scale-105">
+                    <a href="{{ route('admin.activity-log.index') }}"
+                        class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all transform hover:scale-105">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-blue-100">Activity Log</p>
@@ -229,12 +233,15 @@
                                 <p class="text-sm mt-1 text-blue-100">Actividades recientes</p>
                             </div>
                             <svg class="w-12 h-12 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                                </path>
                             </svg>
                         </div>
                     </a>
 
-                    <a href="{{ route('admin.checkins.index') }}" class="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all transform hover:scale-105">
+                    <a href="{{ route('admin.checkins.index') }}"
+                        class="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all transform hover:scale-105">
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium text-green-100">Check-ins</p>
@@ -242,7 +249,8 @@
                                 <p class="text-sm mt-1 text-green-100">Ver estadísticas</p>
                             </div>
                             <svg class="w-12 h-12 text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
                     </a>
@@ -255,10 +263,10 @@
                         <div class="space-y-3">
                             @foreach($alerts as $alert)
                                 <div class="bg-white rounded-lg shadow-md p-4 border-l-4 
-                                    @if($alert['type'] === 'warning') border-yellow-500
-                                    @elseif($alert['type'] === 'error') border-red-500
-                                    @else border-blue-500
-                                    @endif">
+                                                    @if($alert['type'] === 'warning') border-yellow-500
+                                                    @elseif($alert['type'] === 'error') border-red-500
+                                                    @else border-blue-500
+                                                    @endif">
                                     <div class="flex items-center">
                                         <span class="text-2xl mr-3">{{ $alert['icon'] }}</span>
                                         <p class="text-sm text-gray-900">{{ $alert['message'] }}</p>
@@ -273,7 +281,8 @@
                 <div class="bg-white rounded-2xl shadow-xl p-6 mb-8">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-lg font-bold text-gray-900">Actividad Reciente</h3>
-                        <a href="{{ route('admin.activity-log.index') }}" class="text-sm text-pink-600 hover:text-pink-700 font-medium">
+                        <a href="{{ route('admin.activity-log.index') }}"
+                            class="text-sm text-pink-600 hover:text-pink-700 font-medium">
                             Ver todo →
                         </a>
                     </div>
@@ -355,7 +364,8 @@
                             <div>
                                 <p class="text-sm text-gray-600">Tickets por Orden</p>
                                 <p class="text-2xl font-bold text-gray-900">
-                                    {{ $completedOrders > 0 ? number_format($totalTickets / $completedOrders, 1) : 0 }}</p>
+                                    {{ $completedOrders > 0 ? number_format($totalTickets / $completedOrders, 1) : 0 }}
+                                </p>
                             </div>
                             <div class="bg-blue-500 p-3 rounded-lg">
                                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -458,7 +468,8 @@
                                     <p class="text-xs text-gray-500">{{ $order->event->name ?? 'Evento no disponible' }}</p>
                                 </div>
                                 <div class="text-right">
-                                    <p class="font-bold text-green-600 text-sm">${{ number_format($order->payments->sum('total') ?? 0, 2) }}</p>
+                                    <p class="font-bold text-green-600 text-sm">
+                                        ${{ number_format($order->payments->sum('total') ?? 0, 2) }}</p>
                                     <p class="text-xs text-gray-500">{{ $order->created_at->diffForHumans() }}</p>
                                 </div>
                             </div>
@@ -476,7 +487,8 @@
                             <div class="flex items-center justify-between p-3 border-l-4 border-green-500 bg-gray-50 rounded">
                                 <div>
                                     <p class="font-semibold text-gray-900 text-sm">
-                                        {{ $checkin->ticket->order->event->name ?? 'N/A' }}</p>
+                                        {{ $checkin->ticket->order->event->name ?? 'N/A' }}
+                                    </p>
                                     <p class="text-xs text-gray-500">{{ substr($checkin->ticket->id, 0, 8) }}...</p>
                                 </div>
                                 <div class="text-right">
@@ -502,7 +514,8 @@
                                     class="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">Activo</span>
                             </div>
                             <p class="text-sm text-gray-600 mb-2">
-                                {{ \Carbon\Carbon::parse($event->date)->format('d M Y, H:i') }}</p>
+                                {{ \Carbon\Carbon::parse($event->date)->format('d M Y, H:i') }}
+                            </p>
                             <p class="text-xs text-gray-500">{{ Str::limit($event->address, 40) }}</p>
                         </div>
                     @empty

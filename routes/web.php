@@ -50,6 +50,9 @@ Route::domain('{subdomain}.' . config('app.url'))
         Route::put('eventos/{event:slug}', [SpaceEventController::class, 'update'])
             ->name('spaces.events.update')
             ->middleware(['auth', 'email.verified', 'space.member']);
+        Route::delete('eventos/{event:slug}', [SpaceEventController::class, 'destroy'])
+            ->name('spaces.events.destroy')
+            ->middleware(['auth', 'email.verified', 'space.member']);
         Route::get('/{event:slug}', [SpaceEventController::class, 'show']);
         // Mostrar eventos por categoría
         Route::get('/categories/{id}', [SpaceEventController::class, 'showEvents'])
@@ -143,6 +146,7 @@ Route::middleware(['cart.context', \App\Http\Middleware\HandleCorsForCart::class
 // Rutas protegidas por roles
 Route::middleware(['auth', 'email.verified', 'role:admin,staff'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/export/pdf', [DashboardController::class, 'exportPdf'])->name('dashboard.export.pdf');
 });
 
 Route::middleware(['auth', 'email.verified', 'role:admin'])->group(function () {

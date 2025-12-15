@@ -25,7 +25,11 @@ class ReportController extends Controller
     public function index()
     {
         $stats = [
-            'total_sales' => Order::where('status', 'completed')->sum('total'),
+            'total_sales' => \DB::table('payments')
+                ->join('orders', 'payments.order_id', '=', 'orders.id')
+                ->where('orders.status', 'completed')
+                ->whereNull('orders.deleted_at')
+                ->sum('payments.total'),
             'total_orders' => Order::where('status', 'completed')->count(),
             'total_users' => User::count(),
             'total_checkins' => Checkin::count(),
@@ -54,10 +58,17 @@ class ReportController extends Controller
             ->get();
 
         // Calculate statistics
+        $totalSales = \DB::table('payments')
+            ->join('orders', 'payments.order_id', '=', 'orders.id')
+            ->whereIn('orders.id', $sales->pluck('id'))
+            ->sum('payments.total');
+
+        $averageOrder = $sales->count() > 0 ? $totalSales / $sales->count() : 0;
+
         $stats = [
-            'total_sales' => $sales->sum('total'),
+            'total_sales' => $totalSales,
             'total_orders' => $sales->count(),
-            'average_order' => $sales->avg('total'),
+            'average_order' => $averageOrder,
             'total_tickets' => DB::table('tickets')
                 ->join('orders', 'tickets.order_id', '=', 'orders.id')
                 ->where('orders.status', 'completed')
@@ -65,23 +76,29 @@ class ReportController extends Controller
                 ->count(),
         ];
 
-        // Sales by event
-        $salesByEvent = Order::select('event_id', DB::raw('SUM(total) as total_sales'), DB::raw('COUNT(*) as total_orders'))
-            ->where('status', 'completed')
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->groupBy('event_id')
-            ->with('event')
+        // Sales by event - need to join with payments
+        $salesByEvent = DB::table('orders')
+            ->join('payments', 'orders.id', '=', 'payments.order_id')
+            ->join('events', 'orders.event_id', '=', 'events.id')
+            ->select('orders.event_id', 'events.name as event_name', DB::raw('SUM(payments.total) as total_sales'), DB::raw('COUNT(DISTINCT orders.id) as total_orders'))
+            ->where('orders.status', 'completed')
+            ->whereNull('orders.deleted_at')
+            ->whereBetween('orders.created_at', [$startDate, $endDate])
+            ->groupBy('orders.event_id', 'events.name')
             ->orderBy('total_sales', 'desc')
             ->get();
 
-        // Sales by day (for chart)
-        $salesByDay = Order::select(
-            DB::raw('DATE(created_at) as date'),
-            DB::raw('SUM(total) as total'),
-            DB::raw('COUNT(*) as count')
-        )
-            ->where('status', 'completed')
-            ->whereBetween('created_at', [$startDate, $endDate])
+        // Sales by day (for chart) - need to join with payments
+        $salesByDay = DB::table('orders')
+            ->join('payments', 'orders.id', '=', 'payments.order_id')
+            ->select(
+                DB::raw('DATE(orders.created_at) as date'),
+                DB::raw('SUM(payments.total) as total'),
+                DB::raw('COUNT(DISTINCT orders.id) as count')
+            )
+            ->where('orders.status', 'completed')
+            ->whereNull('orders.deleted_at')
+            ->whereBetween('orders.created_at', [$startDate, $endDate])
             ->groupBy('date')
             ->orderBy('date')
             ->get();
@@ -91,11 +108,14 @@ class ReportController extends Controller
         $prevStartDate = $startDate->copy()->subDays($periodDiff);
         $prevEndDate = $startDate->copy()->subDay();
 
-        $prevSales = Order::where('status', 'completed')
-            ->whereBetween('created_at', [$prevStartDate, $prevEndDate])
-            ->sum('total');
+        $previousPeriodSales = \DB::table('payments')
+            ->join('orders', 'payments.order_id', '=', 'orders.id')
+            ->where('orders.status', 'completed')
+            ->whereNull('orders.deleted_at')
+            ->whereBetween('orders.created_at', [$prevStartDate, $prevEndDate])
+            ->sum('payments.total');
 
-        $growth = $prevSales > 0 ? (($stats['total_sales'] - $prevSales) / $prevSales) * 100 : 0;
+        $growth = $previousPeriodSales > 0 ? (($stats['total_sales'] - $previousPeriodSales) / $previousPeriodSales) * 100 : 0;
 
         ActivityLog::log('viewed', 'Viewed sales report', null, null, [
             'period' => $period,
@@ -153,12 +173,15 @@ class ReportController extends Controller
             ->groupBy('role')
             ->get();
 
-        // Top users by orders
-        $topUsers = User::select('users.*', DB::raw('COUNT(orders.id) as orders_count'), DB::raw('SUM(orders.total) as total_spent'))
+        // Top users by orders - need to join with payments
+        $topUsers = DB::table('users')
             ->join('orders', 'users.id', '=', 'orders.user_id')
+            ->join('payments', 'orders.id', '=', 'payments.order_id')
+            ->select('users.*', DB::raw('COUNT(DISTINCT orders.id) as orders_count'), DB::raw('SUM(payments.total) as total_spent'))
             ->where('orders.status', 'completed')
+            ->whereNull('users.deleted_at')
             ->whereBetween('orders.created_at', [$startDate, $endDate])
-            ->groupBy('users.id')
+            ->groupBy('users.id', 'users.name', 'users.email', 'users.role', 'users.created_at', 'users.updated_at', 'users.deleted_at', 'users.verified_at')
             ->orderBy('total_spent', 'desc')
             ->limit(10)
             ->get();
@@ -278,10 +301,17 @@ class ReportController extends Controller
             ->with(['event', 'user'])
             ->get();
 
+        $totalSales = \DB::table('payments')
+            ->join('orders', 'payments.order_id', '=', 'orders.id')
+            ->whereIn('orders.id', $sales->pluck('id'))
+            ->sum('payments.total');
+
+        $averageOrder = $sales->count() > 0 ? $totalSales / $sales->count() : 0;
+
         $stats = [
-            'total_sales' => $sales->sum('total'),
+            'total_sales' => $totalSales,
             'total_orders' => $sales->count(),
-            'average_order' => $sales->avg('total'),
+            'average_order' => $averageOrder,
         ];
 
         $pdf = Pdf::loadView('admin.reports.pdf.sales', compact('sales', 'stats', 'startDate', 'endDate'));

@@ -40,18 +40,32 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'date' => 'required|date',
-            'location' => 'required|string|max:255',
+            'address' => 'required|string|max:500',
+            'coordinates' => 'nullable|string|max:255',
+            'description' => 'required|string|max:2000',
+            'agenda' => 'nullable|string|max:2000',
+            'type_events_id' => 'required|exists:type_events,id',
+            'spaces_id' => 'required|exists:spaces,id',
+            'state_id' => 'required|exists:states,id',
+            'image' => 'nullable|image|max:2048',
+            'banner' => 'nullable|image|max:2048',
+            'banner_app' => 'nullable|image|max:2048',
+            'icon' => 'nullable|image|max:1024',
+            'active' => 'boolean',
+        ], [
+            'description.max' => 'La descripción no puede exceder 2000 caracteres (sin formato).',
+            'agenda.max' => 'La agenda no puede exceder 2000 caracteres (sin formato).',
         ]);
 
         // Creación del nuevo evento.
-        Event::create($request->all());
+        Event::create($validated);
 
         // Redirecciona a la lista de eventos con un mensaje de éxito.
         return redirect()->route('admin.events.index')
-                         ->with('success', 'Evento creado correctamente.');
+            ->with('success', 'Evento creado correctamente.');
     }
 
     /**
@@ -78,18 +92,32 @@ class EventController extends Controller
     public function update(Request $request, Event $event)
     {
         // Validación de los datos del formulario.
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'date' => 'required|date',
-            'location' => 'required|string|max:255',
+            'address' => 'required|string|max:500',
+            'coordinates' => 'nullable|string|max:255',
+            'description' => 'required|string|max:2000',
+            'agenda' => 'nullable|string|max:2000',
+            'type_events_id' => 'required|exists:type_events,id',
+            'spaces_id' => 'required|exists:spaces,id',
+            'state_id' => 'required|exists:states,id',
+            'image' => 'nullable|image|max:2048',
+            'banner' => 'nullable|image|max:2048',
+            'banner_app' => 'nullable|image|max:2048',
+            'icon' => 'nullable|image|max:1024',
+            'active' => 'boolean',
+        ], [
+            'description.max' => 'La descripción no puede exceder 2000 caracteres (sin formato).',
+            'agenda.max' => 'La agenda no puede exceder 2000 caracteres (sin formato).',
         ]);
 
         // Actualización del evento.
-        $event->update($request->all());
+        $event->update($validated);
 
         // Redirecciona a la lista de eventos con un mensaje de éxito.
         return redirect()->route('admin.events.index')
-                         ->with('success', 'Evento actualizado correctamente.');
+            ->with('success', 'Evento actualizado correctamente.');
     }
 
     /**
@@ -102,6 +130,6 @@ class EventController extends Controller
 
         // Redirecciona a la lista de eventos con un mensaje de éxito.
         return redirect()->route('admin.events.index')
-                         ->with('success', 'Evento eliminado correctamente.');
+            ->with('success', 'Evento eliminado correctamente.');
     }
 }

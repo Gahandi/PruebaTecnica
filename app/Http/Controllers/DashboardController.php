@@ -14,6 +14,7 @@ use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class DashboardController extends Controller
 {
@@ -322,5 +323,108 @@ class DashboardController extends Controller
             'activityByAction',
             'alerts'
         ));
+    }
+
+    /**
+     * Export dashboard to PDF
+     */
+    public function exportPdf()
+    {
+        // Get all the same data as index
+        $totalEvents = Event::count();
+        $activeEvents = Event::where('active', true)->where('date', '>=', now())->count();
+        $totalOrders = Order::count();
+        $completedOrders = Order::where('status', 'completed')->count();
+        $totalTickets = Ticket::count();
+        $totalRevenue = Payment::whereHas('order', function ($query) {
+            $query->where('status', 'completed');
+        })->sum('total');
+        $totalCheckins = Checkin::count();
+        $totalUsers = User::count();
+
+        // Growth metrics
+        $previousPeriodStart = now()->subDays(60);
+        $previousPeriodEnd = now()->subDays(30);
+        $currentPeriodStart = now()->subDays(30);
+
+        $previousRevenue = Payment::whereHas('order', function ($query) {
+            $query->where('status', 'completed');
+        })
+            ->whereBetween('created_at', [$previousPeriodStart, $previousPeriodEnd])
+            ->sum('total');
+
+        $currentRevenue = Payment::whereHas('order', function ($query) {
+            $query->where('status', 'completed');
+        })
+            ->where('created_at', '>=', $currentPeriodStart)
+            ->sum('total');
+
+        $revenueGrowth = $previousRevenue > 0
+            ? (($currentRevenue - $previousRevenue) / $previousRevenue) * 100
+            : 0;
+
+        $conversionRate = $totalOrders > 0 ? ($completedOrders / $totalOrders) * 100 : 0;
+        $averageOrderValue = $completedOrders > 0 ? $totalRevenue / $completedOrders : 0;
+        $checkinRate = $totalTickets > 0 ? ($totalCheckins / $totalTickets) * 100 : 0;
+
+        // Popular events
+        $popularEvents = Event::withCount([
+            'orders' => function ($query) {
+                $query->where('status', 'completed');
+            }
+        ])
+            ->orderBy('orders_count', 'desc')
+            ->limit(10)
+            ->get()
+            ->map(function ($event) {
+                $revenue = Payment::whereHas('order', function ($query) use ($event) {
+                    $query->where('event_id', $event->id)
+                        ->where('status', 'completed');
+                })->sum('total');
+                $event->revenue = $revenue;
+                return $event;
+            });
+
+        // Top buyers
+        $topBuyers = User::select('users.*')
+            ->join('orders', 'users.id', '=', 'orders.user_id')
+            ->join('payments', 'orders.id', '=', 'payments.order_id')
+            ->where('orders.status', 'completed')
+            ->groupBy('users.id', 'users.name', 'users.email', 'users.created_at', 'users.updated_at', 'users.email_verified_at', 'users.password', 'users.remember_token', 'users.last_name', 'users.phone', 'users.deleted_at', 'users.image', 'users.verified', 'users.verified_at', 'users.verification_code', 'users.role')
+            ->selectRaw('users.*, COUNT(DISTINCT orders.id) as orders_count, SUM(payments.total) as total_spent')
+            ->orderBy('total_spent', 'desc')
+            ->limit(10)
+            ->get();
+
+        // User stats
+        $userStats = [
+            'total' => User::count(),
+            'admins' => User::where('role', 'admin')->count(),
+            'staff' => User::where('role', 'staff')->count(),
+            'regular' => User::where('role', 'user')->count(),
+            'verified' => User::whereNotNull('verified_at')->count(),
+        ];
+
+        $pdf = Pdf::loadView('admin.reports.pdf.dashboard', compact(
+            'totalEvents',
+            'activeEvents',
+            'totalOrders',
+            'completedOrders',
+            'totalTickets',
+            'totalRevenue',
+            'totalCheckins',
+            'totalUsers',
+            'revenueGrowth',
+            'conversionRate',
+            'averageOrderValue',
+            'checkinRate',
+            'popularEvents',
+            'topBuyers',
+            'userStats'
+        ));
+
+        ActivityLog::log('exported', 'Exported dashboard to PDF');
+
+        return $pdf->download('dashboard-' . now()->format('Y-m-d') . '.pdf');
     }
 }
