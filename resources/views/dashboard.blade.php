@@ -25,14 +25,14 @@
                             </svg>
                             Exportar PDF
                         </a>
-                        <button
+                        <!-- <button
                             class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg shadow-lg text-sm font-medium text-white hover:from-pink-600 hover:to-purple-700 transition-all transform hover:scale-105">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
                                 </path>
                             </svg>
                             Nuevo Evento
-                        </button>
+                        </button> -->
                     </div>
                 </div>
             </div>

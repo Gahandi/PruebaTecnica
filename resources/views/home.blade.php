@@ -564,4 +564,3 @@
         });
     </script>
 @endpush
-```
