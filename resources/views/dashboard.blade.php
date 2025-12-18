@@ -465,7 +465,11 @@
                             <div class="flex items-center justify-between p-3 border-l-4 border-pink-500 bg-gray-50 rounded">
                                 <div>
                                     <p class="font-semibold text-gray-900 text-sm">{{ $order->user->name ?? 'Usuario' }}</p>
-                                    <p class="text-xs text-gray-500">{{ $order->event->name ?? 'Evento no disponible' }}</p>
+                                    @foreach($order->events as $event)
+                                        <p class="text-xs text-gray-500">
+                                            {{ $event->name }}
+                                        </p>
+                                    @endforeach
                                 </div>
                                 <div class="text-right">
                                     <p class="font-bold text-green-600 text-sm">

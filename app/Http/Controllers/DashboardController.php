@@ -150,24 +150,27 @@ class DashboardController extends Controller
             ->get();
 
         // ========== EVENTOS MÁS POPULARES ==========
-        $popularEvents = Event::withCount([
-            'orders' => function ($query) {
-                $query->where('status', 'completed');
-            }
-        ])
-            ->orderBy('orders_count', 'desc')
-            ->limit(5)
-            ->get()
-            ->map(function ($event) {
-                // Calcular revenue desde payments
-                $revenue = Payment::whereHas('order', function ($query) use ($event) {
-                    $query->where('event_id', $event->id)
-                        ->where('status', 'completed');
-                })->sum('total');
-
-                $event->revenue = $revenue;
-                return $event;
-            });
+        $popularEvents = Event::select('events.*')
+        ->selectSub(function ($query) {
+            $query->from('orders')
+                ->where('orders.status', 'completed')
+                ->whereRaw(
+                    "JSON_SEARCH(orders.event_id, 'one', events.id) IS NOT NULL"
+                )
+                ->selectRaw('COUNT(*)');
+        }, 'orders_count')
+        ->selectSub(function ($query) {
+            $query->from('payments')
+                ->join('orders', 'orders.id', '=', 'payments.order_id')
+                ->where('orders.status', 'completed')
+                ->whereRaw(
+                    "JSON_SEARCH(orders.event_id, 'one', events.id) IS NOT NULL"
+                )
+                ->selectRaw('COALESCE(SUM(payments.total), 0)');
+        }, 'revenue')
+        ->orderByDesc('orders_count')
+        ->limit(5)
+        ->get();
 
         // ========== TOP COMPRADORES ==========
         $topBuyers = User::select('users.*')
@@ -197,17 +200,34 @@ class DashboardController extends Controller
             ->get();
 
         // ========== CHECK-INS RECIENTES ==========
-        $recentCheckins = Checkin::with(['ticket.order.event', 'ticket.order.user'])
+        $recentCheckins = Checkin::with(['ticket.event', 'ticket.order.user'])
             ->latest()
             ->limit(10)
             ->get();
 
         // ========== ACTIVIDAD RECIENTE ==========
-        $recentOrders = Order::with(['user', 'event'])
-            ->where('status', 'completed')
-            ->latest()
-            ->limit(5)
-            ->get();
+        $recentOrders = Order::where('status', 'completed')
+        ->latest()
+        ->limit(5)
+        ->get()
+        ->map(function ($order) {
+
+            $eventArray = is_string($order->event_id)
+                ? json_decode($order->event_id, true)
+                : $order->event_id;
+
+            $eventIds = collect($eventArray ?? [])
+                ->values()
+                ->unique()
+                ->values();
+
+            $order->events = Event::whereIn('id', $eventIds)
+                ->withTrashed()
+                ->get();
+
+            return $order;
+        });
+
 
         // ========== PRÓXIMOS EVENTOS ==========
         $upcomingEvents = Event::where('active', true)
@@ -368,22 +388,27 @@ class DashboardController extends Controller
         $checkinRate = $totalTickets > 0 ? ($totalCheckins / $totalTickets) * 100 : 0;
 
         // Popular events
-        $popularEvents = Event::withCount([
-            'orders' => function ($query) {
-                $query->where('status', 'completed');
-            }
-        ])
-            ->orderBy('orders_count', 'desc')
-            ->limit(10)
-            ->get()
-            ->map(function ($event) {
-                $revenue = Payment::whereHas('order', function ($query) use ($event) {
-                    $query->where('event_id', $event->id)
-                        ->where('status', 'completed');
-                })->sum('total');
-                $event->revenue = $revenue;
-                return $event;
-            });
+        $popularEvents = Event::select('events.*')
+            ->selectSub(function ($query) {
+                $query->from('orders')
+                    ->where('orders.status', 'completed')
+                    ->whereRaw(
+                        "JSON_SEARCH(orders.event_id, 'one', events.id) IS NOT NULL"
+                    )
+                    ->selectRaw('COUNT(*)');
+            }, 'orders_count')
+            ->selectSub(function ($query) {
+                $query->from('payments')
+                    ->join('orders', 'orders.id', '=', 'payments.order_id')
+                    ->where('orders.status', 'completed')
+                    ->whereRaw(
+                        "JSON_SEARCH(orders.event_id, 'one', events.id) IS NOT NULL"
+                    )
+                    ->selectRaw('COALESCE(SUM(payments.total), 0)');
+            }, 'revenue')
+            ->orderByDesc('orders_count')
+            ->limit(5)
+            ->get();
 
         // Top buyers
         $topBuyers = User::select('users.*')

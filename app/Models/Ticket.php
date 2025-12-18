@@ -73,7 +73,7 @@ class Ticket extends Model
 		return $this->belongsTo(TicketType::class, 'ticket_types_id');
 	}
 
-    public function eventTicket()
+    public function event()
 	{
 		return $this->belongsTo(Event::class, 'event_id');
 	}

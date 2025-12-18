@@ -42,7 +42,7 @@ class Order extends Model
 
 	protected $casts = [
 		'user_id' => 'int',
-		'event_id' => 'string',
+		'event_id' => 'array',
 		'created_by' => 'int',
 		'state_id' => 'int'
 	];
