@@ -14,6 +14,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ScannerController;
 use App\Http\Controllers\Admin\AdminSpaceController;
 use App\Http\Controllers\Admin\AdminEventController;
+use App\Http\Controllers\SpaceManagementController;
 use App\Http\Controllers\GoogleMerchantController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -60,19 +61,34 @@ Route::domain('{subdomain}.' . config('app.url'))
         Route::get('/categories/{id}', [SpaceEventController::class, 'showEvents'])
             ->name('categories.events');
 
-        // Rutas de cupones por espacio (solo para admins del espacio)
         Route::prefix('coupons')
             ->name('spaces.coupons.')
             ->middleware(['auth', 'email.verified', 'space.member'])
             ->group(function () {
-            Route::get('/', [SpaceCouponController::class, 'index'])->name('index');
-            Route::get('/create', [SpaceCouponController::class, 'create'])->name('create');
-            Route::post('/', [SpaceCouponController::class, 'store'])->name('store');
-            Route::get('/{coupon}', [SpaceCouponController::class, 'show'])->name('show');
-            Route::get('/{coupon}/edit', [SpaceCouponController::class, 'edit'])->name('edit');
-            Route::put('/{coupon}', [SpaceCouponController::class, 'update'])->name('update');
-            Route::delete('/{coupon}', [SpaceCouponController::class, 'destroy'])->name('destroy');
+                Route::get('/', [SpaceCouponController::class, 'index'])->name('index');
+                Route::get('/create', [SpaceCouponController::class, 'create'])->name('create');
+                Route::post('/', [SpaceCouponController::class, 'store'])->name('store');
+                Route::get('/{coupon}', [SpaceCouponController::class, 'show'])->name('show');
+                Route::get('/{coupon}/edit', [SpaceCouponController::class, 'edit'])->name('edit');
+                Route::put('/{coupon}', [SpaceCouponController::class, 'update'])->name('update');
+                Route::delete('/{coupon}', [SpaceCouponController::class, 'destroy'])->name('destroy');
+            });
+
+        // Rutas de gestión del espacio (solo para admins del espacio)
+        Route::prefix('manage')
+            ->name('spaces.manage.')
+            ->middleware(['auth', 'email.verified'])
+            ->group(function () {
+            Route::put('/users/{user}/role', [SpaceManagementController::class, 'updateUserRole'])->name('users.update-role');
+            Route::delete('/users/{user}', [SpaceManagementController::class, 'removeUser'])->name('users.remove');
+            Route::post('/users/invite', [SpaceManagementController::class, 'inviteUser'])->name('users.invite');
+            Route::put('/roles/{role}/permissions', [SpaceManagementController::class, 'updateRolePermissions'])->name('roles.update-permissions');
         });
+
+        // Rutas de seguir/dejar de seguir espacio
+        Route::post('/follow', [SpaceManagementController::class, 'followSpace'])->name('spaces.follow')->middleware(['auth']);
+        Route::delete('/unfollow', [SpaceManagementController::class, 'unfollowSpace'])->name('spaces.unfollow')->middleware(['auth']);
+
         // Rutas de checkout para subdominio
     });
 
@@ -84,6 +100,10 @@ Route::get('/refresh-csrf', function () {
     return response()->json(['csrf_token' => csrf_token()]);
 });
 
+// Ruta para dejar de seguir espacios desde el perfil principal (evita CORS)
+Route::delete('/spaces/{subdomain}/unfollow', [SpaceManagementController::class, 'unfollowSpaceBySubdomain'])
+    ->middleware(['auth'])
+    ->name('spaces.unfollow.main');
 
 // Check-in route for QR scanning (no auth required)
 Route::get('/checkin/{ticket}', [OrderController::class, 'checkinTicket'])->name('tickets.checkin');

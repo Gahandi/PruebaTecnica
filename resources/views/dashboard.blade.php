@@ -26,26 +26,27 @@
                             Exportar PDF
                         </a>
                         <!-- <button
-                            class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg shadow-lg text-sm font-medium text-white hover:from-pink-600 hover:to-purple-700 transition-all transform hover:scale-105">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
-                                </path>
-                            </svg>
-                            Nuevo Evento
-                        </button> -->
+                                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg shadow-lg text-sm font-medium text-white hover:from-pink-600 hover:to-purple-700 transition-all transform hover:scale-105">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
+                                    </path>
+                                </svg>
+                                Nuevo Evento
+                            </button> -->
                     </div>
                 </div>
             </div>
 
             {{-- Main Metrics Cards --}}
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
                 {{-- Revenue Card --}}
                 <div
-                    class="bg-white rounded-2xl shadow-xl p-6 border-l-4 border-pink-500 transform transition-all hover:scale-105 hover:shadow-2xl">
+                    class="bg-white rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl p-4 sm:p-6 border-l-4 border-pink-500 transform transition-all hover:shadow-2xl">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600">Ingresos Totales</p>
-                            <p class="text-3xl font-bold text-gray-900 mt-2">${{ number_format($totalRevenue, 2) }}</p>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs sm:text-sm font-medium text-gray-600">Ingresos Totales</p>
+                            <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mt-1 sm:mt-2 truncate">
+                                ${{ number_format($totalRevenue, 2) }}</p>
                             <div class="flex items-center mt-2">
                                 @if($revenueGrowth >= 0)
                                     <svg class="w-4 h-4 text-green-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -64,11 +65,13 @@
                                     <span
                                         class="text-sm font-semibold text-red-600">{{ number_format($revenueGrowth, 1) }}%</span>
                                 @endif
-                                <span class="text-xs text-gray-500 ml-2">vs mes anterior</span>
+                                <span class="text-xs text-gray-500 ml-1 sm:ml-2 hidden xs:inline">vs mes anterior</span>
                             </div>
                         </div>
-                        <div class="bg-gradient-to-br from-pink-500 to-pink-600 p-4 rounded-xl">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div
+                            class="bg-gradient-to-br from-pink-500 to-pink-600 p-2 sm:p-3 lg:p-4 rounded-lg sm:rounded-xl ml-2 sm:ml-4 flex-shrink-0">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-white" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
                                 </path>
@@ -79,11 +82,12 @@
 
                 {{-- Orders Card --}}
                 <div
-                    class="bg-white rounded-2xl shadow-xl p-6 border-l-4 border-blue-500 transform transition-all hover:scale-105 hover:shadow-2xl">
+                    class="bg-white rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl p-4 sm:p-6 border-l-4 border-blue-500 transform transition-all hover:shadow-2xl">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600">Órdenes Completadas</p>
-                            <p class="text-3xl font-bold text-gray-900 mt-2">{{ number_format($completedOrders) }}</p>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs sm:text-sm font-medium text-gray-600">Órdenes Completadas</p>
+                            <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mt-1 sm:mt-2">
+                                {{ number_format($completedOrders) }}</p>
                             <div class="flex items-center mt-2">
                                 @if($ordersGrowth >= 0)
                                     <svg class="w-4 h-4 text-green-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -102,11 +106,13 @@
                                     <span
                                         class="text-sm font-semibold text-red-600">{{ number_format($ordersGrowth, 1) }}%</span>
                                 @endif
-                                <span class="text-xs text-gray-500 ml-2">vs mes anterior</span>
+                                <span class="text-xs text-gray-500 ml-1 sm:ml-2 hidden xs:inline">vs mes anterior</span>
                             </div>
                         </div>
-                        <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-4 rounded-xl">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div
+                            class="bg-gradient-to-br from-blue-500 to-blue-600 p-2 sm:p-3 lg:p-4 rounded-lg sm:rounded-xl ml-2 sm:ml-4 flex-shrink-0">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-white" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
                                 </path>
@@ -117,19 +123,22 @@
 
                 {{-- Tickets Card --}}
                 <div
-                    class="bg-white rounded-2xl shadow-xl p-6 border-l-4 border-purple-500 transform transition-all hover:scale-105 hover:shadow-2xl">
+                    class="bg-white rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl p-4 sm:p-6 border-l-4 border-purple-500 transform transition-all hover:shadow-2xl">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600">Tickets Vendidos</p>
-                            <p class="text-3xl font-bold text-gray-900 mt-2">{{ number_format($totalTickets) }}</p>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs sm:text-sm font-medium text-gray-600">Tickets Vendidos</p>
+                            <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mt-1 sm:mt-2">
+                                {{ number_format($totalTickets) }}</p>
                             <div class="mt-2">
                                 <span class="text-sm text-gray-600">Promedio: </span>
                                 <span
                                     class="text-sm font-semibold text-purple-600">${{ number_format($averageOrderValue, 2) }}</span>
                             </div>
                         </div>
-                        <div class="bg-gradient-to-br from-purple-500 to-purple-600 p-4 rounded-xl">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div
+                            class="bg-gradient-to-br from-purple-500 to-purple-600 p-2 sm:p-3 lg:p-4 rounded-lg sm:rounded-xl ml-2 sm:ml-4 flex-shrink-0">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-white" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z">
                                 </path>
@@ -140,18 +149,21 @@
 
                 {{-- Events Card --}}
                 <div
-                    class="bg-white rounded-2xl shadow-xl p-6 border-l-4 border-green-500 transform transition-all hover:scale-105 hover:shadow-2xl">
+                    class="bg-white rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl p-4 sm:p-6 border-l-4 border-green-500 transform transition-all hover:shadow-2xl">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-600">Eventos Activos</p>
-                            <p class="text-3xl font-bold text-gray-900 mt-2">{{ $activeEvents }}</p>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs sm:text-sm font-medium text-gray-600">Eventos Activos</p>
+                            <p class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mt-1 sm:mt-2">
+                                {{ $activeEvents }}</p>
                             <div class="mt-2">
                                 <span class="text-sm text-gray-600">Total: </span>
                                 <span class="text-sm font-semibold text-green-600">{{ $totalEvents }}</span>
                             </div>
                         </div>
-                        <div class="bg-gradient-to-br from-green-500 to-green-600 p-4 rounded-xl">
-                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div
+                            class="bg-gradient-to-br from-green-500 to-green-600 p-2 sm:p-3 lg:p-4 rounded-lg sm:rounded-xl ml-2 sm:ml-4 flex-shrink-0">
+                            <svg class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-white" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
                                 </path>
@@ -162,41 +174,50 @@
             </div>
 
             {{-- Secondary Metrics --}}
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-                <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-xl p-6 text-white">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                <div
+                    class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl p-4 sm:p-6 text-white">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-orange-100">Tasa de Conversión</p>
-                            <p class="text-4xl font-bold mt-2">{{ number_format($conversionRate, 1) }}%</p>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs sm:text-sm font-medium text-orange-100">Tasa de Conversión</p>
+                            <p class="text-2xl sm:text-3xl lg:text-4xl font-bold mt-1 sm:mt-2">
+                                {{ number_format($conversionRate, 1) }}%</p>
                         </div>
-                        <svg class="w-12 h-12 text-orange-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-orange-200 flex-shrink-0 ml-2" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                         </svg>
                     </div>
                 </div>
 
-                <div class="bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl shadow-xl p-6 text-white">
+                <div
+                    class="bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl p-4 sm:p-6 text-white">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-teal-100">Check-ins Realizados</p>
-                            <p class="text-4xl font-bold mt-2">{{ number_format($totalCheckins) }}</p>
-                            <p class="text-sm mt-1">{{ number_format($checkinRate, 1) }}% de tickets</p>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs sm:text-sm font-medium text-teal-100">Check-ins Realizados</p>
+                            <p class="text-2xl sm:text-3xl lg:text-4xl font-bold mt-1 sm:mt-2">
+                                {{ number_format($totalCheckins) }}</p>
+                            <p class="text-xs sm:text-sm mt-1">{{ number_format($checkinRate, 1) }}% de tickets</p>
                         </div>
-                        <svg class="w-12 h-12 text-teal-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-teal-200 flex-shrink-0 ml-2" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                     </div>
                 </div>
 
-                <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl shadow-xl p-6 text-white">
+                <div
+                    class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl p-4 sm:p-6 text-white">
                     <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-indigo-100">Usuarios Registrados</p>
-                            <p class="text-4xl font-bold mt-2">{{ number_format($totalUsers) }}</p>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs sm:text-sm font-medium text-indigo-100">Usuarios Registrados</p>
+                            <p class="text-2xl sm:text-3xl lg:text-4xl font-bold mt-1 sm:mt-2">
+                                {{ number_format($totalUsers) }}</p>
                         </div>
-                        <svg class="w-12 h-12 text-indigo-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-indigo-200 flex-shrink-0 ml-2" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
                             </path>
@@ -207,7 +228,7 @@
 
             {{-- Admin Quick Actions --}}
             @if(auth()->user()->hasRole('admin'))
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
                     <a href="{{ route('admin.users.index') }}"
                         class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all transform hover:scale-105">
                         <div class="flex items-center justify-between">
@@ -263,10 +284,10 @@
                         <div class="space-y-3">
                             @foreach($alerts as $alert)
                                 <div class="bg-white rounded-lg shadow-md p-4 border-l-4 
-                                                    @if($alert['type'] === 'warning') border-yellow-500
-                                                    @elseif($alert['type'] === 'error') border-red-500
-                                                    @else border-blue-500
-                                                    @endif">
+                                                                    @if($alert['type'] === 'warning') border-yellow-500
+                                                                    @elseif($alert['type'] === 'error') border-red-500
+                                                                    @else border-blue-500
+                                                                    @endif">
                                     <div class="flex items-center">
                                         <span class="text-2xl mr-3">{{ $alert['icon'] }}</span>
                                         <p class="text-sm text-gray-900">{{ $alert['message'] }}</p>

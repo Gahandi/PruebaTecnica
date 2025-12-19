@@ -45,7 +45,7 @@
 
                 {{-- Spaces --}}
                 <a href="{{ route('admin.spaces.index') }}"
-                    class="flex items-center px-6 py-3 text-black hover:bg-gray-700 hover:text-white transition-colors">
+                    class="flex items-center px-6 py-3 text-black hover:bg-gray-700 hover:text-white transition-colors {{ request()->routeIs('admin.spaces.*') ? 'bg-gray-200 text-black border-l-4 border-pink-500' : '' }}">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 6h6v6H4V6zm10 0h6v6h-6V6zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z" />
@@ -56,9 +56,11 @@
 
                 {{-- Events --}}
                 <a href="{{ route('admin.events.index') }}"
-                    class="flex items-center px-6 py-3 text-black hover:bg-gray-700 hover:text-white transition-colors">
+                    class="flex items-center px-6 py-3 text-black hover:bg-gray-700 hover:text-white transition-colors {{ request()->routeIs('admin.events.*') ? 'bg-gray-200 text-black border-l-4 border-pink-500' : '' }}">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"> </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                        </path>
                     </svg>
                     Eventos
                 </a>

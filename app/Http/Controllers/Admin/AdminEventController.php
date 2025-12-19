@@ -13,7 +13,8 @@ class AdminEventController extends Controller
      */
     public function index()
     {
-        $events = Event::with('space')
+        $events = Event::with(['space', 'state', 'type_event'])
+            ->withCount(['tickets_events', 'orders'])
             ->latest()
             ->paginate(15);
 

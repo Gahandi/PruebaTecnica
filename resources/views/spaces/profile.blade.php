@@ -17,21 +17,63 @@
          <div class="mb-8">
              <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
             <div class="relative facebook-style-photo">
-                     <div class="absolute top-8 right-8 z-30">
-                @auth
-                        @if($isAdmin)
-                        <button 
-                            type="button"
-                                onclick="window.location.href='{{ route('spaces.edit', $space->subdomain) }}'"
-                                class="bg-white bg-opacity-90 backdrop-blur-sm rounded-full px-6 py-3 shadow-xl flex items-center space-x-3 hover:bg-opacity-100 transition-all duration-300 hover:scale-105">
-                            <svg class="w-5 h-5 text-pink-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"></path>
-                            </svg>
-                            <span class="text-sm font-semibold text-gray-800">Editar</span>
-                        </button>
-                    @endif
-                    @endauth
-            </div>
+                     <div class="absolute top-8 right-8 z-30 flex items-center space-x-3">
+                         <!-- Follower Count Badge -->
+                         <div class="bg-white bg-opacity-90 backdrop-blur-sm rounded-full px-4 py-2 shadow-xl flex items-center space-x-2">
+                             <svg class="w-5 h-5 text-pink-600" fill="currentColor" viewBox="0 0 20 20">
+                                 <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"></path>
+                             </svg>
+                             <span class="text-sm font-bold text-gray-800">{{ $followerCount ?? 0 }}</span>
+                             <span class="text-xs text-gray-600">seguidores</span>
+                         </div>
+                         
+                         @auth
+                             @if($isAdmin)
+                                 <button 
+                                     type="button"
+                                     onclick="window.location.href='{{ route('spaces.edit', $space->subdomain) }}'"
+                                     class="bg-white bg-opacity-90 backdrop-blur-sm rounded-full px-6 py-3 shadow-xl flex items-center space-x-3 hover:bg-opacity-100 transition-all duration-300 hover:scale-105">
+                                     <svg class="w-5 h-5 text-pink-600" fill="currentColor" viewBox="0 0 20 20">
+                                         <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"></path>
+                                     </svg>
+                                     <span class="text-sm font-semibold text-gray-800">Editar</span>
+                                 </button>
+                             @elseif(!($isMember ?? false))
+                                 <!-- Follow Button - Not a member -->
+                                 <button 
+                                     type="button"
+                                     onclick="followSpace()"
+                                     id="followBtn"
+                                     class="bg-gradient-to-r from-pink-500 to-pink-600 rounded-full px-6 py-3 shadow-xl flex items-center space-x-2 hover:from-pink-600 hover:to-pink-700 transition-all duration-300 hover:scale-105">
+                                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                     </svg>
+                                     <span class="text-sm font-semibold text-white">Seguir</span>
+                                 </button>
+                             @elseif($isFollowing ?? false)
+                                 <!-- Following Button -->
+                                 <button 
+                                     type="button"
+                                     onclick="unfollowSpace()"
+                                     id="unfollowBtn"
+                                     class="bg-white bg-opacity-90 backdrop-blur-sm rounded-full px-6 py-3 shadow-xl flex items-center space-x-2 hover:bg-red-50 transition-all duration-300 group">
+                                     <svg class="w-5 h-5 text-pink-600 group-hover:text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                     </svg>
+                                     <span class="text-sm font-semibold text-gray-800 group-hover:text-red-500">Siguiendo</span>
+                                 </button>
+                             @endif
+                         @else
+                             <!-- Login to Follow -->
+                             <a href="{{ route('login') }}" 
+                                class="bg-gradient-to-r from-pink-500 to-pink-600 rounded-full px-6 py-3 shadow-xl flex items-center space-x-2 hover:from-pink-600 hover:to-pink-700 transition-all duration-300 hover:scale-105">
+                                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                 </svg>
+                                 <span class="text-sm font-semibold text-white">Seguir</span>
+                             </a>
+                         @endauth
+                     </div>
                      @if($space->banner)
                     <img src="{{ \App\Helpers\ImageHelper::getImageUrl($space->banner) }}" alt="{{ $space->name }}" class="w-full h-96 object-cover">
                      @else
@@ -110,6 +152,24 @@
                                 <span>Editar</span>
                             </div>
                         </button>
+                        
+                        <button onclick="switchTab('roles')" id="tab-roles" class="tab-button px-6 py-4 text-sm font-medium text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                </svg>
+                                <span>Roles y Permisos</span>
+                            </div>
+                        </button>
+                        
+                        <button onclick="switchTab('orders')" id="tab-orders" class="tab-button px-6 py-4 text-sm font-medium text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                </svg>
+                                <span>Órdenes</span>
+                            </div>
+                        </button>
                     @endif
                 </nav>
             </div>
@@ -129,19 +189,49 @@
                         'totalMembers' => $totalMembers,
                         'totalTicketsAvailable' => $totalTicketsAvailable,
                         'totalTicketsSold' => $totalTicketsSold,
-                        'totalRevenue' => $totalRevenue
+                        'totalRevenue' => $totalRevenue,
+                        'monthlyRevenueData' => $monthlyRevenueData ?? ['months' => [], 'revenues' => []],
+                        'ticketsByType' => $ticketsByType ?? collect(),
+                        'recentOrders' => $recentOrders ?? collect(),
+                        'recentCheckins' => $recentCheckins ?? collect(),
+                        'totalCheckins' => $totalCheckins ?? 0,
+                        'checkinRate' => $checkinRate ?? 0,
+                        'upcomingEvents' => $upcomingEvents ?? collect(),
+                        'totalOrders' => $totalOrders ?? 0,
+                        'averageTicketPrice' => $averageTicketPrice ?? 0,
+                        'dailySalesData' => $dailySalesData ?? ['days' => [], 'revenues' => []]
                     ])
-                                    </div>
+                </div>
 
                 <!-- Tab: Usuarios -->
                 <div id="content-users" class="tab-content hidden">
-                    @include('spaces.tabs.users', ['usersWithStats' => $usersWithStats, 'space' => $space])
-                                        </div>
+                    @include('spaces.tabs.users', [
+                        'usersWithStats' => $usersWithStats,
+                        'space' => $space,
+                        'isAdmin' => $isAdmin,
+                        'roleSpaces' => $roleSpaces ?? collect()
+                    ])
+                </div>
 
                 <!-- Tab: Editar (solo admin) -->
                 @if($isAdmin)
                 <div id="content-edit" class="tab-content hidden">
                     @include('spaces.tabs.edit', ['space' => $space])
+                </div>
+                
+                <!-- Tab: Roles y Permisos (solo admin) -->
+                <div id="content-roles" class="tab-content hidden">
+                    @include('spaces.tabs.roles', [
+                        'roleSpaces' => $roleSpaces ?? collect(),
+                        'allPermissions' => $allPermissions ?? collect()
+                    ])
+                </div>
+                
+                <!-- Tab: Órdenes (solo admin) -->
+                <div id="content-orders" class="tab-content hidden">
+                    @include('spaces.tabs.orders', [
+                        'spaceOrders' => $spaceOrders ?? collect()
+                    ])
                 </div>
                 @endif
             </div>
@@ -174,6 +264,57 @@ function switchTab(tabName) {
         button.classList.add('active', 'border-pink-500', 'text-pink-600');
         button.classList.remove('border-transparent', 'text-gray-500');
     }
+}
+
+// Follow/Unfollow Functions
+function followSpace() {
+    fetch('/follow', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'Error al seguir el espacio');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error de conexión');
+    });
+}
+
+function unfollowSpace() {
+    if (!confirm('¿Estás seguro de que deseas dejar de seguir este espacio?')) {
+        return;
+    }
+    
+    fetch('/unfollow', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'Error al dejar de seguir');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error de conexión');
+    });
 }
 </script>
 

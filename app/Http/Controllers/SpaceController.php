@@ -35,32 +35,36 @@ class SpaceController extends Controller
             ->where('active', true)
             ->where('date', '>=', now())
             ->with(['ticketTypes', 'tags', 'type_event']);
-        
+
         if ($tagFilter) {
-            $eventsQuery->whereHas('tags', function($query) use ($tagFilter) {
+            $eventsQuery->whereHas('tags', function ($query) use ($tagFilter) {
                 $query->where('tags.id', $tagFilter);
             });
         }
-        
+
         if ($categoryFilter) {
             $eventsQuery->where('type_events_id', $categoryFilter);
         }
 
         $filteredEvents = $eventsQuery->get();
-        
+
         // Obtener tags únicos de los eventos del espacio
-        $allTags = \App\Models\Tag::whereHas('events', function($query) use ($space) {
+        $allTags = \App\Models\Tag::whereHas('events', function ($query) use ($space) {
             $query->where('spaces_id', $space->id)->where('active', true);
-        })->withCount(['events' => function($query) use ($space) {
-            $query->where('spaces_id', $space->id)->where('active', true);
-        }])->get();
+        })->withCount([
+                    'events' => function ($query) use ($space) {
+                        $query->where('spaces_id', $space->id)->where('active', true);
+                    }
+                ])->get();
 
         // Obtener categorías únicas de los eventos del espacio
-        $allCategories = \App\Models\TypeEvent::whereHas('events', function($query) use ($space) {
+        $allCategories = \App\Models\TypeEvent::whereHas('events', function ($query) use ($space) {
             $query->where('spaces_id', $space->id)->where('active', true);
-        })->withCount(['events' => function($query) use ($space) {
-            $query->where('spaces_id', $space->id)->where('active', true);
-        }])->get();
+        })->withCount([
+                    'events' => function ($query) use ($space) {
+                        $query->where('spaces_id', $space->id)->where('active', true);
+                    }
+                ])->get();
 
         // Estadísticas generales del espacio
         $totalEvents = $space->events->count();
@@ -105,7 +109,7 @@ class SpaceController extends Controller
                 ->get();
 
             // Filtrar órdenes que pertenecen a eventos de este espacio
-            $userOrders = $allUserOrders->filter(function($order) use ($eventIds) {
+            $userOrders = $allUserOrders->filter(function ($order) use ($eventIds) {
                 // Si event_id es un array JSON, verificar si contiene algún ID del espacio
                 if (is_string($order->event_id)) {
                     $decoded = json_decode($order->event_id, true);
@@ -119,7 +123,7 @@ class SpaceController extends Controller
 
             // Obtener tickets del usuario para eventos de este espacio
             $userTickets = \App\Models\Ticket::whereIn('event_id', $eventIds->toArray())
-                ->whereHas('order', function($query) use ($user) {
+                ->whereHas('order', function ($query) use ($user) {
                     $query->where('user_id', $user->id);
                 })
                 ->get();
@@ -157,9 +161,159 @@ class SpaceController extends Controller
         }
 
         // Ordenar usuarios por revenue descendente
-        usort($usersWithStats, function($a, $b) {
+        usort($usersWithStats, function ($a, $b) {
             return $b['revenue'] <=> $a['revenue'];
         });
+
+        // ===== ENHANCED DASHBOARD DATA =====
+
+        // Monthly Revenue Data (últimos 6 meses)
+        $monthlyRevenueData = ['months' => [], 'revenues' => []];
+        for ($i = 5; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $monthlyRevenueData['months'][] = $date->translatedFormat('M Y');
+
+            // Obtener órdenes del mes para eventos de este espacio
+            $monthRevenue = \App\Models\Payment::whereHas('order', function ($q) use ($eventIds, $date) {
+                $q->whereIn('event_id', $eventIds->toArray())
+                    ->whereMonth('created_at', $date->month)
+                    ->whereYear('created_at', $date->year);
+            })->sum('total');
+
+            $monthlyRevenueData['revenues'][] = $monthRevenue ?: 0;
+        }
+
+        // Ticket Distribution by Type
+        $ticketsByType = collect();
+        $ticketTypeStats = [];
+        foreach ($space->events as $event) {
+            foreach ($event->ticketTypes as $ticketType) {
+                $ticketEvent = \App\Models\TicketsEvent::where('event_id', $event->id)
+                    ->where('ticket_types_id', $ticketType->id)
+                    ->first();
+
+                if ($ticketEvent) {
+                    $sold = \App\Models\Ticket::where('event_id', $event->id)
+                        ->where('ticket_types_id', $ticketType->id)
+                        ->count();
+
+                    $typeName = $ticketType->name;
+                    if (!isset($ticketTypeStats[$typeName])) {
+                        $ticketTypeStats[$typeName] = 0;
+                    }
+                    $ticketTypeStats[$typeName] += $sold;
+                }
+            }
+        }
+        foreach ($ticketTypeStats as $name => $sold) {
+            $ticketsByType->push(['name' => $name, 'total_sold' => $sold]);
+        }
+
+        // Recent Orders (últimas 10 órdenes de eventos de este espacio)
+        $recentOrders = \App\Models\Order::with(['user', 'payments', 'tickets'])
+            ->whereHas('tickets', function ($q) use ($eventIds) {
+                $q->whereIn('event_id', $eventIds->toArray());
+            })
+            ->orderBy('created_at', 'desc')
+            ->take(10)
+            ->get()
+            ->map(function ($order) use ($eventIds) {
+                // Obtener eventos de esta orden que pertenecen al espacio
+                $orderEvents = \App\Models\Event::whereIn('id', $eventIds->toArray())
+                    ->whereIn('id', $order->tickets->pluck('event_id')->unique())
+                    ->get();
+                $order->events = $orderEvents;
+                return $order;
+            });
+
+        // Recent Check-ins (últimos 10 check-ins de eventos de este espacio)
+        $recentCheckins = \App\Models\Checkin::with(['ticket.order.user'])
+            ->whereHas('ticket', function ($q) use ($eventIds) {
+                $q->whereIn('event_id', $eventIds->toArray());
+            })
+            ->orderBy('scanned_at', 'desc')
+            ->take(10)
+            ->get();
+
+        // Total Check-ins
+        $totalCheckins = \App\Models\Checkin::whereHas('ticket', function ($q) use ($eventIds) {
+            $q->whereIn('event_id', $eventIds->toArray());
+        })->count();
+
+        // Check-in Rate
+        $checkinRate = $totalTicketsSold > 0 ? ($totalCheckins / $totalTicketsSold) * 100 : 0;
+
+        // Upcoming Events
+        $upcomingEvents = Event::where('spaces_id', $space->id)
+            ->where('active', true)
+            ->where('date', '>=', now())
+            ->orderBy('date', 'asc')
+            ->take(5)
+            ->get();
+
+        // Total Orders
+        $totalOrders = \App\Models\Order::whereHas('tickets', function ($q) use ($eventIds) {
+            $q->whereIn('event_id', $eventIds->toArray());
+        })->count();
+
+        // Average Ticket Price
+        $averageTicketPrice = $totalTicketsSold > 0 ? $totalRevenue / $totalTicketsSold : 0;
+
+        // Daily Sales (últimos 7 días)
+        $dailySalesData = ['days' => [], 'revenues' => []];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $dailySalesData['days'][] = $date->translatedFormat('D d');
+
+            $dayRevenue = \App\Models\Payment::whereHas('order', function ($q) use ($eventIds, $date) {
+                $q->whereHas('tickets', function ($q2) use ($eventIds) {
+                    $q2->whereIn('event_id', $eventIds->toArray());
+                })
+                    ->whereDate('created_at', $date->toDateString());
+            })->sum('total');
+
+            $dailySalesData['revenues'][] = $dayRevenue ?: 0;
+        }
+
+        // Available Roles for user management
+        $roleSpaces = \App\Models\RoleSpace::whereNull('deleted_at')->get();
+
+        // All Permissions for role management
+        $allPermissions = \App\Models\Permission::whereNull('deleted_at')->get();
+
+        // ===== ORDERS TAB DATA =====
+        $spaceOrders = \App\Models\Order::with(['user', 'payments', 'tickets.ticketType', 'tickets.event'])
+            ->whereHas('tickets', function ($q) use ($eventIds) {
+                $q->whereIn('event_id', $eventIds->toArray());
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        // ===== FOLLOW SYSTEM DATA =====
+        // Follower count (users with role_space_id = 3 = viewer = follower)
+        $followerCount = \App\Models\SpacesUser::where('space_id', $space->id)
+            ->where('role_space_id', 3)
+            ->whereNull('deleted_at')
+            ->count();
+
+        // Check if current user is following
+        $isFollowing = false;
+        if (auth()->check()) {
+            $isFollowing = \App\Models\SpacesUser::where('space_id', $space->id)
+                ->where('user_id', auth()->id())
+                ->where('role_space_id', 3)
+                ->whereNull('deleted_at')
+                ->exists();
+        }
+
+        // Check if user is member (any role)
+        $isMember = false;
+        if (auth()->check()) {
+            $isMember = \App\Models\SpacesUser::where('space_id', $space->id)
+                ->where('user_id', auth()->id())
+                ->whereNull('deleted_at')
+                ->exists();
+        }
 
         return view('spaces.profile', compact(
             'space',
@@ -174,7 +328,26 @@ class SpaceController extends Controller
             'allTags',
             'allCategories',
             'tagFilter',
-            'categoryFilter'
+            'categoryFilter',
+            // Enhanced Dashboard Data
+            'monthlyRevenueData',
+            'ticketsByType',
+            'recentOrders',
+            'recentCheckins',
+            'totalCheckins',
+            'checkinRate',
+            'upcomingEvents',
+            'totalOrders',
+            'averageTicketPrice',
+            'dailySalesData',
+            'roleSpaces',
+            'allPermissions',
+            // Orders Tab Data
+            'spaceOrders',
+            // Follow System Data
+            'followerCount',
+            'isFollowing',
+            'isMember'
         ));
     }
 
@@ -275,7 +448,7 @@ class SpaceController extends Controller
         }
 
         return redirect()->route('spaces.profile', $space->subdomain)
-                        ->with('success', 'Perfil del cajón actualizado exitosamente');
+            ->with('success', 'Perfil del cajón actualizado exitosamente');
     }
 
     public function updateProfile(Request $request, $subdomain)

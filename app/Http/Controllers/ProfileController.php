@@ -12,13 +12,25 @@ class ProfileController extends Controller
     public function show()
     {
         $user = Auth::user();
-        return view('users.profile', compact('user'));
+
+        // Get spaces the user follows (role_space_id = 3 = viewer = follower)
+        $spacesFollowing = \App\Models\Space::whereHas('users', function ($q) use ($user) {
+            $q->where('user_id', $user->id)
+                ->where('role_space_id', 3)
+                ->whereNull('spaces_users.deleted_at');
+        })->withCount([
+                    'users' => function ($q) {
+                        $q->where('role_space_id', 3)->whereNull('spaces_users.deleted_at');
+                    }
+                ])->get();
+
+        return view('users.profile', compact('user', 'spacesFollowing'));
     }
 
     public function update(Request $request)
     {
         $user = Auth::user();
-        
+
         // Validar solo información personal (sin campos de contraseña)
         $request->validate([
             'name' => 'required|string|max:255',
@@ -39,7 +51,7 @@ class ProfileController extends Controller
     public function updatePassword(Request $request)
     {
         $user = Auth::user();
-        
+
         $request->validate([
             'current_password' => 'required|string',
             'password' => 'required|string|min:8|confirmed',
