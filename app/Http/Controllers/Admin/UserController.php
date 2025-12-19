@@ -11,9 +11,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use App\Traits\S3ImageManager;
 
 class UserController extends Controller
 {
+    use S3ImageManager;
+
     /**
      * Display a listing of users
      */
@@ -108,13 +111,47 @@ class UserController extends Controller
             $data['verified_at'] = now();
         }
 
+        // Crear usuario primero
+        $user = User::create($data);
+
         // Handle image upload
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('users', 'public');
-            $data['image'] = $imagePath;
-        }
 
-        $user = User::create($data);
+            $imageFile = $request->file('image');
+            $fileContents = file_get_contents($imageFile->getPathname());
+
+            // Detectar extensión (igual que en banner)
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mimeType = finfo_buffer($finfo, $fileContents);
+            finfo_close($finfo);
+
+            $extensions = [
+                'image/jpeg' => 'jpg',
+                'image/jpg'  => 'jpg',
+                'image/png'  => 'png',
+                'image/gif'  => 'gif',
+                'image/webp' => 'webp',
+            ];
+
+            $extension = $extensions[$mimeType] ?? 'jpg';
+
+            // Generar nombre
+            $fileName = $user->id . '.' . $extension;
+
+            // 👉 Ruta relativa EXACTA como el banner
+            $relativePath = env('S3_ENVIRONMENT') . '/users/' . $fileName;
+
+            // Subir a S3
+            $this->saveImages(
+                $fileContents,
+                'users',
+                $user->id
+            );
+
+            // Guardar SOLO la ruta relativa
+            $user->image = $relativePath;
+            $user->save();
+        }
 
         // Assign to spaces if provided
         if ($request->filled('spaces')) {

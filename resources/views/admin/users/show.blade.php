@@ -31,7 +31,7 @@
                         <div class="-mt-16 mb-4">
                             @if($user->image)
                                 <img class="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover mx-auto" 
-                                     src="{{ asset('storage/' . $user->image) }}" alt="{{ $user->name }}">
+                                     src="{{ \App\Helpers\ImageHelper::getImageUrl($user->image) }}" alt="{{ $user->name }}">
                             @else
                                 <div class="w-32 h-32 rounded-full border-4 border-white shadow-lg bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white text-4xl font-bold mx-auto">
                                     {{ substr($user->name, 0, 1) }}

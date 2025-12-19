@@ -156,7 +156,7 @@
                                             <div class="flex-shrink-0 h-10 w-10">
                                                 @if($user->image)
                                                     <img class="h-10 w-10 rounded-full object-cover"
-                                                        src="{{ asset('storage/' . $user->image) }}" alt="{{ $user->name }}">
+                                                    src="{{ \App\Helpers\ImageHelper::getImageUrl($user->image) }}" alt="{{ $user->name }}">
                                                 @else
                                                     <div
                                                         class="h-10 w-10 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white font-bold">

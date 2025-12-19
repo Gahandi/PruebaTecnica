@@ -65,7 +65,16 @@ class Order extends Model
             }
         });
     }
+	public function getEventAttribute()
+	{
+		if (!$this->event_id) {
+			return null;
+		}
 
+		$eventId = collect($this->event_id)->values()->first();
+
+		return Event::find($eventId);
+	}
 	public function user()
 	{
 		return $this->belongsTo(User::class);

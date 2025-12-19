@@ -12,6 +12,8 @@ use App\Http\Controllers\SpaceCouponController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ScannerController;
+use App\Http\Controllers\Admin\AdminSpaceController;
+use App\Http\Controllers\Admin\AdminEventController;
 use App\Http\Controllers\GoogleMerchantController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -233,8 +235,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Activity Log
     Route::get('activity-log', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-log.index');
+    Route::get('activity-log/export', [\App\Http\Controllers\Admin\ActivityLogController::class, 'export'])->name('activity-log.export');
     Route::get('activity-log/{activityLog}', [\App\Http\Controllers\Admin\ActivityLogController::class, 'show'])->name('activity-log.show');
-    Route::get('activity-log-export', [\App\Http\Controllers\Admin\ActivityLogController::class, 'export'])->name('activity-log.export');
     Route::delete('activity-log/clear', [\App\Http\Controllers\Admin\ActivityLogController::class, 'clear'])->name('activity-log.clear');
 
     // Check-ins Management
@@ -259,4 +261,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('settings', [\App\Http\Controllers\Admin\SettingsController::class, 'store'])->name('settings.store');
     Route::delete('settings/{setting}', [\App\Http\Controllers\Admin\SettingsController::class, 'destroy'])->name('settings.destroy');
     Route::post('settings/initialize', [\App\Http\Controllers\Admin\SettingsController::class, 'initializeDefaults'])->name('settings.initialize');
+
+    // Spaces
+    Route::get('spaces', [AdminSpaceController::class, 'index'])->name('spaces.index');
+
+    // Event
+    Route::get('events', [AdminEventController::class, 'index'])->name('events.index');
+    Route::delete('events/{event}', [AdminEventController::class, 'destroy'])->name('events.destroy');
+
 });

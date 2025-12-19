@@ -26,7 +26,7 @@ class SalesReportExport implements FromCollection, WithHeadings, WithMapping, Wi
     {
         return Order::where('status', 'completed')
             ->whereBetween('created_at', [$this->startDate, $this->endDate])
-            ->with(['event', 'user'])
+            ->with(['user'])
             ->get();
     }
 

@@ -17,12 +17,15 @@ class CheckinController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Checkin::with(['ticket.order.user', 'ticket.order.event', 'user']);
+        $query = Checkin::with(['ticket.order.user', 'user']);
 
         // Filter by event
         if ($request->filled('event_id')) {
             $query->whereHas('ticket.order', function ($q) use ($request) {
-                $q->where('event_id', $request->event_id);
+                $q->whereRaw(
+                    "JSON_SEARCH(orders.event_id, 'one', ?) IS NOT NULL",
+                    [$request->event_id]
+                );                
             });
         }
 
@@ -74,10 +77,14 @@ class CheckinController extends Controller
         $checkinsByEvent = DB::table('checkins')
             ->join('tickets', 'checkins.ticket_id', '=', 'tickets.id')
             ->join('orders', 'tickets.order_id', '=', 'orders.id')
-            ->join('events', 'orders.event_id', '=', 'events.id')
+            ->join('events', function ($join) {
+                $join->whereRaw(
+                    "JSON_SEARCH(orders.event_id, 'one', events.id) IS NOT NULL"
+                );
+            })
             ->select('events.name', DB::raw('COUNT(checkins.id) as count'))
             ->groupBy('events.id', 'events.name')
-            ->orderBy('count', 'desc')
+            ->orderByDesc('count')
             ->limit(10)
             ->get();
 
@@ -135,12 +142,15 @@ class CheckinController extends Controller
      */
     public function export(Request $request)
     {
-        $query = Checkin::with(['ticket.order.user', 'ticket.order.event', 'user']);
+        $query = Checkin::with(['ticket.order.user','user']);
 
         // Apply filters
         if ($request->filled('event_id')) {
             $query->whereHas('ticket.order', function ($q) use ($request) {
-                $q->where('event_id', $request->event_id);
+                $q->whereRaw(
+                    "JSON_SEARCH(orders.event_id, 'one', ?) IS NOT NULL",
+                    [$request->event_id]
+                );                
             });
         }
         if ($request->filled('date_from')) {

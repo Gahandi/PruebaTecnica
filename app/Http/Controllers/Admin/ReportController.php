@@ -54,7 +54,7 @@ class ReportController extends Controller
         // Get sales data
         $sales = Order::where('status', 'completed')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->with(['event', 'user'])
+            ->with(['user'])
             ->get();
 
         // Calculate statistics
@@ -79,7 +79,11 @@ class ReportController extends Controller
         // Sales by event - need to join with payments
         $salesByEvent = DB::table('orders')
             ->join('payments', 'orders.id', '=', 'payments.order_id')
-            ->join('events', 'orders.event_id', '=', 'events.id')
+            ->join('events', function ($join) {
+                $join->whereRaw(
+                    "JSON_SEARCH(orders.event_id, 'one', events.id) IS NOT NULL"
+                );
+            })
             ->select('orders.event_id', 'events.name as event_name', DB::raw('SUM(payments.total) as total_sales'), DB::raw('COUNT(DISTINCT orders.id) as total_orders'))
             ->where('orders.status', 'completed')
             ->whereNull('orders.deleted_at')
@@ -177,12 +181,26 @@ class ReportController extends Controller
         $topUsers = DB::table('users')
             ->join('orders', 'users.id', '=', 'orders.user_id')
             ->join('payments', 'orders.id', '=', 'payments.order_id')
-            ->select('users.*', DB::raw('COUNT(DISTINCT orders.id) as orders_count'), DB::raw('SUM(payments.total) as total_spent'))
+            ->select(
+                'users.id',
+                'users.name',
+                'users.last_name',
+                'users.email',
+                'users.role',
+                DB::raw('COUNT(DISTINCT orders.id) as orders_count'),
+                DB::raw('SUM(payments.total) as total_spent')
+            )
             ->where('orders.status', 'completed')
             ->whereNull('users.deleted_at')
             ->whereBetween('orders.created_at', [$startDate, $endDate])
-            ->groupBy('users.id', 'users.name', 'users.email', 'users.role', 'users.created_at', 'users.updated_at', 'users.deleted_at', 'users.verified_at')
-            ->orderBy('total_spent', 'desc')
+            ->groupBy(
+                'users.id',
+                'users.name',
+                'users.last_name',
+                'users.email',
+                'users.role'
+            )
+            ->orderByDesc('total_spent')
             ->limit(10)
             ->get();
 
@@ -216,11 +234,14 @@ class ReportController extends Controller
 
         // Get check-ins data
         $query = Checkin::whereBetween('created_at', [$startDate, $endDate])
-            ->with(['ticket.order.event', 'user']);
+            ->with(['ticket.order.user', 'user']);
 
         if ($eventId) {
             $query->whereHas('ticket.order', function ($q) use ($eventId) {
-                $q->where('event_id', $eventId);
+                $q->whereRaw(
+                    "JSON_SEARCH(orders.event_id, 'one', ?) IS NOT NULL",
+                    [$eventId]
+                );
             });
         }
 
@@ -237,7 +258,11 @@ class ReportController extends Controller
         $checkinsByEvent = DB::table('checkins')
             ->join('tickets', 'checkins.ticket_id', '=', 'tickets.id')
             ->join('orders', 'tickets.order_id', '=', 'orders.id')
-            ->join('events', 'orders.event_id', '=', 'events.id')
+            ->join('events', function ($join) {
+                $join->whereRaw(
+                    "JSON_SEARCH(orders.event_id, 'one', events.id) IS NOT NULL"
+                );
+            })
             ->select('events.name', 'events.id', DB::raw('COUNT(checkins.id) as count'))
             ->whereBetween('checkins.created_at', [$startDate, $endDate])
             ->groupBy('events.id', 'events.name')
@@ -298,7 +323,7 @@ class ReportController extends Controller
 
         $sales = Order::where('status', 'completed')
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->with(['event', 'user'])
+            ->with(['user'])
             ->get();
 
         $totalSales = \DB::table('payments')
