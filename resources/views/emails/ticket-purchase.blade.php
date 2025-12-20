@@ -124,7 +124,7 @@
             
             @foreach($tickets as $ticket)
             <div class="ticket-item">
-                <strong>{{ $ticket->eventTicket->name ?? 'Evento' }}</strong><br>
+                <strong>{{ $ticket->event->name ?? 'Evento' }}</strong><br>
                 <small>Tipo: {{ $ticket->ticketType->name ?? 'Boleto' }}</small><br>
                 <small>ID: {{ substr($ticket->id, 0, 8) }}</small>
             </div>

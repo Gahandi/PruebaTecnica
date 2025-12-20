@@ -35,7 +35,7 @@ class SendTicketPurchaseEmail implements ShouldQueue
     {
         try {
             // Cargar relaciones necesarias
-            $this->order->load(['tickets.ticketType', 'tickets.eventTicket', 'user', 'payments']);
+            $this->order->load(['tickets.ticketType', 'tickets.event', 'user', 'payments']);
             
             // Generar PDFs para cada ticket
             $this->generateTicketPDFs();
@@ -84,9 +84,9 @@ class SendTicketPurchaseEmail implements ShouldQueue
         
         foreach ($this->order->tickets as $ticket) {
             try {
-                $ticket->load(['ticketType', 'eventTicket', 'order.user']);
+                $ticket->load(['ticketType', 'event', 'order.user']);
                 
-                $event = $ticket->eventTicket;
+                $event = $ticket->event;
                 $ticketType = $ticket->ticketType;
                 $order = $ticket->order;
                 $user = $order->user;

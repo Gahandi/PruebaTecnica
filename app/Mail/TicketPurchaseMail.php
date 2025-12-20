@@ -22,7 +22,7 @@ class TicketPurchaseMail extends Mailable
      */
     public function __construct(Order $order)
     {
-        $this->order = $order->load(['tickets.ticketType', 'tickets.eventTicket', 'user', 'payments']);
+        $this->order = $order->load(['tickets.ticketType', 'tickets.event', 'user', 'payments']);
         $this->tickets = $this->order->tickets;
     }
 
@@ -32,7 +32,7 @@ class TicketPurchaseMail extends Mailable
     public function envelope(): Envelope
     {
         $customerName = $this->order->user ? $this->order->user->name : 'Cliente';
-        $eventName = $this->tickets->first()?->eventTicket?->name ?? 'Evento';
+        $eventName = $this->tickets->first()?->event?->name ?? 'Evento';
         
         return new Envelope(
             subject: "Tus boletos para {$eventName} - Orden #{$this->order->id}",

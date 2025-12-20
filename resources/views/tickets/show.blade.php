@@ -9,7 +9,7 @@
     <div class="flex justify-between items-center mb-6">
         <div>
             <h1 class="text-3xl font-bold text-gray-900">Boleto #{{ substr($ticket->id, 0, 8) }}</h1>
-            <p class="text-gray-600">{{ $ticket->eventTicket->name }}</p>
+            <p class="text-gray-600">{{ $ticket->event->name }}</p>
         </div>
         <div class="flex space-x-3">
             <a href="{{ route('tickets.my') }}"
@@ -29,8 +29,8 @@
             <!-- Event Header -->
             <div class="h-32 bg-gradient-to-r from-pink-500 to-pink-600 flex items-center justify-center text-white">
                 <div class="text-center">
-                    <h2 class="text-2xl font-bold">{{ $ticket->eventTicket->name }}</h2>
-                    <p class="text-sm opacity-90">{{ \Carbon\Carbon::parse($ticket->eventTicket->date)->format('d/m/Y H:i') }}</p>
+                    <h2 class="text-2xl font-bold">{{ $ticket->event->name }}</h2>
+                    <p class="text-sm opacity-90">{{ \Carbon\Carbon::parse($ticket->event->date)->format('d/m/Y H:i') }}</p>
                 </div>
             </div>
 
@@ -49,7 +49,7 @@
 
                     <div class="flex justify-between">
                         <span class="text-gray-600">Ubicación:</span>
-                        <span class="font-semibold">{{ $ticket->eventTicket->address }}</span>
+                        <span class="font-semibold">{{ $ticket->event->address }}</span>
                     </div>
 
                     <div class="flex justify-between">
@@ -91,17 +91,17 @@
                 <div class="space-y-3">
                     <div>
                         <span class="text-gray-600 font-medium">Fecha y Hora:</span>
-                        <p class="text-lg">{{ \Carbon\Carbon::parse($ticket->eventTicket->date)->format('l, d F Y \a \l\a\s H:i') }}</p>
+                        <p class="text-lg">{{ \Carbon\Carbon::parse($ticket->event->date)->format('l, d F Y \a \l\a\s H:i') }}</p>
                     </div>
 
                     <div>
                         <span class="text-gray-600 font-medium">Ubicación:</span>
-                        <p class="text-lg">{{ $ticket->eventTicket->address }}</p>
+                        <p class="text-lg">{{ $ticket->event->address }}</p>
                     </div>
 
                     <div>
                         <span class="text-gray-600 font-medium">Descripción:</span>
-                        <p class="text-gray-700">{{ $ticket->eventTicket->description ?? 'Sin descripción disponible.' }}</p>
+                        <p class="text-gray-700">{{ $ticket->event->description ?? 'Sin descripción disponible.' }}</p>
                     </div>
                 </div>
             </div>

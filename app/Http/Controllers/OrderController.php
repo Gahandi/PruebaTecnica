@@ -34,7 +34,7 @@ class OrderController extends Controller
             abort(403, 'No tienes permisos para ver este boleto.');
         }
 
-        $ticket->load(['order.user', 'eventTicket.ticketTypes' => function($query) {
+        $ticket->load(['order.user', 'event.ticketTypes' => function($query) {
             $query->withPivot('quantity', 'price');
         }, 'checkin']);
         return view('tickets.show', compact('ticket'));
@@ -50,7 +50,7 @@ class OrderController extends Controller
             ->with([
                 'tickets.ticketType',
                 'tickets.checkin',
-                'tickets.eventTicket.space',
+                'tickets.event.space',
                 'payments.coupon'
             ])
             ->latest()
@@ -92,7 +92,7 @@ class OrderController extends Controller
         }
 
         // Cargar relaciones
-        $ticket->load(['order.user', 'eventTicket', 'checkin']);
+        $ticket->load(['order.user', 'event', 'checkin']);
 
         /* 1. GENERAR QR SI NO EXISTE*/
         if (!$ticket->qr_url) {

@@ -146,29 +146,29 @@
                                                         @endif
                                                     @endif
                                                     
-                                                    @if($ticket->eventTicket)
+                                                    @if($ticket->event)
                                                         <div class="mb-2">
                                                             <p class="text-sm font-semibold text-gray-700 mb-1">Evento:</p>
-                                                            <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($ticket->eventTicket->space->subdomain ?? '') }}/{{ $ticket->eventTicket->slug }}" 
+                                                            <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($ticket->event->space->subdomain ?? '') }}/{{ $ticket->event->slug }}" 
                                                                class="text-pink-600 hover:text-pink-800 font-medium text-sm">
-                                                                {{ $ticket->eventTicket->name }}
+                                                                {{ $ticket->event->name }}
                                                             </a>
                                                         </div>
-                                                        @if($ticket->eventTicket->space)
+                                                        @if($ticket->event->space)
                                                             <div class="mb-2">
                                                                 <p class="text-sm font-semibold text-gray-700 mb-1">Espacio:</p>
-                                                                <p class="text-sm text-gray-600">{{ $ticket->eventTicket->space->name }}</p>
+                                                                <p class="text-sm text-gray-600">{{ $ticket->event->space->name }}</p>
                                                             </div>
                                                         @endif
-                                                        @if($ticket->eventTicket->date)
+                                                        @if($ticket->event->date)
                                                             <div class="mb-2">
                                                                 <p class="text-sm font-semibold text-gray-700 mb-1">Fecha:</p>
-                                                                <p class="text-sm text-gray-600">{{ \Carbon\Carbon::parse($ticket->eventTicket->date)->format('d M Y, H:i') }}</p>
+                                                                <p class="text-sm text-gray-600">{{ \Carbon\Carbon::parse($ticket->event->date)->format('d M Y, H:i') }}</p>
                                                             </div>
-                                                            @if($ticket->eventTicket->address)
+                                                            @if($ticket->event->address)
                                                                 <div class="mb-2">
                                                                     <p class="text-sm font-semibold text-gray-700 mb-1">Ubicación:</p>
-                                                                    <p class="text-sm text-gray-600">{{ $ticket->eventTicket->address }}</p>
+                                                                    <p class="text-sm text-gray-600">{{ $ticket->event->address }}</p>
                                                                 </div>
                                                             @endif
                                                         @endif
@@ -219,8 +219,8 @@
                                             </div>
                                             
                                             <!-- Event Link -->
-                                            @if($ticket->eventTicket)
-                                                <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($ticket->eventTicket->space->subdomain ?? '') }}/{{ $ticket->eventTicket->slug }}" 
+                                            @if($ticket->event)
+                                                <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($ticket->event->space->subdomain ?? '') }}/{{ $ticket->event->slug }}" 
                                                    class="mt-2 w-full bg-gradient-to-r from-pink-500 to-pink-400  hover:from-pink-600 hover:to-pink-500 text-white text-white text-center px-4 py-2.5 rounded-lg transition-all duration-200 font-semibold text-sm block">
                                                     Ver Evento Completo
                                                 </a>

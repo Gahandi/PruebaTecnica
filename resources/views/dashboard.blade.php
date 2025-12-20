@@ -38,7 +38,7 @@
             </div>
 
             {{-- Main Metrics Cards --}}
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
                 {{-- Revenue Card --}}
                 <div
                     class="bg-white rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl p-4 sm:p-6 border-l-4 border-pink-500 transform transition-all hover:shadow-2xl">

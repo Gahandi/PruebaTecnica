@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boleto - {{ $ticket->eventTicket->name }}</title>
+    <title>Boleto - {{ $ticket->event->name }}</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -139,8 +139,8 @@
     <div class="ticket">
         <!-- Header -->
         <div class="header">
-            <h1>{{ $ticket->eventTicket->name }}</h1>
-            <p>{{ \Carbon\Carbon::parse($ticket->eventTicket->date)->format('l, d F Y \a \l\a\s H:i') }}</p>
+            <h1>{{ $ticket->event->name }}</h1>
+            <p>{{ \Carbon\Carbon::parse($ticket->event->date)->format('l, d F Y \a \l\a\s H:i') }}</p>
         </div>
 
         <!-- Content -->
@@ -164,7 +164,7 @@
                 
                 <div class="info-item">
                     <div class="info-label">Ubicación</div>
-                    <div class="info-value">{{ $ticket->eventTicket->address }}</div>
+                    <div class="info-value">{{ $ticket->event->address }}</div>
                 </div>
                 
                 <div class="info-item">
