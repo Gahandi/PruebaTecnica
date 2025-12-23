@@ -68,13 +68,14 @@ class HomeController extends Controller
                 $query->whereDate('date', '>=', now());
             }
         ])
-            ->having('events_count', '>', 0)
+            ->orderBy('name')
             ->get()
             ->map(function ($type) {
                 return [
                     'id' => $type->id,
                     'name' => $type->name,
-                    'count' => $type->events_count
+                    'count' => $type->events_count,
+                    'image' => $type->image
                 ];
             });
 
@@ -107,14 +108,14 @@ class HomeController extends Controller
         // Si no hay categorías, crear algunas por defecto
         if ($categories->isEmpty()) {
             $categories = collect([
-                ['name' => 'Conciertos', 'count' => 0],
-                ['name' => 'Deportes', 'count' => 0],
-                ['name' => 'Teatro', 'count' => 0],
-                ['name' => 'Comedia', 'count' => 0],
-                ['name' => 'Conferencias', 'count' => 0],
-                ['name' => 'Festivales', 'count' => 0],
-                ['name' => 'Exposiciones', 'count' => 0],
-                ['name' => 'Otros', 'count' => 0],
+                ['id' => null, 'name' => 'Conciertos', 'count' => 0],
+                ['id' => null, 'name' => 'Deportes', 'count' => 0],
+                ['id' => null, 'name' => 'Teatro', 'count' => 0],
+                ['id' => null, 'name' => 'Comedia', 'count' => 0],
+                ['id' => null, 'name' => 'Conferencias', 'count' => 0],
+                ['id' => null, 'name' => 'Festivales', 'count' => 0],
+                ['id' => null, 'name' => 'Exposiciones', 'count' => 0],
+                ['id' => null, 'name' => 'Otros', 'count' => 0],
             ]);
         }
 

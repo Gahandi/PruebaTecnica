@@ -101,17 +101,27 @@
                                 <div class="flex flex-wrap items-center gap-2 mb-1">
                                     <h3 class="text-base sm:text-xl font-bold text-gray-900 truncate">{{ $user->name }} {{ $user->last_name }}</h3>
                                     @if($isAdmin)
-                                        <!-- Role Selector for Admin -->
-                                        <select onchange="updateUserRole({{ $user->id }}, this.value)" 
-                                                class="ml-2 text-xs font-semibold rounded-full px-3 py-1 border-2 cursor-pointer transition-colors
-                                                       {{ $currentRoleId == 1 ? 'bg-yellow-100 text-yellow-800 border-yellow-300' : ($currentRoleId == 2 ? 'bg-blue-100 text-blue-800 border-blue-300' : 'bg-gray-100 text-gray-800 border-gray-300') }}"
-                                                id="role-select-{{ $user->id }}">
-                                            @foreach($roleSpaces ?? [] as $roleSpace)
-                                                <option value="{{ $roleSpace->id }}" {{ $currentRoleId == $roleSpace->id ? 'selected' : '' }}>
-                                                    {{ ucfirst($roleSpace->name) }}
-                                                </option>
-                                            @endforeach
-                                        </select>
+                                        @php
+                                            $isCurrentUser = $user->id === auth()->id();
+                                        @endphp
+                                        @if($isCurrentUser)
+                                            {{-- Current user - show badge without selector --}}
+                                            <span class="ml-2 text-xs font-semibold rounded-full px-3 py-1 bg-yellow-100 text-yellow-800 border-2 border-yellow-300 cursor-not-allowed opacity-75" title="No puedes cambiar tu propio rol">
+                                                {{ ucfirst($roleSpaces->firstWhere('id', $currentRoleId)?->name ?? 'Admin') }} (tú)
+                                            </span>
+                                        @else
+                                            {{-- Other users - show selector --}}
+                                            <select onchange="updateUserRole({{ $user->id }}, this.value)" 
+                                                    class="ml-2 text-xs font-semibold rounded-full px-3 py-1 border-2 cursor-pointer transition-colors
+                                                           {{ $currentRoleId == 1 ? 'bg-yellow-100 text-yellow-800 border-yellow-300' : ($currentRoleId == 2 ? 'bg-blue-100 text-blue-800 border-blue-300' : 'bg-gray-100 text-gray-800 border-gray-300') }}"
+                                                    id="role-select-{{ $user->id }}">
+                                                @foreach($roleSpaces ?? [] as $roleSpace)
+                                                    <option value="{{ $roleSpace->id }}" {{ $currentRoleId == $roleSpace->id ? 'selected' : '' }}>
+                                                        {{ ucfirst($roleSpace->name) }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        @endif
                                     @else
                                         <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $userIsAdmin ? 'bg-yellow-100 text-yellow-800' : ($role == 'staff' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800') }}">
                                             {{ ucfirst($role) }}

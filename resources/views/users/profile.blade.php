@@ -228,62 +228,77 @@
 
         <!-- Espacios que Sigo -->
         @if(isset($spacesFollowing) && $spacesFollowing->count() > 0)
-            <div class="max-w-4xl mx-auto mt-6 px-4 sm:px-6 lg:px-8">
-                <div class="bg-white shadow-xl rounded-xl p-6 border border-gray-100">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-[#e24972]">Espacios que Sigo</h3>
-                        <span class="text-sm text-gray-500">{{ $spacesFollowing->count() }}
-                            espacio{{ $spacesFollowing->count() != 1 ? 's' : '' }}</span>
+            <div class="mt-8">
+                <div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
+                    <!-- Header with gradient -->
+                    <div class="bg-gradient-to-r from-pink-500 to-pink-400 px-6 py-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="bg-white/20 rounded-full p-2">
+                                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-white">Espacios que Sigo</h3>
+                            </div>
+                            <span class="bg-white/20 text-white text-sm font-semibold px-3 py-1 rounded-full">
+                                {{ $spacesFollowing->count() }} espacio{{ $spacesFollowing->count() != 1 ? 's' : '' }}
+                            </span>
+                        </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        @foreach($spacesFollowing as $space)
-                            <div
-                                class="border rounded-xl p-4 hover:shadow-lg transition-shadow bg-gradient-to-br from-gray-50 to-white">
-                                <div class="flex items-center space-x-3 mb-3">
-                                    @if($space->logo)
-                                        <img src="{{ \App\Helpers\ImageHelper::getImageUrl($space->logo) }}" alt="{{ $space->name }}"
-                                            class="w-12 h-12 rounded-full object-cover border-2 border-pink-200">
-                                    @else
-                                        <div
-                                            class="w-12 h-12 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
-                                            {{ strtoupper(substr($space->name, 0, 1)) }}
-                                        </div>
-                                    @endif
-                                    <div class="flex-1 min-w-0">
-                                        <a href="http://{{ $space->subdomain }}.{{ config('app.url') }}/"
-                                            class="text-sm font-bold text-gray-900 hover:text-pink-600 truncate block">
-                                            {{ $space->name }}
-                                        </a>
-                                        <div class="flex items-center space-x-1 text-xs text-gray-500">
-                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                <path
-                                                    d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z">
-                                                </path>
-                                            </svg>
-                                            <span>{{ $space->users_count ?? 0 }} seguidores</span>
+                    <!-- Space Cards Grid -->
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                            @foreach($spacesFollowing as $space)
+                                <div class="group relative bg-gradient-to-br from-gray-50 to-white border-2 border-gray-100 rounded-xl p-5 hover:border-pink-200 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                                    <!-- Space Logo & Info -->
+                                    <div class="flex items-start space-x-4 mb-4">
+                                        @if($space->logo)
+                                            <img src="{{ \App\Helpers\ImageHelper::getImageUrl($space->logo) }}" alt="{{ $space->name }}"
+                                                class="w-16 h-16 rounded-xl object-cover border-2 border-pink-100 shadow-md group-hover:scale-105 transition-transform duration-300">
+                                        @else
+                                            <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white font-bold text-2xl shadow-md group-hover:scale-105 transition-transform duration-300">
+                                                {{ strtoupper(substr($space->name, 0, 1)) }}
+                                            </div>
+                                        @endif
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="font-bold text-gray-900 group-hover:text-pink-600 truncate text-lg transition-colors">
+                                                {{ $space->name }}
+                                            </h4>
+                                            <div class="flex items-center space-x-1 text-sm text-gray-500 mt-1">
+                                                <svg class="w-4 h-4 text-pink-400" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"></path>
+                                                </svg>
+                                                <span>{{ $space->users_count ?? 0 }} seguidores</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="flex space-x-2">
+
+                                    <!-- Action Buttons -->
                                     @php
                                         $baseHost = parse_url(config('app.url'), PHP_URL_HOST) ?: config('app.url');
                                     @endphp
-                                    <a href="http://{{ $space->subdomain }}.{{ $baseHost }}/"
-                                        class="flex-1 text-center py-2 px-3 bg-pink-100 text-pink-600 rounded-lg text-xs font-semibold hover:bg-pink-200 transition-colors">
-                                        Ver Espacio
-                                    </a>
-                                    <button type="button" onclick="unfollowFromProfile('{{ $space->subdomain }}')"
-                                        class="py-2 px-3 bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold hover:bg-red-100 hover:text-red-600 transition-colors"
-                                        title="Dejar de seguir">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </button>
+                                    <div class="flex space-x-2">
+                                        <a href="http://{{ $space->subdomain }}.{{ $baseHost }}/"
+                                            class="flex-1 text-center py-2.5 px-4 bg-gradient-to-r from-pink-500 to-pink-400 text-white rounded-lg text-sm font-semibold hover:from-pink-600 hover:to-pink-500 transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center space-x-2">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                            </svg>
+                                            <span>Ver Espacio</span>
+                                        </a>
+                                        <button type="button" onclick="unfollowFromProfile('{{ $space->subdomain }}')"
+                                            class="py-2.5 px-3 bg-gray-100 text-gray-500 rounded-lg text-sm font-semibold hover:bg-red-50 hover:text-red-500 transition-all duration-300 group/btn"
+                                            title="Dejar de seguir">
+                                            <svg class="w-5 h-5 group-hover/btn:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        @endforeach
+                            @endforeach
+                        </div>
                     </div>
                 </div>
             </div>

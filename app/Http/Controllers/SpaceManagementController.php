@@ -27,6 +27,14 @@ class SpaceManagementController extends Controller
             'role_space_id' => 'required|exists:role_spaces,id'
         ]);
 
+        // Prevent admin from changing their own role
+        if ($user->id === auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No puedes cambiar tu propio rol. Otro administrador debe hacerlo.'
+            ], 400);
+        }
+
         // Find the spaces_users record
         $spaceUser = SpacesUser::where('space_id', $space->id)
             ->where('user_id', $user->id)
@@ -214,6 +222,21 @@ class SpaceManagementController extends Controller
 
         if (!$user) {
             return response()->json(['success' => false, 'message' => 'Debes iniciar sesión'], 401);
+        }
+
+        // Check if user is staff or admin of this space (role_space_id: 1=admin, 2=staff)
+        // Staff and admins cannot follow their own space
+        $isStaffOrAdmin = SpacesUser::where('space_id', $space->id)
+            ->where('user_id', $user->id)
+            ->whereIn('role_space_id', [1, 2])
+            ->whereNull('deleted_at')
+            ->exists();
+
+        if ($isStaffOrAdmin) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Como staff o administrador de este espacio, no puedes seguirlo'
+            ], 400);
         }
 
         // Check if already a member

@@ -114,30 +114,39 @@
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
                         @foreach($categories as $category)
+                            @php
+                                $catId = is_array($category) ? ($category['id'] ?? null) : ($category->id ?? null);
+                                $catName = is_array($category) ? ($category['name'] ?? 'Categoría') : ($category->name ?? 'Categoría');
+                                $catCount = is_array($category) ? ($category['count'] ?? 0) : ($category->count ?? $category->events_count ?? 0);
+                                $catImage = is_array($category) ? ($category['image'] ?? null) : ($category->image ?? null);
+                                $catImageUrl = $catImage ? \App\Helpers\ImageHelper::getImageUrl($catImage) : asset('images/categories/Poster7.jpeg');
+                            @endphp
+                            @if($catId)
                             <div class="group cursor-pointer">
-                                <a href="{{ route('events.search', ['category' => $category['id']]) }}">
+                                <a href="{{ route('events.search', ['category' => $catId]) }}">
                                     <div class="relative rounded-lg sm:rounded-xl overflow-hidden
                                                     aspect-[16/9] transition-all duration-300 transform
                                                     hover:scale-110 hover:shadow-2xl">
                                         {{-- Imagen con blur --}}
-                                        <img src="{{ asset('images/categories/Poster7.jpeg') }}" class="w-full h-full object-cover filter blur-sm group-hover:blur-none transition-all duration-300">
+                                        <img src="{{ $catImageUrl }}" class="w-full h-full object-cover filter blur-xs group-hover:blur-none transition-all duration-300">
 
                                         {{-- Degradado oscuro encima --}}
-                                        <div class="absolute inset-0 bg-gradient-to-r from-[rgba(255,105,180,0.70)] to-[rgba(255,105,180,0.90)]">
+                                        <div class="absolute opacity-0 inset-0 bg-gradient-to-r from-[rgba(255,105,180,0.70)] to-[rgba(255,105,180,0.90)]">
                                         </div>
 
                                         {{-- Texto --}}
                                         <div class="absolute bottom-0 left-0 right-0 p-3 sm:p-4 lg:p-6 text-white">
                                             <h3 class="font-serif text-xs sm:text-sm lg:text-base font-semibold mb-1">
-                                                {{ $category['name'] }}
+                                                {{ $catName }}
                                             </h3>
                                             <p class="text-xs opacity-90">
-                                                {{ $category['count'] }} eventos
+                                                {{ $catCount }} eventos
                                             </p>
                                         </div>
                                     </div>
                                 </a>
                             </div>
+                            @endif
                         @endforeach
                     </div>
                 </div>

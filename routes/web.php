@@ -45,6 +45,9 @@ Route::domain('{subdomain}.' . config('app.url'))
         Route::post('/events', [SpaceEventController::class, 'store'])
             ->name('spaces.events.store')
             ->middleware(['auth', 'email.verified', 'space.member']);
+        Route::post('/categories', [SpaceEventController::class, 'storeCategory'])
+            ->name('spaces.categories.store')
+            ->middleware(['auth', 'email.verified', 'space.member']);
 
         Route::get('eventos/{event:slug}/editar', [SpaceEventController::class, 'edit'])
             ->name('spaces.events.edit')

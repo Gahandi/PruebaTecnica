@@ -25,11 +25,10 @@ class UserSpacesController extends Controller
         $user = Auth::user();
 
         // Verificar si el usuario ya tiene un cajón
-        if ($user->spaces()->count() > 0) {
+        if ($user->hasAdminSpace()) {
             return redirect()->route('user.spaces.index')
-                            ->with('error', 'Ya tienes un cajón de eventos. Solo puedes tener uno por usuario.');
+                ->with('error', 'Ya tienes un cajón de eventos. Solo puedes tener uno por usuario.');
         }
-
         return view('user.spaces.create');
     }
 
@@ -38,9 +37,9 @@ class UserSpacesController extends Controller
         $user = Auth::user();
 
         // Verificar si ya tiene un cajón
-        if ($user->spaces()->count() > 0) {
+        if ($user->hasAdminSpace()) {
             return redirect()->route('user.spaces.index')
-                ->with('error', 'Ya tienes un cajón de eventos. Solo puedes tener uno por usuario.');
+                ->withErrors(['error' => 'Ya tienes un cajón de eventos. Solo puedes tener uno por usuario.']);
         }
 
         $request->validate([
@@ -49,6 +48,35 @@ class UserSpacesController extends Controller
             'subdomain' => 'required|string|max:50|unique:spaces,subdomain|alpha_dash',
             'logo' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
             'banner' => 'required|image|mimes:jpeg,png,jpg,webp|max:4096',
+        ], [
+            // Mensajes para el nombre
+            'name.required' => 'El nombre de tu cajón es obligatorio.',
+            'name.string' => 'El nombre debe ser un texto válido.',
+            'name.max' => 'El nombre no puede tener más de 255 caracteres.',
+
+            // Mensajes para la descripción
+            'description.required' => 'La descripción es obligatoria.',
+            'description.string' => 'La descripción debe ser un texto válido.',
+            'description.max' => 'La descripción no puede tener más de 1000 caracteres.',
+
+            // Mensajes para el subdominio
+            'subdomain.required' => 'Debes escribir un nombre para generar la URL personalizada.',
+            'subdomain.string' => 'La URL debe ser un texto válido.',
+            'subdomain.max' => 'La URL no puede tener más de 50 caracteres.',
+            'subdomain.unique' => 'Esta URL ya está en uso. Prueba con otro nombre.',
+            'subdomain.alpha_dash' => 'La URL solo puede contener letras, números y guiones.',
+
+            // Mensajes para el logo
+            'logo.required' => 'El logo es obligatorio. Por favor sube una imagen.',
+            'logo.image' => 'El logo debe ser una imagen válida.',
+            'logo.mimes' => 'El logo debe ser de tipo: JPEG, PNG, JPG o WebP.',
+            'logo.max' => 'El logo no puede pesar más de 2MB.',
+
+            // Mensajes para el banner
+            'banner.required' => 'El banner es obligatorio. Por favor sube una imagen.',
+            'banner.image' => 'El banner debe ser una imagen válida.',
+            'banner.mimes' => 'El banner debe ser de tipo: JPEG, PNG, JPG o WebP.',
+            'banner.max' => 'El banner no puede pesar más de 4MB.',
         ]);
 
         // SUBIR LOGO
@@ -78,12 +106,12 @@ class UserSpacesController extends Controller
         ]);
 
         return redirect()->route('user.spaces.index')
-                        ->with('success', 'Tu cajón se creó correctamente con su logo y banner.');
+            ->with('success', 'Tu cajón se creó correctamente con su logo y banner.');
     }
 
     public function join()
     {
-        $spaces = Space::whereDoesntHave('users', function($query) {
+        $spaces = Space::whereDoesntHave('users', function ($query) {
             $query->where('user_id', Auth::id());
         })->get();
 
@@ -105,6 +133,6 @@ class UserSpacesController extends Controller
         ]);
 
         return redirect()->route('user.spaces.index')
-                        ->with('success', 'Te has unido al espacio exitosamente');
+            ->with('success', 'Te has unido al espacio exitosamente');
     }
 }

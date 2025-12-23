@@ -127,13 +127,21 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                             </svg>
                                         </button>
-                                        <div class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200" id="spaces-menu" style="display: none;">
-                                            @if($currentUser->spaces->count() > 0)
-                                                @foreach($currentUser->spaces as $space)
+                                        <div class="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200 max-h-96 overflow-y-auto" id="spaces-menu" style="display: none;">
+                                            @php
+                                                // Use pivot data directly (already loaded) - no extra queries
+                                                $mySpacesNav = $currentUser->spaces->filter(fn($s) => $s->pivot->role_space_id == 1);
+                                                $staffSpacesNav = $currentUser->spaces->filter(fn($s) => $s->pivot->role_space_id == 2);
+                                                $followingSpacesNav = $currentUser->spaces->filter(fn($s) => $s->pivot->role_space_id == 3);
+                                            @endphp
+
+                                            @if($mySpacesNav->count() > 0)
+                                                <p class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider bg-gray-50">Mi Espacio</p>
+                                                @foreach($mySpacesNav as $space)
                                                     <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                                         <div class="flex items-center">
-                                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                                            <svg class="w-4 h-4 mr-2 text-pink-500" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
                                                             </svg>
                                                             <div>
                                                                 <div class="font-medium">{{ $space->name }}</div>
@@ -142,8 +150,44 @@
                                                         </div>
                                                     </a>
                                                 @endforeach
-                                                <div class="border-t border-gray-100 my-1"></div>
                                             @endif
+
+                                            @if($staffSpacesNav->count() > 0)
+                                                <p class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider bg-gray-50 {{ $mySpacesNav->count() > 0 ? 'border-t border-gray-100' : '' }}">Donde Soy Staff</p>
+                                                @foreach($staffSpacesNav as $space)
+                                                    <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                        <div class="flex items-center">
+                                                            <svg class="w-4 h-4 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                                                                <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z"></path>
+                                                            </svg>
+                                                            <div>
+                                                                <div class="font-medium">{{ $space->name }}</div>
+                                                                <div class="text-xs text-gray-500">{{ $space->subdomain }}.{{ \App\Helpers\SubdomainHelper::getBaseDomain() }}</div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                @endforeach
+                                            @endif
+
+                                            @if($followingSpacesNav->count() > 0)
+                                                <p class="px-4 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider bg-gray-50 {{ ($mySpacesNav->count() > 0 || $staffSpacesNav->count() > 0) ? 'border-t border-gray-100' : '' }}">Espacios que Sigo</p>
+                                                @foreach($followingSpacesNav as $space)
+                                                    <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                                        <div class="flex items-center">
+                                                            <svg class="w-4 h-4 mr-2 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                                            </svg>
+                                                            <div>
+                                                                <div class="font-medium">{{ $space->name }}</div>
+                                                                <div class="text-xs text-gray-500">{{ $space->subdomain }}.{{ \App\Helpers\SubdomainHelper::getBaseDomain() }}</div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                @endforeach
+                                            @endif
+
+                                            <div class="border-t border-gray-100 my-1"></div>
 
                                             <a href="{{ route('user.spaces.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                                                 <div class="flex items-center">

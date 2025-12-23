@@ -25,9 +25,13 @@ class SpaceEventController extends Controller
         }
 
         // Cargar la relación ticketTypes con información de la tabla intermedia
-        $event->load(['ticketTypes' => function($query) {
-            $query->withPivot('quantity', 'price');
-        }, 'tags', 'space']);
+        $event->load([
+            'ticketTypes' => function ($query) {
+                $query->withPivot('quantity', 'price');
+            },
+            'tags',
+            'space'
+        ]);
 
         return view('events.show', compact('event', 'space'));
     }
@@ -59,6 +63,74 @@ class SpaceEventController extends Controller
         $tags = Tag::all();
 
         return view('spaces.events.create', compact('space', 'ticketTypes', 'typeEvents', 'tags'));
+    }
+
+    /**
+     * Store a new event category (TypeEvent) with optional S3 image upload
+     */
+    public function storeCategory(Request $request, $subdomain)
+    {
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255|unique:type_events,name',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            ]);
+
+            $categoryData = [
+                'name' => $request->name,
+            ];
+
+            // Upload image to S3 if provided
+            if ($request->hasFile('image')) {
+                $imageFile = $request->file('image');
+                $fileContents = file_get_contents($imageFile->getPathname());
+
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mimeType = finfo_buffer($finfo, $fileContents);
+                finfo_close($finfo);
+
+                $extensions = [
+                    'image/jpeg' => 'jpg',
+                    'image/jpg' => 'jpg',
+                    'image/png' => 'png',
+                    'image/gif' => 'gif',
+                    'image/webp' => 'webp',
+                ];
+                $extension = $extensions[$mimeType] ?? 'jpg';
+
+                $productId = 'category_' . time();
+                $fileName = $productId . '.' . $extension;
+                $imagePath = env('S3_ENVIRONMENT') . '/categories/images/' . $fileName;
+
+                $this->saveImages($fileContents, 'categories/images', $productId);
+                $categoryData['image'] = $imagePath;
+            }
+
+            $category = TypeEvent::create($categoryData);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Categoría creada exitosamente',
+                'category' => [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'image' => $category->image ?? null,
+                ]
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error de validación',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Error al crear categoría: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al crear la categoría: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function store(Request $request, $subdomain)
@@ -195,7 +267,7 @@ class SpaceEventController extends Controller
                 // Determinar si es un tipo existente (ID) o uno nuevo (Name)
                 $ticketName = $ticketTypeData['name'];
 
-                if(is_numeric($ticketName) && $ticketName > 0){
+                if (is_numeric($ticketName) && $ticketName > 0) {
                     $ticketType = TicketType::find($ticketName);
 
                     //Si el id no existe loguear o saltar.
@@ -203,7 +275,7 @@ class SpaceEventController extends Controller
                         \Log::warning("Tipo de Boleto con ID $ticketName no encontrado, saltando.");
                         continue;
                     }
-                }else{
+                } else {
                     $ticketType = TicketType::firstOrCreate(
                         ['name' => $ticketName]
                     );
@@ -255,7 +327,7 @@ class SpaceEventController extends Controller
         }
     }
 
-        /**
+    /**
      * Muestra el formulario para editar un evento existente.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -275,14 +347,16 @@ class SpaceEventController extends Controller
 
         // 2. Cargar las relaciones necesarias
         // Cargar la relación ticketTypes con el pivot (quantity y price)
-        $event->load(['ticketTypes' => function($query) {
-            $query->withPivot('quantity', 'price');
-        }]);
+        $event->load([
+            'ticketTypes' => function ($query) {
+                $query->withPivot('quantity', 'price');
+            }
+        ]);
 
         $ticketTypes = TicketType::all();
         $typeEvents = TypeEvent::all();
         $tags = Tag::all();
-        
+
         // Cargar tags del evento
         $event->load('tags');
 
@@ -353,8 +427,11 @@ class SpaceEventController extends Controller
                     $mimeType = finfo_buffer($finfo, $fileContents);
                     finfo_close($finfo);
                     $extensions = [
-                        'image/jpeg' => 'jpg', 'image/jpg' => 'jpg', 'image/png' => 'png',
-                        'image/gif' => 'gif', 'image/webp' => 'webp',
+                        'image/jpeg' => 'jpg',
+                        'image/jpg' => 'jpg',
+                        'image/png' => 'png',
+                        'image/gif' => 'gif',
+                        'image/webp' => 'webp',
                     ];
                     $extension = $extensions[$mimeType] ?? 'jpg';
 

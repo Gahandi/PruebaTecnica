@@ -6,55 +6,55 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Spatie\Permission\Traits\HasRoles; 
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-	use SoftDeletes, HasRoles; 
+    use SoftDeletes, HasRoles;
 
-	protected $table = 'users';
+    protected $table = 'users';
 
-	protected $casts = [
-		'email_verified_at' => 'datetime',
-		'verified_at' => 'datetime',
-		'verified' => 'bool'
-	];
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'verified_at' => 'datetime',
+        'verified' => 'bool'
+    ];
 
-	protected $hidden = [
-		'password',
-		'remember_token'
-	];
+    protected $hidden = [
+        'password',
+        'remember_token'
+    ];
 
-	protected $fillable = [
-		'name',
-		'last_name',
-		'phone',
-		'image',
-		'email_verified_at',
-		'verified',
-		'verified_at',
-		'verification_code',
-		'email',
-		'password',
-		'role'
-	];
+    protected $fillable = [
+        'name',
+        'last_name',
+        'phone',
+        'image',
+        'email_verified_at',
+        'verified',
+        'verified_at',
+        'verification_code',
+        'email',
+        'password',
+        'role'
+    ];
 
-	public function checkins()
-	{
-		return $this->hasMany(Checkin::class, 'scanned_by');
-	}
+    public function checkins()
+    {
+        return $this->hasMany(Checkin::class, 'scanned_by');
+    }
 
-	public function spaces()
-	{
-		return $this->belongsToMany(Space::class, 'spaces_users')
-					->withPivot('id', 'role_space_id', 'deleted_at')
-					->withTimestamps();
-	}
+    public function spaces()
+    {
+        return $this->belongsToMany(Space::class, 'spaces_users')
+            ->withPivot('id', 'role_space_id', 'deleted_at')
+            ->withTimestamps();
+    }
 
-	public function orders()
-	{
-		return $this->hasMany(Order::class);
-	}
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 
     public function users_codes()
     {
@@ -80,14 +80,22 @@ class User extends Authenticatable
     {
         $query = $this->spaces()
             ->where('spaces.id', $spaceId);
-        
+
         if ($roleName) {
-            $query->whereHas('role_space', function($q) use ($roleName) {
+            $query->whereHas('role_space', function ($q) use ($roleName) {
                 $q->where('name', $roleName);
             });
         }
-        
+
         return $query->exists();
+    }
+
+    public function idRole($spaceId)
+    {
+        return \DB::table('spaces_users')
+            ->where('user_id', $this->id)
+            ->where('space_id', $spaceId)
+            ->value('role_space_id');
     }
 
     /**
@@ -97,13 +105,24 @@ class User extends Authenticatable
      * @param string|array $role The role name(s) to check
      * @return bool
      */
+    /**
+     * Check if user is admin of ANY space (has their own "cajón")
+     */
+    public function hasAdminSpace()
+    {
+        return $this->spaces()
+            ->wherePivot('role_space_id', 1) // 1 = admin role
+            ->wherePivotNull('deleted_at') // Excluir relaciones eliminadas
+            ->exists();
+    }
+
     public function hasRole($role)
     {
         // Si es un array, verificar si tiene alguno de los roles
         if (is_array($role)) {
             return in_array($this->role, $role);
         }
-        
+
         // Verificar el rol directamente desde la columna
         return $this->role === $role;
     }
