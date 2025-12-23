@@ -79,7 +79,7 @@
             <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
             Próximos Eventos
         </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
             @foreach($upcomingEvents as $event)
                 <div
                     class="group bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-pink-300">

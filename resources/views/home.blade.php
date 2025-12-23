@@ -91,8 +91,7 @@
     <div class="bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 py-8 sm:py-12 lg:py-16">
         <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
             <div class="text-center mb-6 sm:mb-8 lg:mb-12">
-                <h2 class="font-serif  text-2xl sm:text-3xl md:text-4xl font-bold text-[#e24972] mb-2 sm:mb-4">Explora por
-                    Categoría</h2>
+                <h2 class="font-serif  text-2xl sm:text-3xl md:text-4xl font-bold text-[#e24972] mb-2 sm:mb-4">Explora por Categoría</h2>
                 <p class="text-sm sm:text-base lg:text-lg text-gray-600">Encuentra eventos que te interesen</p>
             </div>
 
@@ -135,7 +134,7 @@
                                         </div>
 
                                         {{-- Texto --}}
-                                        <div class="absolute bottom-0 left-0 right-0 p-3 sm:p-4 lg:p-6 text-white">
+                                        <div class="absolute bottom-0 left-0 right-0 p-3 sm:p-4 lg:p-6 text-black">
                                             <h3 class="font-serif text-xs sm:text-sm lg:text-base font-semibold mb-1">
                                                 {{ $catName }}
                                             </h3>

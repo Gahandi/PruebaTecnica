@@ -3,7 +3,7 @@
     <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">Dashboard de {{ $space->name }}</h2>
 
     <!-- Métricas Principales -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+    <div class="grid grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-6 mb-6 sm:mb-8">
         <!-- Total Eventos -->
         <div
             class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white shadow-xl">

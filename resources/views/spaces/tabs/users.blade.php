@@ -133,7 +133,7 @@
                         </div>
 
                         <!-- Estadísticas del Usuario -->
-                        <div class="grid grid-cols-3 gap-2 sm:gap-4 lg:gap-6">
+                        <div class="grid grid-cols-2 gap-2 sm:gap-4 lg:gap-6">
                             <!-- Boletos -->
                             <div class="text-center p-2 sm:p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg sm:rounded-xl">
                                 <div class="text-xl sm:text-3xl font-bold text-blue-600 mb-1">{{ $ticketsOwned }}</div>
