@@ -120,27 +120,22 @@
                                 $catImage = is_array($category) ? ($category['image'] ?? null) : ($category->image ?? null);
                                 $catImageUrl = $catImage ? \App\Helpers\ImageHelper::getImageUrl($catImage) : asset('images/categories/Poster7.jpeg');
                             @endphp
-                            @if($catId)
+                            @if($catId && $catCount > 0)
                             <div class="group cursor-pointer">
                                 <a href="{{ route('events.search', ['category' => $catId]) }}">
                                     <div class="relative rounded-lg sm:rounded-xl overflow-hidden
-                                                    aspect-[16/9] transition-all duration-300 transform
-                                                    hover:scale-110 hover:shadow-2xl">
-                                        {{-- Imagen con blur --}}
-                                        <img src="{{ $catImageUrl }}" class="w-full h-full object-cover filter blur-xs group-hover:blur-none transition-all duration-300">
+                                                aspect-square transition-all duration-300 transform
+                                                hover:rotate-1 hover:shadow-2xl">
 
-                                        {{-- Degradado oscuro encima --}}
-                                        <div class="absolute opacity-0 inset-0 bg-gradient-to-r from-[rgba(255,105,180,0.70)] to-[rgba(255,105,180,0.90)]">
-                                        </div>
+                                        {{-- Imagen --}}
+                                        <img src="{{ $catImageUrl }}"
+                                            class="w-full h-full object-cover filter transition-all duration-300">
 
-                                        {{-- Texto --}}
-                                        <div class="absolute bottom-0 left-0 right-0 p-3 sm:p-4 lg:p-6 text-black">
-                                            <h3 class="font-serif text-xs sm:text-sm lg:text-base font-semibold mb-1">
-                                                {{ $catName }}
-                                            </h3>
-                                            <p class="text-xs opacity-90">
-                                                {{ $catCount }} eventos
-                                            </p>
+                                        {{-- Degradado --}}
+                                        <div class="absolute inset-0 opacity-0
+                                                    bg-gradient-to-r from-[rgba(255,105,180,0.40)]
+                                                    to-[ rgba(252, 159, 205, 0.7)]
+                                                    group-hover:opacity-100 transition-all duration-300">
                                         </div>
                                     </div>
                                 </a>

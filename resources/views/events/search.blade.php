@@ -204,7 +204,7 @@
                             @if($search || $tagId || $categoryId || $minPrice || $maxPrice)
                                 Resultados de Búsqueda
                             @else
-                                Todos los Eventos
+                                Todos los Eventoooos
                             @endif
                         </h2>
                         <p class="text-gray-600 mt-2 text-sm sm:text-base">

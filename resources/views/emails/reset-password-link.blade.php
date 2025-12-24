@@ -25,17 +25,6 @@
             padding: 30px;
             border-radius: 0 0 8px 8px;
         }
-        .button {
-            display: inline-block;
-            padding: 14px 28px;
-            background: #f8279fff;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-            font-weight: bold;
-            margin: 20px 0;
-            text-align: center;
-        }
         .button:hover {
             opacity: 0.9;
         }
@@ -79,7 +68,21 @@
         <p>Si solicitaste este cambio, haz clic en el botón a continuación para crear una nueva contraseña:</p>
 
         <div style="text-align: center;">
-            <a href="{{ $resetUrl }}" class="button">Restablecer Contraseña</a>
+            <a 
+                href="{{ $resetUrl }}" 
+                style="
+                display: inline-block;
+                padding: 14px 28px;
+                background: #f8279fff;
+                color: white;
+                text-decoration: none !important;
+                border-radius: 6px;
+                font-weight: bold;
+                margin: 20px 0;
+                text-align: center;
+            ">
+                Restablecer Contraseña
+            </a>
         </div>
 
         <div class="link-fallback">

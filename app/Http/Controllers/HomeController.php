@@ -68,7 +68,9 @@ class HomeController extends Controller
                 $query->whereDate('date', '>=', now());
             }
         ])
+            ->having('events_count', '>', 0)
             ->orderBy('name')
+            ->limit(4)
             ->get()
             ->map(function ($type) {
                 return [

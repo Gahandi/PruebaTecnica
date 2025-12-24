@@ -80,7 +80,7 @@
                                     @enderror
                                 </div>
 
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <div>
                                         <label for="date" class="block text-sm font-medium text-gray-700 mb-3">Fecha y
                                             Hora</label>
@@ -99,33 +99,50 @@
                                     </div>
 
                                     <div>
-                                        <label for="type_event_id" class="block text-sm font-medium text-gray-700 mb-3">Tipo
-                                            de Evento</label>
-                                        <div class="flex gap-2">
+                                        <label for="type_event_id"
+                                            class="block text-sm font-medium text-gray-700 mb-2 break-words">
+                                            Tipo de Evento
+                                        </label>
+
+                                        <div class="flex flex-col sm:flex-row gap-2">
                                             <select name="type_event_id" id="type_event_id" required
-                                                class="flex-1 border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('type_event_id') border-red-500 @enderror">
+                                                class="w-full sm:flex-1 border-2 border-pink-200 rounded-xl px-4 py-3
+                                                    focus:ring-2 focus:ring-pink-500 focus:border-pink-500
+                                                    transition-all duration-200
+                                                    @error('type_event_id') border-red-500 @enderror">
                                                 <option value="">Selecciona un tipo</option>
                                                 @foreach($typeEvents as $typeEvent)
-                                                    <option value="{{ $typeEvent->id }}" {{ old('type_event_id') == $typeEvent->id ? 'selected' : '' }}>
+                                                    <option value="{{ $typeEvent->id }}"
+                                                        {{ old('type_event_id') == $typeEvent->id ? 'selected' : '' }}>
                                                         {{ $typeEvent->name }}
                                                     </option>
                                                 @endforeach
                                             </select>
+
                                             <button type="button" onclick="openCategoryModal()"
-                                                class="bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 text-white px-4 py-3 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg flex items-center space-x-2 whitespace-nowrap"
+                                                class="w-full sm:w-auto
+                                                    bg-gradient-to-r from-pink-500 to-pink-400
+                                                    hover:from-pink-600 hover:to-pink-500
+                                                    text-white px-4 py-3 rounded-xl
+                                                    transition-all duration-300 shadow-md hover:shadow-lg
+                                                    flex items-center justify-center space-x-2"
                                                 title="Crear nueva categoría">
+
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                                 </svg>
+
+                                                <span class="sm:hidden">Nueva categoría</span>
                                                 <span class="hidden sm:inline">Nueva</span>
                                             </button>
                                         </div>
+
                                         @error('type_event_id')
                                             <p class="mt-2 text-sm text-red-600 flex items-center">
                                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                 </svg>
                                                 {{ $message }}
                                             </p>

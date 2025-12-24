@@ -34,7 +34,7 @@ class TypeEventSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'name' => 'Redes Sociales y Generación de Contenido',
+                'name' => 'Fotografía y Redes Sociales',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

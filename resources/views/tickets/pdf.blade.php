@@ -5,138 +5,156 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boleto - {{ $ticket->event->name }}</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
+        @page {
             margin: 0;
-            padding: 20px;
-            background: #f8f9fa;
         }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica', sans-serif;
+            background: #fdf2f8;
+            color: #111827;
+        }
+
         .ticket {
-            max-width: 600px;
-            margin: 0 auto;
+            max-width: 550px;
+            margin: 20px auto;
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 18px;
             overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
+
+        .logo-wrapper {
             text-align: center;
+            width: 100%;
         }
+
+        .logo {
+            display: block;
+            margin: 15px auto 0 auto;
+            width: 140px;
+        }
+
+        /* HEADER */
+        .header {
+            padding: 15px 5px;
+            text-align: center;
+            color: black;
+        }
+
         .header h1 {
             margin: 0;
-            font-size: 28px;
-            font-weight: bold;
+            font-size: 30px;
+            letter-spacing: 1px;
+            color: #f8279fff;
         }
+
         .header p {
-            margin: 5px 0 0 0;
-            font-size: 16px;
-            opacity: 0.9;
+            margin-top: 8px;
+            font-size: 14px;
+            opacity: 0.95;
         }
+
+        /* PERFORATED LINE */
+        .perforation {
+            border-top: 2px dashed #e5e7eb;
+            margin: 0;
+        }
+
+        /* CONTENT */
         .content {
-            padding: 30px;
+            padding: 10px;
         }
+
+        .ticket-id {
+            text-align: center;
+            font-size: 18px;
+            letter-spacing: 2px;
+            font-weight: bold;
+            color: #f8279fff;
+            margin-bottom: 20px;
+        }
+
+        /* INFO GRID */
         .ticket-info {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 18px;
         }
-        .info-item {
-            border-bottom: 1px solid #e5e7eb;
-            padding-bottom: 10px;
-        }
+
         .info-label {
-            font-size: 12px;
-            color: #6b7280;
+            font-size: 11px;
+            color: #9ca3af;
             text-transform: uppercase;
-            font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
+
         .info-value {
-            font-size: 16px;
-            color: #111827;
-            font-weight: 500;
-        }
-        .qr-section {
-            text-align: center;
-            margin: 30px 0;
-            padding: 20px;
-            background: #f9fafb;
-            border-radius: 8px;
-        }
-        .qr-code {
-            width: 200px;
-            height: 200px;
-            margin: 0 auto 15px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: white;
-        }
-        .qr-code img {
-            max-width: 180px;
-            max-height: 180px;
-        }
-        .status {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: bold;
-            text-transform: uppercase;
         }
+
+        /* STATUS */
+        .status {
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            display: inline-block;
+        }
+
         .status.valid {
             background: #dcfce7;
             color: #166534;
         }
+
         .status.used {
-            background: #fef2f2;
-            color: #dc2626;
+            background: #fee2e2;
+            color: #b91c1c;
         }
-        .footer {
-            background: #f3f4f6;
-            padding: 20px 30px;
-            text-align: center;
-            font-size: 12px;
-            color: #6b7280;
-        }
-        .ticket-id {
-            font-family: 'Courier New', monospace;
-            font-size: 18px;
-            font-weight: bold;
-            color: #374151;
-            margin-bottom: 10px;
-        }
-        .instructions {
-            background: #fef3c7;
-            border: 1px solid #f59e0b;
-            border-radius: 6px;
-            padding: 15px;
+
+        /* QR */
+        .qr-section {
             margin-top: 20px;
+            padding: 20px;
+            border-radius: 14px;
+            background: #f9fafb;
+            text-align: center;
         }
-        .instructions h3 {
-            margin: 0 0 10px 0;
-            font-size: 14px;
-            color: #92400e;
+
+        .qr-section h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
         }
-        .instructions ul {
-            margin: 0;
-            padding-left: 20px;
-            font-size: 12px;
-            color: #92400e;
+
+        .qr-code img {
+            width: 200px;
+            height: 200px;
+            border-radius: 12px;
+            border: 3px solid #f472b6;
         }
-        .instructions li {
-            margin-bottom: 5px;
+
+        /* FOOTER */
+        .footer {
+            background: #f8279fff;
+            color: white;
+            text-align: center;
+            padding: 18px;
+            font-size: 11px;
         }
     </style>
+
 </head>
 <body>
     <div class="ticket">
+        
+        <div class="logo-wrapper">
+            <img src="{{ public_path('images/logo/Logo_merrycolor.png') }}"
+                alt="Logo Merrycolor"
+                class="logo">
+        </div>
+
         <!-- Header -->
         <div class="header">
             <h1>{{ $ticket->event->name }}</h1>
@@ -202,7 +220,7 @@
             <!-- QR Code Section -->
             <div class="qr-section">
                 <h3 style="margin: 0 0 15px 0; color: #374151;">Código QR de Entrada</h3>
-                <div class="qr-code" style="text-align: center; margin-top: 20px;">
+                <div class="" style="text-align: center; margin-top: 20px;">
                     @if($ticket->qr_base64)
                         <img src="{{ $ticket->qr_base64 }}" 
                             alt="QR Code" 
@@ -233,8 +251,7 @@
 
         <!-- Footer -->
         <div class="footer">
-            <p><strong>{{ config('app.name', 'Laravel') }}</strong></p>
-            <p>Este es un boleto electrónico válido. No se requiere impresión física.</p>
+            <p><strong>Este es un boleto electrónico válido. No se requiere impresión física.</strong></p>
             <p>Generado el {{ now()->format('d/m/Y H:i:s') }}</p>
         </div>
     </div>

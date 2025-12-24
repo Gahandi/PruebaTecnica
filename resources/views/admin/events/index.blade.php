@@ -45,7 +45,7 @@
                                     <td class="px-6 py-4">
                                         <div class="flex items-center">
                                             @if($event->image)
-                                                <img src="{{ asset('storage/' . $event->image) }}" 
+                                                <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}"
                                                      alt="{{ $event->name }}"
                                                      class="w-12 h-12 rounded-lg object-cover mr-4 shadow-sm">
                                             @else
@@ -86,7 +86,7 @@
                                         @if($event->space)
                                             <div class="flex items-center">
                                                 @if($event->space->logo)
-                                                    <img src="{{ asset('storage/' . $event->space->logo) }}" 
+                                                    <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->space->logo) }}" 
                                                          alt="{{ $event->space->name }}"
                                                          class="w-10 h-10 rounded-full object-cover mr-3 shadow-sm border border-gray-200">
                                                 @else
