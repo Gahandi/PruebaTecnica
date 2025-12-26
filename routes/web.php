@@ -138,6 +138,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/events', [PublicEventController::class, 'index'])->name('events.public');
 Route::get('/events/{event}', [PublicEventController::class, 'show'])->name('events.show');
 
+// Rutas públicas de categorías
+Route::get('/categories', [\App\Http\Controllers\Public\CategoryController::class, 'index'])->name('categories.index');
+Route::get('/categories/{category}', [\App\Http\Controllers\Public\CategoryController::class, 'show'])->name('categories.show');
+
 // Google Merchant Feed
 Route::get('/feeds/google-merchant.xml', [GoogleMerchantController::class, 'feed'])->name('feeds.google-merchant');
 Route::get('/feeds/{subdomain}/google-merchant.xml', [GoogleMerchantController::class, 'feedBySpace'])->name('feeds.google-merchant.space');

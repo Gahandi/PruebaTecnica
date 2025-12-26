@@ -5,17 +5,17 @@ export default defineConfig(
 
 
     {
-    plugins: [
-        laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
-            refresh: true,
-        }),
-    ],
+        plugins: [
+            laravel({
+                input: ['resources/css/app.css', 'resources/js/app.js'],
+                refresh: true,
+            }),
+        ],
         server: {
-        host: 'boletos.local',
-        port: 5173,
-        hmr: {
-            host: 'boletos.local',
+            host: 'boletos.test',
+            port: 5173,
+            hmr: {
+                host: 'boletos.test',
+            },
         },
-    },
-});
+    });

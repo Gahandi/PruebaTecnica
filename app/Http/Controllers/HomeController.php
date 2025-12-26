@@ -62,15 +62,14 @@ class HomeController extends Controller
         $featuredEvents->load('tags');
         $allEvents->load('tags');
 
-        // Obtener categorías con conteo de eventos
+        // Obtener todas las categorías con conteo de eventos (sin filtrar por eventos > 0)
         $categories = TypeEvent::withCount([
             'events as events_count' => function ($query) {
-                $query->whereDate('date', '>=', now());
+                $query->whereDate('date', '>=', now())
+                    ->where('active', true);
             }
         ])
-            ->having('events_count', '>', 0)
             ->orderBy('name')
-            ->limit(4)
             ->get()
             ->map(function ($type) {
                 return [
@@ -121,7 +120,34 @@ class HomeController extends Controller
             ]);
         }
 
-        return view('home', compact('featuredEvents', 'allEvents', 'categories', 'tags', 'search', 'tagId', 'categoryId'));
+        // Obtener eventos pasados con estadísticas
+        $pastEvents = Event::with(['space', 'ticketTypes', 'type_event'])
+            ->withCount([
+                'tickets as tickets_sold' => function ($query) {
+                    // Total de tickets vendidos
+                },
+                'tickets as attendees_count' => function ($query) {
+                    $query->where('used', true); // Tickets usados (check-in)
+                }
+            ])
+            ->where('date', '<', now())
+            ->where('active', true)
+            ->orderBy('date', 'desc')
+            ->limit(6)
+            ->get();
+
+        // Obtener espacios/cajones destacados (con más eventos)
+        $spaces = \App\Models\Space::withCount([
+            'events' => function ($query) {
+                $query->where('active', true);
+            }
+        ])
+            ->having('events_count', '>', 0)
+            ->orderBy('events_count', 'desc')
+            ->limit(8)
+            ->get();
+
+        return view('home', compact('featuredEvents', 'allEvents', 'categories', 'tags', 'search', 'tagId', 'categoryId', 'pastEvents', 'spaces'));
     }
 
     public function search(Request $request)

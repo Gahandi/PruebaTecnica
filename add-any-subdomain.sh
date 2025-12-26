@@ -18,7 +18,7 @@ if [ $# -eq 0 ]; then
 fi
 
 SUBDOMAIN=$1
-FULL_DOMAIN="${SUBDOMAIN}.boletos.local"
+FULL_DOMAIN="${SUBDOMAIN}.boletos.test"
 
 echo "🔍 Verificando subdominio: $FULL_DOMAIN"
 

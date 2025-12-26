@@ -23,17 +23,20 @@ Route::prefix('v1')->middleware(['api.security', 'throttle:60,1'])->group(functi
     // Eventos públicos
     Route::get('/events', [EventController::class, 'index']);
     Route::get('/events/{id}', [EventController::class, 'show']);
-    
+
+    // Categorías públicas
+    Route::get('/categories', [\App\Http\Controllers\Public\CategoryController::class, 'apiIndex']);
+
     // Órdenes (checkout) con rate limiting más estricto
     Route::middleware(['throttle:10,1'])->group(function () {
         Route::post('/orders', [OrderController::class, 'store']);
     });
-    
+
     Route::get('/orders/{id}', [OrderController::class, 'show']);
-    
+
     // Tickets
     Route::get('/tickets/{id}', [TicketController::class, 'show']);
-    
+
     // Ruta protegida que requiere autenticación web (sesión)
     Route::middleware([
         \App\Http\Middleware\EncryptCookies::class,
@@ -43,7 +46,7 @@ Route::prefix('v1')->middleware(['api.security', 'throttle:60,1'])->group(functi
     ])->group(function () {
         Route::get('/validate-ticket/{id}', [TicketController::class, 'validateTicket']);
     });
-    
+
     // Coupons
     Route::post('/coupons/validate', [CouponController::class, 'validateCoupon']);
 });

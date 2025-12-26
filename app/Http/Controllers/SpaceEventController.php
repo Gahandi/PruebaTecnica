@@ -190,7 +190,7 @@ class SpaceEventController extends Controller
                 ];
                 $extension = $extensions[$mimeType] ?? 'jpg';
 
-                $productId = $space->id . '_' . time();
+                $productId = $space->id . '_' . time() . '_banner';
                 $fileName = $productId . '.' . $extension;
                 $bannerPath = env('S3_ENVIRONMENT') . '/events/banners/' . $fileName;
 
@@ -219,7 +219,7 @@ class SpaceEventController extends Controller
                 ];
                 $extension = $extensions[$mimeType] ?? 'jpg';
 
-                $productId = $space->id . '_' . time();
+                $productId = $space->id . '_' . time() . '_image';
                 $fileName = $productId . '.' . $extension;
                 $imagePath = env('S3_ENVIRONMENT') . '/events/images/' . $fileName;
 
@@ -247,7 +247,7 @@ class SpaceEventController extends Controller
                 ];
                 $extension = $extensions[$mimeType] ?? 'jpg';
 
-                $productId = $space->id . '_' . time();
+                $productId = $space->id . '_' . time() . '_icon';
                 $fileName = $productId . '.' . $extension;
                 $iconPath = env('S3_ENVIRONMENT') . '/events/icons/' . $fileName;
 

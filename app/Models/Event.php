@@ -69,7 +69,8 @@ class Event extends Model
 		'banner',
 		'banner_app',
 		'icon',
-		'agenda'
+		'agenda',
+		'views_count'
 	];
 
 	public function space()
@@ -107,5 +108,10 @@ class Event extends Model
 	public function tags()
 	{
 		return $this->belongsToMany(Tag::class, 'event_tag');
+	}
+
+	public function tickets()
+	{
+		return $this->hasMany(Ticket::class, 'event_id');
 	}
 }
