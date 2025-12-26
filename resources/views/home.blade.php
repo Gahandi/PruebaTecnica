@@ -171,12 +171,14 @@
                                 <div class="w-full sm:w-1/2 lg:w-1/3 flex-shrink-0 snap-start">
                                     <div class="bg-white rounded-xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 border-2 border-transparent hover:border-pink-200 h-full flex flex-col">
                                         <div class="relative overflow-hidden flex-shrink-0">
-                                            @if($event->banner && $event->banner !== 'test.jpg')
-                                                <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}"
-                                                    alt="{{ $event->name }}"
-                                                    class="w-full h-56 sm:h-64 object-cover transition-transform duration-500 group-hover:scale-110">
+                                            @if($event->icon && $event->icon !== 'test.jpg')
+                                                <div class="aspect-square w-full">
+                                                    <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->icon) }}"
+                                                        alt="{{ $event->name }}"
+                                                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                                                </div>
                                             @else
-                                                <div class="w-full h-56 sm:h-64 bg-gradient-to-br from-purple-500 via-pink-500 to-indigo-500 flex items-center justify-center relative overflow-hidden">
+                                                <div class="aspect-square w-full bg-gradient-to-br from-purple-500 via-pink-500 to-indigo-500 flex items-center justify-center relative overflow-hidden">
                                                     <div class="absolute inset-0 opacity-20"
                                                         style="background-image: url('data:image/svg+xml,%3Csvg width=\" 40\"
                                                         height=\"40\" viewBox=\"0 0 40 40\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg
@@ -284,11 +286,13 @@
                     @foreach($allEvents as $event)
                         <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-pink-200 group h-full flex flex-col">
                             <div class="relative overflow-hidden flex-shrink-0">
-                                @if($event->banner && $event->banner !== 'test.jpg')
-                                    <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}" alt="{{ $event->name }}"
-                                        class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110">
+                                @if($event->icon && $event->icon !== 'test.jpg')
+                                    <div class="aspect-square w-full">
+                                        <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->icon) }}" alt="{{ $event->name }}"
+                                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                                    </div>
                                 @else
-                                    <div class="w-full h-48 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-500 flex items-center justify-center relative overflow-hidden">
+                                    <div class="aspect-square w-full bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-500 flex items-center justify-center relative overflow-hidden">
                                         <div class="absolute inset-0 opacity-20"
                                             style="background-image: url('data:image/svg+xml,%3Csvg width=\" 40\" height=\"40\"
                                             viewBox=\"0 0 40 40\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"%23ffffff\"

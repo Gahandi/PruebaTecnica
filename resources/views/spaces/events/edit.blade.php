@@ -1,4 +1,4 @@
-@extends('layouts.app') {{-- Asumo que usas un layout llamado app.blade.php --}}
+@extends('layouts.space-dashboard')
 
 @section('title', 'Editar Evento - ' . $event->name)
 
@@ -253,7 +253,7 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label for="banner" class="block text-sm font-medium text-gray-700 mb-3">Banner del Evento (debe de ser de 1024 * 768)</label>
+                                <label for="banner" class="block text-sm font-medium text-gray-700 mb-3">Banner del Evento (16:9 — 1920 × 1080 px)</label>
                                 <div class="relative">
                                     <input type="file" name="banner" id="banner" accept="image/*"
                                            class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('banner') border-red-500 @enderror">
@@ -277,7 +277,7 @@
                             </div>
 
                             <div>
-                                <label for="image" class="block text-sm font-medium text-gray-700 mb-3">Imagen Principal (debe de ser de 736 * 308 )</label>
+                                <label for="image" class="block text-sm font-medium text-gray-700 mb-3">Imagen Principal (16:10 — 1920 × 1200 px)</label>
                                 <div class="relative">
                                     <input type="file" name="image" id="image" accept="image/*"
                                            class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('image') border-red-500 @enderror">
@@ -302,7 +302,7 @@
                         </div>
 
                         <div class="mt-6">
-                            <label for="icon" class="block text-sm font-medium text-gray-700 mb-3">Icono del Evento (debe de ser de 800 * 800)</label>
+                            <label for="icon" class="block text-sm font-medium text-gray-700 mb-3">Icono del Evento (1:1 — 800 × 800 px) — Se mostrará en el home</label>
                             <div class="relative">
                                 <input type="file" name="icon" id="icon" accept="image/*"
                                        class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('icon') border-red-500 @enderror">
@@ -664,47 +664,11 @@
             previewImage("image", "preview-image");
 
 
-            // --- 4. Validación de Fecha y Hora (No permite editar a fecha pasada) ---
+            // --- 4. Validación de Fecha y Hora ---
+            // NOTA: Se permite editar eventos pasados para correcciones históricas
             const dateInput = document.getElementById('date');
-            const form = dateInput.closest('form');
-
-            // Establecer el valor mínimo al momento actual
-            function setMinDate() {
-                const now = new Date();
-                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-                let isoNow = now.toISOString().slice(0, 16);
-                dateInput.min = isoNow;
-            }
-
-            setMinDate();
-
-            form.addEventListener('submit', function(event) {
-                const selectedDate = new Date(dateInput.value);
-                const currentDate = new Date();
-
-                const existingError = dateInput.parentNode.querySelector('.date-validation-error');
-                if (existingError) {
-                    existingError.remove();
-                }
-
-                // Si la fecha seleccionada es anterior a la fecha/hora actual, detener el envío.
-                if (selectedDate <= currentDate) {
-                    event.preventDefault();
-
-                    const errorMessage = document.createElement('p');
-                    errorMessage.className = 'mt-2 text-sm text-red-600 flex items-center date-validation-error';
-                    errorMessage.innerHTML = `
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        La fecha y hora del evento no pueden ser anteriores o iguales al momento actual.
-                    `;
-
-                    dateInput.parentNode.appendChild(errorMessage);
-                    dateInput.focus();
-                }
-            });
-
+            
+            // Solo remover errores existentes al cambiar fecha
             dateInput.addEventListener('change', function() {
                 const existingError = dateInput.parentNode.querySelector('.date-validation-error');
                 if (existingError) {

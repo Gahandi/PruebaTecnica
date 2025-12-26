@@ -121,6 +121,16 @@
                         Dashboard
                     </a>
 
+                    <!-- Eventos -->
+                    <a href="{{ route('spaces.events.create', $space->subdomain ?? '') }}" 
+                       class="flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors
+                              {{ request()->routeIs('spaces.events.*') ? 'bg-pink-50 text-pink-700' : 'text-gray-700 hover:bg-gray-100' }}">
+                        <svg class="w-5 h-5 mr-3 {{ request()->routeIs('spaces.events.*') ? 'text-pink-600' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        Eventos
+                    </a>
+
                     <!-- Usuarios -->
                     <a href="{{ route('spaces.profile', $space->subdomain ?? '') }}?tab=users" 
                        class="flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors

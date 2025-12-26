@@ -1,4 +1,4 @@
-@extends('layouts.space')
+@extends('layouts.space-dashboard')
 
 @section('title', 'Crear Evento - ' . $space->name)
 
@@ -302,101 +302,191 @@
                                 Imágenes del Evento
                             </h2>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label for="banner" class="block text-sm font-medium text-gray-700 mb-3">Banner del
-                                        Evento (debe de ser de 1024 * 768)</label>
+                            <!-- Información de proporciones -->
+                            <div class="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                                <p class="text-sm text-blue-700 flex items-start">
+                                    <svg class="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span>Las imágenes deben tener las proporciones indicadas. Se validará automáticamente al cargar cada imagen.</span>
+                                </p>
+                            </div>
+
+                            <!-- Grid de 3 columnas para las imágenes -->
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                
+                                <!-- ICONO (1:1) - Para el Home -->
+                                <div class="bg-white rounded-xl p-4 shadow-sm border-2 border-gray-100">
+                                    <label for="icon" class="block text-sm font-semibold text-gray-800 mb-2">
+                                        🏠 Icono del Evento
+                                    </label>
+                                    <p class="text-xs text-gray-500 mb-3">Proporción 1:1 (800 × 800 px) — Se mostrará en el home</p>
+                                    
                                     <div class="relative">
-                                        <input type="file" name="banner" id="banner" accept="image/*"
-                                            class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('banner') border-red-500 @enderror">
-                                        <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                                </path>
+                                        <input type="file" name="icon" id="icon" accept="image/*"
+                                            class="w-full border-2 border-pink-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 text-sm @error('icon') border-red-500 @enderror">
+                                    </div>
+                                    
+                                    <!-- Mensaje de validación -->
+                                    <div id="icon-validation" class="mt-2 hidden">
+                                        <p class="text-sm flex items-center"></p>
+                                    </div>
+                                    
+                                    @error('icon')
+                                        <p class="mt-2 text-sm text-red-600 flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
+                                            {{ $message }}
+                                        </p>
+                                    @enderror
+                                    
+                                    <!-- Vista Previa Realista - Simula tarjeta del Home -->
+                                    <div class="mt-4">
+                                        <p class="text-xs text-gray-500 mb-2 font-medium">📍 Así se verá en el home:</p>
+                                        <div class="bg-gray-50 rounded-xl p-3">
+                                            <div class="bg-white rounded-xl shadow-lg overflow-hidden max-w-[200px] mx-auto border border-gray-100 hover:shadow-xl transition-shadow">
+                                                <!-- Imagen cuadrada 1:1 -->
+                                                <div class="aspect-square bg-gray-200 relative overflow-hidden">
+                                                    <img id="preview-icon" 
+                                                        class="hidden w-full h-full object-cover"
+                                                        alt="Vista previa icono">
+                                                    <div id="icon-placeholder" class="w-full h-full flex items-center justify-center text-gray-400 bg-gradient-to-br from-purple-400 via-pink-400 to-indigo-400">
+                                                        <div class="text-center text-white">
+                                                            <svg class="w-10 h-10 mx-auto mb-1 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                            </svg>
+                                                            <p class="text-xs opacity-75">1:1</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- Info del evento -->
+                                                <div class="p-3">
+                                                    <h4 id="icon-preview-title" class="text-sm font-bold text-pink-600 truncate mb-1">Nombre del Evento</h4>
+                                                    <p class="text-xs text-gray-500 mb-2">📅 Fecha del evento</p>
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full">{{ $space->name }}</span>
+                                                        <span class="text-xs font-bold text-green-600">$XX.XX</span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
+                                </div>
+
+                                <!-- BANNER (16:9) - Para detalles del evento -->
+                                <div class="bg-white rounded-xl p-4 shadow-sm border-2 border-gray-100">
+                                    <label for="banner" class="block text-sm font-semibold text-gray-800 mb-2">
+                                        📺 Banner del Evento
+                                    </label>
+                                    <p class="text-xs text-gray-500 mb-3">Proporción 16:9 (1920 × 1080 px) — Página de detalles</p>
+                                    
+                                    <div class="relative">
+                                        <input type="file" name="banner" id="banner" accept="image/*"
+                                            class="w-full border-2 border-pink-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 text-sm @error('banner') border-red-500 @enderror">
+                                    </div>
+                                    
+                                    <!-- Mensaje de validación -->
+                                    <div id="banner-validation" class="mt-2 hidden">
+                                        <p class="text-sm flex items-center"></p>
+                                    </div>
+                                    
                                     @error('banner')
                                         <p class="mt-2 text-sm text-red-600 flex items-center">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
                                             {{ $message }}
                                         </p>
                                     @enderror
+                                    
+                                    <!-- Vista Previa Realista - Simula página de detalles estilo FB Cover -->
                                     <div class="mt-4">
-                                        <img id="preview-banner"
-                                            class="hidden w-full h-32 object-cover rounded-xl border-2 border-gray-200 shadow-lg"
-                                            alt="Vista previa banner">
+                                        <p class="text-xs text-gray-500 mb-2 font-medium">📍 Así se verá en la página de detalles:</p>
+                                        <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
+                                            <!-- Banner Container 16:9 -->
+                                            <div class="relative bg-gray-900" style="aspect-ratio: 16/9;">
+                                                <img id="preview-banner" 
+                                                    class="hidden absolute inset-0 w-full h-full object-cover object-center"
+                                                    alt="Vista previa banner">
+                                                <div id="banner-placeholder" class="absolute inset-0 flex items-center justify-center text-gray-500 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600">
+                                                    <div class="text-center text-white">
+                                                        <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                        </svg>
+                                                        <p class="text-sm opacity-75">Sube una imagen 16:9</p>
+                                                    </div>
+                                                </div>
+                                                <!-- Gradient overlay (siempre visible) -->
+                                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none"></div>
+                                                <!-- Info overlay en la parte inferior -->
+                                                <div class="absolute bottom-0 left-0 right-0 p-3">
+                                                    <div class="backdrop-blur-sm bg-black/30 rounded-lg p-2 border border-white/20">
+                                                        <div id="banner-preview-title" class="text-white text-sm font-medium truncate">Nombre del Evento</div>
+                                                        <div class="flex items-center gap-2 text-white/70 text-xs mt-1">
+                                                            <span>📅 Fecha</span>
+                                                            <span>•</span>
+                                                            <span>📍 Ubicación</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label for="image" class="block text-sm font-medium text-gray-700 mb-3">Imagen Principal
-                                        (debe de ser de 736 * 308 )</label>
+                                <!-- IMAGEN PRINCIPAL (16:10) -->
+                                <div class="bg-white rounded-xl p-4 shadow-sm border-2 border-gray-100">
+                                    <label for="image" class="block text-sm font-semibold text-gray-800 mb-2">
+                                        🖼️ Imagen Principal
+                                    </label>
+                                    <p class="text-xs text-gray-500 mb-3">Proporción 16:10 (1920 × 1200 px) — Banners secundarios</p>
+                                    
                                     <div class="relative">
                                         <input type="file" name="image" id="image" accept="image/*"
-                                            class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('image') border-red-500 @enderror">
-                                        <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                                </path>
-                                            </svg>
-                                        </div>
+                                            class="w-full border-2 border-pink-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 text-sm @error('image') border-red-500 @enderror">
                                     </div>
+                                    
+                                    <!-- Mensaje de validación -->
+                                    <div id="image-validation" class="mt-2 hidden">
+                                        <p class="text-sm flex items-center"></p>
+                                    </div>
+                                    
                                     @error('image')
                                         <p class="mt-2 text-sm text-red-600 flex items-center">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
                                             {{ $message }}
                                         </p>
                                     @enderror
+                                    
+                                    <!-- Vista Previa Contextual - 16:10 -->
                                     <div class="mt-4">
-                                        <img id="preview-image"
-                                            class="hidden w-full h-32 object-cover rounded-xl border-2 border-gray-200 shadow-lg"
-                                            alt="Vista previa imagen">
+                                        <p class="text-xs text-gray-500 mb-2 font-medium">Vista previa (proporción 16:10):</p>
+                                        <div class="bg-gray-100 rounded-xl p-3">
+                                            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                                                <div class="bg-gray-200 relative overflow-hidden" style="aspect-ratio: 16/10;">
+                                                    <img id="preview-image" 
+                                                        class="hidden w-full h-full object-cover"
+                                                        alt="Vista previa imagen">
+                                                    <div id="image-placeholder" class="w-full h-full flex items-center justify-center text-gray-400">
+                                                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                <div class="p-2">
+                                                    <div class="h-2 bg-gray-200 rounded w-full mb-1"></div>
+                                                    <div class="h-2 bg-gray-100 rounded w-1/2"></div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-
-                            <div class="mt-6">
-                                <label for="icon" class="block text-sm font-medium text-gray-700 mb-3">Icono del Evento
-                                    (debe de ser de 800 * 800)</label>
-                                <div class="relative">
-                                    <input type="file" name="icon" id="icon" accept="image/*"
-                                        class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('icon') border-red-500 @enderror">
-                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                            </path>
-                                        </svg>
-                                    </div>
-                                </div>
-                                @error('icon')
-                                    <p class="mt-2 text-sm text-red-600 flex items-center">
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                        {{ $message }}
-                                    </p>
-                                @enderror
-                                <div class="mt-4">
-                                    <img id="preview-icon"
-                                        class="hidden w-24 h-24 object-cover rounded-xl border-2 border-gray-200 shadow-lg"
-                                        alt="Vista previa icono">
                                 </div>
                             </div>
                         </div>
+
 
                         <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-6">
                             <h2 class="text-xl font-semibold text-[#e24972] mb-6 flex items-center">
@@ -754,52 +844,273 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // --- INICIALIZACIÓN DE EASYMDE (Editor Markdown) ---
-            // Instancia para Agenda
-            new EasyMDE({
+            
+            // Configuración común para los editores
+            const editorToolbar = [
+                "bold", "italic", "strikethrough", "|",
+                "heading-1", "heading-2", "heading-3", "|",
+                "unordered-list", "ordered-list", "checklist", "|",
+                "quote", "code", "horizontal-rule", "|",
+                "link", "image", "table", "|",
+                "preview", "side-by-side", "fullscreen", "|",
+                "guide"
+            ];
+            
+            // CSS personalizado para que la previsualización coincida con la vista final
+            const previewStyles = `
+                .editor-preview, .EasyMDEContainer .editor-preview-side {
+                    font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+                    padding: 1.5rem;
+                    background: linear-gradient(to bottom right, rgba(255,255,255,0.7), rgba(255,255,255,0.6), rgba(251,231,239,0.4));
+                    border-radius: 0.75rem;
+                    border: 1px solid rgba(236,72,153,0.2);
+                }
+                .editor-preview h1, .EasyMDEContainer .editor-preview-side h1 { 
+                    font-size: 2rem; font-weight: 700; color: #111827; margin-bottom: 1rem; 
+                    border-bottom: 2px solid #ec4899; padding-bottom: 0.5rem;
+                }
+                .editor-preview h2, .EasyMDEContainer .editor-preview-side h2 { 
+                    font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 0.75rem; 
+                }
+                .editor-preview h3, .EasyMDEContainer .editor-preview-side h3 { 
+                    font-size: 1.25rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem; 
+                }
+                .editor-preview p, .EasyMDEContainer .editor-preview-side p { 
+                    color: #374151; line-height: 1.75; margin-bottom: 1rem; 
+                }
+                .editor-preview strong, .EasyMDEContainer .editor-preview-side strong { 
+                    font-weight: 600; color: #111827; 
+                }
+                .editor-preview a, .EasyMDEContainer .editor-preview-side a { 
+                    color: #ec4899; text-decoration: underline; 
+                }
+                .editor-preview a:hover, .EasyMDEContainer .editor-preview-side a:hover { 
+                    color: #be185d; 
+                }
+                .editor-preview code, .EasyMDEContainer .editor-preview-side code {
+                    background: rgba(139,92,246,0.1); color: #7c3aed; 
+                    padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875rem;
+                }
+                .editor-preview pre, .EasyMDEContainer .editor-preview-side pre {
+                    background: #1f2937; color: #f3f4f6; padding: 1rem; 
+                    border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0;
+                }
+                .editor-preview pre code, .EasyMDEContainer .editor-preview-side pre code {
+                    background: transparent; color: inherit; padding: 0;
+                }
+                .editor-preview blockquote, .EasyMDEContainer .editor-preview-side blockquote {
+                    border-left: 4px solid #ec4899; background: rgba(251,231,239,0.5);
+                    padding: 0.75rem 1rem; margin: 1rem 0; color: #1f2937; font-style: italic;
+                }
+                .editor-preview ul, .EasyMDEContainer .editor-preview-side ul { 
+                    list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; color: #374151;
+                }
+                .editor-preview ol, .EasyMDEContainer .editor-preview-side ol { 
+                    list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; color: #374151;
+                }
+                .editor-preview li, .EasyMDEContainer .editor-preview-side li { 
+                    margin-bottom: 0.5rem; line-height: 1.75;
+                }
+                .editor-preview li::marker, .EasyMDEContainer .editor-preview-side li::marker {
+                    color: #ec4899;
+                }
+                .editor-preview table, .EasyMDEContainer .editor-preview-side table {
+                    width: 100%; border-collapse: collapse; margin: 1rem 0;
+                }
+                .editor-preview th, .EasyMDEContainer .editor-preview-side th {
+                    background: #fce7f3; color: #831843; padding: 0.75rem; 
+                    border: 1px solid #f9a8d4; text-align: left; font-weight: 600;
+                }
+                .editor-preview td, .EasyMDEContainer .editor-preview-side td {
+                    padding: 0.75rem; border: 1px solid #e5e7eb;
+                }
+                .editor-preview hr, .EasyMDEContainer .editor-preview-side hr {
+                    border: none; border-top: 2px solid #f9a8d4; margin: 1.5rem 0;
+                }
+                .editor-preview img, .EasyMDEContainer .editor-preview-side img {
+                    max-width: 100%; border-radius: 0.5rem; margin: 1rem 0;
+                }
+                /* Estilo para el checklist */
+                .editor-preview input[type="checkbox"], .EasyMDEContainer .editor-preview-side input[type="checkbox"] {
+                    accent-color: #ec4899; margin-right: 0.5rem;
+                }
+            `;
+            
+            // Inyectar estilos personalizados
+            const styleSheet = document.createElement("style");
+            styleSheet.textContent = previewStyles;
+            document.head.appendChild(styleSheet);
+            
+            // Instancia para Agenda (Temario)
+            const easyMDE_agenda = new EasyMDE({
                 element: document.getElementById("agenda"),
                 spellChecker: false,
-                placeholder: "Escribe el temario aquí (usa Markdown)...",
-                minHeight: "250px",
+                placeholder: "# Temario del Evento\n\n## Módulo 1: Introducción\n- Punto 1\n- Punto 2\n\n## Módulo 2: Desarrollo\n1. Primer tema\n2. Segundo tema\n\n> Tip: Usa Markdown para dar formato",
+                minHeight: "300px",
+                maxHeight: "500px",
+                toolbar: editorToolbar,
+                status: ["autosave", "lines", "words", "cursor"],
+                autosave: {
+                    enabled: true,
+                    uniqueId: "agenda_{{ $space->id ?? 'new' }}",
+                    delay: 5000,
+                    text: "Guardado automático: "
+                },
+                previewClass: ["editor-preview", "prose", "prose-pink"],
+                sideBySideFullscreen: false,
+                shortcuts: {
+                    "toggleBold": "Cmd-B",
+                    "toggleItalic": "Cmd-I",
+                    "toggleHeadingSmaller": "Cmd-H",
+                    "toggleHeadingBigger": "Shift-Cmd-H",
+                    "togglePreview": "Cmd-P",
+                    "toggleSideBySide": "F9",
+                    "toggleFullScreen": "F11"
+                }
             });
 
             // Instancia para Descripción
             const easyMDE_description = new EasyMDE({
                 element: document.getElementById("description"),
                 spellChecker: false,
-                placeholder: "Escribe la descripción aquí...",
-                minHeight: "150px",
+                placeholder: "Escribe una descripción atractiva de tu evento...\n\n**Destaca** los puntos más importantes.\n\n- Qué aprenderán\n- Quién debería asistir\n- Qué incluye",
+                minHeight: "250px",
+                maxHeight: "400px",
+                toolbar: editorToolbar,
+                status: ["autosave", "lines", "words", "cursor"],
+                autosave: {
+                    enabled: true,
+                    uniqueId: "description_{{ $space->id ?? 'new' }}",
+                    delay: 5000,
+                    text: "Guardado automático: "
+                },
+                previewClass: ["editor-preview", "prose", "prose-pink"],
+                sideBySideFullscreen: false,
+                shortcuts: {
+                    "toggleBold": "Cmd-B",
+                    "toggleItalic": "Cmd-I",
+                    "toggleHeadingSmaller": "Cmd-H",
+                    "toggleHeadingBigger": "Shift-Cmd-H",
+                    "togglePreview": "Cmd-P",
+                    "toggleSideBySide": "F9",
+                    "toggleFullScreen": "F11"
+                }
             });
 
-            // Esto asegura que la validación 'required' de Laravel reciba el texto.
+            // Sincronizar con el textarea oculto para validación de Laravel
+            easyMDE_agenda.codemirror.on('change', () => {
+                document.getElementById('agenda').value = easyMDE_agenda.value();
+            });
+            
             easyMDE_description.codemirror.on('change', () => {
                 document.getElementById('description').value = easyMDE_description.value();
             });
 
-            // --- SCRIPT DE PREVISUALIZACIÓN DE IMÁGENES ---
-            const previewImage = (inputId, previewId) => {
+            // --- SCRIPT DE PREVISUALIZACIÓN DE IMÁGENES CON VALIDACIÓN DE ASPECT RATIO ---
+            
+            // Configuración de proporciones esperadas para cada imagen
+            const aspectRatioConfig = {
+                'icon': { ratio: 1, name: '1:1', tolerance: 0.05 },
+                'banner': { ratio: 16/9, name: '16:9', tolerance: 0.08 },
+                'image': { ratio: 16/10, name: '16:10', tolerance: 0.08 }
+            };
+            
+            // Función para validar la proporción de una imagen
+            function validateAspectRatio(width, height, expectedRatio, tolerance) {
+                const actualRatio = width / height;
+                const difference = Math.abs(actualRatio - expectedRatio) / expectedRatio;
+                return difference <= tolerance;
+            }
+            
+            // Función mejorada de previsualización con validación
+            const previewImageWithValidation = (inputId, previewId, placeholderId, validationId) => {
                 const input = document.getElementById(inputId);
                 const preview = document.getElementById(previewId);
-
-                if (!input || !preview) return; // Salir si los elementos no existen
-
+                const placeholder = document.getElementById(placeholderId);
+                const validationDiv = document.getElementById(validationId);
+                
+                if (!input || !preview) return;
+                
+                const config = aspectRatioConfig[inputId];
+                
                 input.addEventListener("change", (event) => {
                     const file = event.target.files[0];
                     if (file) {
                         const reader = new FileReader();
                         reader.onload = e => {
-                            preview.src = e.target.result;
-                            preview.classList.remove("hidden");
+                            // Crear imagen temporal para obtener dimensiones
+                            const img = new Image();
+                            img.onload = function() {
+                                const width = this.width;
+                                const height = this.height;
+                                const actualRatio = (width / height).toFixed(2);
+                                
+                                // Validar proporción
+                                const isValid = validateAspectRatio(width, height, config.ratio, config.tolerance);
+                                
+                                // Actualizar vista previa
+                                preview.src = e.target.result;
+                                preview.classList.remove("hidden");
+                                if (placeholder) placeholder.classList.add("hidden");
+                                
+                                // Mostrar mensaje de validación
+                                if (validationDiv) {
+                                    validationDiv.classList.remove("hidden");
+                                    const p = validationDiv.querySelector('p');
+                                    
+                                    if (isValid) {
+                                        p.className = 'text-sm flex items-center text-green-600';
+                                        p.innerHTML = `
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                            ✓ Proporción correcta (${config.name}) — ${width}×${height}px
+                                        `;
+                                        input.classList.remove('border-red-500');
+                                        input.classList.add('border-green-500');
+                                    } else {
+                                        p.className = 'text-sm flex items-center text-amber-600';
+                                        p.innerHTML = `
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                            </svg>
+                                            ⚠ Proporción diferente: detectada ${actualRatio}:1 (esperada ${config.name}) — ${width}×${height}px
+                                        `;
+                                        input.classList.remove('border-green-500');
+                                        input.classList.add('border-amber-500');
+                                    }
+                                }
+                            };
+                            img.src = e.target.result;
                         };
                         reader.readAsDataURL(file);
                     } else {
                         preview.src = "";
                         preview.classList.add("hidden");
+                        if (placeholder) placeholder.classList.remove("hidden");
+                        if (validationDiv) validationDiv.classList.add("hidden");
+                        input.classList.remove('border-green-500', 'border-red-500', 'border-amber-500');
                     }
                 });
             };
-            previewImage("icon", "preview-icon");
-            previewImage("banner", "preview-banner");
-            previewImage("image", "preview-image");
+            
+            // Inicializar previsualización con validación para cada input
+            previewImageWithValidation("icon", "preview-icon", "icon-placeholder", "icon-validation");
+            previewImageWithValidation("banner", "preview-banner", "banner-placeholder", "banner-validation");
+            previewImageWithValidation("image", "preview-image", "image-placeholder", "image-validation");
+            
+            // --- SINCRONIZACIÓN DEL NOMBRE DEL EVENTO EN LAS PREVISUALIZACIONES ---
+            const eventNameInput = document.getElementById('name');
+            const iconPreviewTitle = document.getElementById('icon-preview-title');
+            const bannerPreviewTitle = document.getElementById('banner-preview-title');
+            
+            if (eventNameInput) {
+                eventNameInput.addEventListener('input', function() {
+                    const eventName = this.value.trim() || 'Nombre del Evento';
+                    if (iconPreviewTitle) iconPreviewTitle.textContent = eventName;
+                    if (bannerPreviewTitle) bannerPreviewTitle.textContent = eventName;
+                });
+            }
 
             // --- MAPA INTERACTIVO (GOOGLE MAPS) ---
             // Esta función será llamada cuando Google Maps API esté cargado
