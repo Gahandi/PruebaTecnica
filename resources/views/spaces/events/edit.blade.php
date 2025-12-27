@@ -602,20 +602,163 @@
         document.addEventListener("DOMContentLoaded", function() {
 
             // --- 1. Inicializar EasyMDE ---
-            new EasyMDE({
+            
+            // Configuración común para los editores
+            const editorToolbar = [
+                "bold", "italic", "strikethrough", "|",
+                "heading-1", "heading-2", "heading-3", "|",
+                "unordered-list", "ordered-list", "checklist", "|",
+                "quote", "code", "horizontal-rule", "|",
+                "link", "image", "table", "|",
+                "preview", "side-by-side", "fullscreen", "|",
+                "guide"
+            ];
+            
+            // CSS personalizado para que la previsualización coincida con la vista final
+            const previewStyles = `
+                .editor-preview, .EasyMDEContainer .editor-preview-side {
+                    font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+                    padding: 1.5rem;
+                    background: linear-gradient(to bottom right, rgba(255,255,255,0.7), rgba(255,255,255,0.6), rgba(251,231,239,0.4));
+                    border-radius: 0.75rem;
+                    border: 1px solid rgba(236,72,153,0.2);
+                }
+                .editor-preview h1, .EasyMDEContainer .editor-preview-side h1 { 
+                    font-size: 2rem; font-weight: 700; color: #111827; margin-bottom: 1rem; 
+                    border-bottom: 2px solid #ec4899; padding-bottom: 0.5rem;
+                }
+                .editor-preview h2, .EasyMDEContainer .editor-preview-side h2 { 
+                    font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 0.75rem; 
+                }
+                .editor-preview h3, .EasyMDEContainer .editor-preview-side h3 { 
+                    font-size: 1.25rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem; 
+                }
+                .editor-preview p, .EasyMDEContainer .editor-preview-side p { 
+                    color: #374151; line-height: 1.75; margin-bottom: 1rem; 
+                }
+                .editor-preview strong, .EasyMDEContainer .editor-preview-side strong { 
+                    font-weight: 600; color: #111827; 
+                }
+                .editor-preview a, .EasyMDEContainer .editor-preview-side a { 
+                    color: #ec4899; text-decoration: underline; 
+                }
+                .editor-preview a:hover, .EasyMDEContainer .editor-preview-side a:hover { 
+                    color: #be185d; 
+                }
+                .editor-preview code, .EasyMDEContainer .editor-preview-side code {
+                    background: rgba(139,92,246,0.1); color: #7c3aed; 
+                    padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875rem;
+                }
+                .editor-preview pre, .EasyMDEContainer .editor-preview-side pre {
+                    background: #1f2937; color: #f3f4f6; padding: 1rem; 
+                    border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0;
+                }
+                .editor-preview pre code, .EasyMDEContainer .editor-preview-side pre code {
+                    background: transparent; color: inherit; padding: 0;
+                }
+                .editor-preview blockquote, .EasyMDEContainer .editor-preview-side blockquote {
+                    border-left: 4px solid #ec4899; background: rgba(251,231,239,0.5);
+                    padding: 0.75rem 1rem; margin: 1rem 0; color: #1f2937; font-style: italic;
+                }
+                .editor-preview ul, .EasyMDEContainer .editor-preview-side ul { 
+                    list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; color: #374151;
+                }
+                .editor-preview ol, .EasyMDEContainer .editor-preview-side ol { 
+                    list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; color: #374151;
+                }
+                .editor-preview li, .EasyMDEContainer .editor-preview-side li { 
+                    margin-bottom: 0.5rem; line-height: 1.75;
+                }
+                .editor-preview li::marker, .EasyMDEContainer .editor-preview-side li::marker {
+                    color: #ec4899;
+                }
+                .editor-preview table, .EasyMDEContainer .editor-preview-side table {
+                    width: 100%; border-collapse: collapse; margin: 1rem 0;
+                }
+                .editor-preview th, .EasyMDEContainer .editor-preview-side th {
+                    background: #fce7f3; color: #831843; padding: 0.75rem; 
+                    border: 1px solid #f9a8d4; text-align: left; font-weight: 600;
+                }
+                .editor-preview td, .EasyMDEContainer .editor-preview-side td {
+                    padding: 0.75rem; border: 1px solid #e5e7eb;
+                }
+                .editor-preview hr, .EasyMDEContainer .editor-preview-side hr {
+                    border: none; border-top: 2px solid #f9a8d4; margin: 1.5rem 0;
+                }
+                .editor-preview img, .EasyMDEContainer .editor-preview-side img {
+                    max-width: 100%; border-radius: 0.5rem; margin: 1rem 0;
+                }
+                .editor-preview input[type="checkbox"], .EasyMDEContainer .editor-preview-side input[type="checkbox"] {
+                    accent-color: #ec4899; margin-right: 0.5rem;
+                }
+            `;
+            
+            // Inyectar estilos personalizados
+            const styleSheet = document.createElement("style");
+            styleSheet.textContent = previewStyles;
+            document.head.appendChild(styleSheet);
+            
+            // Instancia para Agenda (Temario)
+            const easyMDE_agenda = new EasyMDE({
                 element: document.getElementById("agenda"),
                 spellChecker: false,
-                placeholder: "Escribe el temario aquí (usa Markdown)...",
-                minHeight: "250px",
+                placeholder: "# Temario del Evento\n\n## Módulo 1: Introducción\n- Punto 1\n- Punto 2\n\n## Módulo 2: Desarrollo\n1. Primer tema\n2. Segundo tema\n\n> Tip: Usa Markdown para dar formato",
+                minHeight: "300px",
+                maxHeight: "500px",
+                toolbar: editorToolbar,
+                status: ["autosave", "lines", "words", "cursor"],
+                autosave: {
+                    enabled: true,
+                    uniqueId: "agenda_edit_{{ $event->id }}",
+                    delay: 5000,
+                    text: "Guardado automático: "
+                },
+                previewClass: ["editor-preview", "prose", "prose-pink"],
+                sideBySideFullscreen: false,
+                shortcuts: {
+                    "toggleBold": "Cmd-B",
+                    "toggleItalic": "Cmd-I",
+                    "toggleHeadingSmaller": "Cmd-H",
+                    "toggleHeadingBigger": "Shift-Cmd-H",
+                    "togglePreview": "Cmd-P",
+                    "toggleSideBySide": "F9",
+                    "toggleFullScreen": "F11"
+                }
             });
-
+            
+            // Instancia para Descripción
             const easyMDE_description = new EasyMDE({
                 element: document.getElementById("description"),
                 spellChecker: false,
-                placeholder: "Escribe la descripción aquí...",
-                minHeight: "150px",
+                placeholder: "Escribe una descripción atractiva de tu evento...\n\n**Destaca** los puntos más importantes.\n\n- Qué aprenderán\n- Quién debería asistir\n- Qué incluye",
+                minHeight: "250px",
+                maxHeight: "400px",
+                toolbar: editorToolbar,
+                status: ["autosave", "lines", "words", "cursor"],
+                autosave: {
+                    enabled: true,
+                    uniqueId: "description_edit_{{ $event->id }}",
+                    delay: 5000,
+                    text: "Guardado automático: "
+                },
+                previewClass: ["editor-preview", "prose", "prose-pink"],
+                sideBySideFullscreen: false,
+                shortcuts: {
+                    "toggleBold": "Cmd-B",
+                    "toggleItalic": "Cmd-I",
+                    "toggleHeadingSmaller": "Cmd-H",
+                    "toggleHeadingBigger": "Shift-Cmd-H",
+                    "togglePreview": "Cmd-P",
+                    "toggleSideBySide": "F9",
+                    "toggleFullScreen": "F11"
+                }
             });
 
+            // Sincronizar con el textarea oculto para validación de Laravel
+            easyMDE_agenda.codemirror.on('change', () => {
+                document.getElementById('agenda').value = easyMDE_agenda.value();
+            });
+            
             // Asegurar que el textarea oculto de descripción se actualice
             easyMDE_description.codemirror.on('change', () => {
                 document.getElementById('description').value = easyMDE_description.value();
