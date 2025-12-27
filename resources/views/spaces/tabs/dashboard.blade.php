@@ -1,6 +1,6 @@
 <!-- Tab: Dashboard - Enhanced Version -->
 <div>
-    <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">Dashboard de {{ $space->name }}</h2>
+    <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">Tablero de {{ $space->name }}</h2>
 
     <!-- Métricas Principales -->
     <div class="grid grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-6 mb-6 sm:mb-8">
@@ -189,7 +189,8 @@
                     </div>
                     <div class="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
                         <p class="text-2xl sm:text-3xl font-bold text-blue-600">
-                            {{ $totalTicketsAvailable - $totalTicketsSold }}</p>
+                            {{ $totalTicketsAvailable - $totalTicketsSold }}
+                        </p>
                         <p class="text-xs sm:text-sm text-blue-800">Disponibles</p>
                     </div>
                 </div>

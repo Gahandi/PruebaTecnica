@@ -21,7 +21,7 @@
 @section('content')
     <!-- Hero Section -->
     <div class="relative bg-gradient-to-r from-pink-500 to-pink-600 overflow-hidden">
-        <div class="relative max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-12 sm:py-16 lg:py-24">
+        <div class="relative max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-16 sm:py-20 lg:py-32">
             <div class="text-center">
                 <h1 class="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6">
                     Eventos para cursos de
@@ -30,7 +30,7 @@
                     </span>
                 </h1>
                 <p class="text-base sm:text-lg md:text-xl lg:text-2xl text-white mb-6 sm:mb-8 max-w-3xl mx-auto px-2">
-                    Descubre conciertos, deportes, teatro, comedia y más. Compra boletos de forma segura y fácil.
+                    Descubre los mejores eventos. Compra boletos de forma segura y fácil.
                 </p>
 
                 <!-- Search Bar Mejorado -->
@@ -38,17 +38,14 @@
                     <form method="GET" action="{{ route('events.search') }}" class="relative">
                         <div class="flex flex-col sm:flex-row gap-3">
                             <div class="flex-1 relative">
-                                <input type="text" name="q" value="{{ $search ?? '' }}"
-                                    placeholder="¿Qué evento buscas? Ej: concierto, rock, teatro..."
+                                <input type="text" name="q" value="{{ $search ?? '' }}" placeholder="¿Qué evento buscas?"
                                     class="w-full px-6 py-4 text-lg rounded-2xl border-0 shadow-xl focus:ring-4 focus:ring-pink-300 focus:outline-none bg-white text-gray-900 placeholder-gray-400">
-                                <svg class="absolute right-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
                             </div>
                             <button type="submit"
-                                class="bg-gradient-to-r from-pink-500 to-pink-400 text-white px-6 sm:px-8 py-4 rounded-2xl font-bold text-base sm:text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2 w-full sm:w-auto">
+                                class="bg-white text-pink-900 px-6 sm:px-8 py-4 rounded-2xl font-bold text-base sm:text-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2 w-full sm:w-auto">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -91,72 +88,62 @@
     </div>
 
     <!-- Categories Section Carousel -->
-    <div class="bg-gray-50 py-8 sm:py-12 lg:py-16">
+    <div class="bg-gray-50 py-12 sm:py-16 lg:py-24">
         <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
             <div class="text-center mb-6 sm:mb-8 lg:mb-12">
                 <h2 class="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#e24972] mb-2 sm:mb-4">Explora por
-                    Categoría</h2>
+                    categoría</h2>
                 <p class="text-sm sm:text-base lg:text-lg text-gray-600">Encuentra eventos que te interesen</p>
             </div>
 
-            <!-- Carousel de Categorías -->
+            <!-- Carousel de Categorías (Desktop) y Grid 4x4 (Móvil) -->
             @if($categories && $categories->count() > 0)
-                <div class="relative -mx-2 sm:-mx-4 lg:-mx-8 px-2 sm:px-4 lg:px-8">
-                    <div class="overflow-x-auto overflow-y-visible scrollbar-hide scroll-smooth snap-x snap-mandatory py-4"
-                        id="categoriesCarouselContainer" style="scrollbar-width: none; -ms-overflow-style: none;">
-                        <div class="flex gap-4 px-2" id="categoriesCarousel">
-                            @php
-                                // Agrupar todas las categorías en chunks de 4
-                                $categoryChunks = $categories->chunk(4);
-                            @endphp
 
-                            @foreach($categoryChunks as $chunk)
-                                <div class="w-full flex-shrink-0 snap-start">
-                                    <div class="flex gap-3 sm:gap-4 lg:gap-6 justify-center">
+                {{-- Lógica PHP previa --}}
+                @php
+                    // MÓVIL: Agrupar en chunks de 16 para el grid 4x4 (4 filas x 4 columnas)
+                    $mobileCategoryChunks = $categories->chunk(16);
+
+                    // DESKTOP: Usamos la colección completa sin chunk para scroll continuo
+                    $allCategories = $categories;
+                @endphp
+
+                {{-- ========================================== --}}
+                {{-- MÓVIL: Carousel con Grid 4x4 (lg:hidden) --}}
+                {{-- ========================================== --}}
+                <div class="lg:hidden relative group">
+
+                    <div class="overflow-x-auto overflow-y-hidden scrollbar-hide scroll-smooth snap-x snap-mandatory pb-6"
+                        id="mobileCategoriesCarousel" style="scrollbar-width: none; -ms-overflow-style: none;">
+
+                        <div class="flex">
+                            @foreach($mobileCategoryChunks as $chunkIndex => $chunk)
+                                {{-- Cada Slide del Carousel Móvil --}}
+                                <div class="w-full flex-shrink-0 snap-center px-2">
+                                    {{-- Grid 4x4 (4 columnas) --}}
+                                    <div class="grid grid-cols-2 gap-2">
                                         @foreach($chunk as $category)
                                             @php
                                                 $catId = is_array($category) ? ($category['id'] ?? null) : ($category->id ?? null);
                                                 $catName = is_array($category) ? ($category['name'] ?? 'Categoría') : ($category->name ?? 'Categoría');
-                                                $catCount = is_array($category) ? ($category['count'] ?? 0) : ($category->count ?? $category->events_count ?? 0);
                                                 $catImage = is_array($category) ? ($category['image'] ?? null) : ($category->image ?? null);
                                                 $catImageUrl = $catImage ? \App\Helpers\ImageHelper::getImageUrl($catImage) : asset('images/categories/Poster7.jpeg');
                                             @endphp
-                                            <div class="group cursor-pointer w-1/4 min-w-[140px] max-w-[200px]">
-                                                <a href="{{ route('categories.show', ['category' => $catId]) }}">
+
+                                            <a href="{{ route('categories.show', ['category' => $catId]) }}" class="block group/item">
+                                                <div class="relative rounded-lg overflow-hidden aspect-square shadow-sm">
+                                                    <img src="{{ $catImageUrl }}" alt="{{ $catName }}"
+                                                        class="w-full h-full object-cover">
+                                                    {{-- Overlay sutil --}}
                                                     <div
-                                                        class="relative rounded-lg sm:rounded-xl overflow-hidden
-                                                                                                                                aspect-square transition-all duration-300 transform
-                                                                                                                                hover:scale-105 hover:shadow-2xl">
-
-                                                        {{-- Imagen --}}
-                                                        <img src="{{ $catImageUrl }}" alt="{{ $catName }}"
-                                                            class="w-full h-full object-cover filter transition-all duration-300">
-
-                                                        {{-- Overlay con nombre de categoría --}}
-                                                        <div
-                                                            class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent
-                                                                                                                                    flex items-end justify-center p-3 sm:p-4">
-                                                            <div class="text-center">
-                                                                <h3
-                                                                    class="text-white font-bold text-xs sm:text-sm lg:text-base drop-shadow-lg line-clamp-2">
-                                                                    {{ $catName }}
-                                                                </h3>
-                                                                <span class="text-white/80 text-xs">
-                                                                    {{ $catCount }} {{ $catCount == 1 ? 'evento' : 'eventos' }}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-
-                                                        {{-- Degradado hover --}}
-                                                        <div
-                                                            class="absolute inset-0 opacity-0
-                                                                                                                                    bg-gradient-to-r from-[rgba(255,105,180,0.40)]
-                                                                                                                                    to-[rgba(252,159,205,0.7)]
-                                                                                                                                    group-hover:opacity-100 transition-all duration-300">
-                                                        </div>
+                                                        class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end justify-center p-1">
+                                                        <span
+                                                            class="text-white text-[9px] font-bold text-center leading-tight line-clamp-2">
+                                                            {{ $catName }}
+                                                        </span>
                                                     </div>
-                                                </a>
-                                            </div>
+                                                </div>
+                                            </a>
                                         @endforeach
                                     </div>
                                 </div>
@@ -164,34 +151,12 @@
                         </div>
                     </div>
 
-                    {{-- Blur/Fade overlays en los bordes - mejorados --}}
-                    <div class="absolute left-0 top-0 bottom-0 w-16 sm:w-28 lg:w-36 pointer-events-none z-[5]"
-                        style="background: linear-gradient(to right, rgb(249 250 251) 0%, rgb(249 250 251 / 0.95) 30%, rgb(249 250 251 / 0.7) 60%, transparent 100%);">
-                    </div>
-                    <div class="absolute right-0 top-0 bottom-0 w-16 sm:w-28 lg:w-36 pointer-events-none z-[5]"
-                        style="background: linear-gradient(to left, rgb(249 250 251) 0%, rgb(249 250 251 / 0.95) 30%, rgb(249 250 251 / 0.7) 60%, transparent 100%);">
-                    </div>
-
-                    {{-- Carousel Controls --}}
-                    <button onclick="scrollCategoriesCarousel('prev')"
-                        class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/0 backdrop-blur-sm rounded-full p-3 shadow-lg hover:shadow-xl transition-all hover:bg-white z-10">
-                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                        </svg>
-                    </button>
-                    <button onclick="scrollCategoriesCarousel('next')"
-                        class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/0 backdrop-blur-sm rounded-full p-3 shadow-lg hover:shadow-xl transition-all hover:bg-white z-10">
-                        <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </button>
-
-                    {{-- Indicadores de página --}}
-                    @if($categoryChunks->count() > 1)
-                        <div class="flex justify-center gap-2 mt-4" id="categoriesIndicators">
-                            @foreach($categoryChunks as $index => $chunk)
-                                <button onclick="goToCategorySlide({{ $index }})"
-                                    class="w-3 h-3 rounded-full transition-all duration-300 {{ $index === 0 ? 'bg-pink-500 w-8' : 'bg-gray-300 hover:bg-gray-400' }}"
+                    {{-- Indicadores (Puntos) Móvil --}}
+                    @if($mobileCategoryChunks->count() > 1)
+                        <div class="absolute bottom-0 left-0 right-0 flex justify-center gap-1.5 pb-1">
+                            @foreach($mobileCategoryChunks as $index => $chunk)
+                                <button onclick="scrollToMobileSlide({{ $index }})"
+                                    class="h-1.5 rounded-full transition-all duration-300 mobile-indicator {{ $index === 0 ? 'bg-pink-500 w-4' : 'bg-gray-300 w-1.5' }}"
                                     data-index="{{ $index }}">
                                 </button>
                             @endforeach
@@ -199,18 +164,86 @@
                     @endif
                 </div>
 
-                {{-- Ver todas las categorías --}}
-                <div class="text-center mt-8">
-                    <a href="{{ route('categories.index') }}"
-                        class="inline-flex items-center bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
-                            </path>
+                {{-- ========================================== --}}
+                {{-- DESKTOP: Carousel Continuo (hidden lg:block) --}}
+                {{-- ========================================== --}}
+                <div class="hidden lg:block relative -mx-8 px-8 group/desktop">
+
+                    {{-- Botón Anterior --}}
+                    <button onclick="scrollDesktop('left')"
+                        class="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg text-gray-700 opacity-0 group-hover/desktop:opacity-100 transition-opacity duration-300 hover:bg-pink-50 hover:text-pink-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                         </svg>
-                        Ver Todas las Categorías
+                    </button>
+
+                    {{-- Contenedor de Scroll --}}
+                    <div class="overflow-x-auto scrollbar-hide scroll-smooth py-4" id="desktopCategoriesContainer"
+                        style="scrollbar-width: none;">
+
+                        {{-- Flex container continuo (sin chunks) --}}
+                        <div class="flex gap-4">
+                            @foreach($allCategories as $category)
+                                @php
+                                    $catId = is_array($category) ? ($category['id'] ?? null) : ($category->id ?? null);
+                                    $catName = is_array($category) ? ($category['name'] ?? 'Categoría') : ($category->name ?? 'Categoría');
+                                    $catCount = is_array($category) ? ($category['count'] ?? 0) : ($category->count ?? $category->events_count ?? 0);
+                                    $catImage = is_array($category) ? ($category['image'] ?? null) : ($category->image ?? null);
+                                    $catImageUrl = $catImage ? \App\Helpers\ImageHelper::getImageUrl($catImage) : asset('images/categories/Poster7.jpeg');
+                                @endphp
+
+                                {{-- Item individual (ancho fijo o flexible) --}}
+                                <div
+                                    class="flex-shrink-0 w-[200px] xl:w-[240px] select-none transition-transform duration-300 hover:-translate-y-1">
+                                    <a href="{{ route('categories.show', ['category' => $catId]) }}" class="block h-full">
+                                        <div
+                                            class="relative rounded-xl overflow-hidden aspect-[5/5] group cursor-pointer shadow-md hover:shadow-xl transition-shadow">
+                                            <img src="{{ $catImageUrl }}" alt="{{ $catName }}"
+                                                class="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110">
+
+                                            {{-- Overlay Desktop --}}
+                                            <div
+                                                class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-end p-4">
+                                                <h3
+                                                    class="text-white font-bold text-lg leading-tight mb-1 group-hover:text-pink-300 transition-colors">
+                                                    {{ $catName }}
+                                                </h3>
+                                                <p class="text-gray-300 text-xs font-medium">
+                                                    {{ $catCount }} eventos
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- Botón Siguiente --}}
+                    <button onclick="scrollDesktop('right')"
+                        class="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg text-gray-700 opacity-0 group-hover/desktop:opacity-100 transition-opacity duration-300 hover:bg-pink-50 hover:text-pink-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+
+                    {{-- Fade lateral para indicar continuidad --}}
+                    <div
+                        class="absolute top-0 right-0 h-full w-24 bg-gradient-to-l from-white via-white/50 to-transparent pointer-events-none z-10 lg:block hidden">
+                    </div>
+                    <div
+                        class="absolute top-0 left-0 h-full w-24 bg-gradient-to-r from-white via-white/50 to-transparent pointer-events-none z-10 lg:block hidden">
+                    </div>
+                </div>
+
+                {{-- Ver todas --}}
+                <div class="text-center mt-6 mb-8">
+                    <a href="{{ route('categories.index') }}"
+                        class="text-sm font-semibold text-pink-600 hover:text-pink-700 hover:underline">
+                        Ver todas las categorías &rarr;
                     </a>
                 </div>
+
             @endif
         </div>
     </div>
@@ -218,7 +251,7 @@
 
     <!-- Featured Events Carousel -->
     @if($featuredEvents->count() > 0)
-        <div class="py-8 sm:py-12 lg:py-16 bg-gradient-to-br from-white via-blue-50 to-indigo-50">
+        <div class="py-12 sm:py-16 lg:py-24 bg-pink-50">
             <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
                 <div class="text-center mb-6 sm:mb-8 lg:mb-12">
                     <h2 class="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#e24972] mb-2 sm:mb-4">Eventos
@@ -344,7 +377,7 @@
     @endif
 
     <!-- All Events Section -->
-    <div class="py-8 sm:py-12 lg:py-16 bg-gray-50">
+    <div class="py-12 sm:py-16 lg:py-24 bg-gray-50">
         <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
             <div class="text-center mb-6 sm:mb-8 lg:mb-12">
                 <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-[#e24972] mb-2 sm:mb-4">Todos los Eventos</h2>
@@ -605,214 +638,93 @@
         </div>
     </div>
 
-    <!-- Past Events Section with Statistics -->
+    <!-- Past Events Section -->
     @if(isset($pastEvents) && $pastEvents->count() > 0)
-        <div class="py-8 sm:py-12 lg:py-16 bg-gradient-to-br from-slate-900 via-gray-900 to-zinc-900 relative overflow-hidden">
-            <!-- Background decorative elements -->
-            <div class="absolute inset-0 overflow-hidden pointer-events-none">
-                <div class="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
-                <div class="absolute bottom-0 right-1/4 w-80 h-80 bg-pink-500/10 rounded-full blur-3xl"></div>
-                <div
-                    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-cyan-500/5 to-purple-500/5 rounded-full blur-3xl">
-                </div>
-            </div>
-
-            <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 relative z-10">
+        <div class="py-12 sm:py-16 lg:py-24 bg-pink-50">
+            <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
                 <div class="text-center mb-6 sm:mb-8 lg:mb-12">
-                    <h2
-                        class="text-2xl sm:text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-gray-200 via-white to-gray-300 mb-2 sm:mb-4">
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-[#e24972] mb-2 sm:mb-4">
                         Eventos Pasados
                     </h2>
-                    <p class="text-sm sm:text-base lg:text-lg text-gray-400">Estadísticas de nuestros eventos más exitosos</p>
+                    <p class="text-sm sm:text-base lg:text-lg text-gray-600">Revive nuestros eventos anteriores</p>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                     @foreach($pastEvents as $event)
-                        @php
-                            $ticketsSold = $event->tickets_sold ?? 0;
-                            $attendees = $event->attendees_count ?? 0;
-                            $views = $event->views_count ?? 0;
-                            $attendanceRate = $ticketsSold > 0 ? round(($attendees / $ticketsSold) * 100) : 0;
-                            $maxStat = max($views, $ticketsSold, $attendees, 1);
-                        @endphp
-                        <div class="group h-full">
-                            <!-- Card con glassmorphism -->
-                            <div
-                                class="relative bg-white/5 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/10 hover:border-white/20 transition-all duration-500 h-full flex flex-col shadow-2xl hover:shadow-purple-500/10">
-                                <!-- Imagen 1:1 -->
-                                <div class="relative overflow-hidden flex-shrink-0">
-                                    @if($event->icon && $event->icon !== 'test.jpg')
-                                        <div class="aspect-square w-full">
-                                            <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->icon) }}"
-                                                alt="{{ $event->name }}"
-                                                class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500">
-                                        </div>
-                                    @else
-                                        <div
-                                            class="aspect-square w-full bg-gradient-to-br from-purple-900/50 via-gray-800/50 to-pink-900/50 flex items-center justify-center">
-                                            <span class="text-5xl opacity-50">🎪</span>
-                                        </div>
-                                    @endif
-
-                                    <!-- Gradient overlay -->
+                        <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}/{{ $event->slug }}"
+                            class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-pink-200 group h-full flex flex-col">
+                            <div class="relative overflow-hidden flex-shrink-0">
+                                @if($event->icon && $event->icon !== 'test.jpg')
+                                    <div class="aspect-square w-full">
+                                        <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->icon) }}" alt="{{ $event->name }}"
+                                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 grayscale-[30%]">
+                                    </div>
+                                @else
                                     <div
-                                        class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-80">
-                                    </div>
-
-                                    <!-- Badge -->
-                                    <div class="absolute top-3 left-3">
-                                        <span
-                                            class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg shadow-emerald-500/30">
-                                            ✓ Finalizado
-                                        </span>
-                                    </div>
-
-                                    <!-- Event name overlay -->
-                                    <div class="absolute bottom-0 left-0 right-0 p-4">
-                                        <h3 class="text-lg sm:text-xl font-bold text-white mb-1 line-clamp-2 drop-shadow-lg">
-                                            {{ $event->name }}
-                                        </h3>
-                                        <p class="text-gray-300 text-sm flex items-center">
-                                            <svg class="w-4 h-4 mr-1.5 text-pink-400" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                                </path>
+                                        class="aspect-square w-full bg-gradient-to-br from-gray-400 via-gray-500 to-gray-600 flex items-center justify-center relative overflow-hidden">
+                                        <div class="text-center text-white relative z-10">
+                                            <svg class="w-12 h-12 mx-auto mb-2 drop-shadow-lg" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd"
+                                                    d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                                    clip-rule="evenodd"></path>
                                             </svg>
-                                            {{ \Carbon\Carbon::parse($event->date)->format('d M Y') }}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div class="p-4 sm:p-5 flex flex-col flex-grow">
-                                    <!-- Estadísticas Futuristas con barras animated -->
-                                    <div class="space-y-4 mb-4">
-                                        <!-- Visitas -->
-                                        <div class="group/stat">
-                                            <div class="flex items-center justify-between mb-1.5">
-                                                <div class="flex items-center text-cyan-400">
-                                                    <div
-                                                        class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center mr-2">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                                            </path>
-                                                        </svg>
-                                                    </div>
-                                                    <span class="text-xs font-medium uppercase tracking-wider">Visitas</span>
-                                                </div>
-                                                <span
-                                                    class="text-xl font-bold text-white tabular-nums">{{ number_format($views) }}</span>
-                                            </div>
-                                            <div class="h-1.5 bg-gray-700/50 rounded-full overflow-hidden">
-                                                <div class="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full transition-all duration-1000 ease-out group-hover/stat:shadow-lg group-hover/stat:shadow-cyan-500/50"
-                                                    style="width: {{ $maxStat > 0 ? min(($views / $maxStat) * 100, 100) : 0 }}%">
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Vendidos -->
-                                        <div class="group/stat">
-                                            <div class="flex items-center justify-between mb-1.5">
-                                                <div class="flex items-center text-emerald-400">
-                                                    <div
-                                                        class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center mr-2">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z">
-                                                            </path>
-                                                        </svg>
-                                                    </div>
-                                                    <span class="text-xs font-medium uppercase tracking-wider">Vendidos</span>
-                                                </div>
-                                                <span
-                                                    class="text-xl font-bold text-white tabular-nums">{{ number_format($ticketsSold) }}</span>
-                                            </div>
-                                            <div class="h-1.5 bg-gray-700/50 rounded-full overflow-hidden">
-                                                <div class="h-full bg-gradient-to-r from-emerald-500 to-green-500 rounded-full transition-all duration-1000 ease-out group-hover/stat:shadow-lg group-hover/stat:shadow-emerald-500/50"
-                                                    style="width: {{ $maxStat > 0 ? min(($ticketsSold / $maxStat) * 100, 100) : 0 }}%">
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Asistentes -->
-                                        <div class="group/stat">
-                                            <div class="flex items-center justify-between mb-1.5">
-                                                <div class="flex items-center text-purple-400">
-                                                    <div
-                                                        class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center mr-2">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z">
-                                                            </path>
-                                                        </svg>
-                                                    </div>
-                                                    <span class="text-xs font-medium uppercase tracking-wider">Asistieron</span>
-                                                </div>
-                                                <span
-                                                    class="text-xl font-bold text-white tabular-nums">{{ number_format($attendees) }}</span>
-                                            </div>
-                                            <div class="h-1.5 bg-gray-700/50 rounded-full overflow-hidden">
-                                                <div class="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-1000 ease-out group-hover/stat:shadow-lg group-hover/stat:shadow-purple-500/50"
-                                                    style="width: {{ $maxStat > 0 ? min(($attendees / $maxStat) * 100, 100) : 0 }}%">
-                                                </div>
-                                            </div>
+                                            <p class="font-bold drop-shadow-lg">{{ $event->name }}</p>
                                         </div>
                                     </div>
-
-                                    @if($ticketsSold > 0)
-                                        <!-- Circular Progress / Tasa de Asistencia -->
-                                        <div class="flex items-center justify-center py-3 mb-3">
-                                            <div class="relative">
-                                                <!-- SVG Circular Progress -->
-                                                <svg class="w-20 h-20 transform -rotate-90" viewBox="0 0 100 100">
-                                                    <circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="8" fill="none"
-                                                        class="text-gray-700/50"></circle>
-                                                    <circle cx="50" cy="50" r="40" stroke="url(#gradient-{{ $event->id }})"
-                                                        stroke-width="8" fill="none" stroke-linecap="round"
-                                                        stroke-dasharray="{{ 251.2 * $attendanceRate / 100 }}, 251.2"
-                                                        class="transition-all duration-1000 ease-out"></circle>
-                                                    <defs>
-                                                        <linearGradient id="gradient-{{ $event->id }}" x1="0%" y1="0%" x2="100%"
-                                                            y2="0%">
-                                                            <stop offset="0%" stop-color="#a855f7"></stop>
-                                                            <stop offset="100%" stop-color="#ec4899"></stop>
-                                                        </linearGradient>
-                                                    </defs>
-                                                </svg>
-                                                <div class="absolute inset-0 flex items-center justify-center">
-                                                    <div class="text-center">
-                                                        <span class="text-xl font-bold text-white">{{ $attendanceRate }}%</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="ml-4 text-left">
-                                                <p class="text-gray-400 text-xs uppercase tracking-wider">Tasa de</p>
-                                                <p class="text-white font-semibold">Asistencia</p>
-                                            </div>
-                                        </div>
-                                    @endif
-
-                                    <div class="flex-grow"></div>
-
-                                    <!-- Organizador -->
-                                    <div class="flex items-center justify-between pt-3 border-t border-white/10">
-                                        <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}"
-                                            target="_blank"
-                                            class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white transition-all">
-                                            <span class="w-2 h-2 rounded-full bg-pink-500 mr-2"></span>
-                                            {{ $event->space->name }}
-                                        </a>
-                                        @if($event->type_event)
-                                            <span
-                                                class="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">{{ $event->type_event->name }}</span>
-                                        @endif
-                                    </div>
+                                @endif
+                                {{-- Badge Finalizado --}}
+                                <div class="absolute top-4 right-4">
+                                    <span
+                                        class="bg-gradient-to-r from-gray-600 to-gray-500 text-white px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold shadow-lg">
+                                        ✓ Finalizado
+                                    </span>
                                 </div>
                             </div>
-                        </div>
+                            <div class="p-4 sm:p-5 lg:p-6 flex flex-col flex-grow">
+                                {{-- Título --}}
+                                <h3 class="text-lg sm:text-xl font-bold text-[#e24972] mb-3 line-clamp-2">{{ $event->name }}</h3>
+
+                                {{-- Fecha --}}
+                                <div class="mb-4">
+                                    <p class="text-gray-600 mb-2 text-sm flex items-center">
+                                        <svg class="w-4 h-4 mr-2 text-pink-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                            </path>
+                                        </svg>
+                                        {{ \Carbon\Carbon::parse($event->date)->format('d M Y, H:i') }}
+                                    </p>
+
+                                    <p class="text-gray-500 text-sm line-clamp-2 flex items-start">
+                                        <svg class="w-4 h-4 mr-2 text-pink-500 mt-0.5 flex-shrink-0" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                            </path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        {{ $event->address }}
+                                    </p>
+                                </div>
+
+                                {{-- Espaciador --}}
+                                <div class="flex-grow"></div>
+
+                                {{-- Footer con Space --}}
+                                <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                                    <span
+                                        onclick="event.preventDefault(); event.stopPropagation(); window.open('{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($event->space->subdomain) }}', '_blank');"
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800 hover:bg-pink-200 transition-colors cursor-pointer z-10">
+                                        {{ $event->space->name }}
+                                    </span>
+                                    <span class="text-gray-400 text-sm font-medium">
+                                        Ver evento →
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
                     @endforeach
                 </div>
             </div>
@@ -821,7 +733,7 @@
 
     <!-- Spaces/Cajones Section -->
     @if(isset($spaces) && $spaces->count() > 0)
-        <div class="py-8 sm:py-12 lg:py-16 bg-gradient-to-br from-pink-50 via-white to-purple-50">
+        <div class="py-12 sm:py-16 lg:py-24 bg-gradient-to-br from-pink-50 via-white to-purple-50">
             <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
                 <div class="text-center mb-6 sm:mb-8 lg:mb-12">
                     <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-2 sm:mb-4">
@@ -894,7 +806,7 @@
     @endif
 
     <!-- CTA Section -->
-    <div class="bg-gradient-to-r from-pink-500 to-pink-600 py-16">
+    <div class="bg-gradient-to-r from-pink-500 to-pink-600 py-20 sm:py-24 lg:py-32">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
                 ¿Tienes un evento que promocionar?
@@ -1081,6 +993,53 @@
                 }
             });
         }
+        // --- Lógica MÓVIL ---
+        function scrollToMobileSlide(index) {
+            const container = document.getElementById('mobileCategoriesCarousel');
+            const slideWidth = container.offsetWidth; // Ancho de un slide completo
+
+            container.scrollTo({
+                left: slideWidth * index,
+                behavior: 'smooth'
+            });
+
+            updateMobileIndicators(index);
+        }
+
+        // Detectar scroll manual en móvil para actualizar puntitos
+        const mobileContainer = document.getElementById('mobileCategoriesCarousel');
+        if (mobileContainer) {
+            mobileContainer.addEventListener('scroll', () => {
+                const index = Math.round(mobileContainer.scrollLeft / mobileContainer.offsetWidth);
+                updateMobileIndicators(index);
+            });
+        }
+
+        function updateMobileIndicators(activeIndex) {
+            const dots = document.querySelectorAll('.mobile-indicator');
+            dots.forEach((dot, idx) => {
+                if (idx === activeIndex) {
+                    dot.classList.remove('bg-gray-300', 'w-1.5');
+                    dot.classList.add('bg-pink-500', 'w-4');
+                } else {
+                    dot.classList.remove('bg-pink-500', 'w-4');
+                    dot.classList.add('bg-gray-300', 'w-1.5');
+                }
+            });
+        }
+
+
+        // --- Lógica DESKTOP ---
+        function scrollDesktop(direction) {
+            const container = document.getElementById('desktopCategoriesContainer');
+            const scrollAmount = 600; // Cantidad de pixeles a mover
+
+            if (direction === 'left') {
+                container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        }
 
         // Auto-scroll para categorías
         function startCategoriesAutoScroll() {
@@ -1140,6 +1099,45 @@
             // Iniciar auto-scroll al cargar
             startCategoriesAutoScroll();
         }
+        // === MOBILE CATEGORIES CAROUSEL ===
+        const mobileCategoriesCarousel = document.getElementById('mobileCategoriesCarousel');
+        const mobileCategoriesIndicators = document.getElementById('mobileCategoriesIndicators');
+
+        function goToMobileCategorySlide(index) {
+            if (!mobileCategoriesCarousel) return;
+
+            const slideWidth = mobileCategoriesCarousel.offsetWidth;
+            mobileCategoriesCarousel.scrollTo({
+                left: slideWidth * index,
+                behavior: 'smooth'
+            });
+        }
+
+        function updateMobileCategoriesIndicators() {
+            if (!mobileCategoriesCarousel || !mobileCategoriesIndicators) return;
+
+            const slideWidth = mobileCategoriesCarousel.offsetWidth;
+            const currentIndex = Math.round(mobileCategoriesCarousel.scrollLeft / slideWidth);
+
+            const indicators = mobileCategoriesIndicators.querySelectorAll('button');
+            indicators.forEach((indicator, index) => {
+                if (index === currentIndex) {
+                    indicator.classList.remove('bg-gray-300', 'w-2');
+                    indicator.classList.add('bg-pink-500', 'w-6');
+                } else {
+                    indicator.classList.remove('bg-pink-500', 'w-6');
+                    indicator.classList.add('bg-gray-300', 'w-2');
+                }
+            });
+        }
+
+        // Detectar scroll manual en el carousel móvil
+        if (mobileCategoriesCarousel) {
+            mobileCategoriesCarousel.addEventListener('scroll', () => {
+                updateMobileCategoriesIndicators();
+            }, { passive: true });
+        }
+
         // === COUNTDOWN TIMER para eventos próximos (menos de 48 horas) ===
         function updateCountdowns() {
             const countdownElements = document.querySelectorAll('[data-countdown]');
@@ -1149,31 +1147,17 @@
                 const eventDate = new Date(el.getAttribute('data-countdown'));
                 const diff = eventDate - now;
 
-                if (diff <= 0) {
-                    // El evento ya pasó o está ocurriendo
-                    el.querySelector('.countdown-text').textContent = '¡Ahora!';
-                    el.classList.remove('animate-pulse');
-                    el.classList.add('bg-green-500');
-                    return;
-                }
-
-                const hours = Math.floor(diff / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-                if (hours < 1) {
-                    // Menos de 1 hora - mostrar minutos y segundos
-                    el.querySelector('.countdown-text').textContent = `${minutes}m ${seconds}s`;
-                } else if (hours < 48) {
-                    // Menos de 48 horas - mostrar horas y minutos
-                    el.querySelector('.countdown-text').textContent = `${hours}h ${minutes}m`;
-                }
+                if (diff <= 0) { // El evento ya pasó o está ocurriendo el.querySelector('.countdown-text').textContent='¡Ahora!' ;
+                    el.classList.remove('animate-pulse'); el.classList.add('bg-green-500'); return;
+                } const hours = Math.floor(diff /
+                    (1000 * 60 * 60)); const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)); const seconds = Math.floor((diff
+                        % (1000 * 60)) / 1000); if (hours < 1) { // Menos de 1 hora - mostrar minutos y segundos
+                            el.querySelector('.countdown-text').textContent = `${minutes}m ${seconds}s`;
+                        } else if (hours < 48) { // Menos de 48
+                            horas - mostrar horas y minutos el.querySelector('.countdown-text').textContent = `${hours}h ${minutes}m`;
+                        }
             });
-        }
-
-        // Actualizar countdowns cada segundo
-        setInterval(updateCountdowns, 1000);
-        // Primera actualización inmediata
-        updateCountdowns();
-    </script>
+        } //
+                    Actualizar countdowns cada segundo setInterval(updateCountdowns, 1000); // Primera actualización inmediata
+        updateCountdowns(); </script>
 @endpush

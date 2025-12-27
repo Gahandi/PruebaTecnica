@@ -135,7 +135,10 @@ Route::prefix('verify')->name('verify.')->group(function () {
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Rutas públicas
-Route::get('/events', [PublicEventController::class, 'index'])->name('events.public');
+// Redirigir /events a home (evitar duplicidad de vistas)
+Route::get('/events', function () {
+    return redirect()->route('home');
+})->name('events.public');
 Route::get('/events/{event}', [PublicEventController::class, 'show'])->name('events.show');
 
 // Rutas públicas de categorías

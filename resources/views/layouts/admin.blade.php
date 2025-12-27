@@ -24,7 +24,7 @@
                             d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
                         </path>
                     </svg>
-                    Dashboard
+                    Tablero
                 </a>
 
                 {{-- Divider --}}
@@ -160,108 +160,9 @@
 
         {{-- Main Content --}}
         <div class="flex-1 flex flex-col overflow-hidden">
-            {{-- Top Bar (Mobile) --}}
-            <header class="bg-white shadow-sm md:hidden">
-                <div class="flex items-center justify-between p-4">
-                    <h1 class="text-xl font-bold text-gray-900">Panel de administración</h1>
-                    <button id="mobile-menu-button" class="text-black hover:text-gray-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </button>
-                </div>
-            </header>
-
             {{-- Content Area --}}
             <main class="flex-1 overflow-y-auto bg-gray-50">
                 @yield('admin-content')
             </main>
         </div>
-    </div>
-
-    {{-- Mobile Menu (Hidden by default) --}}
-    <div id="mobile-menu" class="hidden fixed inset-0 z-50 md:hidden">
-        <div class="fixed inset-0 bg-gray-900 bg-opacity-75" id="mobile-menu-overlay"></div>
-        <aside class="fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-gray-900 to-gray-800 text-white flex flex-col">
-            {{-- Same navigation as desktop --}}
-            <div class="p-6 border-b border-gray-700 flex items-center justify-between">
-                <h1 class="text-2xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
-                    Admin Panel
-                </h1>
-                <button id="mobile-menu-close" class="text-gray-400 hover:text-white">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                        </path>
-                    </svg>
-                </button>
-            </div>
-
-            <nav class="flex-1 overflow-y-auto py-4">
-                <a href="{{ route('dashboard') }}"
-                    class="flex items-center px-6 py-3 text-black hover:bg-gray-700 hover:text-white transition-colors">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-                        </path>
-                    </svg>
-                    Dashboard
-                </a>
-                <a href="{{ route('admin.users.index') }}"
-                    class="flex items-center px-6 py-3 text-black hover:bg-gray-700 hover:text-white transition-colors">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
-                        </path>
-                    </svg>
-                    Usuarios
-                </a>
-                <a href="{{ route('admin.checkins.index') }}"
-                    class="flex items-center px-6 py-3 text-black hover:bg-gray-700 hover:text-white transition-colors">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    Check-ins
-                </a>
-                <a href="{{ route('admin.activity-log.index') }}"
-                    class="flex items-center px-6 py-3 text-black hover:bg-gray-700 hover:text-white transition-colors">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
-                        </path>
-                    </svg>
-                    Activity Log
-                </a>
-            </nav>
-        </aside>
-    </div>
-
-    @push('scripts')
-        <script>
-            // Mobile menu toggle
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-            const mobileMenuClose = document.getElementById('mobile-menu-close');
-            const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
-
-            if (mobileMenuButton) {
-                mobileMenuButton.addEventListener('click', () => {
-                    mobileMenu.classList.remove('hidden');
-                });
-            }
-
-            if (mobileMenuClose) {
-                mobileMenuClose.addEventListener('click', () => {
-                    mobileMenu.classList.add('hidden');
-                });
-            }
-
-            if (mobileMenuOverlay) {
-                mobileMenuOverlay.addEventListener('click', () => {
-                    mobileMenu.classList.add('hidden');
-                });
-            }
-        </script>
-    @endpush
-@endsection
+</div>@endsection

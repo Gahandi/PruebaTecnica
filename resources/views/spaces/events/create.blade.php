@@ -7,9 +7,9 @@
     <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
 
 
-    <div class="max-w-6xl mx-auto py-8 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto py-4 sm:py-6 lg:py-8 px-2 sm:px-4 lg:px-8">
         <div class="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-100">
-            <div class="bg-gradient-to-r from-pink-500 to-pink-600 px-8 py-6 text-white">
+            <div class="bg-gradient-to-r from-pink-500 to-pink-600 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 text-white">
                 <div class="flex items-center justify-between">
                     <div>
                         <h1 class="text-3xl font-bold">Crear Nuevo Evento</h1>
@@ -29,13 +29,13 @@
             </div>
 
             <form method="POST" action="{{ route('spaces.events.store', $space->subdomain) }}" enctype="multipart/form-data"
-                class="p-8">
+                class="p-3 sm:p-5 lg:p-8">
                 @csrf
 
                 <div class="grid grid-cols-1 gap-12">
 
                     <div classs="space-y-8">
-                        <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-6">
+                        <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-3 sm:p-4 lg:p-6">
                             <h2 class="text-xl font-semibold text-[#e24972] mb-6 flex items-center">
                                 <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
@@ -272,7 +272,7 @@
                     </div>
 
                     <div class="space-y-8">
-                        <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-6">
+                        <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-3 sm:p-4 lg:p-6">
                             <h2 class="text-xl font-semibold text-[#e24972] mb-6 flex items-center">
                                 <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
@@ -291,7 +291,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-6">
+                        <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-3 sm:p-4 lg:p-6">
                             <h2 class="text-xl font-semibold text-[#e24972] mb-6 flex items-center">
                                 <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
@@ -318,7 +318,7 @@
                                 <!-- ICONO (1:1) - Para el Home -->
                                 <div class="bg-white rounded-xl p-4 shadow-sm border-2 border-gray-100">
                                     <label for="icon" class="block text-sm font-semibold text-gray-800 mb-2">
-                                        🏠 Icono del Evento
+                                        Icono del Evento
                                     </label>
                                     <p class="text-xs text-gray-500 mb-3">Proporción 1:1 (800 × 800 px) — Se mostrará en el home</p>
                                     
@@ -343,7 +343,7 @@
                                     
                                     <!-- Vista Previa Realista - Simula tarjeta del Home -->
                                     <div class="mt-4">
-                                        <p class="text-xs text-gray-500 mb-2 font-medium">📍 Así se verá en el home:</p>
+                                        <p class="text-xs text-gray-500 mb-2 font-medium">Así se verá en el home:</p>
                                         <div class="bg-gray-50 rounded-xl p-3">
                                             <div class="bg-white rounded-xl shadow-lg overflow-hidden max-w-[200px] mx-auto border border-gray-100 hover:shadow-xl transition-shadow">
                                                 <!-- Imagen cuadrada 1:1 -->
@@ -363,7 +363,7 @@
                                                 <!-- Info del evento -->
                                                 <div class="p-3">
                                                     <h4 id="icon-preview-title" class="text-sm font-bold text-pink-600 truncate mb-1">Nombre del Evento</h4>
-                                                    <p class="text-xs text-gray-500 mb-2">📅 Fecha del evento</p>
+                                                    <p class="text-xs text-gray-500 mb-2">Fecha del evento</p>
                                                     <div class="flex items-center justify-between">
                                                         <span class="text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full">{{ $space->name }}</span>
                                                         <span class="text-xs font-bold text-green-600">$XX.XX</span>
@@ -377,7 +377,7 @@
                                 <!-- BANNER (16:9) - Para detalles del evento -->
                                 <div class="bg-white rounded-xl p-4 shadow-sm border-2 border-gray-100">
                                     <label for="banner" class="block text-sm font-semibold text-gray-800 mb-2">
-                                        📺 Banner del Evento
+                                        Banner del Evento
                                     </label>
                                     <p class="text-xs text-gray-500 mb-3">Proporción 16:9 (1920 × 1080 px) — Página de detalles</p>
                                     
@@ -402,7 +402,7 @@
                                     
                                     <!-- Vista Previa Realista - Simula página de detalles estilo FB Cover -->
                                     <div class="mt-4">
-                                        <p class="text-xs text-gray-500 mb-2 font-medium">📍 Así se verá en la página de detalles:</p>
+                                        <p class="text-xs text-gray-500 mb-2 font-medium">Así se verá en la página de detalles:</p>
                                         <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
                                             <!-- Banner Container 16:9 -->
                                             <div class="relative bg-gray-900" style="aspect-ratio: 16/9;">
@@ -424,9 +424,9 @@
                                                     <div class="backdrop-blur-sm bg-black/30 rounded-lg p-2 border border-white/20">
                                                         <div id="banner-preview-title" class="text-white text-sm font-medium truncate">Nombre del Evento</div>
                                                         <div class="flex items-center gap-2 text-white/70 text-xs mt-1">
-                                                            <span>📅 Fecha</span>
+                                                            <span>Fecha</span>
                                                             <span>•</span>
-                                                            <span>📍 Ubicación</span>
+                                                            <span>Ubicación</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -438,7 +438,7 @@
                                 <!-- IMAGEN PRINCIPAL (16:10) -->
                                 <div class="bg-white rounded-xl p-4 shadow-sm border-2 border-gray-100">
                                     <label for="image" class="block text-sm font-semibold text-gray-800 mb-2">
-                                        🖼️ Imagen Principal
+                                        Imagen Principal
                                     </label>
                                     <p class="text-xs text-gray-500 mb-3">Proporción 16:10 (1920 × 1200 px) — Banners secundarios</p>
                                     
@@ -488,7 +488,7 @@
                         </div>
 
 
-                        <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-6">
+                        <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-3 sm:p-4 lg:p-6">
                             <h2 class="text-xl font-semibold text-[#e24972] mb-6 flex items-center">
                                 <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
