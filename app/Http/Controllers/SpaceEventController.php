@@ -360,8 +360,8 @@ class SpaceEventController extends Controller
         // Cargar tags del evento
         $event->load('tags');
 
-        // 3. Retornar la vista de edición con los datos
-        return view('spaces.events.edit', compact('space', 'event', 'ticketTypes', 'typeEvents', 'tags'));
+        // 3. Retornar la vista de creación (unificada para crear/editar)
+        return view('spaces.events.create', compact('space', 'event', 'ticketTypes', 'typeEvents', 'tags'));
     }
 
     /**

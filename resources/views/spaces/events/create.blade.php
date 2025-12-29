@@ -28,8 +28,9 @@
                 </div>
             </div>
 
-            <form method="POST" action="{{ isset($event) ? route('spaces.events.update', ['subdomain' => $space->subdomain, 'event' => $event->slug]) : route('spaces.events.store', $space->subdomain) }}" enctype="multipart/form-data"
-                class="p-8">
+            <form method="POST"
+                action="{{ isset($event) ? route('spaces.events.update', ['subdomain' => $space->subdomain, 'event' => $event->slug]) : route('spaces.events.store', $space->subdomain) }}"
+                enctype="multipart/form-data" class="p-8">
                 @csrf
                 @if(isset($event))
                     @method('PUT')
@@ -52,7 +53,8 @@
                                 <div>
                                     <label for="name" class="block text-sm font-medium text-gray-700 mb-3">Nombre del
                                         Evento</label>
-                                    <input type="text" name="name" id="name" value="{{ old('name', $event->name ?? '') }}" required
+                                    <input type="text" name="name" id="name" value="{{ old('name', $event->name ?? '') }}"
+                                        required
                                         class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('name') border-red-500 @enderror"
                                         placeholder="Ej: Conferencia de Tecnología 2024">
                                     @error('name')
@@ -87,7 +89,8 @@
                                     <div>
                                         <label for="date" class="block text-sm font-medium text-gray-700 mb-3">Fecha y
                                             Hora</label>
-                                        <input type="datetime-local" name="date" id="date" value="{{ old('date', isset($event) ? \Carbon\Carbon::parse($event->date)->format('Y-m-d\TH:i') : '') }}"
+                                        <input type="datetime-local" name="date" id="date"
+                                            value="{{ old('date', isset($event) ? \Carbon\Carbon::parse($event->date)->format('Y-m-d\TH:i') : '') }}"
                                             required
                                             class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('date') border-red-500 @enderror">
                                         @error('date')
@@ -108,27 +111,24 @@
                                         </label>
 
                                         <div class="flex flex-col sm:flex-row gap-2">
-                                            <select name="type_event_id" id="type_event_id" required
-                                                class="w-full sm:flex-1 border-2 border-pink-200 rounded-xl px-4 py-3
-                                                    focus:ring-2 focus:ring-pink-500 focus:border-pink-500
-                                                    transition-all duration-200
-                                                    @error('type_event_id') border-red-500 @enderror">
+                                            <select name="type_event_id" id="type_event_id" required class="w-full sm:flex-1 border-2 border-pink-200 rounded-xl px-4 py-3
+                                                                        focus:ring-2 focus:ring-pink-500 focus:border-pink-500
+                                                                        transition-all duration-200
+                                                                        @error('type_event_id') border-red-500 @enderror">
                                                 <option value="">Selecciona un tipo</option>
                                                 @foreach($typeEvents as $typeEvent)
-                                                    <option value="{{ $typeEvent->id }}"
-                                                        {{ old('type_event_id', $event->type_events_id ?? '') == $typeEvent->id ? 'selected' : '' }}>
+                                                    <option value="{{ $typeEvent->id }}" {{ old('type_event_id', $event->type_events_id ?? '') == $typeEvent->id ? 'selected' : '' }}>
                                                         {{ $typeEvent->name }}
                                                     </option>
                                                 @endforeach
                                             </select>
 
-                                            <button type="button" onclick="openCategoryModal()"
-                                                class="w-full sm:w-auto
-                                                    bg-gradient-to-r from-pink-500 to-pink-400
-                                                    hover:from-pink-600 hover:to-pink-500
-                                                    text-white px-4 py-3 rounded-xl
-                                                    transition-all duration-300 shadow-md hover:shadow-lg
-                                                    flex items-center justify-center space-x-2"
+                                            <button type="button" onclick="openCategoryModal()" class="w-full sm:w-auto
+                                                                        bg-gradient-to-r from-pink-500 to-pink-400
+                                                                        hover:from-pink-600 hover:to-pink-500
+                                                                        text-white px-4 py-3 rounded-xl
+                                                                        transition-all duration-300 shadow-md hover:shadow-lg
+                                                                        flex items-center justify-center space-x-2"
                                                 title="Crear nueva categoría">
 
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -172,7 +172,8 @@
                                 <div>
                                     <label for="address"
                                         class="block text-sm font-medium text-gray-700 mb-3">Dirección</label>
-                                    <input type="text" name="address" id="address" value="{{ old('address', $event->address ?? '') }}" required
+                                    <input type="text" name="address" id="address"
+                                        value="{{ old('address', $event->address ?? '') }}" required
                                         class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('address') border-red-500 @enderror"
                                         placeholder="Ej: Av. Reforma 123, Ciudad de México">
                                     <p class="mt-2 text-sm text-gray-500 flex items-center">
@@ -196,7 +197,8 @@
                                 <div class="hidden">
                                     <label for="coordinates"
                                         class="block text-sm font-medium text-gray-700 mb-3">Coordenadas GPS</label>
-                                    <input type="text" name="coordinates" id="coordinates" value="{{ old('coordinates', $event->coordinates ?? '') }}"
+                                    <input type="text" name="coordinates" id="coordinates"
+                                        value="{{ old('coordinates', $event->coordinates ?? '') }}"
                                         class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('coordinates') border-red-500 @enderror"
                                         placeholder="Ej: 19.4326, -99.1332">
                                     @error('coordinates')
@@ -308,56 +310,77 @@
                             <!-- Información de proporciones -->
                             <div class="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
                                 <p class="text-sm text-blue-700 flex items-start">
-                                    <svg class="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    <svg class="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
-                                    <span>Las imágenes deben tener las proporciones indicadas. Se validará automáticamente al cargar cada imagen.</span>
+                                    <span>Las imágenes deben tener las proporciones indicadas. Se validará automáticamente
+                                        al cargar cada imagen.</span>
                                 </p>
                             </div>
 
                             <!-- Grid de 3 columnas para las imágenes -->
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                
+
                                 <!-- ICONO (1:1) - Para el Home -->
                                 <div class="bg-white rounded-xl p-4 shadow-sm border-2 border-gray-100">
                                     <label for="icon" class="block text-sm font-semibold text-gray-800 mb-2">
                                         Icono del Evento
                                     </label>
-                                    <p class="text-xs text-gray-500 mb-3">Proporción 1:1 (800 × 800 px) — Se mostrará en el home</p>
-                                    
+                                    <p class="text-xs text-gray-500 mb-3">Proporción 1:1 (800 × 800 px) — Se mostrará en el
+                                        home</p>
+
                                     <div class="relative">
                                         <input type="file" name="icon" id="icon" accept="image/*"
                                             class="w-full border-2 border-pink-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 text-sm @error('icon') border-red-500 @enderror">
                                     </div>
-                                    
+
+                                    {{-- Imagen actual (si existe) --}}
+                                    @if(isset($event) && $event->icon)
+                                        <div class="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                                            <p class="text-xs text-green-700 mb-2 font-medium">Imagen actual:</p>
+                                            <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->icon) }}"
+                                                alt="Icono actual" class="w-20 h-20 object-cover rounded-lg shadow-sm">
+                                            <p class="text-xs text-gray-500 mt-2">Selecciona una nueva imagen para reemplazarla
+                                            </p>
+                                        </div>
+                                    @endif
+
                                     <!-- Mensaje de validación -->
                                     <div id="icon-validation" class="mt-2 hidden">
                                         <p class="text-sm flex items-center"></p>
                                     </div>
-                                    
+
                                     @error('icon')
                                         <p class="mt-2 text-sm text-red-600 flex items-center">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
                                             {{ $message }}
                                         </p>
                                     @enderror
-                                    
+
                                     <!-- Vista Previa Realista - Simula tarjeta del Home -->
                                     <div class="mt-4">
                                         <p class="text-xs text-gray-500 mb-2 font-medium">Así se verá en el home:</p>
                                         <div class="bg-gray-50 rounded-xl p-3">
-                                            <div class="bg-white rounded-xl shadow-lg overflow-hidden max-w-[200px] mx-auto border border-gray-100 hover:shadow-xl transition-shadow">
+                                            <div
+                                                class="bg-white rounded-xl shadow-lg overflow-hidden max-w-[200px] mx-auto border border-gray-100 hover:shadow-xl transition-shadow">
                                                 <!-- Imagen cuadrada 1:1 -->
                                                 <div class="aspect-square bg-gray-200 relative overflow-hidden">
-                                                    <img id="preview-icon" 
-                                                        class="hidden w-full h-full object-cover"
+                                                    <img id="preview-icon" class="hidden w-full h-full object-cover"
                                                         alt="Vista previa icono">
-                                                    <div id="icon-placeholder" class="w-full h-full flex items-center justify-center text-gray-400 bg-gradient-to-br from-purple-400 via-pink-400 to-indigo-400">
+                                                    <div id="icon-placeholder"
+                                                        class="w-full h-full flex items-center justify-center text-gray-400 bg-gradient-to-br from-purple-400 via-pink-400 to-indigo-400">
                                                         <div class="text-center text-white">
-                                                            <svg class="w-10 h-10 mx-auto mb-1 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                            <svg class="w-10 h-10 mx-auto mb-1 opacity-50" fill="none"
+                                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    stroke-width="2"
+                                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                                </path>
                                                             </svg>
                                                             <p class="text-xs opacity-75">1:1</p>
                                                         </div>
@@ -365,10 +388,13 @@
                                                 </div>
                                                 <!-- Info del evento -->
                                                 <div class="p-3">
-                                                    <h4 id="icon-preview-title" class="text-sm font-bold text-pink-600 truncate mb-1">Nombre del Evento</h4>
+                                                    <h4 id="icon-preview-title"
+                                                        class="text-sm font-bold text-pink-600 truncate mb-1">Nombre del
+                                                        Evento</h4>
                                                     <p class="text-xs text-gray-500 mb-2">Fecha del evento</p>
                                                     <div class="flex items-center justify-between">
-                                                        <span class="text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full">{{ $space->name }}</span>
+                                                        <span
+                                                            class="text-xs bg-pink-100 text-pink-700 px-2 py-0.5 rounded-full">{{ $space->name }}</span>
                                                         <span class="text-xs font-bold text-green-600">$XX.XX</span>
                                                     </div>
                                                 </div>
@@ -382,50 +408,73 @@
                                     <label for="banner" class="block text-sm font-semibold text-gray-800 mb-2">
                                         Banner del Evento
                                     </label>
-                                    <p class="text-xs text-gray-500 mb-3">Proporción 16:9 (1920 × 1080 px) — Página de detalles</p>
-                                    
+                                    <p class="text-xs text-gray-500 mb-3">Proporción 16:9 (1920 × 1080 px) — Página de
+                                        detalles</p>
+
                                     <div class="relative">
                                         <input type="file" name="banner" id="banner" accept="image/*"
                                             class="w-full border-2 border-pink-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 text-sm @error('banner') border-red-500 @enderror">
                                     </div>
-                                    
+
+                                    {{-- Banner actual (si existe) --}}
+                                    @if(isset($event) && $event->banner)
+                                        <div class="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                                            <p class="text-xs text-green-700 mb-2 font-medium">Banner actual:</p>
+                                            <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}"
+                                                alt="Banner actual" class="w-full h-24 object-cover rounded-lg shadow-sm">
+                                            <p class="text-xs text-gray-500 mt-2">Selecciona una nueva imagen para reemplazarla
+                                            </p>
+                                        </div>
+                                    @endif
                                     <!-- Mensaje de validación -->
                                     <div id="banner-validation" class="mt-2 hidden">
                                         <p class="text-sm flex items-center"></p>
                                     </div>
-                                    
+
                                     @error('banner')
                                         <p class="mt-2 text-sm text-red-600 flex items-center">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
                                             {{ $message }}
                                         </p>
                                     @enderror
-                                    
+
                                     <!-- Vista Previa Realista - Simula página de detalles estilo FB Cover -->
                                     <div class="mt-4">
-                                        <p class="text-xs text-gray-500 mb-2 font-medium">Así se verá en la página de detalles:</p>
+                                        <p class="text-xs text-gray-500 mb-2 font-medium">Así se verá en la página de
+                                            detalles:</p>
                                         <div class="rounded-xl overflow-hidden shadow-lg border border-gray-200">
                                             <!-- Banner Container 16:9 -->
                                             <div class="relative bg-gray-900" style="aspect-ratio: 16/9;">
-                                                <img id="preview-banner" 
+                                                <img id="preview-banner"
                                                     class="hidden absolute inset-0 w-full h-full object-cover object-center"
                                                     alt="Vista previa banner">
-                                                <div id="banner-placeholder" class="absolute inset-0 flex items-center justify-center text-gray-500 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600">
+                                                <div id="banner-placeholder"
+                                                    class="absolute inset-0 flex items-center justify-center text-gray-500 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600">
                                                     <div class="text-center text-white">
-                                                        <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                        <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none"
+                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                            </path>
                                                         </svg>
                                                         <p class="text-sm opacity-75">Sube una imagen 16:9</p>
                                                     </div>
                                                 </div>
                                                 <!-- Gradient overlay (siempre visible) -->
-                                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none"></div>
+                                                <div
+                                                    class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent pointer-events-none">
+                                                </div>
                                                 <!-- Info overlay en la parte inferior -->
                                                 <div class="absolute bottom-0 left-0 right-0 p-3">
-                                                    <div class="backdrop-blur-sm bg-black/30 rounded-lg p-2 border border-white/20">
-                                                        <div id="banner-preview-title" class="text-white text-sm font-medium truncate">Nombre del Evento</div>
+                                                    <div
+                                                        class="backdrop-blur-sm bg-black/30 rounded-lg p-2 border border-white/20">
+                                                        <div id="banner-preview-title"
+                                                            class="text-white text-sm font-medium truncate">Nombre del
+                                                            Evento</div>
                                                         <div class="flex items-center gap-2 text-white/70 text-xs mt-1">
                                                             <span>Fecha</span>
                                                             <span>•</span>
@@ -443,39 +492,57 @@
                                     <label for="image" class="block text-sm font-semibold text-gray-800 mb-2">
                                         Imagen Principal
                                     </label>
-                                    <p class="text-xs text-gray-500 mb-3">Proporción 16:10 (1920 × 1200 px) — Banners secundarios</p>
-                                    
+                                    <p class="text-xs text-gray-500 mb-3">Proporción 16:10 (1920 × 1200 px) — Banners
+                                        secundarios</p>
+
                                     <div class="relative">
                                         <input type="file" name="image" id="image" accept="image/*"
                                             class="w-full border-2 border-pink-200 rounded-xl px-3 py-2 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 text-sm @error('image') border-red-500 @enderror">
                                     </div>
-                                    
+
+                                    {{-- Imagen principal actual (si existe) --}}
+                                    @if(isset($event) && $event->image)
+                                        <div class="mt-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                                            <p class="text-xs text-green-700 mb-2 font-medium">Imagen actual:</p>
+                                            <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->image) }}"
+                                                alt="Imagen actual" class="w-full h-20 object-cover rounded-lg shadow-sm">
+                                            <p class="text-xs text-gray-500 mt-2">Selecciona una nueva imagen para reemplazarla
+                                            </p>
+                                        </div>
+                                    @endif
                                     <!-- Mensaje de validación -->
                                     <div id="image-validation" class="mt-2 hidden">
                                         <p class="text-sm flex items-center"></p>
                                     </div>
-                                    
+
                                     @error('image')
                                         <p class="mt-2 text-sm text-red-600 flex items-center">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
                                             {{ $message }}
                                         </p>
                                     @enderror
-                                    
+
                                     <!-- Vista Previa Contextual - 16:10 -->
                                     <div class="mt-4">
-                                        <p class="text-xs text-gray-500 mb-2 font-medium">Vista previa (proporción 16:10):</p>
+                                        <p class="text-xs text-gray-500 mb-2 font-medium">Vista previa (proporción 16:10):
+                                        </p>
                                         <div class="bg-gray-100 rounded-xl p-3">
                                             <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                                                <div class="bg-gray-200 relative overflow-hidden" style="aspect-ratio: 16/10;">
-                                                    <img id="preview-image" 
-                                                        class="hidden w-full h-full object-cover"
+                                                <div class="bg-gray-200 relative overflow-hidden"
+                                                    style="aspect-ratio: 16/10;">
+                                                    <img id="preview-image" class="hidden w-full h-full object-cover"
                                                         alt="Vista previa imagen">
-                                                    <div id="image-placeholder" class="w-full h-full flex items-center justify-center text-gray-400">
-                                                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                    <div id="image-placeholder"
+                                                        class="w-full h-full flex items-center justify-center text-gray-400">
+                                                        <svg class="w-10 h-10" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                            </path>
                                                         </svg>
                                                     </div>
                                                 </div>
@@ -503,38 +570,92 @@
                             </h2>
 
                             <div id="ticket-types" class="space-y-4">
-                                <div class="ticket-type border-2 border-pink-200 rounded-xl p-6 shadow-sm">
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-3">Nombre del
-                                                Boleto</label>
-                                            <select name="ticket_types[0][name]"
-                                                class="ticket-name-select w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
-                                                required>
-                                                <option value="">Selecciona un tipo</option>
-                                                @foreach($ticketTypes as $ticketType)
-                                                    <option value="{{ $ticketType->id }}">{{ $ticketType->name }}</option>
-                                                @endforeach
-                                                <option value="other">Agregar otro tipo</option>
-                                            </select>
-                                            <input type="text" name="ticket_types[0][name_other]"
-                                                class="ticket-name-input hidden w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
-                                                placeholder="Escribe el nombre del boleto">
+                                @if(isset($event) && $event->ticketTypes->count() > 0)
+                                    {{-- Modo edición: mostrar tickets existentes --}}
+                                    @foreach($event->ticketTypes as $index => $eventTicket)
+                                        <div
+                                            class="ticket-type border-2 border-pink-200 rounded-xl p-6 shadow-sm {{ $index > 0 ? 'relative' : '' }}">
+                                            @if($index > 0)
+                                                <button type="button" onclick="removeTicketType(this)"
+                                                    class="text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded-lg transition-all duration-200 absolute top-4 right-4">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                        </path>
+                                                    </svg>
+                                                </button>
+                                            @endif
+                                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-3">Nombre del
+                                                        Boleto</label>
+                                                    <select name="ticket_types[{{ $index }}][name]" data-index="{{ $index }}"
+                                                        class="ticket-name-select w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
+                                                        required>
+                                                        <option value="">Selecciona un tipo</option>
+                                                        @foreach($ticketTypes as $ticketType)
+                                                            <option value="{{ $ticketType->id }}" {{ $eventTicket->id == $ticketType->id ? 'selected' : '' }}>{{ $ticketType->name }}</option>
+                                                        @endforeach
+                                                        <option value="other">Agregar otro tipo</option>
+                                                    </select>
+                                                    <input type="text" name="ticket_types[{{ $index }}][name_other]"
+                                                        class="ticket-name-input hidden w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                                                        placeholder="Escribe el nombre del boleto">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-3">Precio ($)</label>
+                                                    <input type="number" name="ticket_types[{{ $index }}][price]" step="0.01"
+                                                        min="0" required
+                                                        value="{{ old('ticket_types.' . $index . '.price', $eventTicket->pivot->price ?? '') }}"
+                                                        class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
+                                                        placeholder="0.00">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700 mb-3">Cantidad</label>
+                                                    <input type="number" name="ticket_types[{{ $index }}][quantity]" min="1"
+                                                        required
+                                                        value="{{ old('ticket_types.' . $index . '.quantity', $eventTicket->pivot->quantity ?? '') }}"
+                                                        class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
+                                                        placeholder="100">
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-3">Precio ($)</label>
-                                            <input type="number" name="ticket_types[0][price]" step="0.01" min="0" required
-                                                class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
-                                                placeholder="0.00">
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700 mb-3">Cantidad</label>
-                                            <input type="number" name="ticket_types[0][quantity]" min="1" required
-                                                class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
-                                                placeholder="100">
+                                    @endforeach
+                                @else
+                                    {{-- Modo creación: formulario vacío --}}
+                                    <div class="ticket-type border-2 border-pink-200 rounded-xl p-6 shadow-sm">
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-3">Nombre del
+                                                    Boleto</label>
+                                                <select name="ticket_types[0][name]"
+                                                    class="ticket-name-select w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
+                                                    required>
+                                                    <option value="">Selecciona un tipo</option>
+                                                    @foreach($ticketTypes as $ticketType)
+                                                        <option value="{{ $ticketType->id }}">{{ $ticketType->name }}</option>
+                                                    @endforeach
+                                                    <option value="other">Agregar otro tipo</option>
+                                                </select>
+                                                <input type="text" name="ticket_types[0][name_other]"
+                                                    class="ticket-name-input hidden w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+                                                    placeholder="Escribe el nombre del boleto">
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-3">Precio ($)</label>
+                                                <input type="number" name="ticket_types[0][price]" step="0.01" min="0" required
+                                                    class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
+                                                    placeholder="0.00">
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-700 mb-3">Cantidad</label>
+                                                <input type="number" name="ticket_types[0][quantity]" min="1" required
+                                                    class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
+                                                    placeholder="100">
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                @endif
                             </div>
 
                             <button type="button" onclick="addTicketType()"
@@ -558,8 +679,7 @@
                         class="px-8 bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 py-3 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl font-medium flex items-center space-x-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             @if(isset($event))
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M5 13l4 4L19 7"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             @else
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -579,7 +699,8 @@
         </script>
 
     <script>
-        let ticketTypeCount = 1;
+        // Inicializar con el número de ticket types existentes (para edición)
+        let ticketTypeCount = {{ isset($event) && $event->ticketTypes->count() > 0 ? $event->ticketTypes->count() : 1 }};
 
         // Función para manejar el cambio entre select e input
         function handleTicketTypeChange(selectElement) {
@@ -627,41 +748,41 @@
             const currentIndex = ticketTypeCount; // Capturar el índice actual
 
             newTicketType.innerHTML = `
-                <div class="flex justify-between items-start mb-4">
-                    <h3 class="font-semibold text-gray-900 text-lg">Tipo de Boleto ${currentIndex + 1}</h3>
-                    <button type="button" onclick="removeTicketType(this)"
-                            class="text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded-lg transition-all duration-200 absolute top-4 right-4">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                        </svg>
-                    </button>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Nombre del Boleto</label>
-                        <select name="ticket_types[${currentIndex}][name]" data-index="${currentIndex}" class="ticket-name-select w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200" required>
-                            <option value="">Selecciona un tipo</option>
-                            @foreach($ticketTypes as $ticketType)
-                                <option value="{{ $ticketType->id }}">{{ $ticketType->name }}</option>
-                            @endforeach
-                            <option value="other">Agregar otro tipo</option>
-                        </select>
-                        <input type="text" name="ticket_types[${currentIndex}][name_other]" class="ticket-name-input hidden w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200" placeholder="Escribe el nombre del boleto">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Precio ($)</label>
-                        <input type="number" name="ticket_types[${currentIndex}][price]" step="0.01" min="0" required
-                               class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
-                               placeholder="0.00">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">Cantidad</label>
-                        <input type="number" name="ticket_types[${currentIndex}][quantity]" min="1" required
-                               class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
-                               placeholder="50">
-                    </div>
-                </div>
-            `;
+                                    <div class="flex justify-between items-start mb-4">
+                                        <h3 class="font-semibold text-gray-900 text-lg">Tipo de Boleto ${currentIndex + 1}</h3>
+                                        <button type="button" onclick="removeTicketType(this)"
+                                                class="text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded-lg transition-all duration-200 absolute top-4 right-4">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-3">Nombre del Boleto</label>
+                                            <select name="ticket_types[${currentIndex}][name]" data-index="${currentIndex}" class="ticket-name-select w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200" required>
+                                                <option value="">Selecciona un tipo</option>
+                                                @foreach($ticketTypes as $ticketType)
+                                                    <option value="{{ $ticketType->id }}">{{ $ticketType->name }}</option>
+                                                @endforeach
+                                                <option value="other">Agregar otro tipo</option>
+                                            </select>
+                                            <input type="text" name="ticket_types[${currentIndex}][name_other]" class="ticket-name-input hidden w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200" placeholder="Escribe el nombre del boleto">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-3">Precio ($)</label>
+                                            <input type="number" name="ticket_types[${currentIndex}][price]" step="0.01" min="0" required
+                                                   class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
+                                                   placeholder="0.00">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-3">Cantidad</label>
+                                            <input type="number" name="ticket_types[${currentIndex}][quantity]" min="1" required
+                                                   class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
+                                                   placeholder="50">
+                                        </div>
+                                    </div>
+                                `;
             container.appendChild(newTicketType);
 
             // Agregar event listener al nuevo select
@@ -724,11 +845,11 @@
                     const errorMessage = document.createElement('p');
                     errorMessage.className = 'mt-2 text-sm text-red-600 flex items-center date-validation-error';
                     errorMessage.innerHTML = `
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        No se puede crear un evento con fecha anterior o igual a la de hoy.
-                    `;
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            No se puede crear un evento con fecha anterior o igual a la de hoy.
+                                        `;
 
                     // Insertar el mensaje justo después del input de fecha
                     dateInput.parentNode.appendChild(errorMessage);
@@ -752,7 +873,15 @@
             const tagsSelect = document.getElementById('tags-select');
             const tagsHiddenInputs = document.getElementById('tags-hidden-inputs');
             const tagsEmptyMessage = document.getElementById('tags-empty-message');
-            let selectedTags = [];
+
+            // Inicializar con tags existentes (para edición)
+            let selectedTags = [
+                @if(isset($event) && $event->tags->count() > 0)
+                    @foreach($event->tags as $tag)
+                        "{{ $tag->name }}"{{ !$loop->last ? ',' : '' }}
+                    @endforeach
+                @endif
+                                ];
 
             function addTag(tagName) {
                 tagName = tagName.trim();
@@ -792,17 +921,17 @@
                     const tagElement = document.createElement('span');
                     tagElement.className = 'inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-gradient-to-r from-pink-100 to-emerald-100 text-pink-800 border border-pink-300 shadow-sm hover:shadow-md transition-all duration-200 transform hover:scale-105';
                     tagElement.innerHTML = `
-                        <svg class="w-3 h-3 mr-1.5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                        </svg>
-                        ${tag}
-                        <button type="button" onclick="removeTagFromEvent('${tag.replace(/'/g, "\\'")}')" 
-                                class="ml-2 text-pink-700 hover:text-red-600 hover:bg-red-50 rounded-full p-0.5 transition-all duration-200">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    `;
+                                            <svg class="w-3 h-3 mr-1.5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                            </svg>
+                                            ${tag}
+                                            <button type="button" onclick="removeTagFromEvent('${tag.replace(/'/g, "\\'")}')" 
+                                                    class="ml-2 text-pink-700 hover:text-red-600 hover:bg-red-50 rounded-full p-0.5 transition-all duration-200">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                </svg>
+                                            </button>
+                                        `;
                     tagsContainer.appendChild(tagElement);
                 });
             }
@@ -838,6 +967,12 @@
                 }
             });
 
+            // Inicializar tags existentes (para edición) - debe ir DESPUÉS de definir las funciones
+            if (selectedTags.length > 0) {
+                renderTags();
+                updateHiddenInputs();
+            }
+
             // Agregar tag desde el select
             tagsSelect.addEventListener('change', function () {
                 if (this.value) {
@@ -852,7 +987,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // --- INICIALIZACIÓN DE EASYMDE (Editor Markdown) ---
-            
+
             // Configuración común para los editores
             const editorToolbar = [
                 "bold", "italic", "strikethrough", "|",
@@ -863,92 +998,92 @@
                 "preview", "side-by-side", "fullscreen", "|",
                 "guide"
             ];
-            
+
             // CSS personalizado para que la previsualización coincida con la vista final
             const previewStyles = `
-                .editor-preview, .EasyMDEContainer .editor-preview-side {
-                    font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
-                    padding: 1.5rem;
-                    background: linear-gradient(to bottom right, rgba(255,255,255,0.7), rgba(255,255,255,0.6), rgba(251,231,239,0.4));
-                    border-radius: 0.75rem;
-                    border: 1px solid rgba(236,72,153,0.2);
-                }
-                .editor-preview h1, .EasyMDEContainer .editor-preview-side h1 { 
-                    font-size: 2rem; font-weight: 700; color: #111827; margin-bottom: 1rem; 
-                    border-bottom: 2px solid #ec4899; padding-bottom: 0.5rem;
-                }
-                .editor-preview h2, .EasyMDEContainer .editor-preview-side h2 { 
-                    font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 0.75rem; 
-                }
-                .editor-preview h3, .EasyMDEContainer .editor-preview-side h3 { 
-                    font-size: 1.25rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem; 
-                }
-                .editor-preview p, .EasyMDEContainer .editor-preview-side p { 
-                    color: #374151; line-height: 1.75; margin-bottom: 1rem; 
-                }
-                .editor-preview strong, .EasyMDEContainer .editor-preview-side strong { 
-                    font-weight: 600; color: #111827; 
-                }
-                .editor-preview a, .EasyMDEContainer .editor-preview-side a { 
-                    color: #ec4899; text-decoration: underline; 
-                }
-                .editor-preview a:hover, .EasyMDEContainer .editor-preview-side a:hover { 
-                    color: #be185d; 
-                }
-                .editor-preview code, .EasyMDEContainer .editor-preview-side code {
-                    background: rgba(139,92,246,0.1); color: #7c3aed; 
-                    padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875rem;
-                }
-                .editor-preview pre, .EasyMDEContainer .editor-preview-side pre {
-                    background: #1f2937; color: #f3f4f6; padding: 1rem; 
-                    border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0;
-                }
-                .editor-preview pre code, .EasyMDEContainer .editor-preview-side pre code {
-                    background: transparent; color: inherit; padding: 0;
-                }
-                .editor-preview blockquote, .EasyMDEContainer .editor-preview-side blockquote {
-                    border-left: 4px solid #ec4899; background: rgba(251,231,239,0.5);
-                    padding: 0.75rem 1rem; margin: 1rem 0; color: #1f2937; font-style: italic;
-                }
-                .editor-preview ul, .EasyMDEContainer .editor-preview-side ul { 
-                    list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; color: #374151;
-                }
-                .editor-preview ol, .EasyMDEContainer .editor-preview-side ol { 
-                    list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; color: #374151;
-                }
-                .editor-preview li, .EasyMDEContainer .editor-preview-side li { 
-                    margin-bottom: 0.5rem; line-height: 1.75;
-                }
-                .editor-preview li::marker, .EasyMDEContainer .editor-preview-side li::marker {
-                    color: #ec4899;
-                }
-                .editor-preview table, .EasyMDEContainer .editor-preview-side table {
-                    width: 100%; border-collapse: collapse; margin: 1rem 0;
-                }
-                .editor-preview th, .EasyMDEContainer .editor-preview-side th {
-                    background: #fce7f3; color: #831843; padding: 0.75rem; 
-                    border: 1px solid #f9a8d4; text-align: left; font-weight: 600;
-                }
-                .editor-preview td, .EasyMDEContainer .editor-preview-side td {
-                    padding: 0.75rem; border: 1px solid #e5e7eb;
-                }
-                .editor-preview hr, .EasyMDEContainer .editor-preview-side hr {
-                    border: none; border-top: 2px solid #f9a8d4; margin: 1.5rem 0;
-                }
-                .editor-preview img, .EasyMDEContainer .editor-preview-side img {
-                    max-width: 100%; border-radius: 0.5rem; margin: 1rem 0;
-                }
-                /* Estilo para el checklist */
-                .editor-preview input[type="checkbox"], .EasyMDEContainer .editor-preview-side input[type="checkbox"] {
-                    accent-color: #ec4899; margin-right: 0.5rem;
-                }
-            `;
-            
+                                    .editor-preview, .EasyMDEContainer .editor-preview-side {
+                                        font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+                                        padding: 1.5rem;
+                                        background: linear-gradient(to bottom right, rgba(255,255,255,0.7), rgba(255,255,255,0.6), rgba(251,231,239,0.4));
+                                        border-radius: 0.75rem;
+                                        border: 1px solid rgba(236,72,153,0.2);
+                                    }
+                                    .editor-preview h1, .EasyMDEContainer .editor-preview-side h1 { 
+                                        font-size: 2rem; font-weight: 700; color: #111827; margin-bottom: 1rem; 
+                                        border-bottom: 2px solid #ec4899; padding-bottom: 0.5rem;
+                                    }
+                                    .editor-preview h2, .EasyMDEContainer .editor-preview-side h2 { 
+                                        font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 0.75rem; 
+                                    }
+                                    .editor-preview h3, .EasyMDEContainer .editor-preview-side h3 { 
+                                        font-size: 1.25rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem; 
+                                    }
+                                    .editor-preview p, .EasyMDEContainer .editor-preview-side p { 
+                                        color: #374151; line-height: 1.75; margin-bottom: 1rem; 
+                                    }
+                                    .editor-preview strong, .EasyMDEContainer .editor-preview-side strong { 
+                                        font-weight: 600; color: #111827; 
+                                    }
+                                    .editor-preview a, .EasyMDEContainer .editor-preview-side a { 
+                                        color: #ec4899; text-decoration: underline; 
+                                    }
+                                    .editor-preview a:hover, .EasyMDEContainer .editor-preview-side a:hover { 
+                                        color: #be185d; 
+                                    }
+                                    .editor-preview code, .EasyMDEContainer .editor-preview-side code {
+                                        background: rgba(139,92,246,0.1); color: #7c3aed; 
+                                        padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875rem;
+                                    }
+                                    .editor-preview pre, .EasyMDEContainer .editor-preview-side pre {
+                                        background: #1f2937; color: #f3f4f6; padding: 1rem; 
+                                        border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0;
+                                    }
+                                    .editor-preview pre code, .EasyMDEContainer .editor-preview-side pre code {
+                                        background: transparent; color: inherit; padding: 0;
+                                    }
+                                    .editor-preview blockquote, .EasyMDEContainer .editor-preview-side blockquote {
+                                        border-left: 4px solid #ec4899; background: rgba(251,231,239,0.5);
+                                        padding: 0.75rem 1rem; margin: 1rem 0; color: #1f2937; font-style: italic;
+                                    }
+                                    .editor-preview ul, .EasyMDEContainer .editor-preview-side ul { 
+                                        list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; color: #374151;
+                                    }
+                                    .editor-preview ol, .EasyMDEContainer .editor-preview-side ol { 
+                                        list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; color: #374151;
+                                    }
+                                    .editor-preview li, .EasyMDEContainer .editor-preview-side li { 
+                                        margin-bottom: 0.5rem; line-height: 1.75;
+                                    }
+                                    .editor-preview li::marker, .EasyMDEContainer .editor-preview-side li::marker {
+                                        color: #ec4899;
+                                    }
+                                    .editor-preview table, .EasyMDEContainer .editor-preview-side table {
+                                        width: 100%; border-collapse: collapse; margin: 1rem 0;
+                                    }
+                                    .editor-preview th, .EasyMDEContainer .editor-preview-side th {
+                                        background: #fce7f3; color: #831843; padding: 0.75rem; 
+                                        border: 1px solid #f9a8d4; text-align: left; font-weight: 600;
+                                    }
+                                    .editor-preview td, .EasyMDEContainer .editor-preview-side td {
+                                        padding: 0.75rem; border: 1px solid #e5e7eb;
+                                    }
+                                    .editor-preview hr, .EasyMDEContainer .editor-preview-side hr {
+                                        border: none; border-top: 2px solid #f9a8d4; margin: 1.5rem 0;
+                                    }
+                                    .editor-preview img, .EasyMDEContainer .editor-preview-side img {
+                                        max-width: 100%; border-radius: 0.5rem; margin: 1rem 0;
+                                    }
+                                    /* Estilo para el checklist */
+                                    .editor-preview input[type="checkbox"], .EasyMDEContainer .editor-preview-side input[type="checkbox"] {
+                                        accent-color: #ec4899; margin-right: 0.5rem;
+                                    }
+                                `;
+
             // Inyectar estilos personalizados
             const styleSheet = document.createElement("style");
             styleSheet.textContent = previewStyles;
             document.head.appendChild(styleSheet);
-            
+
             // Instancia para Agenda (Temario)
             const easyMDE_agenda = new EasyMDE({
                 element: document.getElementById("agenda"),
@@ -1009,38 +1144,38 @@
             easyMDE_agenda.codemirror.on('change', () => {
                 document.getElementById('agenda').value = easyMDE_agenda.value();
             });
-            
+
             easyMDE_description.codemirror.on('change', () => {
                 document.getElementById('description').value = easyMDE_description.value();
             });
 
             // --- SCRIPT DE PREVISUALIZACIÓN DE IMÁGENES CON VALIDACIÓN DE ASPECT RATIO ---
-            
+
             // Configuración de proporciones esperadas para cada imagen
             const aspectRatioConfig = {
                 'icon': { ratio: 1, name: '1:1', tolerance: 0.05 },
-                'banner': { ratio: 16/9, name: '16:9', tolerance: 0.08 },
-                'image': { ratio: 16/10, name: '16:10', tolerance: 0.08 }
+                'banner': { ratio: 16 / 9, name: '16:9', tolerance: 0.08 },
+                'image': { ratio: 16 / 10, name: '16:10', tolerance: 0.08 }
             };
-            
+
             // Función para validar la proporción de una imagen
             function validateAspectRatio(width, height, expectedRatio, tolerance) {
                 const actualRatio = width / height;
                 const difference = Math.abs(actualRatio - expectedRatio) / expectedRatio;
                 return difference <= tolerance;
             }
-            
+
             // Función mejorada de previsualización con validación
             const previewImageWithValidation = (inputId, previewId, placeholderId, validationId) => {
                 const input = document.getElementById(inputId);
                 const preview = document.getElementById(previewId);
                 const placeholder = document.getElementById(placeholderId);
                 const validationDiv = document.getElementById(validationId);
-                
+
                 if (!input || !preview) return;
-                
+
                 const config = aspectRatioConfig[inputId];
-                
+
                 input.addEventListener("change", (event) => {
                     const file = event.target.files[0];
                     if (file) {
@@ -1048,42 +1183,42 @@
                         reader.onload = e => {
                             // Crear imagen temporal para obtener dimensiones
                             const img = new Image();
-                            img.onload = function() {
+                            img.onload = function () {
                                 const width = this.width;
                                 const height = this.height;
                                 const actualRatio = (width / height).toFixed(2);
-                                
+
                                 // Validar proporción
                                 const isValid = validateAspectRatio(width, height, config.ratio, config.tolerance);
-                                
+
                                 // Actualizar vista previa
                                 preview.src = e.target.result;
                                 preview.classList.remove("hidden");
                                 if (placeholder) placeholder.classList.add("hidden");
-                                
+
                                 // Mostrar mensaje de validación
                                 if (validationDiv) {
                                     validationDiv.classList.remove("hidden");
                                     const p = validationDiv.querySelector('p');
-                                    
+
                                     if (isValid) {
                                         p.className = 'text-sm flex items-center text-green-600';
                                         p.innerHTML = `
-                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                            </svg>
-                                            ✓ Proporción correcta (${config.name}) — ${width}×${height}px
-                                        `;
+                                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                                </svg>
+                                                                ✓ Proporción correcta (${config.name}) — ${width}×${height}px
+                                                            `;
                                         input.classList.remove('border-red-500');
                                         input.classList.add('border-green-500');
                                     } else {
                                         p.className = 'text-sm flex items-center text-amber-600';
                                         p.innerHTML = `
-                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                                            </svg>
-                                            ⚠ Proporción diferente: detectada ${actualRatio}:1 (esperada ${config.name}) — ${width}×${height}px
-                                        `;
+                                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                                                </svg>
+                                                                ⚠ Proporción diferente: detectada ${actualRatio}:1 (esperada ${config.name}) — ${width}×${height}px
+                                                            `;
                                         input.classList.remove('border-green-500');
                                         input.classList.add('border-amber-500');
                                     }
@@ -1101,19 +1236,19 @@
                     }
                 });
             };
-            
+
             // Inicializar previsualización con validación para cada input
             previewImageWithValidation("icon", "preview-icon", "icon-placeholder", "icon-validation");
             previewImageWithValidation("banner", "preview-banner", "banner-placeholder", "banner-validation");
             previewImageWithValidation("image", "preview-image", "image-placeholder", "image-validation");
-            
+
             // --- SINCRONIZACIÓN DEL NOMBRE DEL EVENTO EN LAS PREVISUALIZACIONES ---
             const eventNameInput = document.getElementById('name');
             const iconPreviewTitle = document.getElementById('icon-preview-title');
             const bannerPreviewTitle = document.getElementById('banner-preview-title');
-            
+
             if (eventNameInput) {
-                eventNameInput.addEventListener('input', function() {
+                eventNameInput.addEventListener('input', function () {
                     const eventName = this.value.trim() || 'Nombre del Evento';
                     if (iconPreviewTitle) iconPreviewTitle.textContent = eventName;
                     if (bannerPreviewTitle) bannerPreviewTitle.textContent = eventName;
@@ -1399,12 +1534,12 @@
             // Show loading state
             submitBtn.disabled = true;
             submitBtn.innerHTML = `
-            <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span>Creando...</span>
-        `;
+                                <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span>Creando...</span>
+                            `;
 
             try {
                 const formData = new FormData(this);
@@ -1452,11 +1587,11 @@
                 // Reset button
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = `
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                <span>Crear Categoría</span>
-            `;
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    <span>Crear Categoría</span>
+                                `;
             }
         });
 
