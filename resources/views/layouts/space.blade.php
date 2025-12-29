@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,336 +18,325 @@
 
     <!-- Custom CSS -->
     <style>
-        [x-cloak] { display: none !important; }
+        [x-cloak] {
+            display: none !important;
+        }
     </style>
 </head>
+
 <body class="font-sans antialiased bg-gray-50">
     <div class="min-h-screen">
         <!-- Space Header -->
         <header class="bg-white shadow-sm border-b sticky top-0 left-0 right-0 z-50 border-gray-200">
             <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
                 <div class="flex justify-between items-center h-16">
-                    <!-- Mobile menu button -->
-                    <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100" onclick="toggleMobileMenu()">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </button>
-
-                        <!-- Space Logo/Name -->
-                    <div class="flex items-center flex-1 md:flex-none min-w-0">
-                        <div class="flex items-center space-x-2 sm:space-x-4 min-w-0">
-                            @if(isset($space) && $space && $space->logo)
-                                <img src="{{ \App\Helpers\ImageHelper::getImageUrl($space->logo) }}" alt="{{ $space->name ?? 'Space' }}" class="h-8 w-8 sm:h-10 sm:w-10 rounded-lg object-cover flex-shrink-0">
-                            @else
-                                <div class="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-                                    <span class="text-white font-bold text-sm sm:text-lg">{{ substr(isset($space) && $space ? $space->name : 'S', 0, 1) }}</span>
-                                </div>
-                            @endif
-                            <div class="min-w-0">
-                                <h1 class="text-base sm:text-lg lg:text-xl font-bold text-gray-900 truncate">{{ isset($space) && $space ? $space->name : 'Space' }}</h1>
-                                <p class="text-xs sm:text-sm text-gray-500 truncate hidden sm:block">{{ (isset($space) && $space ? $space->subdomain : '') }}.{{ \App\Helpers\SubdomainHelper::getBaseDomain() }}</p>
-                            </div>
-                        </div>
+                    <!-- Left: Mobile menu button -->
+                    <div class="flex items-center md:hidden">
+                        <button id="mobile-menu-button"
+                            class="p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none"
+                            onclick="toggleMobileMenu()">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </button>
                     </div>
 
-                    <!-- Desktop Navigation -->
-                    <div class="hidden md:flex items-center space-x-2 lg:space-x-4">
-                        <!-- Cart Dropdown -->
-                        <div class="relative group" id="cart-dropdown">
-                            <button class="text-gray-700 hover:text-gray-900 relative p-2 rounded-lg hover:bg-gray-100 transition-colors group" onclick="toggleCartDropdown()">
-                            <svg class="w-6 h-6 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l-1 7a2 2 0 01-2 2H8a2 2 0 01-2-2L5 9z"></path>
-                            </svg>
+                    <!-- Center (Mobile) / Left (Desktop): Space Logo/Name -->
+                    <div class="flex-1 flex justify-center md:justify-start min-w-0">
+                        <a href="{{ route('spaces.profile', isset($space) && $space ? $space->subdomain : '') }}"
+                            class="flex items-center space-x-2 sm:space-x-4">
+                            @if(isset($space) && $space && $space->logo)
+                                <img src="{{ \App\Helpers\ImageHelper::getImageUrl($space->logo) }}"
+                                    alt="{{ $space->name ?? 'Space' }}"
+                                    class="h-8 w-8 sm:h-10 sm:w-10 rounded-lg object-cover flex-shrink-0">
+                            @else
+                                <div
+                                    class="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+                                    <span
+                                        class="text-white font-bold text-sm sm:text-lg">{{ substr(isset($space) && $space ? $space->name : 'S', 0, 1) }}</span>
+                                </div>
+                            @endif
+                            <div class="min-w-0 flex flex-col items-center md:items-start">
+                                <h1 class="text-base sm:text-lg lg:text-xl font-bold text-gray-900 truncate">
+                                    {{ isset($space) && $space ? $space->name : 'Space' }}
+                                </h1>
+                                <p class="text-xs sm:text-sm text-gray-500 truncate hidden sm:block">
+                                    {{ (isset($space) && $space ? $space->subdomain : '') }}.{{ \App\Helpers\SubdomainHelper::getBaseDomain() }}
+                                </p>
+                            </div>
+                        </a>
+                    </div>
 
-                            <span class="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center
-                                        bg-red-500 text-white text-xs font-bold
-                                        min-w-[18px] h-[18px] px-1 rounded-full border-2 border-white shadow-lg"
-                                  id="cart-count-badge" style="display: none;">
-                                0
-                            </span>
+                    <!-- Right: Cart & Desktop Navigation -->
+                    <div class="flex items-center gap-2 md:gap-4">
+
+                        <!-- Cart Dropdown (Visible on Mobile & Desktop) -->
+                        <div class="relative group" id="cart-dropdown">
+                            <button
+                                class="text-gray-700 hover:text-gray-900 relative p-2 rounded-lg hover:bg-gray-100 transition-colors group"
+                                onclick="toggleCartDropdown()">
+                                <svg class="w-6 h-6 transition-transform group-hover:scale-110" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l-1 7a2 2 0 01-2 2H8a2 2 0 01-2-2L5 9z"></path>
+                                </svg>
+
+                                <span class="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center
+                                            bg-red-500 text-white text-xs font-bold
+                                            min-w-[18px] h-[18px] px-1 rounded-full border-2 border-white shadow-lg"
+                                    id="cart-count-badge" style="display: none;">
+                                    0
+                                </span>
                             </button>
 
                             <!-- Cart Dropdown Menu -->
-                            <div class="fixed sm:absolute right-0 top-16 sm:top-auto sm:mt-2 w-full sm:w-80 lg:w-96 max-w-sm bg-white rounded-lg shadow-xl z-50 border border-gray-200 max-h-[calc(100vh-4rem)] overflow-hidden flex flex-col" id="cart-menu" style="display: none;">
-                                <!-- Header -->
-                                <div class="px-3 py-2 sm:px-4 sm:py-3 border-b border-gray-200 bg-gray-50 rounded-t-lg flex-shrink-0">
-                                    <div class="flex items-center justify-between">
-                                        <div class="min-w-0 flex-1">
-                                            <h3 class="text-base sm:text-lg font-semibold text-[#e24972] truncate">Carrito de Compras</h3>
-                                            <p class="text-xs sm:text-sm text-gray-500">{{ \App\Helpers\CartHelper::getCartCount() }} item(s)</p>
-                                        </div>
-                                        <button onclick="closeCartDropdown()" class="text-gray-400 hover:text-gray-600 ml-2 flex-shrink-0">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Cart Items with Scroll -->
-                                <div class="flex-1 overflow-y-auto max-h-64 sm:max-h-80">
-                                    @php
-                                        $cart = \App\Helpers\CartHelper::getCartWithEventInfo();
-                                        $cartTotal = \App\Helpers\CartHelper::getCartTotal();
-                                    @endphp
-
-                                    @if(empty($cart))
-                                        <div class="px-4 py-8 text-center">
-                                            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l-1 7a2 2 0 01-2 2H8a2 2 0 01-2-2L5 9z"></path>
-                                                </svg>
-                                            </div>
-                                            <p class="text-gray-500 text-sm">Tu carrito está vacío</p>
-                                        </div>
-                                    @else
-                                        @foreach($cart as $key => $item)
-                                            <div class="px-3 py-2 sm:px-4 sm:py-3 border-b border-gray-100 hover:bg-gray-50">
-                                                <div class="flex items-start sm:items-center gap-2 sm:gap-3">
-                                                    <!-- Icono de boleto -->
-                                                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
-                                                        </svg>
-                                                    </div>
-
-                                                    <div class="flex-1 min-w-0">
-                                                        <p class="text-xs sm:text-sm font-medium text-gray-900 truncate">{{ $item['ticket_type_name'] ?? 'Boleto' }}</p>
-                                                        <p class="text-xs text-gray-500 truncate">{{ $item['event_name'] ?? 'Evento' }}</p>
-                                                        @if(isset($item['event_date']))
-                                                            <p class="text-xs text-gray-400">{{ \Carbon\Carbon::parse($item['event_date'])->format('d M Y') }}</p>
-                                                        @endif
-                                                        <!-- Mostrar disponibilidad -->
-                                                        @php
-                                                            $ticket_type_id = $item['ticket_type_id'] ?? null;
-                                                            $event_id = $item['event_id'] ?? null;
-
-                                                            $ticketType = null;
-                                                            if ($ticket_type_id) {
-                                                                $ticketType = \App\Models\TicketType::find($ticket_type_id);
-                                                            }
-
-                                                            // total asignado: si tu pivot está en TicketsEvent u otra tabla, usa esa tabla
-                                                            $totalAsignado = 0;
-                                                            if ($ticketType && $event_id) {
-                                                                $ticketEvent = \App\Models\TicketsEvent::where('ticket_types_id', $ticket_type_id)
-                                                                    ->where('event_id', $event_id)
-                                                                    ->first();
-                                                                $totalAsignado = $ticketEvent ? $ticketEvent->quantity : 0;
-                                                            }
-
-                                                            $vendidos = ($ticket_type_id && $event_id)
-                                                                ? \App\Models\Ticket::where('event_id', $event_id)
-                                                                    ->where('ticket_types_id', $ticket_type_id)
-                                                                    ->count()
-                                                                : 0;
-
-                                                            $reservedQuantity = \App\Models\TicketReservation::where('ticket_types_id', $ticket_type_id)
-                                                                ->where('event_id', $event_id)
-                                                                ->where('reserved_until', '>', now())
-                                                                ->where('is_active', true)
-                                                                ->where('session_id', '!=', session()->getId())
-                                                                ->sum('quantity');
-
-                                                            $disponibles = max(0, $totalAsignado - $vendidos - $reservedQuantity);
-                                                        @endphp
-
-                                                        <p class="text-xs text-green-600 font-medium">
-                                                            Disponibles: {{ $disponibles}} boletos
-                                                        </p>
-                                                    </div>
-
-                                                    <div class="text-right flex-shrink-0">
-                                                        <p class="text-xs sm:text-sm font-medium text-gray-900">{{ $item['quantity'] }}x</p>
-                                                        <p class="text-xs sm:text-sm text-gray-500">${{ number_format($item['price'] * $item['quantity'], 2) }}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    @endif
-                                </div>
-
-                                @if(!empty($cart))
-                                    <!-- Footer with Total and Actions -->
-                                    <div class="px-3 py-2 sm:px-4 sm:py-3 border-t border-gray-200 bg-gray-50 rounded-b-lg flex-shrink-0">
-                                        <div class="flex justify-between items-center mb-2 sm:mb-3">
-                                            <span class="text-xs sm:text-sm font-medium text-gray-900">Total (IVA incluido):</span>
-                                            <span class="text-base sm:text-lg font-bold text-gray-900">${{ number_format($cartTotal, 2) }}</span>
-                                        </div>
-
-                                        <div class="flex flex-col sm:flex-row gap-2">
-                                            <a href="{{ \App\Helpers\CartHelper::getCartViewRoute() }}"
-                                               class="flex-1 bg-gray-600 text-white text-center px-3 py-2 rounded-md text-xs sm:text-sm hover:bg-gray-700 transition-colors">
-                                                Ver Carrito
-                                            </a>
-                                            <a href="{{ \App\Helpers\CartHelper::getCheckoutRoute() }}"
-                                               class="flex-1 bg-gradient-to-r from-pink-500 to-pink-400 text-white text-center px-3 py-2 rounded-md text-xs sm:text-sm hover:from-pink-600 hover:to-pink-500 transition-colors">
-                                                Comprar
-                                            </a>
-                                        </div>
-                                    </div>
-                                @endif
+                            <div class="fixed sm:absolute right-0 top-16 sm:top-auto sm:mt-2 w-full sm:w-80 lg:w-96 max-w-sm bg-white rounded-lg shadow-xl z-50 border border-gray-200 max-h-[calc(100vh-4rem)] overflow-hidden flex flex-col"
+                                id="cart-menu" style="display: none;">
+                                @php
+                                    $cart = \App\Helpers\CartHelper::getCartWithEventInfo();
+                                    $cartCount = \App\Helpers\CartHelper::getCartCount();
+                                    $subtotal = \App\Helpers\CartHelper::getCartTotal();
+                                    $taxes = $subtotal * 0.16; // 16% IVA
+                                    $cartTotal = $subtotal + $taxes; // Total con IVA
+                                @endphp
+                                @include('partials.cart-dropdown', ['cart' => $cart, 'cartCount' => $cartCount, 'cartTotal' => $cartTotal])
                             </div>
                         </div>
 
-                        <!-- Navigation Links -->
-                        <a href="{{ route('spaces.profile', isset($space) && $space ? $space->subdomain : '') }}" class="text-gray-700 hover:text-gray-900 text-sm lg:text-base">
-                            Inicio
-                        </a>
-                        <a href="{{ config('app.url') }}" class="text-gray-700 hover:text-gray-900 text-sm lg:text-base">
-                            Todos los Eventos
-                        </a>
-
-                        @auth
-                            @if(isset($space) && $space)
-                                @php
-                                    $user = auth()->user();
-                                    // Verificar si es admin del space (role_space_id = 1)
-                                    $isAdmin = $user->spaces()
-                                        ->where('spaces.id', $space->id)
-                                        ->wherePivot('role_space_id', 1)
-                                        ->wherePivotNull('deleted_at')
-                                        ->exists();
-                                    
-                                    // Verificar permisos adicionales
-                                    $hasPermission = \App\Models\RoleSpacePermission::hasPermission($space->id, 'create checkins');
-                                    
-                                    $canSeeScanner = $isAdmin || $hasPermission;
-                                @endphp
-                                @if($canSeeScanner)
-                                    <a href="{{ route('scanner.index', ['subdomain' => isset($space) && $space ? $space->subdomain : '']) }}" class="text-gray-700 hover:text-gray-900 flex items-center gap-1">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
-                                        </svg>
-                                        Scanner
-                                    </a>
-                                @endif
-                                @if($isAdmin)
-                                    <a href="{{ route('spaces.coupons.index', isset($space) && $space ? $space->subdomain : '') }}" class="text-gray-700 hover:text-gray-900 flex items-center gap-1">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                                        </svg>
-                                        Cupones
-                                    </a>
-                                @endif
-                            @endif
-                            <!-- User Menu Dropdown -->
-                            <div class="relative group" id="user-dropdown">
-                                <button class="text-gray-700 hover:text-gray-900 flex items-center" onclick="toggleUserDropdown()">
-                                    <svg class="w-6 h-6 transition-transform duration-200 hover:scale-110" id="user-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                    </svg>
-                                    <svg class="w-4 h-4 ml-1 transition-transform duration-200" id="user-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </button>
-                                <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200" id="user-menu" style="display: none;">
-                                    <!-- User Info -->
-                                    <div class="px-4 py-3 border-b border-gray-100">
-                                        <p class="text-sm font-medium text-gray-900">{{ auth()->user()->name }} {{ auth()->user()->last_name }}</p>
-                                        <p class="text-xs text-gray-500">{{ auth()->user()->email }}</p>
-                                    </div>
-
-                                    <!-- Menu Items -->
-                                    <a href="{{ config('app.url') }}/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                        <div class="flex items-center">
-                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                            </svg>
-                                            Perfil
-                                        </div>
-                                    </a>
-
-                                    <a href="{{ config('app.url') }}/my-tickets" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
-                                        <div class="flex items-center">
-                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
-                                            </svg>
-                                            Mis Boletos
-                                        </div>
-                                    </a>
-
-                                    <!-- Logout -->
-                                    <form method="POST" action="{{ config('app.url') }}/logout" class="block">
-                                        @csrf
-                                        <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
-                                            <div class="flex items-center">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                                                </svg>
-                                                Cerrar sesión
-                                            </div>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        @else
-                            <a href="{{ config('app.url') }}/login" class="text-gray-700 hover:text-gray-900 text-sm lg:text-base">
-                                Iniciar sesión
+                        <!-- Desktop Navigation Links (Hidden on Mobile) -->
+                        <div class="hidden md:flex items-center space-x-2 lg:space-x-4">
+                            <!-- Helper Links -->
+                            <a href="{{ route('spaces.profile', isset($space) && $space ? $space->subdomain : '') }}"
+                                class="text-gray-700 hover:text-gray-900 text-sm lg:text-base">
+                                Inicio
                             </a>
-                        @endauth
+                            <a href="{{ config('app.url') }}"
+                                class="text-gray-700 hover:text-gray-900 text-sm lg:text-base">
+                                Todos los Eventos
+                            </a>
+
+                            @auth
+                                @if(isset($space) && $space)
+                                    @php
+                                        $user = auth()->user();
+                                        $isAdmin = $user->spaces()
+                                            ->where('spaces.id', $space->id)
+                                            ->wherePivot('role_space_id', 1)
+                                            ->wherePivotNull('deleted_at')
+                                            ->exists();
+                                        $isStaff = $user->role === 'staff' || $user->role === 'admin'; // Global admin/staff
+                                        $hasPermission = \App\Models\RoleSpacePermission::hasPermission($space->id, 'create checkins');
+                                        $canSeeScanner = $isAdmin || $hasPermission;
+                                    @endphp
+
+                                    @if($canSeeScanner)
+                                        <a href="{{ route('scanner.index', ['subdomain' => isset($space) && $space ? $space->subdomain : '']) }}"
+                                            class="text-gray-700 hover:text-gray-900 flex items-center gap-1 text-sm lg:text-base">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z">
+                                                </path>
+                                            </svg>
+                                            <span class="hidden lg:inline">Scanner</span>
+                                        </a>
+                                    @endif
+
+                                    @if($isAdmin)
+                                        <a href="{{ route('spaces.coupons.index', isset($space) && $space ? $space->subdomain : '') }}"
+                                            class="text-gray-700 hover:text-gray-900 flex items-center gap-1 text-sm lg:text-base">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z">
+                                                </path>
+                                            </svg>
+                                            <span class="hidden lg:inline">Cupones</span>
+                                        </a>
+                                    @endif
+                                @endif
+
+                                <!-- User Menu Dropdown -->
+                                <div class="relative group" id="user-dropdown">
+                                    <button class="text-gray-700 hover:text-gray-900 flex items-center"
+                                        onclick="toggleUserDropdown()">
+                                        <svg class="w-6 h-6 transition-transform duration-200 hover:scale-110"
+                                            id="user-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                                            </path>
+                                        </svg>
+                                        <svg class="w-4 h-4 ml-1 transition-transform duration-200 hidden lg:block"
+                                            id="user-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </button>
+                                    <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200"
+                                        id="user-menu" style="display: none;">
+                                        <!-- User Info -->
+                                        <div class="px-4 py-3 border-b border-gray-100">
+                                            <p class="text-sm font-medium text-gray-900 truncate">{{ auth()->user()->name }}
+                                            </p>
+                                            <p class="text-xs text-gray-500 truncate">{{ auth()->user()->email }}</p>
+                                        </div>
+
+                                        <!-- Menu Items -->
+                                        <a href="{{ config('app.url') }}/profile"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                            Perfil
+                                        </a>
+
+                                        <a href="{{ config('app.url') }}/my-tickets"
+                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
+                                            Mis Boletos
+                                        </a>
+
+                                        @if($isStaff)
+                                            <a href="{{ config('app.url') }}/dashboard"
+                                                class="block px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 transition-colors border-t border-gray-100 mt-1 pt-1">
+                                                Admin General
+                                            </a>
+                                        @endif
+
+                                        <!-- Logout -->
+                                        <form method="POST" action="{{ config('app.url') }}/logout"
+                                            class="block mt-1 pt-1 border-t border-gray-100">
+                                            @csrf
+                                            <button type="submit"
+                                                class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                                                Cerrar sesión
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            @else
+                                <a href="{{ config('app.url') }}/login"
+                                    class="text-gray-700 hover:text-gray-900 text-sm lg:text-base font-medium">
+                                    Iniciar sesión
+                                </a>
+                            @endauth
+                        </div>
                     </div>
                 </div>
 
-                <!-- Mobile Menu -->
+                <!-- Mobile Menu (Unified) -->
                 <div id="mobile-menu" class="hidden md:hidden border-t border-gray-200 bg-white">
                     <div class="px-2 pt-2 pb-3 space-y-1">
-                        <a href="{{ route('spaces.profile', isset($space) && $space ? $space->subdomain : '') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                            Inicio
+                        <!-- Navigation Links Requested -->
+                        <a href="{{ route('spaces.profile', isset($space) && $space ? $space->subdomain : '') }}"
+                            class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-pink-600 hover:bg-pink-50 transition-colors">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-3 text-gray-400 group-hover:text-pink-500" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                                    </path>
+                                </svg>
+                                Inicio del Espacio
+                            </div>
                         </a>
-                        <a href="{{ config('app.url') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                            Todos los Eventos
+
+                        <a href="{{ config('app.url') }}"
+                            class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-pink-600 hover:bg-pink-50 transition-colors">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9">
+                                    </path>
+                                </svg>
+                                Inicio de la Página (Todos los Eventos)
+                            </div>
                         </a>
+
                         @auth
-                            @if(isset($space) && $space)
-                                @php
-                                    $user = auth()->user();
-                                    $isAdmin = $user->spaces()
-                                        ->where('spaces.id', $space->id)
-                                        ->wherePivot('role_space_id', 1)
-                                        ->wherePivotNull('deleted_at')
-                                        ->exists();
-                                    $hasPermission = \App\Models\RoleSpacePermission::hasPermission($space->id, 'create checkins');
-                                    $canSeeScanner = $isAdmin || $hasPermission;
-                                @endphp
-                                @if($canSeeScanner)
-                                    <a href="{{ route('scanner.index', ['subdomain' => isset($space) && $space ? $space->subdomain : '']) }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                                        Scanner
-                                    </a>
-                                @endif
-                                @if($isAdmin)
-                                    <a href="{{ route('spaces.coupons.index', isset($space) && $space ? $space->subdomain : '') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                                        Cupones
-                                    </a>
-                                @endif
+                            @php
+                                $user = auth()->user();
+                                $isAdminSpace = isset($space) && $user->spaces()->where('spaces.id', $space->id)->wherePivot('role_space_id', 1)->exists();
+                                $hasScanner = \App\Models\RoleSpacePermission::hasPermission($space->id, 'create checkins');
+                            @endphp
+
+                            <!-- Admin Space Tools -->
+                            @if(isset($space) && ($isAdminSpace || $hasScanner))
+                                <div class="border-t border-gray-200 my-2 pt-2">
+                                    <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                                        Administración del Espacio</p>
+                                    @if($isAdminSpace || $hasScanner)
+                                        <a href="{{ route('scanner.index', ['subdomain' => $space->subdomain]) }}"
+                                            class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                            Scanner
+                                        </a>
+                                    @endif
+
+                                    @if($isAdminSpace)
+                                        <a href="{{ route('spaces.coupons.index', $space->subdomain) }}"
+                                            class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                            Cupones
+                                        </a>
+                                    @endif
+                                </div>
                             @endif
-                            <div class="border-t border-gray-200 pt-2 mt-2">
-                                <p class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Mi Cuenta</p>
-                                <a href="{{ config('app.url') }}/profile" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                                    Perfil
+
+                            <!-- User Account -->
+                            <div class="border-t border-gray-200 mt-2 pt-2">
+                                <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Mi Cuenta
+                                </p>
+                                <div class="px-3 mb-2 flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <span
+                                            class="h-8 w-8 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 font-bold">
+                                            {{ substr($user->name, 0, 1) }}
+                                        </span>
+                                    </div>
+                                    <div class="ml-3">
+                                        <div class="text-base font-medium text-gray-800">{{ $user->name }}</div>
+                                        <div class="text-sm font-medium text-gray-500">{{ $user->email }}</div>
+                                    </div>
+                                </div>
+
+                                <a href="{{ config('app.url') }}/profile"
+                                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                    Perfil y Configuración
                                 </a>
-                                <a href="{{ config('app.url') }}/my-tickets" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
+                                <a href="{{ config('app.url') }}/my-tickets"
+                                    class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
                                     Mis Boletos
                                 </a>
+                                @if($user->role === 'staff' || $user->role === 'admin')
+                                    <a href="{{ config('app.url') }}/dashboard"
+                                        class="block px-3 py-2 rounded-md text-base font-medium text-blue-600 hover:bg-blue-50">
+                                        Admin General
+                                    </a>
+                                @endif
                             </div>
-                            <!-- Mobile Cart -->
-                            <div class="border-t border-gray-200 pt-2 mt-2">
-                                <a href="{{ \App\Helpers\CartHelper::getCartViewRoute() }}"  class="w-full flex items-center justify-between px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                                    <span>Carrito</span>
-                                    <span id="mobile-cart-count" class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full" style="display: none;">0</span>
-                                </a>
-                            </div>
-                            <form method="POST" action="{{ config('app.url') }}/logout" class="border-t border-gray-200 pt-2 mt-2">
+
+                            <form method="POST" action="{{ config('app.url') }}/logout"
+                                class="mt-2 border-t border-gray-200 pt-2">
                                 @csrf
-                                <button type="submit" class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:text-red-900 hover:bg-red-50">
+                                <button type="submit"
+                                    class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:text-red-900 hover:bg-red-50 flex items-center">
+                                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                        </path>
+                                    </svg>
                                     Cerrar sesión
                                 </button>
                             </form>
                         @else
-                            <a href="{{ config('app.url') }}/login" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
-                                Iniciar sesión
-                            </a>
+                            <div class="mt-4 border-t border-gray-200 pt-4">
+                                <a href="{{ config('app.url') }}/login"
+                                    class="flex w-full items-center justify-center rounded-md border border-transparent bg-pink-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-pink-700">
+                                    Iniciar sesión
+                                </a>
+                                <p class="mt-2 text-center text-sm text-gray-500">
+                                    ¿Aún no tienes cuenta?
+                                    <a href="{{ config('app.url') }}/register"
+                                        class="font-medium text-pink-600 hover:text-pink-500">
+                                        Regístrate
+                                    </a>
+                                </p>
+                            </div>
                         @endauth
                     </div>
                 </div>
@@ -382,7 +372,7 @@
                 console.error('Cart menu not found');
                 return;
             }
-            
+
             if (cartMenu.style.display === 'none' || cartMenu.style.display === '') {
                 // Abrir dropdown y actualizar contenido desde el servidor
                 cartMenu.style.display = 'block';
@@ -398,7 +388,7 @@
                 cartMenu.style.display = 'none';
             }
         }
-        
+
         // Inicializar contador cuando el DOM esté listo (solo una vez)
         let cartCounterInitialized = false;
         function initCartCounter() {
@@ -406,8 +396,8 @@
                 return;
             }
             cartCounterInitialized = true;
-            
-            setTimeout(function() {
+
+            setTimeout(function () {
                 if (typeof window.updateCartCount === 'function') {
                     window.updateCartCount().then(count => {
                         // Actualizar contador móvil también
@@ -424,26 +414,26 @@
                 }
             }, 500);
         }
-        
+
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initCartCounter);
         } else {
             initCartCounter();
         }
-        
+
         function closeCartDropdown() {
             const cartMenu = document.getElementById('cart-menu');
             if (cartMenu) {
                 cartMenu.style.display = 'none';
             }
         }
-        
+
         // Hacer funciones disponibles globalmente
         window.toggleCartDropdown = toggleCartDropdown;
         window.closeCartDropdown = closeCartDropdown;
-        
+
         // Cerrar dropdowns al hacer clic fuera
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             const cartDropdown = document.getElementById('cart-dropdown');
             const cartMenu = document.getElementById('cart-menu');
 
@@ -453,7 +443,7 @@
         });
 
         // Cerrar dropdown cuando se hace clic en los enlaces del carrito
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             if (event.target.closest('a[href*="cart"]') || event.target.closest('a[href*="checkout"]')) {
                 closeCartDropdown();
             }
@@ -476,7 +466,7 @@
         }
 
         // Cerrar dropdowns al hacer clic fuera
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             const userDropdown = document.getElementById('user-dropdown');
             const userMenu = document.getElementById('user-menu');
             const userArrow = document.getElementById('user-arrow');
@@ -502,5 +492,6 @@
             }
         </script>
     @endif
-    </body>
+</body>
+
 </html>

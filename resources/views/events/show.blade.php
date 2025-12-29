@@ -306,211 +306,208 @@
         }
 
         /* ================================ */
-        /* Estilos para Markdown/Prose     */
+        /* Estilos para Markdown con EasyMDE */
         /* ================================ */
-        .markdown-content {
+
+        /* Contenedor glass effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+
+        /* Estilos del editor-preview de EasyMDE */
+        .markdown-preview {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             font-size: 1rem;
             line-height: 1.75;
-            color: #374151;
-        }
-
-        .markdown-content h1 {
-            font-size: 1.875rem;
-            font-weight: 700;
-            color: #111827;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #ec4899;
-        }
-
-        .markdown-content h2 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #1f2937;
-            margin-top: 1.75rem;
-            margin-bottom: 0.75rem;
-            padding-bottom: 0.25rem;
-            border-bottom: 1px solid #f3e8ff;
-        }
-
-        .markdown-content h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #374151;
-            margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .markdown-content h4,
-        .markdown-content h5,
-        .markdown-content h6 {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: #4b5563;
-            margin-top: 1.25rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .markdown-content p {
-            margin-bottom: 1rem;
+            color: #333;
             word-wrap: break-word;
-            overflow-wrap: break-word;
         }
 
-        .markdown-content strong {
+        .markdown-preview h1 {
+            font-size: 2em;
             font-weight: 700;
-            color: #1f2937;
+            margin: 0.67em 0;
+            padding-bottom: 0.3em;
+            border-bottom: 2px solid #ec4899;
+            color: #1a1a1a;
         }
 
-        .markdown-content em {
+        .markdown-preview h2 {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin: 0.83em 0;
+            padding-bottom: 0.2em;
+            border-bottom: 1px solid #eee;
+            color: #2a2a2a;
+        }
+
+        .markdown-preview h3 {
+            font-size: 1.25em;
+            font-weight: 600;
+            margin: 1em 0;
+            color: #3a3a3a;
+        }
+
+        .markdown-preview h4,
+        .markdown-preview h5,
+        .markdown-preview h6 {
+            font-size: 1em;
+            font-weight: 600;
+            margin: 1em 0;
+            color: #4a4a4a;
+        }
+
+        .markdown-preview p {
+            margin: 1em 0;
+        }
+
+        .markdown-preview strong {
+            font-weight: 700;
+        }
+
+        .markdown-preview em {
             font-style: italic;
         }
 
-        .markdown-content a {
+        .markdown-preview a {
             color: #ec4899;
+            text-decoration: none;
+        }
+
+        .markdown-preview a:hover {
             text-decoration: underline;
-            transition: color 0.2s;
         }
 
-        .markdown-content a:hover {
-            color: #be185d;
-        }
-
-        .markdown-content ul {
+        .markdown-preview ul {
             list-style-type: disc;
-            margin-left: 1.5rem;
-            margin-bottom: 1rem;
+            padding-left: 2em;
+            margin: 1em 0;
         }
 
-        .markdown-content ol {
+        .markdown-preview ol {
             list-style-type: decimal;
-            margin-left: 1.5rem;
-            margin-bottom: 1rem;
+            padding-left: 2em;
+            margin: 1em 0;
         }
 
-        .markdown-content li {
-            margin-bottom: 0.5rem;
-            padding-left: 0.25rem;
+        .markdown-preview li {
+            margin: 0.5em 0;
         }
 
-        .markdown-content li::marker {
-            color: #ec4899;
+        .markdown-preview li>ul,
+        .markdown-preview li>ol {
+            margin: 0.5em 0;
         }
 
-        .markdown-content code {
-            background-color: #f3e8ff;
-            color: #7c3aed;
-            padding: 0.125rem 0.375rem;
-            border-radius: 0.25rem;
-            font-size: 0.875em;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        .markdown-preview code {
+            background-color: #f8f0fc;
+            color: #9b59b6;
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: 0.9em;
         }
 
-        .markdown-content pre {
-            background-color: #1f2937;
-            color: #f3f4f6;
-            padding: 1rem;
-            border-radius: 0.5rem;
+        .markdown-preview pre {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 1em;
+            border-radius: 8px;
             overflow-x: auto;
-            margin-bottom: 1rem;
-            font-size: 0.875rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            margin: 1em 0;
+            font-size: 0.875em;
         }
 
-        .markdown-content pre code {
-            background-color: transparent;
+        .markdown-preview pre code {
+            background: none;
             color: inherit;
             padding: 0;
             font-size: inherit;
         }
 
-        .markdown-content blockquote {
+        .markdown-preview blockquote {
             border-left: 4px solid #ec4899;
             background-color: #fdf2f8;
-            padding: 1rem 1rem 1rem 1.5rem;
-            margin: 1rem 0;
-            border-radius: 0 0.5rem 0.5rem 0;
-            font-style: italic;
-            color: #4b5563;
+            margin: 1em 0;
+            padding: 0.5em 1em;
+            border-radius: 0 8px 8px 0;
+            color: #555;
         }
 
-        .markdown-content blockquote p:last-child {
-            margin-bottom: 0;
+        .markdown-preview blockquote p {
+            margin: 0.5em 0;
         }
 
-        .markdown-content table {
-            width: 100%;
+        .markdown-preview table {
             border-collapse: collapse;
-            margin: 1rem 0;
-            font-size: 0.875rem;
+            width: 100%;
+            margin: 1em 0;
         }
 
-        .markdown-content th {
-            background-color: #fce7f3;
-            color: #831843;
-            font-weight: 600;
-            padding: 0.75rem;
+        .markdown-preview th,
+        .markdown-preview td {
+            border: 1px solid #ddd;
+            padding: 0.75em;
             text-align: left;
-            border: 1px solid #fbcfe8;
         }
 
-        .markdown-content td {
-            padding: 0.75rem;
-            border: 1px solid #f3e8ff;
+        .markdown-preview th {
+            background-color: #fce7f3;
+            font-weight: 600;
         }
 
-        .markdown-content tr:nth-child(even) {
+        .markdown-preview tr:nth-child(even) {
             background-color: #fdf4ff;
         }
 
-        .markdown-content img {
+        .markdown-preview img {
             max-width: 100%;
             height: auto;
-            border-radius: 0.5rem;
-            margin: 1rem 0;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin: 1em 0;
         }
 
-        .markdown-content hr {
+        .markdown-preview hr {
             border: none;
-            height: 1px;
+            height: 2px;
             background: linear-gradient(to right, transparent, #ec4899, transparent);
-            margin: 2rem 0;
+            margin: 2em 0;
         }
 
-        /* Listas de tareas (checkboxes) */
-        .markdown-content input[type="checkbox"] {
-            margin-right: 0.5rem;
+        .markdown-preview input[type="checkbox"] {
+            margin-right: 0.5em;
             accent-color: #ec4899;
         }
 
         /* Responsivo */
         @media (max-width: 640px) {
-            .markdown-content {
+            .markdown-preview {
                 font-size: 0.9375rem;
             }
 
-            .markdown-content h1 {
-                font-size: 1.5rem;
+            .markdown-preview h1 {
+                font-size: 1.5em;
             }
 
-            .markdown-content h2 {
-                font-size: 1.25rem;
+            .markdown-preview h2 {
+                font-size: 1.25em;
             }
 
-            .markdown-content h3 {
-                font-size: 1.125rem;
-            }
-
-            .markdown-content pre {
-                font-size: 0.8rem;
-                padding: 0.75rem;
+            .markdown-preview pre {
+                font-size: 0.8em;
+                padding: 0.75em;
             }
         }
     </style>
 
+    {{-- EasyMDE/Marked.js estilos y librerías --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     {{-- Hero Section con Banner Futurista --}}
     @if($event->banner)
@@ -565,7 +562,7 @@
             class="relative z-10 max-w-4xl mx-auto px-2 max-h-[calc(100vh-10vh)] sm:px-4 lg:px-6 py-6 sm:py-8 lg:py-12 space-y-4 sm:space-y-6 lg:space-y-8 {{ $event->banner ? '' : 'pt-20' }}">
 
             {{-- Título del evento con diseño bonito --}}
-            <div class="text-center mb-2" id="event-title-card">
+            <div class="text-center mb-2 mt-4" id="event-title-card">
                 <h1
                     class="text-3xl sm:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent leading-tight pb-2">
                     {{ $event->name }}
@@ -583,7 +580,7 @@
             </div>
 
             <div id="main-content-card"
-                class="bg-white/80 backdrop-blur-2xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border border-white/30 shadow-2xl shadow-purple-500/10">
+                class="glass-card rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 shadow-2xl shadow-purple-500/10">
 
                 <h2 class="text-xl sm:text-2xl font-semibold text-pink-600 mb-4 sm:mb-6 lg:mb-8 flex items-center">
                     <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -674,11 +671,9 @@
                             </svg>
                             Descripción
                         </h3>
-                        <div
-                            class="bg-gradient-to-br from-white/70 via-white/60 to-pink-50/40 backdrop-blur-md rounded-xl p-3 sm:p-6 border border-pink-100/50 shadow-lg overflow-hidden">
-                            <div class="markdown-content">
-                                {!! \App\Helpers\MarkdownHelper::render($event->description) !!}
-                            </div>
+                        <div class="glass-card rounded-xl p-3 sm:p-6 overflow-hidden">
+                            <div id="description-markdown" class="markdown-preview"></div>
+                            <script type="text/markdown" id="description-raw">{{ $event->description }}</script>
                         </div>
                     </div>
                 @endif
@@ -693,14 +688,13 @@
                             </svg>
                             Temario
                         </h3>
-                        <div
-                            class="bg-gradient-to-br from-white/70 via-purple-50/40 to-pink-50/30 backdrop-blur-md rounded-xl p-3 sm:p-6 border border-purple-100/50 shadow-lg overflow-hidden">
-                            <div class="markdown-content">
-                                {!! \App\Helpers\MarkdownHelper::render($event->agenda) !!}
-                            </div>
+                        <div class="glass-card rounded-xl p-3 sm:p-6 overflow-hidden">
+                            <div id="agenda-markdown" class="markdown-preview"></div>
+                            <script type="text/markdown" id="agenda-raw">{{ $event->agenda }}</script>
                         </div>
                     </div>
                 @endif
+
 
                 @if($event->coordinates)
                     <div id="map-section-container" class="bg-gradient-to-r from-pink-50 to-pink-100 rounded-xl p-6">
@@ -785,8 +779,8 @@
                                 @endphp
                                 <div
                                     class="bg-white/60 backdrop-blur-sm border-2 border-gray-200 rounded-xl p-6 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        hover:border-pink-300 transition-all duration-300 hover:shadow-lg hover:scale-105 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        hover:border-pink-300 transition-all duration-300 hover:shadow-lg hover:scale-105 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 
                                     <!-- Columna de nombre y disponibilidad -->
                                     <div class="flex flex-col items-start justify-center flex-1">
@@ -945,7 +939,7 @@
                 @foreach($event->ticketTypes as $ticketType)
                     {{ $ticketType->id }}: {{ $ticketType->pivot->price }}{{ $loop->last ? '' : ',' }}
                 @endforeach
-                                                                                                                                                                                                                                                                                                                    };
+                                                                                                                                                                                                                                                                                                                                                    };
 
             console.log('Ticket prices:', ticketPrices);
 
@@ -1092,7 +1086,7 @@
                     }
                 @endforeach
 
-                                                                                                                                                                                                                                                                                                                        if (tickets.length === 0) {
+                                                                                                                                                                                                                                                                                                                                                        if (tickets.length === 0) {
                     showNotification('Por favor selecciona al menos un boleto.', 'error');
                     return;
                 }
@@ -1102,11 +1096,11 @@
                 const originalText = button.innerHTML;
                 button.disabled = true;
                 button.innerHTML = `
-                                                                                                                                                                                                                                                                                                                            <svg class="w-6 h-6 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                                                                                                                                                                                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                                                                                                                                                                                                                                                                                                                            </svg>
-                                                                                                                                                                                                                                                                                                                            <span>Agregando...</span>
-                                                                                                                                                                                                                                                                                                                        `;
+                                                                                                                                                                                                                                                                                                                                                            <svg class="w-6 h-6 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                                                                                                                                                                                                                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                                                                                                                                                                                                                                                                                                                                            </svg>
+                                                                                                                                                                                                                                                                                                                                                            <span>Agregando...</span>
+                                                                                                                                                                                                                                                                                                                                                        `;
 
                 try {
                     // Obtener token CSRF del dominio base si estamos en un subdominio
@@ -1214,13 +1208,13 @@
 
                 notification.className = `fixed top-20 right-4 ${bgColor} text-white px-6 py-4 rounded-xl shadow-2xl z-[9999] transform translate-x-[120%] transition-all duration-300 ease-out`;
                 notification.innerHTML = `
-                                                                                                                                                                                                                                                                                                                            <div class="flex items-center">
-                                                                                                                                                                                                                                                                                                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                                                                                                                                                                                                                                                                    ${icon}
-                                                                                                                                                                                                                                                                                                                                </svg>
-                                                                                                                                                                                                                                                                                                                                ${message}
-                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                        `;
+                                                                                                                                                                                                                                                                                                                                                            <div class="flex items-center">
+                                                                                                                                                                                                                                                                                                                                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                                                                                                                                                                                                                                                                                                    ${icon}
+                                                                                                                                                                                                                                                                                                                                                                </svg>
+                                                                                                                                                                                                                                                                                                                                                                ${message}
+                                                                                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                                                                                        `;
                 document.body.appendChild(notification);
 
                 setTimeout(() => {
@@ -1312,11 +1306,11 @@
                         // Info window con información del evento
                         const infoWindow = new google.maps.InfoWindow({
                             content: `
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <div class="p-2">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <h3 class="font-bold text-lg mb-1">${eventName}</h3>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <p class="text-gray-600 text-sm">${eventAddress}</p>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    `
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <div class="p-2">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <h3 class="font-bold text-lg mb-1">${eventName}</h3>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <p class="text-gray-600 text-sm">${eventAddress}</p>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    `
                         });
 
                         marker.addListener('click', function () {
@@ -1334,7 +1328,7 @@
                         });
                     }
                 @endif
-                                                                                                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                                                                                                                                    }
 
             // Función para centrar el mapa en la ubicación del evento
             function centerMap() {
@@ -1378,11 +1372,11 @@
                                     const btn = document.getElementById('directions-btn');
                                     btn.onclick = hideDirections;
                                     btn.innerHTML = `
-                                                                                                                                                                                                                                                                                                                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                                                                                                                                                                                                                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                                                                                                                                                                                                                                                                                                                </svg>
-                                                                                                                                                                                                                                                                                                                                                <span class="text-sm font-medium">Ocultar Rutas</span>
-                                                                                                                                                                                                                                                                                                                                            `;
+                                                                                                                                                                                                                                                                                                                                                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                                                                                                                                                                                                                                                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                                                                                                                                                                                                                                                                                                                                                </svg>
+                                                                                                                                                                                                                                                                                                                                                                                <span class="text-sm font-medium">Ocultar Rutas</span>
+                                                                                                                                                                                                                                                                                                                                                                            `;
                                     btn.className = 'bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2 transition-all duration-200 hover:shadow-xl';
                                 } else {
                                     alert('No se pudo calcular la ruta: ' + status);
@@ -1411,11 +1405,11 @@
                     const btn = document.getElementById('directions-btn');
                     btn.onclick = showDirections;
                     btn.innerHTML = `
-                                                                                                                                                                                                                                                                                                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                                                                                                                                                                                                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
-                                                                                                                                                                                                                                                                                                                                </svg>
-                                                                                                                                                                                                                                                                                                                                <span class="text-sm font-medium">Rutas</span>
-                                                                                                                                                                                                                                                                                                                            `;
+                                                                                                                                                                                                                                                                                                                                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                                                                                                                                                                                                                                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                                                                                                                                                                                                                                                                                                                                                                </svg>
+                                                                                                                                                                                                                                                                                                                                                                <span class="text-sm font-medium">Rutas</span>
+                                                                                                                                                                                                                                                                                                                                                            `;
                     btn.className = 'bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2 transition-all duration-200 hover:shadow-xl';
                 }
             }
@@ -1489,6 +1483,49 @@
             // Inicializar mapa automáticamente
             document.addEventListener('DOMContentLoaded', function () {
                 // El mapa se inicializa automáticamente cuando Google Maps API carga (callback initGoogleMap)
+
+                // Renderizar markdown con marked.js (igual que EasyMDE)
+                if (typeof marked !== 'undefined') {
+                    // Configurar marked igual que EasyMDE
+                    marked.setOptions({
+                        gfm: true,          // GitHub Flavored Markdown
+                        breaks: true,       // Saltos de línea como <br>
+                        headerIds: true,    // IDs en headers
+                        mangle: false,      // No mangler emails
+                        smartLists: true,   // Smart lists
+                        smartypants: false  // No smart quotes
+                    });
+
+                    // Sanitizar HTML peligroso
+                    function sanitizeHtml(html) {
+                        // Eliminar scripts
+                        html = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+                        // Eliminar onclick y otros eventos
+                        html = html.replace(/\s+on\w+\s*=\s*["'][^"']*["']/gi, '');
+                        html = html.replace(/\s+on\w+\s*=\s*[^\s>]+/gi, '');
+                        // Eliminar javascript: en href
+                        html = html.replace(/href\s*=\s*["']javascript:[^"']*["']/gi, 'href="#"');
+                        return html;
+                    }
+
+                    // Renderizar descripción
+                    const descriptionRaw = document.getElementById('description-raw');
+                    const descriptionTarget = document.getElementById('description-markdown');
+                    if (descriptionRaw && descriptionTarget) {
+                        const rawContent = descriptionRaw.textContent || descriptionRaw.innerText;
+                        const htmlContent = marked.parse(rawContent);
+                        descriptionTarget.innerHTML = sanitizeHtml(htmlContent);
+                    }
+
+                    // Renderizar temario
+                    const agendaRaw = document.getElementById('agenda-raw');
+                    const agendaTarget = document.getElementById('agenda-markdown');
+                    if (agendaRaw && agendaTarget) {
+                        const rawContent = agendaRaw.textContent || agendaRaw.innerText;
+                        const htmlContent = marked.parse(rawContent);
+                        agendaTarget.innerHTML = sanitizeHtml(htmlContent);
+                    }
+                }
 
                 // Inicializar highlight.js para código en markdown
                 hljs.highlightAll();
