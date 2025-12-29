@@ -31,6 +31,7 @@ class TypeEvent extends Model
 
 	protected $fillable = [
 		'name',
+		'description',
 		'image'
 	];
 

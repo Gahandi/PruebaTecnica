@@ -11,8 +11,18 @@ class TicketTypeController extends Controller
 {
     public function index()
     {
-        $ticketTypes = TicketType::all();
+        $ticketTypes = TicketType::withCount('tickets')->get();
         return view('admin.ticket_types.index', compact('ticketTypes'));
+    }
+
+    public function create()
+    {
+        return view('admin.ticket_types.create');
+    }
+
+    public function edit(TicketType $ticketType)
+    {
+        return view('admin.ticket_types.edit', compact('ticketType'));
     }
 
     public function store(Request $request)

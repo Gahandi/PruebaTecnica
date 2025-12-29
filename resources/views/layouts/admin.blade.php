@@ -3,9 +3,10 @@
 @section('title', $title ?? 'Admin Panel')
 
 @section('content')
-    <div class="flex h-screen bg-gray-100 overflow-hidden">
+    <div class="flex bg-gray-100" style="height: calc(100vh - 4rem);">
         {{-- Sidebar --}}
-        <aside class="w-64 bg-gradient-to-b from-gray-100 to-gray-200 text-white flex-shrink-0 hidden md:flex flex-col">
+        <aside
+            class="w-64 bg-gradient-to-b from-gray-100 to-gray-200 text-white flex-shrink-0 hidden md:flex flex-col h-full overflow-hidden sticky top-16">
             {{-- Logo/Brand --}}
             <div class="p-6 border-b border-gray-700">
                 <h1 class="text-2xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
@@ -43,26 +44,15 @@
                     Usuarios
                 </a>
 
-                {{-- Spaces --}}
+                {{-- Espacios (includes events) --}}
                 <a href="{{ route('admin.spaces.index') }}"
-                    class="flex items-center px-6 py-3 text-black hover:bg-gray-700 hover:text-white transition-colors {{ request()->routeIs('admin.spaces.*') ? 'bg-gray-200 text-black border-l-4 border-pink-500' : '' }}">
+                    class="flex items-center px-6 py-3 text-black hover:bg-gray-700 hover:text-white transition-colors {{ request()->routeIs('admin.spaces.*') || request()->routeIs('admin.events.*') ? 'bg-gray-200 text-black border-l-4 border-pink-500' : '' }}">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 6h6v6H4V6zm10 0h6v6h-6V6zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z" />
+                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
                         </path>
                     </svg>
                     Espacios
-                </a>
-
-                {{-- Events --}}
-                <a href="{{ route('admin.events.index') }}"
-                    class="flex items-center px-6 py-3 text-black hover:bg-gray-700 hover:text-white transition-colors {{ request()->routeIs('admin.events.*') ? 'bg-gray-200 text-black border-l-4 border-pink-500' : '' }}">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                        </path>
-                    </svg>
-                    Eventos
                 </a>
 
                 {{-- Check-ins --}}
@@ -130,10 +120,32 @@
                     </svg>
                     Configuración
                 </a>
+
+                {{-- Event Types --}}
+                <a href="{{ route('admin.type_events.index') }}"
+                    class="flex items-center px-6 py-3 text-black hover:bg-gray-700 hover:text-white transition-colors {{ request()->routeIs('admin.type_events.*') ? 'bg-gray-200 text-black border-l-4 border-pink-500' : '' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z">
+                        </path>
+                    </svg>
+                    Tipos de Evento
+                </a>
+
+                {{-- Ticket Types --}}
+                <a href="{{ route('admin.ticket_types.index') }}"
+                    class="flex items-center px-6 py-3 text-black hover:bg-gray-700 hover:text-white transition-colors {{ request()->routeIs('admin.ticket_types.*') ? 'bg-gray-200 text-black border-l-4 border-pink-500' : '' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z">
+                        </path>
+                    </svg>
+                    Tipos de Boleto
+                </a>
             </nav>
 
             {{-- User Profile Footer --}}
-            <div class="p-4 border-t border-gray-700">
+            <div class="p-4 border-t border-gray-300 flex-shrink-0 bg-gray-200">
                 <div class="flex items-center">
                     <div
                         class="w-10 h-10 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white font-bold">

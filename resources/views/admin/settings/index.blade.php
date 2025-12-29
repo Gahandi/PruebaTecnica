@@ -6,7 +6,7 @@
 <div class="p-6">
     <div class="max-w-7xl mx-auto">
         
-        {{-- Header --}}
+        {{-- Encabezado --}}
         <div class="mb-8 flex justify-between items-center">
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">Configuración del Sistema</h1>
@@ -22,16 +22,16 @@
                         Restaurar Valores por Defecto
                     </button>
                 </form>
-                <button onclick="openModal('add-setting-modal')" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all">
+                <a href="{{ route('admin.settings.create') }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
                     Nueva Configuración
-                </button>
+                </a>
             </div>
         </div>
 
-        {{-- Success Message --}}
+        {{-- Mensaje de éxito --}}
         @if(session('success'))
             <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">
                 <div class="flex">
@@ -43,15 +43,35 @@
             </div>
         @endif
 
-        {{-- Settings Form --}}
+        {{-- Mensaje de error --}}
+        @if(session('error'))
+            <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+                <div class="flex">
+                    <svg class="w-5 h-5 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <p class="text-red-700">{{ session('error') }}</p>
+                </div>
+            </div>
+        @endif
+
+        {{-- Formulario de configuraciones --}}
         <form action="{{ route('admin.settings.update') }}" method="POST">
             @csrf
             @method('PUT')
 
-            @foreach($settings as $group => $groupSettings)
+            @forelse($settings as $group => $groupSettings)
                 <div class="bg-white rounded-xl shadow-lg mb-6 overflow-hidden">
                     <div class="bg-gradient-to-r from-gray-700 to-gray-800 px-6 py-4">
-                        <h2 class="text-xl font-bold text-white capitalize">{{ ucfirst($group) }}</h2>
+                        <h2 class="text-xl font-bold text-white capitalize">
+                            @switch($group)
+                                @case('general') General @break
+                                @case('notifications') Notificaciones @break
+                                @case('system') Sistema @break
+                                @case('fees') Cargos @break
+                                @default {{ ucfirst($group) }}
+                            @endswitch
+                        </h2>
                     </div>
                     
                     <div class="p-6 space-y-4">
@@ -68,12 +88,10 @@
                                 
                                 <div class="ml-4 w-64">
                                     @if($setting->type === 'boolean')
-                                        <label class="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" name="settings[{{ $setting->key }}]" value="true" 
-                                                   {{ $setting->value === 'true' || $setting->value === '1' ? 'checked' : '' }}
-                                                   class="sr-only peer">
-                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-600"></div>
-                                        </label>
+                                        <select name="settings[{{ $setting->key }}]" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent">
+                                            <option value="true" {{ $setting->value === 'true' || $setting->value === '1' ? 'selected' : '' }}>Sí</option>
+                                            <option value="false" {{ $setting->value === 'false' || $setting->value === '0' ? 'selected' : '' }}>No</option>
+                                        </select>
                                     @elseif($setting->type === 'integer')
                                         <input type="number" name="settings[{{ $setting->key }}]" value="{{ $setting->value }}"
                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent">
@@ -83,22 +101,25 @@
                                     @endif
                                 </div>
 
-                                <form action="{{ route('admin.settings.destroy', $setting) }}" method="POST" class="ml-3">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" onclick="return confirm('¿Eliminar esta configuración?')" 
-                                            class="text-red-500 hover:text-red-700 transition-colors">
+                                <div class="ml-3 flex space-x-2">
+                                    <a href="{{ route('admin.settings.edit', $setting) }}" class="text-indigo-600 hover:text-indigo-900">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                         </svg>
-                                    </button>
-                                </form>
+                                    </a>
+                                </div>
                             </div>
                         @endforeach
                     </div>
                 </div>
-            @endforeach
+            @empty
+                <div class="bg-white rounded-xl shadow-lg p-8 text-center">
+                    <p class="text-gray-500">No hay configuraciones registradas.</p>
+                    <a href="{{ route('admin.settings.create') }}" class="mt-4 inline-block text-pink-600 hover:text-pink-800">Crear primera configuración</a>
+                </div>
+            @endforelse
 
+            @if($settings->count() > 0)
             <div class="flex justify-end">
                 <button type="submit" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all shadow-lg">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -107,65 +128,8 @@
                     Guardar Cambios
                 </button>
             </div>
+            @endif
         </form>
     </div>
 </div>
-
-{{-- Add Setting Modal --}}
-<x-modal id="add-setting-modal" title="Nueva Configuración" size="md">
-    <form action="{{ route('admin.settings.store') }}" method="POST">
-        @csrf
-        <div class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Clave</label>
-                <input type="text" name="key" required
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Valor</label>
-                <input type="text" name="value"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
-                <select name="type" required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent">
-                    <option value="string">String</option>
-                    <option value="boolean">Boolean</option>
-                    <option value="integer">Integer</option>
-                    <option value="json">JSON</option>
-                </select>
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Grupo</label>
-                <select name="group" required
-                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent">
-                    <option value="general">General</option>
-                    <option value="notifications">Notificaciones</option>
-                    <option value="system">Sistema</option>
-                </select>
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
-                <textarea name="description" rows="3"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"></textarea>
-            </div>
-        </div>
-        
-        <x-slot name="footer">
-            <button type="button" onclick="closeModal('add-setting-modal')"
-                    class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
-                Cancelar
-            </button>
-            <button type="submit"
-                    class="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all">
-                Crear
-            </button>
-        </x-slot>
-    </form>
-</x-modal>
 @endsection

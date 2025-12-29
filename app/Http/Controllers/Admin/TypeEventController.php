@@ -12,8 +12,18 @@ class TypeEventController extends Controller
 {
     public function index()
     {
-        $typeEvents = TypeEvent::all();
+        $typeEvents = TypeEvent::withCount('events')->get();
         return view('admin.type_events.index', compact('typeEvents'));
+    }
+
+    public function create()
+    {
+        return view('admin.type_events.create');
+    }
+
+    public function edit(TypeEvent $typeEvent)
+    {
+        return view('admin.type_events.edit', compact('typeEvent'));
     }
 
     public function store(Request $request)

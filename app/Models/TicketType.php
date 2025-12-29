@@ -31,7 +31,8 @@ class TicketType extends Model
 	protected $table = 'ticket_types';
 
 	protected $fillable = [
-		'name'
+		'name',
+		'description'
 	];
 
 	public function tickets()

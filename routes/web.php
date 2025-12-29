@@ -186,15 +186,16 @@ Route::middleware(['auth', 'email.verified', 'role:admin'])->group(function () {
 });
 
 // Ruta de prueba sin middleware de roles
-Route::middleware(['auth', 'email.verified'])->group(function () {
-    Route::get('/staff/checkins', [StaffCheckinController::class, 'index'])->name('staff.checkins.index');
-    Route::post('/staff/checkins', [StaffCheckinController::class, 'store'])->name('staff.checkins.store');
-    Route::get('/staff/checkins/create', [StaffCheckinController::class, 'create'])->name('staff.checkins.create');
-    Route::get('/staff/checkins/{checkin}', [StaffCheckinController::class, 'show'])->name('staff.checkins.show');
-    Route::put('/staff/checkins/{checkin}', [StaffCheckinController::class, 'update'])->name('staff.checkins.update');
-    Route::delete('/staff/checkins/{checkin}', [StaffCheckinController::class, 'destroy'])->name('staff.checkins.destroy');
-    Route::get('/staff/checkins/{checkin}/edit', [StaffCheckinController::class, 'edit'])->name('staff.checkins.edit');
-});
+// TODO: Create StaffCheckinController before uncommenting these routes
+// Route::middleware(['auth', 'email.verified'])->group(function () {
+//     Route::get('/staff/checkins', [StaffCheckinController::class, 'index'])->name('staff.checkins.index');
+//     Route::post('/staff/checkins', [StaffCheckinController::class, 'store'])->name('staff.checkins.store');
+//     Route::get('/staff/checkins/create', [StaffCheckinController::class, 'create'])->name('staff.checkins.create');
+//     Route::get('/staff/checkins/{checkin}', [StaffCheckinController::class, 'show'])->name('staff.checkins.show');
+//     Route::put('/staff/checkins/{checkin}', [StaffCheckinController::class, 'update'])->name('staff.checkins.update');
+//     Route::delete('/staff/checkins/{checkin}', [StaffCheckinController::class, 'destroy'])->name('staff.checkins.destroy');
+//     Route::get('/staff/checkins/{checkin}/edit', [StaffCheckinController::class, 'edit'])->name('staff.checkins.edit');
+// });
 
 
 // Rutas de checkout
@@ -287,8 +288,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Settings
     Route::get('settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
+    Route::get('settings/create', [\App\Http\Controllers\Admin\SettingsController::class, 'create'])->name('settings.create');
     Route::put('settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
     Route::post('settings', [\App\Http\Controllers\Admin\SettingsController::class, 'store'])->name('settings.store');
+    Route::get('settings/{setting}/edit', [\App\Http\Controllers\Admin\SettingsController::class, 'edit'])->name('settings.edit');
+    Route::put('settings/{setting}', [\App\Http\Controllers\Admin\SettingsController::class, 'updateSingle'])->name('settings.update.single');
     Route::delete('settings/{setting}', [\App\Http\Controllers\Admin\SettingsController::class, 'destroy'])->name('settings.destroy');
     Route::post('settings/initialize', [\App\Http\Controllers\Admin\SettingsController::class, 'initializeDefaults'])->name('settings.initialize');
 
@@ -297,6 +301,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Event
     Route::get('events', [AdminEventController::class, 'index'])->name('events.index');
+    Route::get('events/{event}', [AdminEventController::class, 'show'])->name('events.show');
     Route::delete('events/{event}', [AdminEventController::class, 'destroy'])->name('events.destroy');
 
     // Event Types

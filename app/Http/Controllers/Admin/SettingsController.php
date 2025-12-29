@@ -125,4 +125,40 @@ class SettingsController extends Controller
         return redirect()->route('admin.settings.index')
             ->with('success', 'Configuración por defecto inicializada.');
     }
+
+    /**
+     * Show create form
+     */
+    public function create()
+    {
+        return view('admin.settings.create');
+    }
+
+    /**
+     * Show edit form
+     */
+    public function edit(Setting $setting)
+    {
+        return view('admin.settings.edit', compact('setting'));
+    }
+
+    /**
+     * Update single setting
+     */
+    public function updateSingle(Request $request, Setting $setting)
+    {
+        $validated = $request->validate([
+            'value' => 'nullable',
+            'type' => 'required|in:string,boolean,integer,json',
+            'group' => 'required|string',
+            'description' => 'nullable|string',
+        ]);
+
+        $setting->update($validated);
+
+        ActivityLog::log('updated', "Updated setting: {$setting->key}", 'Setting', $setting->id, $validated);
+
+        return redirect()->route('admin.settings.index')
+            ->with('success', 'Configuración actualizada exitosamente.');
+    }
 }

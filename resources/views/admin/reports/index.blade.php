@@ -13,7 +13,7 @@
             </div>
 
             {{-- Quick Stats --}}
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <div class="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
                     <p class="text-sm font-medium text-gray-600">Ventas Totales</p>
                     <p class="text-3xl font-bold text-gray-900 mt-2">${{ number_format($stats['total_sales'], 2) }}</p>

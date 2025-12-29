@@ -5,20 +5,78 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Event;
+use App\Models\Space;
+use App\Models\Order;
 
 class AdminEventController extends Controller
 {
     /**
-     * Lista de eventos
+     * Lista de eventos agrupados por espacio
      */
     public function index()
     {
-        $events = Event::with(['space', 'state', 'type_event'])
-            ->withCount(['tickets_events', 'orders'])
+        $spaces = Space::withCount('events')
+            ->with([
+                'events' => function ($query) {
+                    $query->withCount(['tickets_events', 'orders'])
+                        ->with(['type_event'])
+                        ->latest()
+                        ->take(10);
+                }
+            ])
+            ->orderBy('name')
+            ->get();
+
+        $totalEvents = Event::count();
+        $totalSpaces = $spaces->count();
+
+        return view('admin.events.index', compact('spaces', 'totalEvents', 'totalSpaces'));
+    }
+
+    /**
+     * Mostrar detalles completos de un evento
+     */
+    public function show(Event $event)
+    {
+        $event->load([
+            'space',
+            'type_event',
+            'state',
+            'tickets_events.ticket_type',
+        ]);
+
+        // Estadísticas del evento
+        $stats = [
+            'total_orders' => $event->orders()->count(),
+            'completed_orders' => $event->orders()->where('status', 'completed')->count(),
+            'total_tickets' => $event->tickets()->count(),
+            'checked_in' => $event->tickets()->whereNotNull('checked_in_at')->count(),
+            'total_revenue' => $event->orders()->where('status', 'completed')->sum('total'),
+        ];
+
+        // Órdenes del evento paginadas
+        $orders = Order::where('event_id', $event->id)
+            ->with(['user'])
             ->latest()
             ->paginate(15);
 
-        return view('admin.events.index', compact('events'));
+        // Tipos de boletos con conteos
+        $ticketTypes = $event->tickets_events()
+            ->with('ticket_type')
+            ->get()
+            ->map(function ($te) {
+                $sold = $te->tickets()->count();
+                return [
+                    'id' => $te->id,
+                    'name' => $te->ticket_type->name ?? 'Sin tipo',
+                    'price' => $te->price,
+                    'quantity' => $te->quantity,
+                    'sold' => $sold,
+                    'available' => $te->quantity - $sold,
+                ];
+            });
+
+        return view('admin.events.show', compact('event', 'stats', 'orders', 'ticketTypes'));
     }
 
     /**

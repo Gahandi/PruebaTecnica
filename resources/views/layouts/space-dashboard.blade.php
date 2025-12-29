@@ -51,10 +51,10 @@
 
         <!-- Sidebar - Fixed on mobile, static on desktop (Admin/Staff only) -->
         <aside id="sidebar" 
-               class="fixed lg:relative inset-y-0 left-0 z-50 w-64 bg-white shadow-xl 
+               class="fixed lg:sticky inset-y-0 lg:top-0 left-0 z-50 w-64 bg-white shadow-xl 
                       transform -translate-x-full lg:translate-x-0 
                       transition-transform duration-300 ease-in-out 
-                      flex flex-col">
+                      flex flex-col h-screen lg:h-[100vh]">
             
             <!-- Sidebar Header - Simple Clean Design -->
             <div class="p-4 border-b border-gray-200 bg-white">
@@ -189,7 +189,7 @@
             </nav>
 
             <!-- Sidebar Footer - Back to main -->
-            <div class="p-4 border-t border-gray-200">
+            <div class="p-4 border-t border-gray-200 flex-shrink-0 bg-white">
                 <a href="{{ config('app.url') }}" 
                    class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
                     <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
