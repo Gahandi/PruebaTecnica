@@ -58,7 +58,7 @@
 
                 <!-- Filtros por Tags -->
                 @if(isset($tags) && $tags && $tags->count() > 0)
-                    <div class="max-w-6xl mx-auto mb-8">
+                    <div class="max-w-6xl mx-auto mb-8 hidden sm:block">
                         <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-2xl">
                             <h3 class="text-white font-bold mb-4 text-center text-lg flex items-center justify-center">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -249,13 +249,94 @@
     </div>
 
 
+    {{-- Eventos Urgentes - Próximos a comenzar (menos de 48 horas) --}}
+    @if(isset($urgentEvents) && $urgentEvents->count() > 0)
+        <div class="py-8 sm:py-12 bg-gradient-to-br from-orange-500 via-red-500 to-pink-500" id="urgent-events-section">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-6 sm:mb-8">
+                    <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 mb-4">
+                        <span class="animate-pulse">🔥</span>
+                        <span class="text-white font-bold text-sm uppercase tracking-wide">¡No te los pierdas!</span>
+                    </div>
+                    <h2 class="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">
+                        ¡Próximos a Comenzar!
+                    </h2>
+                    <p class="text-white/80 text-sm sm:text-base">Eventos que empiezan en menos de 48 horas</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                    @foreach($urgentEvents as $urgentEvent)
+                        <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($urgentEvent->space->subdomain) }}/{{ $urgentEvent->slug }}"
+                            class="group relative bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+
+                            {{-- Countdown Badge --}}
+                            <div class="absolute top-3 right-3 z-10">
+                                <div class="countdown-badge bg-black/70 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 animate-pulse"
+                                    data-countdown="{{ \Carbon\Carbon::parse($urgentEvent->date)->toIso8601String() }}">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <span class="countdown-text">--:--</span>
+                                </div>
+                            </div>
+
+                            {{-- Image --}}
+                            <div class="aspect-video overflow-hidden">
+                                @if($urgentEvent->icon && $urgentEvent->icon !== 'test.jpg')
+                                    <img src="{{ \App\Helpers\ImageHelper::getImageUrl($urgentEvent->icon) }}"
+                                        alt="{{ $urgentEvent->name }}"
+                                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                @else
+                                    <div
+                                        class="w-full h-full bg-gradient-to-br from-white/20 to-white/5 flex items-center justify-center">
+                                        <svg class="w-12 h-12 text-white/50" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd"
+                                                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                                clip-rule="evenodd"></path>
+                                        </svg>
+                                    </div>
+                                @endif
+                            </div>
+
+                            {{-- Content --}}
+                            <div class="p-4">
+                                <h3
+                                    class="text-white font-bold text-lg mb-2 line-clamp-1 group-hover:text-yellow-200 transition-colors">
+                                    {{ $urgentEvent->name }}
+                                </h3>
+                                <div class="flex items-center gap-2 text-white/70 text-sm mb-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                    <span>{{ \Carbon\Carbon::parse($urgentEvent->date)->format('d M, H:i') }}</span>
+                                </div>
+                                @if($urgentEvent->ticketTypes->count() > 0)
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-white/60 text-xs">Desde</span>
+                                        <span class="text-yellow-300 font-bold text-lg">
+                                            ${{ number_format($urgentEvent->ticketTypes->min('pivot.price'), 2) }}
+                                        </span>
+                                    </div>
+                                @endif
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    @endif
+
+
     <!-- Featured Events Carousel -->
     @if($featuredEvents->count() > 0)
         <div class="py-12 sm:py-16 lg:py-24 bg-pink-50">
             <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
                 <div class="text-center mb-6 sm:mb-8 lg:mb-12">
                     <h2 class="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#e24972] mb-2 sm:mb-4">Eventos
-                        Próximos</h2>
+                        Destacados</h2>
                     <p class="text-sm sm:text-base lg:text-lg text-gray-600">Los eventos más populares del momento</p>
                 </div>
 
@@ -1146,18 +1227,38 @@
             countdownElements.forEach(el => {
                 const eventDate = new Date(el.getAttribute('data-countdown'));
                 const diff = eventDate - now;
+                const countdownText = el.querySelector('.countdown-text');
 
-                if (diff <= 0) { // El evento ya pasó o está ocurriendo el.querySelector('.countdown-text').textContent='¡Ahora!' ;
-                    el.classList.remove('animate-pulse'); el.classList.add('bg-green-500'); return;
-                } const hours = Math.floor(diff /
-                    (1000 * 60 * 60)); const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)); const seconds = Math.floor((diff
-                        % (1000 * 60)) / 1000); if (hours < 1) { // Menos de 1 hora - mostrar minutos y segundos
-                            el.querySelector('.countdown-text').textContent = `${minutes}m ${seconds}s`;
-                        } else if (hours < 48) { // Menos de 48
-                            horas - mostrar horas y minutos el.querySelector('.countdown-text').textContent = `${hours}h ${minutes}m`;
-                        }
+                if (!countdownText) return;
+
+                if (diff <= 0) {
+                    // El evento ya pasó o está ocurriendo
+                    countdownText.textContent = '¡Ahora!';
+                    el.classList.remove('animate-pulse', 'bg-black/70');
+                    el.classList.add('bg-green-500');
+                    return;
+                }
+
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                if (hours < 1) {
+                    // Menos de 1 hora - mostrar minutos y segundos
+                    countdownText.textContent = `${minutes}m ${seconds}s`;
+                    el.classList.remove('bg-black/70');
+                    el.classList.add('bg-red-600');
+                } else if (hours < 48) {
+                    // Menos de 48 horas - mostrar horas y minutos
+                    countdownText.textContent = `${hours}h ${minutes}m`;
+                }
             });
-        } //
-                    Actualizar countdowns cada segundo setInterval(updateCountdowns, 1000); // Primera actualización inmediata
-        updateCountdowns(); </script>
+        }
+
+        // Actualizar countdowns cada segundo
+        setInterval(updateCountdowns, 1000);
+
+        // Primera actualización inmediata
+        updateCountdowns();
+    </script>
 @endpush

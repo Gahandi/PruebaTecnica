@@ -1,19 +1,19 @@
 @extends('layouts.space-dashboard')
 
-@section('title', 'Crear Evento - ' . $space->name)
+@section('title', isset($event) ? 'Editar Evento - ' . $event->name : 'Crear Evento - ' . $space->name)
 
 @section('content')
 
     <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
 
 
-    <div class="max-w-6xl mx-auto py-4 sm:py-6 lg:py-8 px-2 sm:px-4 lg:px-8">
+    <div class="max-w-6xl mx-auto py-8 sm:px-6 lg:px-8">
         <div class="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-100">
-            <div class="bg-gradient-to-r from-pink-500 to-pink-600 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 text-white">
+            <div class="bg-gradient-to-r from-pink-500 to-pink-600 px-8 py-6 text-white">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h1 class="text-3xl font-bold">Crear Nuevo Evento</h1>
-                        <p class="text-blue-100 mt-2 text-lg">En {{ $space->name }}</p>
+                        <h1 class="text-3xl font-bold">{{ isset($event) ? 'Editar Evento' : 'Crear Nuevo Evento' }}</h1>
+                        <p class="text-blue-100 mt-2 text-lg">{{ isset($event) ? $event->name : 'En ' . $space->name }}</p>
                     </div>
                     <a href="{{ route('spaces.profile', $space->subdomain) }}"
                         class="bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-xl hover:bg-white/30 transition-all duration-300 border border-white/30">
@@ -28,14 +28,17 @@
                 </div>
             </div>
 
-            <form method="POST" action="{{ route('spaces.events.store', $space->subdomain) }}" enctype="multipart/form-data"
-                class="p-3 sm:p-5 lg:p-8">
+            <form method="POST" action="{{ isset($event) ? route('spaces.events.update', ['subdomain' => $space->subdomain, 'event' => $event->slug]) : route('spaces.events.store', $space->subdomain) }}" enctype="multipart/form-data"
+                class="p-8">
                 @csrf
+                @if(isset($event))
+                    @method('PUT')
+                @endif
 
                 <div class="grid grid-cols-1 gap-12">
 
                     <div classs="space-y-8">
-                        <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-3 sm:p-4 lg:p-6">
+                        <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-6">
                             <h2 class="text-xl font-semibold text-[#e24972] mb-6 flex items-center">
                                 <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
@@ -49,7 +52,7 @@
                                 <div>
                                     <label for="name" class="block text-sm font-medium text-gray-700 mb-3">Nombre del
                                         Evento</label>
-                                    <input type="text" name="name" id="name" value="{{ old('name') }}" required
+                                    <input type="text" name="name" id="name" value="{{ old('name', $event->name ?? '') }}" required
                                         class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('name') border-red-500 @enderror"
                                         placeholder="Ej: Conferencia de Tecnología 2024">
                                     @error('name')
@@ -68,7 +71,7 @@
                                         class="block text-sm font-medium text-gray-700 mb-3">Descripción</label>
                                     <textarea name="description" id="description" rows="4" required
                                         class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('description') border-red-500 @enderror"
-                                        placeholder="Describe tu evento...">{{ old('description') }}</textarea>
+                                        placeholder="Describe tu evento...">{{ old('description', $event->description ?? '') }}</textarea>
                                     @error('description')
                                         <p class="mt-2 text-sm text-red-600 flex items-center">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -84,7 +87,7 @@
                                     <div>
                                         <label for="date" class="block text-sm font-medium text-gray-700 mb-3">Fecha y
                                             Hora</label>
-                                        <input type="datetime-local" name="date" id="date" value="{{ old('date') }}"
+                                        <input type="datetime-local" name="date" id="date" value="{{ old('date', isset($event) ? \Carbon\Carbon::parse($event->date)->format('Y-m-d\TH:i') : '') }}"
                                             required
                                             class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('date') border-red-500 @enderror">
                                         @error('date')
@@ -113,7 +116,7 @@
                                                 <option value="">Selecciona un tipo</option>
                                                 @foreach($typeEvents as $typeEvent)
                                                     <option value="{{ $typeEvent->id }}"
-                                                        {{ old('type_event_id') == $typeEvent->id ? 'selected' : '' }}>
+                                                        {{ old('type_event_id', $event->type_events_id ?? '') == $typeEvent->id ? 'selected' : '' }}>
                                                         {{ $typeEvent->name }}
                                                     </option>
                                                 @endforeach
@@ -169,7 +172,7 @@
                                 <div>
                                     <label for="address"
                                         class="block text-sm font-medium text-gray-700 mb-3">Dirección</label>
-                                    <input type="text" name="address" id="address" value="{{ old('address') }}" required
+                                    <input type="text" name="address" id="address" value="{{ old('address', $event->address ?? '') }}" required
                                         class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('address') border-red-500 @enderror"
                                         placeholder="Ej: Av. Reforma 123, Ciudad de México">
                                     <p class="mt-2 text-sm text-gray-500 flex items-center">
@@ -193,7 +196,7 @@
                                 <div class="hidden">
                                     <label for="coordinates"
                                         class="block text-sm font-medium text-gray-700 mb-3">Coordenadas GPS</label>
-                                    <input type="text" name="coordinates" id="coordinates" value="{{ old('coordinates') }}"
+                                    <input type="text" name="coordinates" id="coordinates" value="{{ old('coordinates', $event->coordinates ?? '') }}"
                                         class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('coordinates') border-red-500 @enderror"
                                         placeholder="Ej: 19.4326, -99.1332">
                                     @error('coordinates')
@@ -272,7 +275,7 @@
                     </div>
 
                     <div class="space-y-8">
-                        <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-3 sm:p-4 lg:p-6">
+                        <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-6">
                             <h2 class="text-xl font-semibold text-[#e24972] mb-6 flex items-center">
                                 <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
@@ -287,11 +290,11 @@
                                 <textarea id="agenda" name="agenda"
                                     class="w-full rounded-xl border-2 border-pink-200 shadow-sm focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
                                     rows="12"
-                                    placeholder="Escribe el temario aquí (usa Markdown)...">{{ old('agenda') }}</textarea>
+                                    placeholder="Escribe el temario aquí (usa Markdown)...">{{ old('agenda', $event->agenda ?? '') }}</textarea>
                             </div>
                         </div>
 
-                        <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-3 sm:p-4 lg:p-6">
+                        <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-6">
                             <h2 class="text-xl font-semibold text-[#e24972] mb-6 flex items-center">
                                 <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
@@ -488,7 +491,7 @@
                         </div>
 
 
-                        <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-3 sm:p-4 lg:p-6">
+                        <div class="bg-gradient-to-r from-pink-40 to-pink-50 rounded-xl p-6">
                             <h2 class="text-xl font-semibold text-[#e24972] mb-6 flex items-center">
                                 <svg class="w-6 h-6 mr-3 text-pink-600" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
@@ -554,10 +557,15 @@
                     <button type="submit"
                         class="px-8 bg-gradient-to-r from-pink-500 to-pink-400 hover:from-pink-600 hover:to-pink-500 py-3 text-white rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl font-medium flex items-center space-x-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            @if(isset($event))
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            @else
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            @endif
                         </svg>
-                        <span>Crear Evento</span>
+                        <span>{{ isset($event) ? 'Actualizar Evento' : 'Crear Evento' }}</span>
                     </button>
                 </div>
             </form>

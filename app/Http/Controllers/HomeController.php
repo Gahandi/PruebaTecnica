@@ -52,6 +52,14 @@ class HomeController extends Controller
             ->limit(6)
             ->get();
 
+        // Obtener eventos urgentes (próximos en menos de 48 horas)
+        $urgentEvents = (clone $eventsQuery)
+            ->where('date', '<=', now()->addHours(48))
+            ->where('date', '>', now())
+            ->orderBy('date', 'asc')
+            ->limit(4)
+            ->get();
+
         // Obtener todos los eventos para la sección principal
         $allEvents = $eventsQuery
             ->orderBy('date', 'asc')
@@ -147,7 +155,7 @@ class HomeController extends Controller
             ->limit(8)
             ->get();
 
-        return view('home', compact('featuredEvents', 'allEvents', 'categories', 'tags', 'search', 'tagId', 'categoryId', 'pastEvents', 'spaces'));
+        return view('home', compact('featuredEvents', 'allEvents', 'categories', 'tags', 'search', 'tagId', 'categoryId', 'pastEvents', 'spaces', 'urgentEvents'));
     }
 
     public function search(Request $request)
