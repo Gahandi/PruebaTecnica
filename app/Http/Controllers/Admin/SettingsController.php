@@ -105,6 +105,10 @@ class SettingsController extends Controller
             ['key' => 'maintenance_mode', 'value' => 'false', 'type' => 'boolean', 'group' => 'system', 'description' => 'Modo mantenimiento'],
             ['key' => 'max_tickets_per_order', 'value' => '10', 'type' => 'integer', 'group' => 'system', 'description' => 'Máximo de tickets por orden'],
             ['key' => 'session_timeout', 'value' => '120', 'type' => 'integer', 'group' => 'system', 'description' => 'Tiempo de sesión (minutos)'],
+
+            // Fees
+            ['key' => 'service_charge_name', 'value' => 'Cargo por servicio', 'type' => 'string', 'group' => 'fees', 'description' => 'Nombre visible del cargo en el carrito'],
+            ['key' => 'service_charge_percentage', 'value' => '16', 'type' => 'integer', 'group' => 'fees', 'description' => 'Porcentaje de cargo por servicio sobre el subtotal'],
         ];
 
         foreach ($defaults as $default) {

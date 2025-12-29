@@ -40,7 +40,7 @@ class OrderController extends Controller
 
             foreach ($request->tickets as $ticketData) {
                 $ticketType = TicketType::findOrFail($ticketData['ticket_type_id']);
-                
+
                 if ($ticketType->event_id != $event->id) {
                     throw new \Exception('El tipo de boleto no pertenece a este evento');
                 }
@@ -67,13 +67,14 @@ class OrderController extends Controller
                 $coupon = Coupon::where('code', $request->coupon_code)
                     ->where('expires_at', '>', now())
                     ->first();
-                
+
                 if ($coupon) {
                     $discount = ($total * $coupon->discount_percentage) / 100;
                 }
             }
 
-            $taxes = ($total - $discount) * 0.16; // 16% IVA
+            $serviceChargePercentage = \App\Helpers\SettingsHelper::getServiceChargePercentage();
+            $taxes = ($total - $discount) * ($serviceChargePercentage / 100);
             $finalTotal = $total - $discount + $taxes;
 
             // Crear o obtener usuario temporal para la API
@@ -130,7 +131,7 @@ class OrderController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage()
@@ -145,14 +146,14 @@ class OrderController extends Controller
     {
         $order = Order::with(['event', 'items.ticketType', 'tickets', 'coupon'])
             ->find($id);
-        
+
         if (!$order) {
             return response()->json([
                 'success' => false,
                 'message' => 'Orden no encontrada'
             ], 404);
         }
-        
+
         return response()->json([
             'success' => true,
             'data' => $order

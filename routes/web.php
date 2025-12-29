@@ -299,4 +299,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('events', [AdminEventController::class, 'index'])->name('events.index');
     Route::delete('events/{event}', [AdminEventController::class, 'destroy'])->name('events.destroy');
 
+    // Event Types
+    Route::resource('type-events', \App\Http\Controllers\Admin\TypeEventController::class)->names('type_events');
+
+    // Ticket Types
+    Route::resource('ticket-types', \App\Http\Controllers\Admin\TicketTypeController::class)->names('ticket_types');
+
 });

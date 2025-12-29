@@ -97,8 +97,9 @@
                                     $cart = \App\Helpers\CartHelper::getCartWithEventInfo();
                                     $cartCount = \App\Helpers\CartHelper::getCartCount();
                                     $subtotal = \App\Helpers\CartHelper::getCartTotal();
-                                    $taxes = $subtotal * 0.16; // 16% IVA
-                                    $cartTotal = $subtotal + $taxes; // Total con IVA
+                                    $serviceChargePercentage = \App\Helpers\SettingsHelper::getServiceChargePercentage();
+                                    $taxes = $subtotal * ($serviceChargePercentage / 100);
+                                    $cartTotal = $subtotal + $taxes;
                                 @endphp
                                 @include('partials.cart-dropdown', ['cart' => $cart, 'cartCount' => $cartCount, 'cartTotal' => $cartTotal])
                             </div>

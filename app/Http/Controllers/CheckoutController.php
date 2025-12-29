@@ -100,10 +100,10 @@ class CheckoutController extends Controller
                 }
 
                 $validatedCart[$cartKey] = [
-                    'ticket_type_id' => (int)$item['ticket_type_id'],
-                    'event_id' => (int)$item['event_id'],
-                    'quantity' => (int)$item['quantity'],
-                    'price' => isset($item['price']) ? (float)$item['price'] : 0,
+                    'ticket_type_id' => (int) $item['ticket_type_id'],
+                    'event_id' => (int) $item['event_id'],
+                    'quantity' => (int) $item['quantity'],
+                    'price' => isset($item['price']) ? (float) $item['price'] : 0,
                     'ticket_type_name' => $item['ticket_type_name'] ?? 'Boleto',
                     'event_name' => $item['event_name'] ?? 'Evento',
                     'event_date' => $item['event_date'] ?? null,
@@ -126,9 +126,9 @@ class CheckoutController extends Controller
         // Agregar headers CORS
         if ($origin) {
             $response->header('Access-Control-Allow-Origin', $origin)
-                     ->header('Access-Control-Allow-Credentials', 'true')
-                     ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-                     ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN');
+                ->header('Access-Control-Allow-Credentials', 'true')
+                ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN');
         }
 
         return $response;
@@ -154,8 +154,9 @@ class CheckoutController extends Controller
         $cart = \App\Helpers\CartHelper::getCartWithEventInfo();
         $cartCount = \App\Helpers\CartHelper::getCartCount();
         $subtotal = \App\Helpers\CartHelper::getCartTotal();
-        $taxes = $subtotal * 0.16; // 16% IVA
-        $cartTotal = $subtotal + $taxes; // Total con IVA
+        $serviceChargePercentage = \App\Helpers\SettingsHelper::getServiceChargePercentage();
+        $taxes = $subtotal * ($serviceChargePercentage / 100);
+        $cartTotal = $subtotal + $taxes;
 
         $html = view('partials.cart-dropdown', [
             'cart' => $cart,
@@ -292,9 +293,9 @@ class CheckoutController extends Controller
             // Agregar headers CORS si hay un origin
             if ($origin) {
                 $response->header('Access-Control-Allow-Origin', $origin)
-                         ->header('Access-Control-Allow-Credentials', 'true')
-                         ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-                         ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN');
+                    ->header('Access-Control-Allow-Credentials', 'true')
+                    ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+                    ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-TOKEN');
             }
 
             return $response;
@@ -448,12 +449,12 @@ class CheckoutController extends Controller
             // La clave puede venir como "ticket_type_id_event_id"
             $keyParts = explode('_', $key);
             if (count($keyParts) === 2) {
-                $ticketTypeId = (int)$keyParts[0];
-                $eventId = (int)$keyParts[1];
+                $ticketTypeId = (int) $keyParts[0];
+                $eventId = (int) $keyParts[1];
 
                 foreach ($cart as $cartKey => $item) {
-                    $itemTicketTypeId = isset($item['ticket_type_id']) ? (int)$item['ticket_type_id'] : null;
-                    $itemEventId = isset($item['event_id']) ? (int)$item['event_id'] : null;
+                    $itemTicketTypeId = isset($item['ticket_type_id']) ? (int) $item['ticket_type_id'] : null;
+                    $itemEventId = isset($item['event_id']) ? (int) $item['event_id'] : null;
 
                     if ($itemTicketTypeId === $ticketTypeId && $itemEventId === $eventId) {
                         $removedItem = $item; // Guardar el item antes de eliminarlo
@@ -525,20 +526,20 @@ class CheckoutController extends Controller
         }
 
         // Filtrar cupones por espacio o cupones globales
-        $coupons = Coupon::where(function($query) use ($spaceId) {
-            $query->where(function($q) use ($spaceId) {
+        $coupons = Coupon::where(function ($query) use ($spaceId) {
+            $query->where(function ($q) use ($spaceId) {
                 if ($spaceId !== null) {
                     $q->where('spaces_id', $spaceId)
-                      ->orWhereNull('spaces_id'); // También incluir cupones globales
+                        ->orWhereNull('spaces_id'); // También incluir cupones globales
                 } else {
                     $q->whereNull('spaces_id'); // Solo cupones globales si no hay espacio definido
                 }
             });
         })
-        ->where(function($query) {
-            $query->whereNull('expires_at')
-                  ->orWhere('expires_at', '>', now());
-        })->get();
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })->get();
 
         $appliedCoupon = session()->get('applied_coupon');
 
@@ -587,7 +588,8 @@ class CheckoutController extends Controller
             }
 
             $taxableAmount = $subtotal - $discountAmount;
-            $taxes = $taxableAmount * 0.16; // 16% IVA
+            $serviceChargePercentage = \App\Helpers\SettingsHelper::getServiceChargePercentage();
+            $taxes = $taxableAmount * ($serviceChargePercentage / 100);
             $total = $taxableAmount + $taxes;
 
             // Guardar datos del cliente en sesión para usar después (por si hay 3DS/callback)
@@ -759,7 +761,7 @@ class CheckoutController extends Controller
         $chargeIdFromRequest = $request->input('id');
         // Verificación de seguridad básica
         if (!$chargeIdFromSession || $chargeIdFromSession !== $chargeIdFromRequest) {
-           \Log::error('Error de validación en callback: ID de cargo no coincide o no existe en sesión.');
+            \Log::error('Error de validación en callback: ID de cargo no coincide o no existe en sesión.');
             return redirect()->route('checkout.cart')->with('error', 'Hubo un problema al verificar tu pago.');
         }
         try {
@@ -798,7 +800,8 @@ class CheckoutController extends Controller
                     $couponId = $appliedCoupon->id;
                 }
                 $taxableAmount = $subtotal - $discountAmount;
-                $taxes = $taxableAmount * 0.16;
+                $serviceChargePercentage = \App\Helpers\SettingsHelper::getServiceChargePercentage();
+                $taxes = $taxableAmount * ($serviceChargePercentage / 100);
                 $total = $taxableAmount + $taxes;
 
                 return $this->finalizeOrderAndCreateTickets($charge, $cart, $couponId, $subtotal, $discountAmount, $total, $taxes, $customerEmail, $customerName, $request);
@@ -830,7 +833,7 @@ class CheckoutController extends Controller
      * @param string|null $customerPassword Contraseña opcional si se crea cuenta
      * @return \Illuminate\Http\RedirectResponse
      */
-    private function finalizeOrderAndCreateTickets( $charge, $cart, $couponId, $subtotal, $discountAmount, $total, $taxes, $customerEmail = null, $customerName = null, Request $request)
+    private function finalizeOrderAndCreateTickets($charge, $cart, $couponId, $subtotal, $discountAmount, $total, $taxes, $customerEmail = null, $customerName = null, Request $request)
     {
         if ($charge->status !== 'completed') {
             Log::error('Intento de finalizar orden con cargo no completado', [
@@ -903,7 +906,7 @@ class CheckoutController extends Controller
         }
         // IDs de eventos desde el carrito
         $event_id_json = array_unique(array_map(
-            fn ($i) => $i['event_id'],
+            fn($i) => $i['event_id'],
             $cart
         ));
         // TRANSACCIÓN
@@ -1125,9 +1128,9 @@ class CheckoutController extends Controller
         }
 
         $coupon = Coupon::where('code', strtoupper($request->coupon_code))
-            ->where(function($query) {
+            ->where(function ($query) {
                 $query->whereNull('expires_at')
-                      ->orWhere('expires_at', '>', now());
+                    ->orWhere('expires_at', '>', now());
             });
 
         // Si hay un espacio identificado, validar que el cupón pertenezca a ese espacio
@@ -1158,7 +1161,8 @@ class CheckoutController extends Controller
         }
 
         $discount = ($subtotal * $coupon->discount_percentage) / 100;
-        $taxes = ($subtotal - $discount) * 0.16;
+        $serviceChargePercentage = \App\Helpers\SettingsHelper::getServiceChargePercentage();
+        $taxes = ($subtotal - $discount) * ($serviceChargePercentage / 100);
         $total = $subtotal - $discount + $taxes;
 
         return response()->json([
@@ -1192,7 +1196,8 @@ class CheckoutController extends Controller
             $subtotal += $item['price'] * $item['quantity'];
         }
 
-        $taxes = $subtotal * 0.16;
+        $serviceChargePercentage = \App\Helpers\SettingsHelper::getServiceChargePercentage();
+        $taxes = $subtotal * ($serviceChargePercentage / 100);
         $total = $subtotal + $taxes;
 
         return response()->json([

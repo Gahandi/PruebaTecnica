@@ -3,9 +3,10 @@
 @section('title', 'Checkout')
 
 @section('content')
-        <div class="max-w-7xl mx-auto py-4 sm:py-6 lg:py-8 px-2 sm:px-4 lg:px-8">
+    <div class="max-w-7xl mx-auto py-4 sm:py-6 lg:py-8 px-2 sm:px-4 lg:px-8">
         <!-- Header -->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 lg:mb-8 gap-3 sm:gap-0">
+        <div
+            class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 lg:mb-8 gap-3 sm:gap-0">
             <div class="flex-1 min-w-0">
                 <h1 class="text-2xl sm:text-3xl font-bold text-[#e24972]">Finalizar Compra</h1>
                 <p class="text-sm sm:text-base text-gray-600 mt-1">Revisa tu orden y completa el pago de forma segura</p>
@@ -13,14 +14,15 @@
             <a href="{{ route('checkout.cart') }}"
                 class="w-full sm:w-auto bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
+                    </path>
                 </svg>
                 Volver al Carrito
             </a>
         </div>
 
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 // --- 1. Inicialización de OpenPay ---
                 OpenPay.setId('{{ config('services.openpay.merchant_id') }}');
                 OpenPay.setApiKey('{{ config('services.openpay.public_key') }}');
@@ -36,7 +38,7 @@
 
                 // --- 4. Lógica para mostrar/ocultar los campos de pago ---
                 methodRadios.forEach(radio => {
-                    radio.addEventListener('change', function() {
+                    radio.addEventListener('change', function () {
                         const selectedValue = this.value;
                         document.getElementById('openpay-card-info').classList.toggle('hidden', selectedValue !== 'openpay');
                         document.getElementById('card-info').classList.toggle('hidden', selectedValue !== 'card');
@@ -50,8 +52,8 @@
                 }
 
                 // --- 5. Manejador del envío del formulario (SOLO UNO) ---
-                form.addEventListener('submit', function(event) {
-                     // Obtener valores actualizados de contraseña
+                form.addEventListener('submit', function (event) {
+                    // Obtener valores actualizados de contraseña
                     const passwordInput = document.getElementById('customer_password');
                     const passwordConfirmationInput = document.getElementById('customer_password_confirmation');
                     // Validar que los campos de cliente estén llenos
@@ -92,12 +94,12 @@
                         payButton.innerText = 'Procesando...'; // Feedback para el usuario
 
                         OpenPay.token.create({
-                                "card_number": document.querySelector('[data-openpay-card="card_number"]').value,
-                                "holder_name": document.querySelector('[data-openpay-card="holder_name"]').value,
-                                "expiration_year": document.querySelector('[data-openpay-card="expiration_year"]').value,
-                                "expiration_month": document.querySelector('[data-openpay-card="expiration_month"]').value,
-                                "cvv2": document.querySelector('[data-openpay-card="cvv2"]').value,
-                            },
+                            "card_number": document.querySelector('[data-openpay-card="card_number"]').value,
+                            "holder_name": document.querySelector('[data-openpay-card="holder_name"]').value,
+                            "expiration_year": document.querySelector('[data-openpay-card="expiration_year"]').value,
+                            "expiration_month": document.querySelector('[data-openpay-card="expiration_month"]').value,
+                            "cvv2": document.querySelector('[data-openpay-card="cvv2"]').value,
+                        },
                             success_callback, // Función si se crea el token
                             error_callback    // Función si hay un error
                         );
@@ -154,66 +156,55 @@
                             <label for="customer_name" class="block text-sm font-medium text-gray-700 mb-2">
                                 Nombre completo <span class="text-red-500">*</span>
                             </label>
-                            <input type="text"
-                                   name="customer_name"
-                                   id="customer_name"
-                                   value="{{ auth()->check() ? auth()->user()->name : '' }}"
-                                   required
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <input type="text" name="customer_name" id="customer_name"
+                                value="{{ auth()->check() ? auth()->user()->name : '' }}" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                         <div>
                             <label for="customer_email" class="block text-sm font-medium text-gray-700 mb-2">
                                 Correo electrónico <span class="text-red-500">*</span>
                             </label>
-                            <input type="email"
-                                   name="customer_email"
-                                   id="customer_email"
-                                   value="{{ auth()->check() ? auth()->user()->email : '' }}"
-                                   required
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <p class="text-xs text-gray-500 mt-1">Te enviaremos la confirmación de tu compra a este correo</p>
+                            <input type="email" name="customer_email" id="customer_email"
+                                value="{{ auth()->check() ? auth()->user()->email : '' }}" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <p class="text-xs text-gray-500 mt-1">Te enviaremos la confirmación de tu compra a este correo
+                            </p>
                         </div>
                     </div>
 
                     @if(!auth()->check())
-                    <!-- Opción para crear cuenta (solo si no está logueado) -->
-                    <div class="mt-6 pt-6 border-t border-gray-200">
-                        <!-- Campos de contraseña  -->
-                        <div id="password-fields" class=" mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="relative">
-                                <label for="customer_password" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Contraseña <span class="text-red-500">*</span>
-                                </label>
-                                <input type="password"
-                                       name="customer_password"
-                                       id="customer_password"
-                                       minlength="8"
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <button type="button"
-                                        onclick="togglePassword('customer_password', this)"
+                        <!-- Opción para crear cuenta (solo si no está logueado) -->
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <!-- Campos de contraseña  -->
+                            <div id="password-fields" class=" mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="relative">
+                                    <label for="customer_password" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Contraseña <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="password" name="customer_password" id="customer_password" minlength="8"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <button type="button" onclick="togglePassword('customer_password', this)"
                                         class="absolute right-3 top-9 text-gray-500">
-                                    👁️
-                                </button>
+                                        👁️
+                                    </button>
 
-                                <p class="text-xs text-gray-500 mt-1">Mínimo 8 caracteres</p>
-                            </div>
-                            <div class="relative">
-                                <label for="customer_password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">
-                                    Confirmar Contraseña <span class="text-red-500">*</span>
-                                </label>
-                                <input type="password"
-                                       name="customer_password_confirmation"
-                                       id="customer_password_confirmation"
-                                       minlength="8"
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                       <button type="button"
-                                               onclick="togglePassword('customer_password_confirmation', this)"
-                                               class="absolute right-3 top-9 text-gray-500">
-                                           👁️
-                                       </button>
+                                    <p class="text-xs text-gray-500 mt-1">Mínimo 8 caracteres</p>
+                                </div>
+                                <div class="relative">
+                                    <label for="customer_password_confirmation"
+                                        class="block text-sm font-medium text-gray-700 mb-2">
+                                        Confirmar Contraseña <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="password" name="customer_password_confirmation"
+                                        id="customer_password_confirmation" minlength="8"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <button type="button" onclick="togglePassword('customer_password_confirmation', this)"
+                                        class="absolute right-3 top-9 text-gray-500">
+                                        👁️
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
                     @endif
                 </div>
             </div>
@@ -223,7 +214,8 @@
                 <div class="space-y-6">
                     <!-- Order Summary -->
                     <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
-                        <div class="px-3 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+                        <div
+                            class="px-3 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
                             <h2 class="text-lg sm:text-xl font-semibold text-gray-900">Resumen de la Orden</h2>
                         </div>
                         <div class="p-3 sm:p-4 lg:p-6">
@@ -241,7 +233,8 @@
                                     <div class="flex justify-between items-center">
                                         <div>
                                             <p class="text-sm font-medium text-gray-900">
-                                                {{ $item['ticket_type_name'] ?? 'Boleto' }}</p>
+                                                {{ $item['ticket_type_name'] ?? 'Boleto' }}
+                                            </p>
                                             <p class="text-sm text-gray-500">{{ $item['quantity'] }} x
                                                 ${{ number_format($item['price'], 2) }}</p>
                                         </div>
@@ -262,7 +255,9 @@
                                             $discount = ($subtotal * $appliedCoupon->discount_percentage) / 100;
                                         }
                                         $taxableAmount = $subtotal - $discount;
-                                        $taxes = $taxableAmount * 0.16; // 16% IVA
+                                        $serviceChargePercentage = \App\Helpers\SettingsHelper::getServiceChargePercentage();
+                                        $serviceChargeName = \App\Helpers\SettingsHelper::getServiceChargeName();
+                                        $taxes = $taxableAmount * ($serviceChargePercentage / 100);
                                         $total = $taxableAmount + $taxes;
                                     @endphp
                                     @if ($appliedCoupon)
@@ -272,7 +267,8 @@
                                         </div>
                                     @endif
                                     <div class="flex justify-between">
-                                        <dt class="text-base font-medium text-gray-900">IVA (16%)</dt>
+                                        <dt class="text-base font-medium text-gray-900">{{ $serviceChargeName }}
+                                            ({{ $serviceChargePercentage }}%)</dt>
                                         <dd class="text-base font-medium text-gray-900">${{ number_format($taxes, 2) }}</dd>
                                     </div>
                                     <div class="flex justify-between border-t border-gray-200 pt-2">
@@ -286,7 +282,8 @@
 
                     <!-- Coupon Code -->
                     <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-200">
-                        <div class="px-3 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+                        <div
+                            class="px-3 py-3 sm:px-6 sm:py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
                             <h2 class="text-lg sm:text-xl font-semibold text-gray-900">Código de Descuento</h2>
                         </div>
                         <div class="p-6">
@@ -300,8 +297,7 @@
                                             <p class="text-sm text-green-600">{{ $appliedCoupon->discount_percentage }}% de
                                                 descuento</p>
                                         </div>
-                                        <button type="button" onclick="removeCoupon()"
-                                            class="text-red-600 hover:text-red-800">
+                                        <button type="button" onclick="removeCoupon()" class="text-red-600 hover:text-red-800">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M6 18L18 6M6 6l12 12"></path>
@@ -329,10 +325,8 @@
                                             @foreach ($coupons as $coupon)
                                                 <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
                                                     <div>
-                                                        <span
-                                                            class="font-mono text-sm font-medium">{{ $coupon->code }}</span>
-                                                        <span
-                                                            class="text-sm text-gray-500 ml-2">{{ $coupon->discount_percentage }}%
+                                                        <span class="font-mono text-sm font-medium">{{ $coupon->code }}</span>
+                                                        <span class="text-sm text-gray-500 ml-2">{{ $coupon->discount_percentage }}%
                                                             de descuento</span>
                                                     </div>
                                                     <button type="button" onclick="useCoupon('{{ $coupon->code }}')"
@@ -377,68 +371,60 @@
                                 <!-- Card Information (Simulated) - Hidden in production -->
                                 <div id="card-info" class="hidden">
                                     <div class="p-4 bg-blue-50 rounded-md">
-                                        <p class="text-sm text-blue-800">Este método de pago no está disponible actualmente. Por favor, utiliza Openpay.</p>
+                                        <p class="text-sm text-blue-800">Este método de pago no está disponible actualmente.
+                                            Por favor, utiliza Openpay.</p>
                                     </div>
                                 </div>
 
                                 <!-- OpenPay Information -->
                                 <div id="openpay-card-info" class="mt-6">
                                     <h1 class="text-lg font-semibold mb-3">Tarjetas aceptadas<h1>
-                                    <div class="flex justify-center gap-4 items-center bg-gray-50 border border-gray-200 p-4 rounded-lg shadow-sm">
-                                        <img 
-                                            src="{{ asset('images/marcas_aceptacion/americanExpress.png') }}" 
-                                            alt="Card 1"
-                                            class="h-8 sm:h-10 w-auto object-contain"
-                                        >
-                                        <img 
-                                            src="{{ asset('images/marcas_aceptacion/carnet.png') }}" 
-                                            alt="Card 2"
-                                            class="h-8 sm:h-10 w-auto object-contain"
-                                        >
-                                        <img 
-                                            src="{{ asset('images/marcas_aceptacion/masterCard.png') }}" 
-                                            alt="Card 2"
-                                            class="h-8 sm:h-10 w-auto object-contain"
-                                        >
-                                        <img 
-                                            src="{{ asset('images/marcas_aceptacion/visa.png') }}" 
-                                            alt="Card 2"
-                                            class="h-8 sm:h-10 w-auto object-contain"
-                                        >
-                                    </div>
-                                    <input type="hidden" name="openpay_token" id="openpay_token">
-                                    <input type="hidden" name="device_session_id" id="device_session_id">
+                                            <div
+                                                class="flex justify-center gap-4 items-center bg-gray-50 border border-gray-200 p-4 rounded-lg shadow-sm">
+                                                <img src="{{ asset('images/marcas_aceptacion/americanExpress.png') }}"
+                                                    alt="Card 1" class="h-8 sm:h-10 w-auto object-contain">
+                                                <img src="{{ asset('images/marcas_aceptacion/carnet.png') }}" alt="Card 2"
+                                                    class="h-8 sm:h-10 w-auto object-contain">
+                                                <img src="{{ asset('images/marcas_aceptacion/masterCard.png') }}"
+                                                    alt="Card 2" class="h-8 sm:h-10 w-auto object-contain">
+                                                <img src="{{ asset('images/marcas_aceptacion/visa.png') }}" alt="Card 2"
+                                                    class="h-8 sm:h-10 w-auto object-contain">
+                                            </div>
+                                            <input type="hidden" name="openpay_token" id="openpay_token">
+                                            <input type="hidden" name="device_session_id" id="device_session_id">
 
-                                    <div class="grid grid-cols-2 gap-4 mt-4">
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1">Número de Tarjeta</label>
-                                            {{-- ATRIBUTO AÑADIDO --}}
-                                            <input type="text" class="w-full px-3 py-2 border rounded"
-                                                autocomplete="off" data-openpay-card="card_number">
-                                        </div>
-                                        <div>
-                                            <label class="block text-sm font-medium mb-1">CVV</label>
-                                            {{-- ATRIBUTO AÑADIDO --}}
-                                            <input type="text" class="w-full px-3 py-2 border rounded"
-                                                autocomplete="off" data-openpay-card="cvv2">
-                                        </div>
-                                    </div>
-                                    <div class="mt-4">
-                                        <label class="block text-sm font-medium mb-1">Fecha de Expiración</label>
-                                        <div class="flex gap-2">
-                                            {{-- ATRIBUTOS AÑADIDOS --}}
-                                            <input type="text" placeholder="MM" class="w-1/2 px-3 py-2 border rounded"
-                                                data-openpay-card="expiration_month">
-                                            <input type="text" placeholder="YY" class="w-1/2 px-3 py-2 border rounded"
-                                                data-openpay-card="expiration_year">
-                                        </div>
-                                    </div>
-                                    <div class="mt-4">
-                                        <label class="block text-sm font-medium mb-1">Nombre del Titular</label>
-                                        {{-- ATRIBUTO AÑADIDO --}}
-                                        <input type="text" class="w-full px-3 py-2 border rounded"
-                                            data-openpay-card="holder_name">
-                                    </div>
+                                            <div class="grid grid-cols-2 gap-4 mt-4">
+                                                <div>
+                                                    <label class="block text-sm font-medium mb-1">Número de Tarjeta</label>
+                                                    {{-- ATRIBUTO AÑADIDO --}}
+                                                    <input type="text" class="w-full px-3 py-2 border rounded"
+                                                        autocomplete="off" data-openpay-card="card_number">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium mb-1">CVV</label>
+                                                    {{-- ATRIBUTO AÑADIDO --}}
+                                                    <input type="text" class="w-full px-3 py-2 border rounded"
+                                                        autocomplete="off" data-openpay-card="cvv2">
+                                                </div>
+                                            </div>
+                                            <div class="mt-4">
+                                                <label class="block text-sm font-medium mb-1">Fecha de Expiración</label>
+                                                <div class="flex gap-2">
+                                                    {{-- ATRIBUTOS AÑADIDOS --}}
+                                                    <input type="text" placeholder="MM"
+                                                        class="w-1/2 px-3 py-2 border rounded"
+                                                        data-openpay-card="expiration_month">
+                                                    <input type="text" placeholder="YY"
+                                                        class="w-1/2 px-3 py-2 border rounded"
+                                                        data-openpay-card="expiration_year">
+                                                </div>
+                                            </div>
+                                            <div class="mt-4">
+                                                <label class="block text-sm font-medium mb-1">Nombre del Titular</label>
+                                                {{-- ATRIBUTO AÑADIDO --}}
+                                                <input type="text" class="w-full px-3 py-2 border rounded"
+                                                    data-openpay-card="holder_name">
+                                            </div>
                                 </div>
 
                                 <!-- PayPal Information (Hidden by default) -->
@@ -465,48 +451,56 @@
                                 <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
                                     <div class="flex">
                                         <svg class="w-5 h-5 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                            <path fill-rule="evenodd"
+                                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                                clip-rule="evenodd"></path>
                                         </svg>
                                         <div>
                                             <h3 class="text-sm font-medium text-blue-800">Pago Seguro</h3>
-                                            <p class="text-sm text-blue-700">Tus pagos están protegidos con Openpay. Todos los datos son procesados de forma segura.</p>
+                                            <p class="text-sm text-blue-700">Tus pagos están protegidos con Openpay. Todos
+                                                los datos son procesados de forma segura.</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 {{-- INICIO: ALERTA DE ERROR DE OPENPAY --}}
                                 @if(session('openpay_error'))
-                                <div id="openpay-error-alert" class="bg-red-50 border-l-4 border-red-500 p-4 mb-4 animate-pulse">
-                                    <div class="flex">
-                                        <div class="flex-shrink-0">
-                                            <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                                            </svg>
-                                        </div>
-                                        <div class="ml-3">
-                                            <p class="text-sm font-bold text-red-700">
-                                                No se pudo procesar el pago
-                                            </p>
-                                            <p class="text-sm text-red-600 mt-1">
-                                                {{ session('openpay_error') }}
-                                            </p>
+                                    <div id="openpay-error-alert"
+                                        class="bg-red-50 border-l-4 border-red-500 p-4 mb-4 animate-pulse">
+                                        <div class="flex">
+                                            <div class="flex-shrink-0">
+                                                <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd"
+                                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                        clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm font-bold text-red-700">
+                                                    No se pudo procesar el pago
+                                                </p>
+                                                <p class="text-sm text-red-600 mt-1">
+                                                    {{ session('openpay_error') }}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                {{-- Script opcional: Si quieres que además haga scroll hacia el error --}}
-                                <script>
-                                    document.addEventListener("DOMContentLoaded", function() {
-                                        document.getElementById('openpay-error-alert').scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                    });
-                                </script>
+
+                                    {{-- Script opcional: Si quieres que además haga scroll hacia el error --}}
+                                    <script>
+                                        document.addEventListener("DOMContentLoaded", function () {
+                                            document.getElementById('openpay-error-alert').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                        });
+                                    </script>
                                 @endif
                                 {{-- FIN: ALERTA DE ERROR --}}
 
                                 <button type="submit" id="pay-button"
                                     class="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-3 rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all font-semibold shadow-md hover:shadow-lg transform hover:scale-[1.02] flex items-center justify-center gap-2">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                                        </path>
                                     </svg>
                                     Completar Compra
                                 </button>
@@ -531,7 +525,7 @@
 
         // Payment method toggle
         document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
-            radio.addEventListener('change', function() {
+            radio.addEventListener('change', function () {
                 const method = this.value;
 
                 const sections = {
@@ -667,13 +661,13 @@
 @push('scripts')
     <script>
         // Refrescar token CSRF cada 5 minutos
-        setInterval(function() {
+        setInterval(function () {
             fetch('/refresh-csrf', {
-                    method: 'GET',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.csrf_token) {

@@ -40,20 +40,20 @@ class OrderFlowTest extends TestCase
         $response = $this->postJson('/api/v1/orders', $orderData);
 
         $response->assertStatus(201)
-                ->assertJsonStructure([
-                    'success',
-                    'data' => [
-                        'order',
-                        'tickets',
-                        'total',
-                        'discount',
-                        'taxes'
-                    ]
-                ]);
+            ->assertJsonStructure([
+                'success',
+                'data' => [
+                    'order',
+                    'tickets',
+                    'total',
+                    'discount',
+                    'taxes'
+                ]
+            ]);
 
         $this->assertDatabaseHas('orders', [
             'event_id' => $event->id,
-            'total' => ($ticketType->price * 2) * 1.16 // Con IVA
+            'total' => ($ticketType->price * 2) * 1.16 // Con Cargo por Servicio
         ]);
     }
 
@@ -87,7 +87,7 @@ class OrderFlowTest extends TestCase
         $response = $this->postJson('/api/v1/orders', $orderData);
 
         $response->assertStatus(201);
-        
+
         // Verificar que se aplicó el descuento
         $order = json_decode($response->getContent(), true);
         $this->assertEquals(40, $order['data']['discount']); // 20% de 200
@@ -116,9 +116,9 @@ class OrderFlowTest extends TestCase
         $response = $this->postJson('/api/v1/orders', $orderData);
 
         $response->assertStatus(400)
-                ->assertJson([
-                    'success' => false
-                ]);
+            ->assertJson([
+                'success' => false
+            ]);
     }
 
     public function test_can_get_events()
@@ -128,18 +128,18 @@ class OrderFlowTest extends TestCase
         $response = $this->getJson('/api/v1/events');
 
         $response->assertStatus(200)
-                ->assertJsonStructure([
-                    'success',
-                    'data' => [
-                        '*' => [
-                            'id',
-                            'name',
-                            'date',
-                            'location',
-                            'ticket_types'
-                        ]
+            ->assertJsonStructure([
+                'success',
+                'data' => [
+                    '*' => [
+                        'id',
+                        'name',
+                        'date',
+                        'location',
+                        'ticket_types'
                     ]
-                ]);
+                ]
+            ]);
     }
 
     public function test_can_get_specific_event()
@@ -149,13 +149,13 @@ class OrderFlowTest extends TestCase
         $response = $this->getJson("/api/v1/events/{$event->id}");
 
         $response->assertStatus(200)
-                ->assertJson([
-                    'success' => true,
-                    'data' => [
-                        'id' => $event->id,
-                        'name' => $event->name
-                    ]
-                ]);
+            ->assertJson([
+                'success' => true,
+                'data' => [
+                    'id' => $event->id,
+                    'name' => $event->name
+                ]
+            ]);
     }
 
     public function test_can_validate_ticket()
@@ -168,12 +168,12 @@ class OrderFlowTest extends TestCase
         $response = $this->getJson("/api/v1/tickets/{$ticket->id}/validate");
 
         $response->assertStatus(200)
-                ->assertJson([
-                    'success' => true,
-                    'data' => [
-                        'valid' => true
-                    ]
-                ]);
+            ->assertJson([
+                'success' => true,
+                'data' => [
+                    'valid' => true
+                ]
+            ]);
     }
 
     public function test_cannot_validate_used_ticket()
@@ -190,9 +190,9 @@ class OrderFlowTest extends TestCase
         $response = $this->getJson("/api/v1/tickets/{$ticket->id}/validate");
 
         $response->assertStatus(400)
-                ->assertJson([
-                    'success' => false,
-                    'message' => 'Ticket already used'
-                ]);
+            ->assertJson([
+                'success' => false,
+                'message' => 'Ticket already used'
+            ]);
     }
 }

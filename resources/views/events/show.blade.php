@@ -543,23 +543,11 @@
     @endif
 
     {{-- Contenido Principal --}}
-    <div
-        class="relative backdrop-blur-xs  min-h-screen bg-gradient-to-br opacity-50 from-slate-50 via-indigo-50/50 to-purple-50">
+    <div class="relative min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/50 to-purple-50">
         {{-- Fondo decorativo con blur --}}
-        <div class="absolute inset-0 overflow-hidden pointer-events-none">
-            <div
-                class="absolute top-0 -left-1/4 w-1/2 h-1/2 bg-gradient-to-br from-pink-200/30 to-purple-200/30 rounded-full blur-3xl">
-            </div>
-            <div
-                class="absolute bottom-1/4 -right-1/4 w-1/2 h-1/2 bg-gradient-to-br from-blue-200/30 to-cyan-200/30 rounded-full blur-3xl">
-            </div>
-            <div
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-1/2 bg-gradient-to-br from-violet-100/40 to-pink-100/40 rounded-full blur-3xl">
-            </div>
-        </div>
 
         <div
-            class="relative z-10 max-w-4xl mx-auto px-2 max-h-[calc(100vh-10vh)] sm:px-4 lg:px-6 py-6 sm:py-8 lg:py-12 space-y-4 sm:space-y-6 lg:space-y-8 {{ $event->banner ? '' : 'pt-20' }}">
+            class="relative z-10 max-w-4xl mx-auto px-2 min-h-full-screen sm:px-4 lg:px-6 py-6 sm:py-8 lg:py-12 space-y-4 sm:space-y-6 lg:space-y-8 {{ $event->banner ? '' : 'pt-20' }}">
 
             {{-- Título del evento con diseño bonito --}}
             <div class="text-center mb-2 mt-4" id="event-title-card">
@@ -673,7 +661,7 @@
                         </h3>
                         <div class="glass-card rounded-xl p-3 sm:p-6 overflow-hidden">
                             <div id="description-markdown" class="markdown-preview"></div>
-                            <script type="text/markdown" id="description-raw">{{ $event->description }}</script>
+                            <script type="application/json" id="description-data">@json($event->description)</script>
                         </div>
                     </div>
                 @endif
@@ -690,7 +678,7 @@
                         </h3>
                         <div class="glass-card rounded-xl p-3 sm:p-6 overflow-hidden">
                             <div id="agenda-markdown" class="markdown-preview"></div>
-                            <script type="text/markdown" id="agenda-raw">{{ $event->agenda }}</script>
+                            <script type="application/json" id="agenda-data">@json($event->agenda)</script>
                         </div>
                     </div>
                 @endif
@@ -779,8 +767,8 @@
                                 @endphp
                                 <div
                                     class="bg-white/60 backdrop-blur-sm border-2 border-gray-200 rounded-xl p-6 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        hover:border-pink-300 transition-all duration-300 hover:shadow-lg hover:scale-105 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        hover:border-pink-300 transition-all duration-300 hover:shadow-lg hover:scale-105 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 
                                     <!-- Columna de nombre y disponibilidad -->
                                     <div class="flex flex-col items-start justify-center flex-1">
@@ -867,7 +855,8 @@
                                     <span id="discount" class="font-semibold text-green-600">$0.00</span>
                                 </div>
                                 <div class="flex justify-between text-lg">
-                                    <span class="text-gray-600">IVA (16%):</span>
+                                    <span class="text-gray-600">{{ \App\Helpers\SettingsHelper::getServiceChargeName() }}
+                                        ({{ \App\Helpers\SettingsHelper::getServiceChargePercentage() }}%):</span>
                                     <span id="taxes" class="font-semibold">$0.00</span>
                                 </div>
                                 <div class="border-t pt-4">
@@ -939,7 +928,7 @@
                 @foreach($event->ticketTypes as $ticketType)
                     {{ $ticketType->id }}: {{ $ticketType->pivot->price }}{{ $loop->last ? '' : ',' }}
                 @endforeach
-                                                                                                                                                                                                                                                                                                                                                    };
+                                                                                                                                                                                                                                                                                                                                                                                                                    };
 
             console.log('Ticket prices:', ticketPrices);
 
@@ -1058,9 +1047,10 @@
                     discount = (subtotal * appliedCoupon.discount_percentage) / 100;
                 }
 
-                // Calculate taxes (16% IVA)
+                // Calculate taxes
                 const taxableAmount = subtotal - discount;
-                const taxes = taxableAmount * 0.16;
+                const serviceChargePercentage = {{ \App\Helpers\SettingsHelper::getServiceChargePercentage() }};
+                const taxes = taxableAmount * (serviceChargePercentage / 100);
                 const total = taxableAmount + taxes;
 
                 // Update display
@@ -1086,7 +1076,7 @@
                     }
                 @endforeach
 
-                                                                                                                                                                                                                                                                                                                                                        if (tickets.length === 0) {
+                                                                                                                                                                                                                                                                                                                                                                                                                        if (tickets.length === 0) {
                     showNotification('Por favor selecciona al menos un boleto.', 'error');
                     return;
                 }
@@ -1096,11 +1086,11 @@
                 const originalText = button.innerHTML;
                 button.disabled = true;
                 button.innerHTML = `
-                                                                                                                                                                                                                                                                                                                                                            <svg class="w-6 h-6 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                                                                                                                                                                                                                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                                                                                                                                                                                                                                                                                                                                                            </svg>
-                                                                                                                                                                                                                                                                                                                                                            <span>Agregando...</span>
-                                                                                                                                                                                                                                                                                                                                                        `;
+                                                                                                                                                                                                                                                                                                                                                                                                                            <svg class="w-6 h-6 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                                                                                                                                                                                                                                                                                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                                                                                                                                                                                                                                                                                                                                                                                                            </svg>
+                                                                                                                                                                                                                                                                                                                                                                                                                            <span>Agregando...</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                        `;
 
                 try {
                     // Obtener token CSRF del dominio base si estamos en un subdominio
@@ -1208,13 +1198,13 @@
 
                 notification.className = `fixed top-20 right-4 ${bgColor} text-white px-6 py-4 rounded-xl shadow-2xl z-[9999] transform translate-x-[120%] transition-all duration-300 ease-out`;
                 notification.innerHTML = `
-                                                                                                                                                                                                                                                                                                                                                            <div class="flex items-center">
-                                                                                                                                                                                                                                                                                                                                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                                                                                                                                                                                                                                                                                                    ${icon}
-                                                                                                                                                                                                                                                                                                                                                                </svg>
-                                                                                                                                                                                                                                                                                                                                                                ${message}
-                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                        `;
+                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="flex items-center">
+                                                                                                                                                                                                                                                                                                                                                                                                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                                                                                                                                                                                                                                                                                                                                                                    ${icon}
+                                                                                                                                                                                                                                                                                                                                                                                                                                </svg>
+                                                                                                                                                                                                                                                                                                                                                                                                                                ${message}
+                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                        `;
                 document.body.appendChild(notification);
 
                 setTimeout(() => {
@@ -1306,11 +1296,11 @@
                         // Info window con información del evento
                         const infoWindow = new google.maps.InfoWindow({
                             content: `
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <div class="p-2">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <h3 class="font-bold text-lg mb-1">${eventName}</h3>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <p class="text-gray-600 text-sm">${eventAddress}</p>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    `
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <div class="p-2">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <h3 class="font-bold text-lg mb-1">${eventName}</h3>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <p class="text-gray-600 text-sm">${eventAddress}</p>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    `
                         });
 
                         marker.addListener('click', function () {
@@ -1328,7 +1318,7 @@
                         });
                     }
                 @endif
-                                                                                                                                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                                                                                                                                                                                                    }
 
             // Función para centrar el mapa en la ubicación del evento
             function centerMap() {
@@ -1372,11 +1362,11 @@
                                     const btn = document.getElementById('directions-btn');
                                     btn.onclick = hideDirections;
                                     btn.innerHTML = `
-                                                                                                                                                                                                                                                                                                                                                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                                                                                                                                                                                                                                                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                                                                                                                                                                                                                                                                                                                                                                </svg>
-                                                                                                                                                                                                                                                                                                                                                                                <span class="text-sm font-medium">Ocultar Rutas</span>
-                                                                                                                                                                                                                                                                                                                                                                            `;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                </svg>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                <span class="text-sm font-medium">Ocultar Rutas</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                                            `;
                                     btn.className = 'bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2 transition-all duration-200 hover:shadow-xl';
                                 } else {
                                     alert('No se pudo calcular la ruta: ' + status);
@@ -1405,11 +1395,11 @@
                     const btn = document.getElementById('directions-btn');
                     btn.onclick = showDirections;
                     btn.innerHTML = `
-                                                                                                                                                                                                                                                                                                                                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                                                                                                                                                                                                                                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
-                                                                                                                                                                                                                                                                                                                                                                </svg>
-                                                                                                                                                                                                                                                                                                                                                                <span class="text-sm font-medium">Rutas</span>
-                                                                                                                                                                                                                                                                                                                                                            `;
+                                                                                                                                                                                                                                                                                                                                                                                                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                                                                                                                                                                                                                                                                                                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                                                                                                                                                                                                                                                                                                                                                                                                                                </svg>
+                                                                                                                                                                                                                                                                                                                                                                                                                                <span class="text-sm font-medium">Rutas</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                            `;
                     btn.className = 'bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2 transition-all duration-200 hover:shadow-xl';
                 }
             }
@@ -1509,21 +1499,33 @@
                     }
 
                     // Renderizar descripción
-                    const descriptionRaw = document.getElementById('description-raw');
+                    const descriptionData = document.getElementById('description-data');
                     const descriptionTarget = document.getElementById('description-markdown');
-                    if (descriptionRaw && descriptionTarget) {
-                        const rawContent = descriptionRaw.textContent || descriptionRaw.innerText;
-                        const htmlContent = marked.parse(rawContent);
-                        descriptionTarget.innerHTML = sanitizeHtml(htmlContent);
+                    if (descriptionData && descriptionTarget) {
+                        try {
+                            const rawContent = JSON.parse(descriptionData.textContent);
+                            if (rawContent) {
+                                const htmlContent = marked.parse(rawContent);
+                                descriptionTarget.innerHTML = sanitizeHtml(htmlContent);
+                            }
+                        } catch (e) {
+                            console.error('Error parsing description markdown:', e);
+                        }
                     }
 
                     // Renderizar temario
-                    const agendaRaw = document.getElementById('agenda-raw');
+                    const agendaData = document.getElementById('agenda-data');
                     const agendaTarget = document.getElementById('agenda-markdown');
-                    if (agendaRaw && agendaTarget) {
-                        const rawContent = agendaRaw.textContent || agendaRaw.innerText;
-                        const htmlContent = marked.parse(rawContent);
-                        agendaTarget.innerHTML = sanitizeHtml(htmlContent);
+                    if (agendaData && agendaTarget) {
+                        try {
+                            const rawContent = JSON.parse(agendaData.textContent);
+                            if (rawContent) {
+                                const htmlContent = marked.parse(rawContent);
+                                agendaTarget.innerHTML = sanitizeHtml(htmlContent);
+                            }
+                        } catch (e) {
+                            console.error('Error parsing agenda markdown:', e);
+                        }
                     }
                 }
 
