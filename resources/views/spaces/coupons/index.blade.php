@@ -1,138 +1,183 @@
-@extends('layouts.space')
+@extends('layouts.space-dashboard')
 
 @section('title', 'Cupones - ' . $space->name)
 
+@php
+    $primaryColor = $space->color_primary ?? '#ec4899';
+    $secondaryColor = $space->color_secondary ?? '#8b5cf6';
+@endphp
+
 @section('content')
-<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-    <!-- Messages -->
-    @if(session('success'))
-        <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Cupones de Descuento</h1>
-            <p class="text-sm sm:text-base text-gray-600 mt-1">Gestiona los cupones de descuento para {{ $space->name }}</p>
-        </div>
-        <a href="{{ route('spaces.coupons.create', $space->subdomain) }}" 
-           class="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-            </svg>
-            Nuevo Cupón
-        </a>
-    </div>
-
-    <!-- Coupons Table -->
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
-        @if($coupons->count() > 0)
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
-                            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descuento</th>
-                            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usos</th>
-                            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Expira</th>
-                            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                            <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        @foreach($coupons as $coupon)
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-2 sm:mr-4 flex-shrink-0">
-                                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                                            </svg>
-                                        </div>
-                                        <div class="min-w-0">
-                                            <div class="text-sm font-medium text-gray-900 truncate">{{ $coupon->code }}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-semibold text-gray-900">{{ $coupon->discount_percentage }}%</div>
-                                </td>
-                                <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ $coupon->payments_count ?? 0 }}</div>
-                                </td>
-                                <td class="px-4 sm:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
-                                    @if($coupon->expires_at)
-                                        <div class="text-sm text-gray-900">{{ \Carbon\Carbon::parse($coupon->expires_at)->format('d/m/Y') }}</div>
-                                        <div class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($coupon->expires_at)->format('H:i') }}</div>
-                                    @else
-                                        <span class="text-sm text-gray-500">Sin expiración</span>
-                                    @endif
-                                </td>
-                                <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
-                                    @php
-                                        $isExpired = $coupon->expires_at && \Carbon\Carbon::now()->gt(\Carbon\Carbon::parse($coupon->expires_at));
-                                    @endphp
-                                    @if($isExpired)
-                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                            Expirado
-                                        </span>
-                                    @else
-                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            Activo
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <div class="flex flex-col sm:flex-row gap-2">
-                                        <a href="{{ route('spaces.coupons.show', [$space->subdomain, $coupon]) }}" 
-                                           class="text-blue-600 hover:text-blue-900 text-xs sm:text-sm">
-                                            Ver
-                                        </a>
-                                        <a href="{{ route('spaces.coupons.edit', [$space->subdomain, $coupon]) }}" 
-                                           class="text-indigo-600 hover:text-indigo-900 text-xs sm:text-sm">
-                                            Editar
-                                        </a>
-                                        <form method="POST" action="{{ route('spaces.coupons.destroy', [$space->subdomain, $coupon]) }}" 
-                                              class="inline" 
-                                              onsubmit="return confirm('¿Estás seguro de que quieres eliminar este cupón?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900 text-xs sm:text-sm">
-                                                Eliminar
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @else
-            <!-- Empty State -->
-            <div class="text-center py-12 px-4">
-                <div class="w-16 h-16 sm:w-24 sm:h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-8 h-8 sm:w-12 sm:h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                    </svg>
+    <div class="p-4 md:p-6">
+        <div class="max-w-7xl mx-auto space-y-6">
+            {{-- Header --}}
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Cupones de Descuento</h1>
+                    <p class="mt-1 text-sm text-gray-600">{{ $coupons->count() }} cupones en {{ $space->name }}</p>
                 </div>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No hay cupones</h3>
-                <p class="text-sm sm:text-base text-gray-500 mb-4">Comienza creando tu primer cupón de descuento para este espacio.</p>
-                <a href="{{ route('spaces.coupons.create', $space->subdomain) }}" 
-                   class="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                    Crear Cupón
+                <a href="{{ route('spaces.coupons.create', $space->subdomain) }}"
+                    class="inline-flex items-center px-4 py-2 text-white rounded-lg hover:opacity-90 transition-all shadow-lg"
+                    style="background: linear-gradient(135deg, {{ $primaryColor }}, {{ $secondaryColor }});">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Nuevo Cupón
                 </a>
             </div>
-        @endif
-    </div>
-</div>
-@endsection
 
+            {{-- Success Message --}}
+            @if(session('success'))
+                <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">
+                    <p class="text-green-700">{{ session('success') }}</p>
+                </div>
+            @endif
+
+            {{-- Coupons Table --}}
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead style="background: linear-gradient(135deg, {{ $primaryColor }}, {{ $secondaryColor }});">
+                            <tr>
+                                <th class="px-4 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                    Código</th>
+                                <th class="px-4 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                    Descuento</th>
+                                <th
+                                    class="px-4 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden sm:table-cell">
+                                    Usos</th>
+                                <th
+                                    class="px-4 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden md:table-cell">
+                                    Reglas</th>
+                                <th
+                                    class="px-4 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider hidden lg:table-cell">
+                                    Expira</th>
+                                <th class="px-4 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                    Estado</th>
+                                <th class="px-4 py-4 text-center text-xs font-semibold text-white uppercase tracking-wider">
+                                    Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @forelse($coupons as $coupon)
+                                @php
+                                    $status = $coupon->status_badge;
+                                    $statusColors = [
+                                        'active' => 'bg-green-100 text-green-800',
+                                        'inactive' => 'bg-gray-100 text-gray-800',
+                                        'expired' => 'bg-red-100 text-red-800',
+                                        'exhausted' => 'bg-yellow-100 text-yellow-800',
+                                    ];
+                                    $statusLabels = [
+                                        'active' => 'Activo',
+                                        'inactive' => 'Inactivo',
+                                        'expired' => 'Expirado',
+                                        'exhausted' => 'Agotado',
+                                    ];
+                                @endphp
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-4 py-4">
+                                        <span
+                                            class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold font-mono"
+                                            style="background: {{ $primaryColor }}20; color: {{ $primaryColor }};">
+                                            {{ $coupon->code }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-4">
+                                        <span class="text-xl font-bold"
+                                            style="color: {{ $primaryColor }};">{{ $coupon->discount_percentage }}%</span>
+                                    </td>
+                                    <td class="px-4 py-4 hidden sm:table-cell">
+                                        <div class="text-sm">
+                                            <span class="font-semibold text-gray-900">{{ $coupon->uses_count }}</span>
+                                            @if($coupon->max_uses)
+                                                <span class="text-gray-400">/ {{ $coupon->max_uses }}</span>
+                                            @else
+                                                <span class="text-gray-400">/ ∞</span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-4 hidden md:table-cell">
+                                        <div class="flex flex-wrap gap-1">
+                                            @if($coupon->max_uses_per_user)
+                                                <span
+                                                    class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">{{ $coupon->max_uses_per_user }}/usuario</span>
+                                            @endif
+                                            @if($coupon->min_order_amount)
+                                                <span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded">Mín:
+                                                    ${{ number_format($coupon->min_order_amount, 0) }}</span>
+                                            @endif
+                                            @if(!$coupon->max_uses_per_user && !$coupon->min_order_amount)
+                                                <span class="text-xs text-gray-400">Sin reglas</span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-4 hidden lg:table-cell text-sm text-gray-600">
+                                        @if($coupon->expires_at)
+                                            {{ $coupon->expires_at->format('d/m/Y') }}
+                                        @else
+                                            <span class="text-gray-400">Sin límite</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-4">
+                                        <span
+                                            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium {{ $statusColors[$status] ?? 'bg-gray-100 text-gray-800' }}">
+                                            {{ $statusLabels[$status] ?? ucfirst($status) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-4 text-center">
+                                        <div class="flex items-center justify-center gap-2">
+                                            <a href="{{ route('spaces.coupons.edit', [$space->subdomain, $coupon]) }}"
+                                                class="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                                                title="Editar">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                    </path>
+                                                </svg>
+                                            </a>
+                                            <form action="{{ route('spaces.coupons.destroy', [$space->subdomain, $coupon]) }}"
+                                                method="POST" onsubmit="return confirm('¿Eliminar este cupón?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                    class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                                                    title="Eliminar">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                        </path>
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="px-4 py-12 text-center">
+                                        <div class="flex flex-col items-center">
+                                            <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z">
+                                                </path>
+                                            </svg>
+                                            <p class="text-gray-500 text-lg font-medium">No hay cupones</p>
+                                            <p class="text-gray-400 text-sm mb-4">Crea tu primer cupón de descuento</p>
+                                            <a href="{{ route('spaces.coupons.create', $space->subdomain) }}"
+                                                class="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors"
+                                                style="background: {{ $primaryColor }};">
+                                                Crear Cupón
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection

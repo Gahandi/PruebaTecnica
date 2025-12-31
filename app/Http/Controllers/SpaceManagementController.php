@@ -108,11 +108,46 @@ class SpaceManagementController extends Controller
         // Find user by email
         $user = User::where('email', $request->email)->first();
 
+        // Si el usuario NO existe, enviamos invitación por correo
         if (!$user) {
+            // Verificar si ya hay una invitación pendiente
+            $existingInvite = \App\Models\SpaceInvitation::where('space_id', $space->id)
+                ->where('email', $request->email)
+                ->first();
+
+            $token = \Illuminate\Support\Str::random(32);
+
+            if ($existingInvite) {
+                $existingInvite->update([
+                    'role_space_id' => $request->role_space_id,
+                    'token' => $token,
+                    'expires_at' => now()->addDays(7),
+                ]);
+                $invitation = $existingInvite;
+            } else {
+                $invitation = \App\Models\SpaceInvitation::create([
+                    'space_id' => $space->id,
+                    'email' => $request->email,
+                    'role_space_id' => $request->role_space_id,
+                    'token' => $token,
+                    'expires_at' => now()->addDays(7),
+                ]);
+            }
+
+            // Enviar correo
+            try {
+                \Illuminate\Support\Facades\Mail::to($request->email)->send(new \App\Mail\SpaceInvitationMail($invitation, $space));
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al enviar el correo de invitación: ' . $e->getMessage()
+                ], 500);
+            }
+
             return response()->json([
-                'success' => false,
-                'message' => 'No existe un usuario con ese email. El usuario debe registrarse primero.'
-            ], 404);
+                'success' => true,
+                'message' => 'Invitación enviada por correo exitosamente'
+            ]);
         }
 
         // Check if user is already in space
@@ -144,6 +179,9 @@ class SpaceManagementController extends Controller
                 'role_space_id' => $request->role_space_id
             ]);
         }
+
+        // Enviar notificación al usuario registrado (opcional, por ahora solo agregamos)
+        // TODO: Enviar correo de "Has sido añadido al espacio X"
 
         return response()->json([
             'success' => true,

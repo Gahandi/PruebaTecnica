@@ -337,7 +337,7 @@
                 <div class="text-center mb-6 sm:mb-8 lg:mb-12">
                     <h2 class="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#e24972] mb-2 sm:mb-4">Eventos
                         Destacados</h2>
-                    <p class="text-sm sm:text-base lg:text-lg text-gray-600">Los eventos más populares del momento</p>
+                    <p class="text-sm sm:text-base lg:text-lg text-gray-600">Ingresos por eventos</p>
                 </div>
 
                 {{-- Carousel --}}

@@ -429,9 +429,70 @@
             }
         }
 
+        // Función para actualizar el contador del carrito (retorna Promise)
+        function updateCartCount() {
+            return fetch('{{ \App\Helpers\CartHelper::getCartCountRoute() }}', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Actualizar contador en el header
+                    const cartButton = document.querySelector('#cart-dropdown button');
+                    let cartBadge = document.querySelector('#cart-dropdown .bg-red-500');
+
+                    if (data.count > 0) {
+                        if (!cartBadge && cartButton) {
+                            cartBadge = document.createElement('span');
+                            cartBadge.className = 'absolute -top-0.5 -right-0.5 inline-flex items-center justify-center bg-red-500 text-white text-xs font-bold min-w-[18px] h-[18px] px-1 rounded-full border-2 border-white shadow-lg';
+                            cartButton.appendChild(cartBadge);
+                        }
+                        if (cartBadge) {
+                            cartBadge.textContent = data.count;
+                            cartBadge.style.display = 'inline-flex';
+                        }
+                    } else {
+                        if (cartBadge) {
+                            cartBadge.style.display = 'none';
+                        }
+                    }
+                    return data.count;
+                })
+                .catch(error => {
+                    console.error('Error updating cart count:', error);
+                    return 0;
+                });
+        }
+
+        // Función para actualizar el dropdown del carrito
+        function updateCartDropdown() {
+            const cartMenu = document.getElementById('cart-menu');
+            if (!cartMenu) return Promise.resolve();
+
+            return fetch('{{ \App\Helpers\CartHelper::getCartDropdownRoute() }}', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                }
+            })
+                .then(response => response.text())
+                .then(html => {
+                    cartMenu.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error updating cart dropdown:', error);
+                });
+        }
+
         // Hacer funciones disponibles globalmente
         window.toggleCartDropdown = toggleCartDropdown;
         window.closeCartDropdown = closeCartDropdown;
+        window.updateCartCount = updateCartCount;
+        window.updateCartDropdown = updateCartDropdown;
 
         // Cerrar dropdowns al hacer clic fuera
         document.addEventListener('click', function (event) {

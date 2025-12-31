@@ -32,20 +32,20 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
-            
+
             $user = Auth::user();
-            
+
             // Si el usuario no está verificado, redirigir a verificación
             if (!$user->verified_at) {
                 return redirect()->route('verify.email')
                     ->with('warning', 'Por favor, verifica tu correo electrónico para continuar.');
             }
-            
+
             // Redirigir a la URL previa o al dashboard si es admin, o a eventos si es usuario normal
             if ($user->hasRole('admin') || $user->hasRole('staff')) {
                 return redirect()->intended(route('dashboard'));
             }
-            
+
             return redirect()->intended('/');
         }
 
@@ -54,9 +54,12 @@ class AuthController extends Controller
         ]);
     }
 
-    public function showRegisterForm()
+    public function showRegisterForm(Request $request)
     {
-        return view('auth.register');
+        return view('auth.register', [
+            'email' => $request->query('email'),
+            'invitation_token' => $request->query('invitation_token')
+        ]);
     }
 
     public function register(Request $request)
@@ -64,10 +67,11 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'required|string|max:20',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'terms' => 'required|accepted',
+            'invitation_token' => 'nullable|string|exists:space_invitations,token',
         ]);
 
         $user = User::create([
@@ -77,16 +81,43 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'viewer',
-            'verified' => false,
-            'verified_at' => null,
+            'verified' => false, // Will be verified if invitation is valid
+            'verified_at' => null, // Will be set if invitation is valid
         ]);
 
-        // Enviar código de verificación
-        $this->sendVerificationCodeToUser($user);
+        // Process Invitation if exists
+        if ($request->filled('invitation_token')) {
+            $invitation = \App\Models\SpaceInvitation::where('token', $request->invitation_token)
+                ->where('email', $request->email) // Ensure email matches
+                ->first();
+
+            if ($invitation) {
+                // Add to space
+                \App\Models\SpacesUser::create([
+                    'space_id' => $invitation->space_id,
+                    'user_id' => $user->id,
+                    'role_space_id' => $invitation->role_space_id
+                ]);
+
+                // Auto-verify email because they came from a trusted email list invitation
+                $user->verified = true;
+                $user->verified_at = now();
+                $user->save();
+
+                // Delete invitation
+                $invitation->delete();
+            }
+        }
+
+        // Enviar código de verificación solo si NO está verificado
+        if (!$user->verified) {
+            $this->sendVerificationCodeToUser($user);
+            Auth::login($user);
+            return redirect()->route('verify.email')->with('success', '¡Cuenta creada exitosamente! Por favor, verifica tu correo electrónico.');
+        }
 
         Auth::login($user);
-
-        return redirect()->route('verify.email')->with('success', '¡Cuenta creada exitosamente! Por favor, verifica tu correo electrónico.');
+        return redirect()->route('home')->with('success', '¡Cuenta creada y verificada! Bienvenido.');
     }
 
     public function logout(Request $request)
@@ -131,7 +162,7 @@ class AuthController extends Controller
             // Validar configuración de correo antes de intentar enviar
             $mailHost = config('mail.mailers.smtp.host');
             $mailPort = config('mail.mailers.smtp.port');
-            
+
             if (empty($mailHost) || empty($mailPort)) {
                 Log::warning('Configuración de correo incompleta', [
                     'user_id' => $user->id,

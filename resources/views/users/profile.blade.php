@@ -32,9 +32,38 @@
                         </div>
                     </div>
 
-                    <form method="POST" action="{{ route('profile.update') }}" id="profileForm">
+                    <form method="POST" action="{{ route('profile.update') }}" id="profileForm" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
+
+                        <div class="flex items-center space-x-6 mb-6">
+                            <div class="shrink-0">
+                                @if(auth()->user()->image)
+                                    <img class="h-16 w-16 object-cover rounded-full border-2 border-pink-100" 
+                                         src="{{ \App\Helpers\ImageHelper::getImageUrl(auth()->user()->image) }}" 
+                                         alt="Foto de perfil">
+                                @else
+                                    <div class="h-16 w-16 rounded-full bg-gradient-to-br from-pink-400 to-pink-600 flex items-center justify-center text-white text-xl font-bold border-2 border-pink-100">
+                                        {{ substr(auth()->user()->name, 0, 1) }}
+                                    </div>
+                                @endif
+                            </div>
+                            <!-- Input para imagen (inicialmente oculto o readonly si no estamos editando) -->
+                            <div class="flex-1">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Foto de Perfil</label>
+                                <input type="file" name="image" id="image" accept="image/*" disabled
+                                    class="block w-full text-sm text-gray-500
+                                      file:mr-4 file:py-2 file:px-4
+                                      file:rounded-full file:border-0
+                                      file:text-sm file:font-semibold
+                                      file:bg-pink-50 file:text-pink-700
+                                      hover:file:bg-pink-100
+                                      disabled:opacity-50 disabled:cursor-not-allowed">
+                                @error('image')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
@@ -324,6 +353,10 @@
                     input.classList.add('bg-gray-50');
                     input.classList.remove('bg-white');
                 });
+                
+                // Disable file input
+                const fileInput = document.getElementById('image');
+                if(fileInput) fileInput.disabled = true;
             } else {
                 // Activar edición
                 editBtn.classList.add('hidden');
@@ -336,6 +369,10 @@
                     input.classList.remove('bg-gray-50');
                     input.classList.add('bg-white');
                 });
+
+                // Enable file input
+                const fileInput = document.getElementById('image');
+                if(fileInput) fileInput.disabled = false;
             }
         }
 

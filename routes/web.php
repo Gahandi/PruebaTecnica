@@ -39,6 +39,9 @@ Route::domain('{subdomain}.' . config('app.url'))
         Route::get('/edit', [SpaceController::class, 'edit'])->name('spaces.edit')->middleware(['auth', 'email.verified']);
         Route::put('/update', [SpaceController::class, 'update'])->name('spaces.update')->middleware(['auth', 'email.verified']);
         Route::post('/update-profile', [SpaceController::class, 'updateProfile'])->name('spaces.update-profile')->middleware(['auth', 'email.verified']);
+        Route::get('/events', [SpaceEventController::class, 'index'])
+            ->name('spaces.events.index')
+            ->middleware(['auth', 'email.verified', 'space.member']);
         Route::get('/events/create', [SpaceEventController::class, 'create'])
             ->name('spaces.events.create')
             ->middleware(['auth', 'email.verified', 'space.member']);
@@ -59,23 +62,30 @@ Route::domain('{subdomain}.' . config('app.url'))
         Route::delete('eventos/{event:slug}', [SpaceEventController::class, 'destroy'])
             ->name('spaces.events.destroy')
             ->middleware(['auth', 'email.verified', 'space.member']);
-        Route::get('/{event:slug}', [SpaceEventController::class, 'show']);
-        // Mostrar eventos por categoría
+        Route::post('eventos/{event:slug}/duplicate', [SpaceEventController::class, 'duplicate'])
+            ->name('spaces.events.duplicate')
+            ->middleware(['auth', 'email.verified', 'space.member']);
+
+        // Mostrar eventos por categoría (ruta específica antes de catch-all)
         Route::get('/categories/{id}', [SpaceEventController::class, 'showEvents'])
             ->name('categories.events');
 
+        // Cupones del espacio (rutas específicas antes de catch-all)
         Route::prefix('coupons')
             ->name('spaces.coupons.')
             ->middleware(['auth', 'email.verified', 'space.member'])
             ->group(function () {
-                Route::get('/', [SpaceCouponController::class, 'index'])->name('index');
-                Route::get('/create', [SpaceCouponController::class, 'create'])->name('create');
-                Route::post('/', [SpaceCouponController::class, 'store'])->name('store');
-                Route::get('/{coupon}', [SpaceCouponController::class, 'show'])->name('show');
-                Route::get('/{coupon}/edit', [SpaceCouponController::class, 'edit'])->name('edit');
-                Route::put('/{coupon}', [SpaceCouponController::class, 'update'])->name('update');
-                Route::delete('/{coupon}', [SpaceCouponController::class, 'destroy'])->name('destroy');
-            });
+            Route::get('/', [SpaceCouponController::class, 'index'])->name('index');
+            Route::get('/create', [SpaceCouponController::class, 'create'])->name('create');
+            Route::post('/', [SpaceCouponController::class, 'store'])->name('store');
+            Route::get('/{coupon}', [SpaceCouponController::class, 'show'])->name('show');
+            Route::get('/{coupon}/edit', [SpaceCouponController::class, 'edit'])->name('edit');
+            Route::put('/{coupon}', [SpaceCouponController::class, 'update'])->name('update');
+            Route::delete('/{coupon}', [SpaceCouponController::class, 'destroy'])->name('destroy');
+        });
+
+        // CATCH-ALL: Mostrar evento por slug (debe ir AL FINAL porque captura cualquier cosa)
+        Route::get('/{event:slug}', [SpaceEventController::class, 'show']);
 
         // Rutas de gestión del espacio (solo para admins del espacio)
         Route::prefix('manage')
@@ -131,6 +141,8 @@ Route::prefix('verify')->name('verify.')->group(function () {
     Route::post('/send-code', [\App\Http\Controllers\Auth\VerificationController::class, 'sendVerificationCode'])->name('send-code');
     Route::post('/code', [\App\Http\Controllers\Auth\VerificationController::class, 'verifyCode'])->name('code');
 });
+
+Route::get('/invitations/{token}', [\App\Http\Controllers\InvitationController::class, 'accept'])->name('invitations.accept');
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -309,5 +321,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Ticket Types
     Route::resource('ticket-types', \App\Http\Controllers\Admin\TicketTypeController::class)->names('ticket_types');
+
+    // Coupons
+    Route::resource('coupons', \App\Http\Controllers\Admin\CouponController::class)->names('coupons');
 
 });

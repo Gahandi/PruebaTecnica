@@ -9,6 +9,8 @@ use Illuminate\Validation\Rule;
 
 class ProfileController extends Controller
 {
+    use \App\Traits\S3ImageManager;
+
     public function show()
     {
         $user = Auth::user();
@@ -37,12 +39,56 @@ class ProfileController extends Controller
             'last_name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'image' => ['nullable', 'image', 'max:2048'],
         ]);
 
         $user->name = $request->name;
         $user->last_name = $request->last_name;
         $user->phone = $request->phone;
         $user->email = $request->email;
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($user->image && \Storage::disk('public')->exists($user->image)) {
+                \Storage::disk('public')->delete($user->image);
+            }
+
+            // Detectar extensión
+            $imageFile = $request->file('image');
+            $fileContents = file_get_contents($imageFile->getPathname());
+
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mimeType = finfo_buffer($finfo, $fileContents);
+            finfo_close($finfo);
+
+            $extensions = [
+                'image/jpeg' => 'jpg',
+                'image/jpg' => 'jpg',
+                'image/png' => 'png',
+                'image/gif' => 'gif',
+                'image/webp' => 'webp',
+            ];
+
+            $extension = $extensions[$mimeType] ?? 'jpg';
+
+            // Generar nombre
+            $fileName = $user->id . '.' . $extension;
+
+            // Ruta relativa EXACTA como en UserController
+            $relativePath = env('S3_ENVIRONMENT') . '/users/' . $fileName;
+
+            // Subir a S3
+            $this->saveImages(
+                $fileContents,
+                'users',
+                $user->id
+            );
+
+            // Guardar SOLO la ruta relativa
+            $user->image = $relativePath;
+        }
+
         $user->save();
 
         return back()->with('success', 'Información personal actualizada correctamente.');

@@ -103,7 +103,8 @@
                     </div>
                     <div class="p-4">
                         <h4 class="font-bold text-gray-900 mb-2 line-clamp-1 group-hover:text-pink-600 transition-colors">
-                            {{ $event->name }}</h4>
+                            {{ $event->name }}
+                        </h4>
                         <div class="flex items-center text-gray-500 text-sm mb-3">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -132,13 +133,46 @@
                             </div>
                         @endif
 
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-center justify-between mt-4">
                             @auth
                                 @if($isAdmin)
-                                    <a href="{{ route('spaces.events.edit', ['subdomain' => $space->subdomain, 'event' => $event->slug]) }}"
-                                        class="text-gray-500 hover:text-gray-700 text-sm">
-                                        Editar
-                                    </a>
+                                    <div class="flex items-center gap-2">
+                                        @php
+                                            $daysUntil = now()->diffInDays($event->date, false);
+                                            $isLocked = $daysUntil < 4 && $event->date > now();
+                                        @endphp
+
+                                        @if($isLocked)
+                                            <span class="text-gray-400 text-xs flex items-center cursor-help"
+                                                title="Edición bloqueada: faltan menos de 4 días">
+                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                                                    </path>
+                                                </svg>
+                                                Bloqueado
+                                            </span>
+                                        @else
+                                            <a href="{{ route('spaces.events.edit', ['subdomain' => $space->subdomain, 'event' => $event->slug]) }}"
+                                                class="text-gray-500 hover:text-gray-700 text-sm font-medium transition-colors">
+                                                Editar
+                                            </a>
+                                            <form action="{{ route('spaces.events.destroy', [$space->subdomain, $event->slug]) }}"
+                                                method="POST" class="inline-block"
+                                                onsubmit="return confirm('¿Estás seguro de eliminar este evento?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="text-red-400 hover:text-red-600 transition-colors pt-1"
+                                                    title="Eliminar">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                        </path>
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
                                 @else
                                     <span></span>
                                 @endif
@@ -195,13 +229,54 @@
                     class="flex bg-gray-50 rounded-lg overflow-hidden border border-gray-200 hover:bg-gray-100 transition-colors">
                     <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}" alt="{{ $event->name }}"
                         class="w-24 h-24 object-cover flex-shrink-0 grayscale opacity-75">
-                    <div class="p-3 flex-1 min-w-0">
-                        <h4 class="font-medium text-gray-700 text-sm truncate">{{ $event->name }}</h4>
-                        <p class="text-xs text-gray-500 mt-1">{{ \Carbon\Carbon::parse($event->date)->format('d M Y') }}</p>
-                        <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}/{{ $event->slug }}"
-                            class="text-xs text-pink-600 hover:text-pink-700 mt-2 inline-block">
-                            Ver detalles →
-                        </a>
+                    <div class="p-3 flex-1 min-w-0 flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-medium text-gray-700 text-sm truncate" title="{{ $event->name }}">{{ $event->name }}
+                            </h4>
+                            <p class="text-xs text-gray-500 mt-1">{{ \Carbon\Carbon::parse($event->date)->format('d M Y') }}</p>
+                        </div>
+
+                        <div class="flex items-center justify-between mt-2">
+                            <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}/{{ $event->slug }}"
+                                class="text-xs text-blue-600 hover:text-blue-700 font-medium">
+                                Ver
+                            </a>
+
+                            @auth
+                                @if($isAdmin)
+                                    <div class="flex items-center gap-2">
+                                        {{-- Duplicar --}}
+                                        <form action="{{ route('spaces.events.duplicate', [$space->subdomain, $event->slug]) }}"
+                                            method="POST" onsubmit="return confirm('¿Duplicar evento?');">
+                                            @csrf
+                                            <button type="submit" class="text-purple-500 hover:text-purple-700 transition-colors"
+                                                title="Duplicar">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2">
+                                                    </path>
+                                                </svg>
+                                            </button>
+                                        </form>
+
+                                        {{-- Eliminar --}}
+                                        <form action="{{ route('spaces.events.destroy', [$space->subdomain, $event->slug]) }}"
+                                            method="POST" onsubmit="return confirm('¿Eliminar evento anterior?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-400 hover:text-red-600 transition-colors"
+                                                title="Eliminar">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                    </path>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endif
+                            @endauth
+                        </div>
                     </div>
                 </div>
             @endforeach

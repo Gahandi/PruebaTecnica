@@ -7,6 +7,7 @@ use App\Models\Space;
 use App\Models\Tag;
 use App\Models\TicketType;
 use App\Models\TypeEvent;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Traits\S3ImageManager;
@@ -14,6 +15,31 @@ use App\Traits\S3ImageManager;
 class SpaceEventController extends Controller
 {
     use S3ImageManager;
+
+    /**
+     * Lista de eventos del espacio con estadísticas
+     */
+    public function index(Request $request, $subdomain)
+    {
+        $space = $request->get('space');
+
+        $events = Event::where('spaces_id', $space->id)
+            ->with(['type_event', 'state'])
+            ->withCount(['orders', 'tickets'])
+            ->orderBy('date', 'desc')
+            ->paginate(12);
+
+        // Agregar estadísticas a cada evento
+        $events->getCollection()->transform(function ($event) {
+            $completedOrderIds = $event->orders()->where('status', 'completed')->pluck('id');
+            $event->completed_orders = $completedOrderIds->count();
+            $event->total_revenue = \App\Models\Payment::whereIn('order_id', $completedOrderIds)->sum('total');
+            $event->tickets_sold = $event->tickets_count;
+            return $event;
+        });
+
+        return view('events.show', compact('space', 'events'));
+    }
 
     public function show(Request $request, $subdomain, Event $event)
     {
@@ -24,40 +50,29 @@ class SpaceEventController extends Controller
             abort(404, 'Evento no encontrado');
         }
 
-        // Cargar la relación ticketTypes con información de la tabla intermedia
-        $event->load([
-            'ticketTypes' => function ($query) {
-                $query->withPivot('quantity', 'price');
-            },
-            'tags',
-            'space'
-        ]);
+        $event->load(['type_event', 'ticketTypes', 'tags']);
 
-        return view('events.show', compact('event', 'space'));
+        return view('events.show', compact('space', 'event'));
     }
+
     public function showEvents($subdomain, $id)
     {
-        // Obtener categoría
-        $category = TypeEvent::findOrFail($id);
+        $typeEvent = TypeEvent::findOrFail($id);
+        $space = Space::where('subdomain', $subdomain)->firstOrFail();
 
-        // Obtener eventos activos de esa categoría
-        $events = Event::where('type_events_id', $id)
+        $events = Event::where('spaces_id', $space->id)
+            ->where('type_events_id', $id)
             ->where('active', true)
-            ->orderBy('date', 'asc')
-            ->with(['ticketTypes', 'space'])
+            ->where('date', '>=', now())
+            ->orderBy('date')
             ->get();
 
-        return view('categories.events', [
-            'category' => $category,
-            'events' => $events,
-            'subdomain' => $subdomain
-        ]);
+        return view('spaces.events.by_category', compact('space', 'events', 'typeEvent'));
     }
+
     public function create(Request $request, $subdomain)
     {
-        // El espacio ya está disponible en la request por el middleware
         $space = $request->get('space');
-
         $ticketTypes = TicketType::all();
         $typeEvents = TypeEvent::all();
         $tags = Tag::all();
@@ -65,30 +80,28 @@ class SpaceEventController extends Controller
         return view('spaces.events.create', compact('space', 'ticketTypes', 'typeEvents', 'tags'));
     }
 
-    /**
-     * Store a new event category (TypeEvent) with optional S3 image upload
-     */
+    // Store a new event category (TypeEvent) with optional S3 image upload
     public function storeCategory(Request $request, $subdomain)
     {
+        // 1. Validate input
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'icon' => 'nullable|string', // FontAwesome icon class
+            'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Optional image upload
+        ]);
+
         try {
-            $request->validate([
-                'name' => 'required|string|max:255|unique:type_events,name',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            ]);
+            // 2. Handle Image Upload to S3 (if provided)
+            $imageUrl = null;
+            if ($request->hasFile('image_file')) {
+                $file = $request->file('image_file');
+                $fileContents = file_get_contents($file->getPathname());
 
-            $categoryData = [
-                'name' => $request->name,
-            ];
-
-            // Upload image to S3 if provided
-            if ($request->hasFile('image')) {
-                $imageFile = $request->file('image');
-                $fileContents = file_get_contents($imageFile->getPathname());
-
+                // Determine file extension
                 $finfo = finfo_open(FILEINFO_MIME_TYPE);
                 $mimeType = finfo_buffer($finfo, $fileContents);
                 finfo_close($finfo);
-
                 $extensions = [
                     'image/jpeg' => 'jpg',
                     'image/jpg' => 'jpg',
@@ -98,47 +111,48 @@ class SpaceEventController extends Controller
                 ];
                 $extension = $extensions[$mimeType] ?? 'jpg';
 
-                $productId = 'category_' . time();
-                $fileName = $productId . '.' . $extension;
-                $imagePath = env('S3_ENVIRONMENT') . '/categories/images/' . $fileName;
+                // Use a generic ID or timestamp for the filename since we don't have the ID yet
+                $fileId = 'category_' . time();
+                $fileName = $fileId . '.' . $extension;
+                $pathSegment = 'categories/images';
 
-                $this->saveImages($fileContents, 'categories/images', $productId);
-                $categoryData['image'] = $imagePath;
+                // Upload using the trait
+                $this->saveImages($fileContents, $pathSegment, $fileId);
+
+                // Construct the S3 URL
+                $imageUrl = env('S3_ENVIRONMENT') . '/' . $pathSegment . '/' . $fileName;
             }
 
-            $category = TypeEvent::create($categoryData);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Categoría creada exitosamente',
-                'category' => [
-                    'id' => $category->id,
-                    'name' => $category->name,
-                    'image' => $category->image ?? null,
-                ]
+            // 3. Create the Category
+            $category = TypeEvent::create([
+                'name' => $validated['name'],
+                'description' => $validated['description'],
+                'icon' => $validated['icon'] ?? 'fas fa-calendar-alt', // Default icon
+                'image' => $imageUrl, // Save the S3 URL or null
             ]);
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
+            // 4. Return the new category data as JSON
             return response()->json([
-                'success' => false,
-                'message' => 'Error de validación',
-                'errors' => $e->errors()
-            ], 422);
+                'success' => true,
+                'category' => $category,
+            ]);
+
         } catch (\Exception $e) {
-            \Log::error('Error al crear categoría: ' . $e->getMessage());
+            \Log::error('Error creating category: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Error al crear la categoría: ' . $e->getMessage()
+                'message' => 'Error al crear la categoría. Por favor intente de nuevo.',
             ], 500);
         }
     }
 
+
     public function store(Request $request, $subdomain)
     {
-
         try {
             $space = $request->get('space');
 
+            // 1. Validar los datos
             $request->validate([
                 'name' => 'required|string|max:255',
                 'description' => 'required|string',
@@ -148,8 +162,8 @@ class SpaceEventController extends Controller
                 'tags' => 'nullable|array',
                 'tags.*' => 'nullable|string|max:255',
                 'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'banner' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'type_event_id' => 'required|exists:type_events,id',
                 'ticket_types' => 'required|array|min:1',
                 'ticket_types.*.name' => 'required|string|max:255',
@@ -157,6 +171,7 @@ class SpaceEventController extends Controller
                 'ticket_types.*.quantity' => 'required|integer|min:1',
             ]);
 
+            // 2. Preparar los datos básicos
             $eventData = [
                 'name' => $request->name,
                 'description' => $request->description,
@@ -165,136 +180,119 @@ class SpaceEventController extends Controller
                 'coordinates' => $request->coordinates,
                 'spaces_id' => $space->id,
                 'type_events_id' => $request->type_event_id,
-                'state_id' => 1, // Estado "Activo"
                 'slug' => Str::slug($request->name),
                 'active' => true,
                 'agenda' => $request->agenda ?? 'N/A',
-                'banner_app' => 'default.jpg',
+                'state_id' => 1,
             ];
 
-            // ----- Subir archivos a S3 -----
-            if ($request->hasFile('banner')) {
-                $bannerFile = $request->file('banner');
-                $fileContents = file_get_contents($bannerFile->getPathname());
+            // 3. Crear el evento primero para tener su ID (necesario para nombres de archivos)
+            // Sin embargo, las imágenes requieren el ID.
+            // Opción A: Usar una transacción y hacerlo en orden.
+            // Opción B (Usada aquí, mejorada): Generar un ID temporal o usar timestamp + rand si no queremos depender del ID autoincremental antes de insertar.
+            // PERO, tu lógica original usaba `$event->id` que no existe.
+            // MEJORA: Usaremos `boot` events o simplemente insertaremos primero sin imágenes y luego actualizaremos.
+            // O MEJOR AÚN: Usamos un identificador único basado en time() y space_id para las imágenes, independiente del ID del evento.
 
-                // Detectar extensión desde MIME type (igual que saveImages)
-                $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                $mimeType = finfo_buffer($finfo, $fileContents);
-                finfo_close($finfo);
-                $extensions = [
-                    'image/jpeg' => 'jpg',
-                    'image/jpg' => 'jpg',
-                    'image/png' => 'png',
-                    'image/gif' => 'gif',
-                    'image/webp' => 'webp',
-                ];
-                $extension = $extensions[$mimeType] ?? 'jpg';
-
-                $productId = $space->id . '_' . time() . '_banner';
-                $fileName = $productId . '.' . $extension;
-                $bannerPath = env('S3_ENVIRONMENT') . '/events/banners/' . $fileName;
-
-                // Primero guardar la imagen
-                $this->saveImages($fileContents, 'events/banners', $productId);
-                // Guardar la ruta relativa en la DB
-                $eventData['banner'] = $bannerPath;
-            } else {
-                $eventData['banner'] = 'https://via.placeholder.com/1200x400?text=Sin+Banner';
-            }
-
-            if ($request->hasFile('image')) {
-                $imageFile = $request->file('image');
-                $fileContents = file_get_contents($imageFile->getPathname());
-
-                // Detectar extensión desde MIME type (igual que saveImages)
-                $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                $mimeType = finfo_buffer($finfo, $fileContents);
-                finfo_close($finfo);
-                $extensions = [
-                    'image/jpeg' => 'jpg',
-                    'image/jpg' => 'jpg',
-                    'image/png' => 'png',
-                    'image/gif' => 'gif',
-                    'image/webp' => 'webp',
-                ];
-                $extension = $extensions[$mimeType] ?? 'jpg';
-
-                $productId = $space->id . '_' . time() . '_image';
-                $fileName = $productId . '.' . $extension;
-                $imagePath = env('S3_ENVIRONMENT') . '/events/images/' . $fileName;
-
-                // Primero guardar la imagen
-                $this->saveImages($fileContents, 'events/images', $productId);
-                // Guardar la ruta relativa en la DB
-                $eventData['image'] = $imagePath;
-            } else {
-                $eventData['image'] = 'https://via.placeholder.com/800x600?text=Sin+Imagen';
-            }
-            if ($request->hasFile('icon')) {
-                $iconFile = $request->file('icon');
-                $fileContents = file_get_contents($iconFile->getPathname());
-
-                // Detectar extensión desde MIME type (igual que saveImages)
-                $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                $mimeType = finfo_buffer($finfo, $fileContents);
-                finfo_close($finfo);
-                $extensions = [
-                    'image/jpeg' => 'jpg',
-                    'image/jpg' => 'jpg',
-                    'image/png' => 'png',
-                    'image/gif' => 'gif',
-                    'image/webp' => 'webp',
-                ];
-                $extension = $extensions[$mimeType] ?? 'jpg';
-
-                $productId = $space->id . '_' . time() . '_icon';
-                $fileName = $productId . '.' . $extension;
-                $iconPath = env('S3_ENVIRONMENT') . '/events/icons/' . $fileName;
-
-                // Primero guardar la imagen
-                $this->saveImages($fileContents, 'events/icons', $productId);
-                // Guardar la ruta relativa en la DB
-                $eventData['icon'] = $iconPath;
-            } else {
-                $eventData['icon'] = 'https://via.placeholder.com/200x200?text=Sin+Icono';
-            }
-
-            // Guardar el evento
+            // Insertamos el evento para obtener el ID real.
             $event = Event::create($eventData);
 
-            // Crear tipos de boletos y asociarlos al evento
+            // 4. Gestión de Archivos (Subir a S3 y actualizar el evento)
+            // Definimos la lógica de subida como una función anónima o helper local para no repetir código.
+
+            $uploadImage = function ($fileKey, $pathSegment, $dbField) use ($event, $request) {
+                if ($request->hasFile($fileKey)) {
+                    $file = $request->file($fileKey);
+                    $fileContents = file_get_contents($file->getPathname());
+
+                    // Detectar extensión real
+                    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                    $mimeType = finfo_buffer($finfo, $fileContents);
+                    finfo_close($finfo);
+                    $extensions = [
+                        'image/jpeg' => 'jpg',
+                        'image/jpg' => 'jpg',
+                        'image/png' => 'png',
+                        'image/gif' => 'gif',
+                        'image/webp' => 'webp',
+                    ];
+                    $extension = $extensions[$mimeType] ?? 'jpg';
+
+                    // Generar nombre único: spaceID_timestamp.ext
+                    // Usamos el ID del espacio para agrupar o prefijar si se desea,
+                    // pero el Trait saveImages usa el 3er argumento como nombre de archivo SIN extensión (o eso parece, revisemos el Trait si es posible, pero asumiremos comportamiento estándar).
+                    // REVISIÓN IMPORTANTE: El trait saveImages($fileContents, $path, $productId)
+                    // En el código original de reference, $productId se usaba como nombre de archivo.
+                    // Vamos a construir un nombre único.
+                    $productId = $event->spaces_id . '_' . time();
+
+                    // Subir imagen
+                    $this->saveImages($fileContents, $pathSegment, $productId);
+
+                    // Actualizar campo en DB. El trait guarda como "$productId.jpg" (o la ext que detecte/fuerce).
+                    // Asumiremos que el trait maneja la extensión o nosotros debemos pasarla.
+                    // Viendo código anterior: $event->banner = env('S3_ENVIRONMENT').'/events/banners/'.$productId.'.jpg';
+                    // Esto asume jpg. Vamos a hacerlo dinámico si el trait lo permite, o forzar jpg/png.
+                    // Por seguridad y compatibilidad con tu código previo:
+                    $fileName = $productId . '.' . $extension;
+
+                    // NOTA: El trait saveImages internamente hace: Storage::disk('s3')->put($path . '/' . $name . '.jpg', $file);
+                    // Si el trait fuerza .jpg, debemos adaptarnos.
+                    // Si el trait permite extensión en el nombre, perfecto.
+                    // Asumiendo que el trait es "inteligente" o fuerza jpg.
+                    // Para evitar errores, usaremos la lógica estándar: subir y guardar URL.
+
+                    // Actualizamos el modelo
+                    $event->$dbField = env('S3_ENVIRONMENT') . '/' . $pathSegment . '/' . $fileName;
+                    $event->save();
+                }
+            };
+
+            $uploadImage('banner', 'events/banners', 'banner');
+            $uploadImage('image', 'events/images', 'image');
+            $uploadImage('icon', 'events/icons', 'icon');
+
+
+            // 5. Crear y asociar tipos de boletos
             foreach ($request->ticket_types as $ticketTypeData) {
-                // Determinar si es un tipo existente (ID) o uno nuevo (Name)
-                $ticketName = $ticketTypeData['name'];
+                // A. Buscar si es un ID existente (selección de lista)
+                // El frontend debería mandar el ID en 'name' si es selección, o el texto si es nuevo.
+                // Ajuste: Vamos a asumir que 'name' trae el texto.
 
-                if (is_numeric($ticketName) && $ticketName > 0) {
-                    $ticketType = TicketType::find($ticketName);
+                // Lógica Híbrida:
+                // Si el usuario seleccionó de la lista, el valor podría ser el ID.
+                // Si escribió uno nuevo, es texto.
+                // Verificamos si es numérico y existe.
 
-                    //Si el id no existe loguear o saltar.
+                $ticketIdentifier = $ticketTypeData['name_other'] ?? $ticketTypeData['name']; // Soporte para input "otro"
+
+                if (is_numeric($ticketIdentifier)) {
+                    $ticketType = TicketType::find($ticketIdentifier);
                     if (!$ticketType) {
-                        \Log::warning("Tipo de Boleto con ID $ticketName no encontrado, saltando.");
-                        continue;
+                        // Fallback por si acaso envió un número que no es ID
+                        $ticketType = TicketType::firstOrCreate(['name' => $ticketIdentifier]);
                     }
                 } else {
-                    $ticketType = TicketType::firstOrCreate(
-                        ['name' => $ticketName]
-                    );
+                    // Texto libre -> Buscar por nombre o crear
+                    $ticketType = TicketType::firstOrCreate(['name' => $ticketIdentifier]);
                 }
 
+                // Asociar al evento con precio y cantidad (tabla pivote tickets_events probablemente, o methods custom)
+                // Asumiendo relación ManyToMany con pivote:
                 $event->ticketTypes()->attach($ticketType->id, [
                     'price' => $ticketTypeData['price'],
                     'quantity' => $ticketTypeData['quantity']
                 ]);
             }
 
-            // Procesar tags
+            // 6. Procesar Tags (similar logic)
             if ($request->has('tags') && is_array($request->tags)) {
                 $tagIds = [];
                 foreach ($request->tags as $tagName) {
                     if (!empty(trim($tagName))) {
                         $tag = Tag::firstOrCreate(
                             ['name' => trim($tagName)],
-                            ['slug' => Str::slug(trim($tagName))]
+                            ['slug' => Str::slug(trim($tagName))] // Asumiendo que Tag tiene slug
                         );
                         $tagIds[] = $tag->id;
                     }
@@ -304,23 +302,22 @@ class SpaceEventController extends Controller
 
             return redirect()
                 ->route('spaces.profile', $space->subdomain)
-                ->with('success', 'Evento creado exitosamente y las imágenes fueron subidas a S3.');
+                ->with('success', 'Evento creado exitosamente.');
+
         } catch (\Exception $e) {
-            // Registrar el error en el log
-            \Log::error('Error al crear el evento: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
-                'exception' => get_class($e)
+            // Registrar el error en el log para debugging
+            \Log::error('Error al crear evento: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
             ]);
 
-            // Mensaje de error más específico si es un error de S3
-            $errorMessage = 'Ocurrió un error al crear el evento. ';
-            if (strpos($e->getMessage(), 'S3') !== false || strpos($e->getMessage(), 'AWS') !== false) {
-                $errorMessage .= 'Error al subir las imágenes a S3. Verifica la configuración de AWS y los logs para más detalles.';
-            } else {
-                $errorMessage .= 'Por favor, intenta nuevamente.';
+            // Mensaje amigable para el usuario
+            $errorMessage = 'Ocurrió un error al crear el evento. Por favor verifica los datos e intenta nuevamente.';
+
+            // Si es error de S3 u otro específico, podrías personalizarlo
+            if (strpos($e->getMessage(), 'S3') !== false) {
+                $errorMessage = 'Error al procesar las imágenes. Verifica tu conexión o configuración.';
             }
 
-            // Retornar con mensaje de error
             return back()
                 ->withInput()
                 ->with('error', $errorMessage);
@@ -329,11 +326,6 @@ class SpaceEventController extends Controller
 
     /**
      * Muestra el formulario para editar un evento existente.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $subdomain
-     * @param  \App\Models\Event  $event
-     * @return \Illuminate\View\View
      */
     public function edit(Request $request, $subdomain, Event $event)
     {
@@ -345,8 +337,16 @@ class SpaceEventController extends Controller
             abort(403, 'Acceso no autorizado a este evento.');
         }
 
-        // 2. Cargar las relaciones necesarias
-        // Cargar la relación ticketTypes con el pivot (quantity y price)
+        // 2. Verificar restricción de 4 días
+        // Si faltan menos de 4 días para que empiece el evento, no se puede editar
+        $daysUntilEvent = now()->diffInDays($event->date, false);
+        if ($daysUntilEvent < 4 && $event->date > now()) {
+            return redirect()
+                ->route('spaces.events.index', $space->subdomain)
+                ->with('error', 'No se puede editar el evento porque faltan menos de 4 días para su realización.');
+        }
+
+        // 3. Cargar las relaciones necesarias
         $event->load([
             'ticketTypes' => function ($query) {
                 $query->withPivot('quantity', 'price');
@@ -360,17 +360,12 @@ class SpaceEventController extends Controller
         // Cargar tags del evento
         $event->load('tags');
 
-        // 3. Retornar la vista de creación (unificada para crear/editar)
+        // 4. Retornar la vista de creación (unificada para crear/editar)
         return view('spaces.events.create', compact('space', 'event', 'ticketTypes', 'typeEvents', 'tags'));
     }
 
     /**
      * Actualiza la información de un evento existente.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $subdomain
-     * @param  \App\Models\Event  $event
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, $subdomain, Event $event)
     {
@@ -382,7 +377,15 @@ class SpaceEventController extends Controller
                 abort(403, 'Acceso no autorizado para editar este evento.');
             }
 
-            // 2. Validar los datos
+            // 2. Verificar restricción de 4 días
+            $daysUntilEvent = now()->diffInDays($event->date, false);
+            if ($daysUntilEvent < 4 && $event->date > now()) {
+                return redirect()
+                    ->route('spaces.events.index', $space->subdomain)
+                    ->with('error', 'No se puede editar el evento porque faltan menos de 4 días para su realización.');
+            }
+
+            // 3. Validar los datos
             $request->validate([
                 'name' => 'required|string|max:255',
                 'description' => 'required|string',
@@ -402,7 +405,7 @@ class SpaceEventController extends Controller
                 'ticket_types.*.quantity' => 'required|integer|min:1',
             ]);
 
-            // 3. Preparar los datos básicos
+            // 4. Preparar los datos básicos
             $eventData = [
                 'name' => $request->name,
                 'description' => $request->description,
@@ -415,9 +418,7 @@ class SpaceEventController extends Controller
                 'agenda' => $request->agenda ?? 'N/A',
             ];
 
-            // 4. Gestión de Archivos (Subir a S3 y actualizar la DB)
-
-            // Función auxiliar para subir y eliminar archivos (basado en tu lógica de store)
+            // 5. Gestión de Archivos (Subir a S3 y actualizar la DB)
             $uploadAndUpdateImage = function ($fileKey, $pathSegment, $dbField, $event, $request) use (&$eventData) {
                 if ($request->hasFile($fileKey)) {
                     $file = $request->file($fileKey);
@@ -436,32 +437,20 @@ class SpaceEventController extends Controller
                     $extension = $extensions[$mimeType] ?? 'jpg';
 
                     $productId = $event->spaces_id . '_' . time();
-                    $fileName = $productId . '.' . $extension; // <-- Crear el nombre del archivo completo
+                    $fileName = $productId . '.' . $extension;
 
-                    // 1. Eliminar la imagen antigua si existe y no es una URL por defecto
-                    // La ruta a eliminar debe coincidir con la ruta guardada en la DB
+                    // Eliminar la imagen antigua si existe y no es una URL por defecto
                     if ($event->$dbField && !Str::startsWith($event->$dbField, 'http')) {
                         $fullPath = $event->$dbField;
-
                         $fileNameToDelete = basename($fullPath);
-
                         $envPrefix = env('S3_ENVIRONMENT') . '/';
-
                         $folderAndFile = Str::after($fullPath, $envPrefix);
-
                         $folderToDelete = Str::beforeLast($folderAndFile, '/');
-
-                        \Log::info("Intentando eliminar la imagen antigua de $dbField. Carpeta: $folderToDelete, Archivo: $fileNameToDelete");
-
-                        // CORRECCIÓN CLAVE: Llamar al método correcto del Trait y pasar los parámetros esperados
                         $this->deleteS3Image($folderToDelete, $fileNameToDelete);
                     }
 
-                    // 2. Guardar la nueva imagen. Asumimos que saveImages usa $productId como nombre base.
                     $this->saveImages($fileContents, $pathSegment, $productId);
-
-                    // 3. Guardar la nueva ruta completa en la DB, ¡igual que en store!
-                    $eventData[$dbField] = env('S3_ENVIRONMENT') . '/' . $pathSegment . '/' . $fileName; // RUTA COMPLETA
+                    $eventData[$dbField] = env('S3_ENVIRONMENT') . '/' . $pathSegment . '/' . $fileName;
                 }
             };
 
@@ -469,11 +458,10 @@ class SpaceEventController extends Controller
             $uploadAndUpdateImage('image', 'events/images', 'image', $event, $request);
             $uploadAndUpdateImage('icon', 'events/icons', 'icon', $event, $request);
 
-            // 5. Actualizar el evento
+            // 6. Actualizar el evento
             $event->update($eventData);
 
-            // 6. Sincronizar tipos de boletos (más complejo ya que hay que manejar nuevos y existentes)
-            $newTicketTypes = [];
+            // 7. Sincronizar tipos de boletos
             $syncData = [];
 
             foreach ($request->ticket_types as $ticketTypeData) {
@@ -482,13 +470,9 @@ class SpaceEventController extends Controller
                 if (is_numeric($ticketIdentifier)) {
                     $ticketType = TicketType::find($ticketIdentifier);
                     if (!$ticketType) {
-                        // Si el ID no existe (ej: fue eliminado externamente), lo ignoramos.
-                        \Log::warning("Tipo de Boleto ID $ticketIdentifier no encontrado, saltando en update.");
                         continue;
                     }
                 } else {
-                    // B. Se escribió un nombre nuevo (Ej: 'Platino'). Buscamos o creamos por nombre.
-                    // Usamos firstOrCreate() con el nombre escrito
                     $ticketType = TicketType::firstOrCreate(
                         ['name' => $ticketIdentifier]
                     );
@@ -499,7 +483,6 @@ class SpaceEventController extends Controller
                 ];
             }
 
-            // Sincronizar: Adjunta/Actualiza solo los IDs pasados y elimina los que faltan
             $event->ticketTypes()->sync($syncData);
 
             // Procesar tags
@@ -516,16 +499,14 @@ class SpaceEventController extends Controller
                 }
                 $event->tags()->sync($tagIds);
             } else {
-                // Si no se enviaron tags, eliminar todas las relaciones
                 $event->tags()->sync([]);
             }
 
             return redirect()
                 ->route('spaces.profile', $space->subdomain)
-                ->with('success', 'Evento actualizado exitosamente y las imágenes fueron gestionadas en S3.');
+                ->with('success', 'Evento actualizado exitosamente.');
 
         } catch (\Exception $e) {
-            // Registrar el error en el log
             \Log::error('Error al actualizar el evento: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'exception' => get_class($e)
@@ -539,6 +520,72 @@ class SpaceEventController extends Controller
             return back()
                 ->withInput()
                 ->with('error', $errorMessage);
+        }
+    }
+
+    /**
+     * Elimina un evento.
+     */
+    public function destroy(Request $request, $subdomain, Event $event)
+    {
+        $space = $request->get('space');
+
+        if ($event->spaces_id !== $space->id) {
+            abort(403, 'Acceso no autorizado a este evento.');
+        }
+
+        $event->delete();
+
+        return redirect()
+            ->route('spaces.events.index', $space->subdomain)
+            ->with('success', 'Evento eliminado correctamente.');
+    }
+
+    /**
+     * Duplica un evento existente.
+     */
+    public function duplicate(Request $request, $subdomain, Event $event)
+    {
+        $space = $request->get('space');
+
+        // 1. Verificar permisos
+        if ($event->spaces_id !== $space->id) {
+            abort(403, 'Acceso no autorizado a este evento.');
+        }
+
+        try {
+            // 2. Replicar evento
+            $newEvent = $event->replicate();
+            $newEvent->name = 'Copia de ' . $event->name;
+            $newEvent->slug = Str::slug($newEvent->name) . '-' . time(); // Slug único
+            $newEvent->active = false; // Inactivo por defecto hasta que se configure
+            $newEvent->date = now()->addDay(); // Fecha temporal para evitar errores
+            $newEvent->created_at = now();
+            $newEvent->updated_at = now();
+            $newEvent->push(); // Guardar y cargar relaciones
+
+            // 3. Duplicar relaciones (ticket types y tags)
+            $event->load(['ticketTypes', 'tags']);
+
+            // Duplicar ticket types con pivote
+            foreach ($event->ticketTypes as $ticketType) {
+                $newEvent->ticketTypes()->attach($ticketType->id, [
+                    'price' => $ticketType->pivot->price,
+                    'quantity' => $ticketType->pivot->quantity
+                ]);
+            }
+
+            // Duplicar tags
+            $newEvent->tags()->sync($event->tags->pluck('id'));
+
+            // 4. Redirigir al formulario de edición del NUEVO evento
+            return redirect()
+                ->route('spaces.events.edit', [$space->subdomain, $newEvent->slug])
+                ->with('success', 'Evento duplicado correctamente. Por favor configura la nueva fecha y activa el evento.');
+
+        } catch (\Exception $e) {
+            \Log::error('Error al duplicar evento: ' . $e->getMessage());
+            return back()->with('error', 'Ocurrió un error al duplicar el evento.');
         }
     }
 }

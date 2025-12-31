@@ -282,12 +282,28 @@ class SpaceController extends Controller
         $allPermissions = \App\Models\Permission::whereNull('deleted_at')->get();
 
         // ===== ORDERS TAB DATA =====
-        $spaceOrders = \App\Models\Order::with(['user', 'payments', 'tickets.ticketType', 'tickets.event'])
+        $ordersSearch = $request->get('orders_search', '');
+        $ordersQuery = \App\Models\Order::with(['user', 'payments', 'tickets.ticketType', 'tickets.event'])
             ->whereHas('tickets', function ($q) use ($eventIds) {
                 $q->whereIn('event_id', $eventIds->toArray());
-            })
+            });
+
+        // Apply search filter
+        if (!empty($ordersSearch)) {
+            $ordersQuery->where(function ($q) use ($ordersSearch) {
+                $q->where('id', 'like', "%{$ordersSearch}%")
+                    ->orWhereHas('user', function ($uq) use ($ordersSearch) {
+                        $uq->where('name', 'like', "%{$ordersSearch}%")
+                            ->orWhere('email', 'like', "%{$ordersSearch}%")
+                            ->orWhere('last_name', 'like', "%{$ordersSearch}%");
+                    });
+            });
+        }
+
+        $spaceOrders = $ordersQuery
             ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            ->paginate(15)
+            ->appends(['tab' => 'orders', 'orders_search' => $ordersSearch]);
 
         // ===== FOLLOW SYSTEM DATA =====
         // Follower count (users with role_space_id = 3 = viewer = follower)

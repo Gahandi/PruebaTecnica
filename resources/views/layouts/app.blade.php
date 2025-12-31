@@ -276,7 +276,8 @@
                                     <!-- User Info -->
                                     <div class="px-4 py-3 border-b border-gray-100">
                                         <p class="text-sm font-medium text-gray-900">{{ $currentUser->name }}
-                                            {{ $currentUser->last_name }}</p>
+                                            {{ $currentUser->last_name }}
+                                        </p>
                                         <p class="text-xs text-gray-500">{{ $currentUser->email }}</p>
                                     </div>
 
@@ -366,7 +367,8 @@
                     </div>
 
                     <!-- Mobile Menu -->
-                    <div id="mobile-menu" class="hidden md:hidden absolute left-0 right-0 top-16 bg-white border-t border-gray-200 shadow-lg z-40 max-h-[calc(100vh-4rem)] overflow-y-auto">
+                    <div id="mobile-menu"
+                        class="hidden md:hidden absolute left-0 right-0 top-16 bg-white border-t border-gray-200 shadow-lg z-40 max-h-[calc(100vh-4rem)] overflow-y-auto">
                         <div class="px-2 pt-2 pb-3 space-y-1">
                             <a href="{{ config('app.url') }}/"
                                 class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">
@@ -380,92 +382,122 @@
                             @endphp
                             @if(auth()->check() && $mobileIsVerified && ($mobileIsAdmin || $mobileIsStaff))
                                 <div class="border-t border-gray-200 pt-2 mt-2">
-                                    <p class="px-3 py-2 text-xs font-semibold text-pink-600 uppercase tracking-wider bg-pink-50 flex items-center">
+                                    <p
+                                        class="px-3 py-2 text-xs font-semibold text-pink-600 uppercase tracking-wider bg-pink-50 flex items-center">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                            </path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                         </svg>
                                         Panel de Administración
                                     </p>
-                                    
+
                                     {{-- Tablero --}}
                                     <a href="{{ route('dashboard') }}"
                                         class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-pink-50 {{ request()->routeIs('dashboard') ? 'bg-pink-50 text-pink-600 border-l-2 border-pink-500' : '' }}">
-                                        <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                        <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                                            </path>
                                         </svg>
                                         Tablero
                                     </a>
-                                    
+
                                     {{-- Usuarios --}}
                                     <a href="{{ route('admin.users.index') }}"
                                         class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-pink-50 {{ request()->routeIs('admin.users.*') ? 'bg-pink-50 text-pink-600 border-l-2 border-pink-500' : '' }}">
-                                        <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                        <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                                            </path>
                                         </svg>
                                         Usuarios
                                     </a>
-                                    
+
                                     {{-- Espacios --}}
                                     <a href="{{ route('admin.spaces.index') }}"
                                         class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-pink-50 {{ request()->routeIs('admin.spaces.*') ? 'bg-pink-50 text-pink-600 border-l-2 border-pink-500' : '' }}">
-                                        <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h6v6H4V6zm10 0h6v6h-6V6zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"></path>
+                                        <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 6h6v6H4V6zm10 0h6v6h-6V6zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"></path>
                                         </svg>
                                         Espacios
                                     </a>
-                                    
+
                                     {{-- Eventos --}}
                                     <a href="{{ route('admin.events.index') }}"
                                         class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-pink-50 {{ request()->routeIs('admin.events.*') ? 'bg-pink-50 text-pink-600 border-l-2 border-pink-500' : '' }}">
-                                        <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                            </path>
                                         </svg>
                                         Eventos
                                     </a>
-                                    
+
                                     {{-- Check-ins --}}
                                     <a href="{{ route('admin.checkins.index') }}"
                                         class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-pink-50 {{ request()->routeIs('admin.checkins.*') ? 'bg-pink-50 text-pink-600 border-l-2 border-pink-500' : '' }}">
-                                        <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                         Check-ins
                                     </a>
-                                    
+
                                     {{-- Activity Log --}}
                                     <a href="{{ route('admin.activity-log.index') }}"
                                         class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-pink-50 {{ request()->routeIs('admin.activity-log.*') ? 'bg-pink-50 text-pink-600 border-l-2 border-pink-500' : '' }}">
-                                        <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                        <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                                            </path>
                                         </svg>
                                         Activity Log
                                     </a>
-                                    
+
                                     {{-- Estadísticas --}}
                                     <a href="{{ route('admin.checkins.stats') }}"
                                         class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-pink-50 {{ request()->routeIs('admin.checkins.stats') ? 'bg-pink-50 text-pink-600 border-l-2 border-pink-500' : '' }}">
-                                        <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                        <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                            </path>
                                         </svg>
                                         Estadísticas
                                     </a>
-                                    
+
                                     {{-- Reportes --}}
                                     <a href="{{ route('admin.reports.index') }}"
                                         class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-pink-50 {{ request()->routeIs('admin.reports.*') ? 'bg-pink-50 text-pink-600 border-l-2 border-pink-500' : '' }}">
-                                        <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                            </path>
                                         </svg>
                                         Reportes
                                     </a>
-                                    
+
                                     {{-- Configuración --}}
                                     <a href="{{ route('admin.settings.index') }}"
                                         class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-pink-50 {{ request()->routeIs('admin.settings.*') ? 'bg-pink-50 text-pink-600 border-l-2 border-pink-500' : '' }}">
-                                        <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <svg class="w-4 h-4 mr-3 text-gray-500" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                            </path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                         </svg>
                                         Configuración
                                     </a>
@@ -626,12 +658,12 @@
             const menu = document.getElementById('mobile-menu');
             const button = document.getElementById('mobile-menu-button');
             const mobileCartMenu = document.getElementById('mobile-cart-menu');
-            
+
             // Cerrar carrito móvil si está abierto
             if (mobileCartMenu && mobileCartMenu.style.display !== 'none') {
                 mobileCartMenu.style.display = 'none';
             }
-            
+
             if (menu.classList.contains('hidden')) {
                 menu.classList.remove('hidden');
                 button.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
@@ -674,17 +706,17 @@
         function toggleMobileCartDropdown() {
             const mobileCartMenu = document.getElementById('mobile-cart-menu');
             const mobileMenu = document.getElementById('mobile-menu');
-            
+
             if (!mobileCartMenu) {
                 console.error('Mobile cart menu not found');
                 return;
             }
-            
+
             // Cerrar menú móvil si está abierto
             if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
                 mobileMenu.classList.add('hidden');
             }
-            
+
             if (mobileCartMenu.style.display === 'none' || mobileCartMenu.style.display === '') {
                 mobileCartMenu.style.display = 'block';
                 // Actualizar contenido del carrito
@@ -768,9 +800,71 @@
                 mobileCartMenu.style.display = 'none';
             }
         }
+
+        // Función para actualizar el contador del carrito (retorna Promise)
+        function updateCartCount() {
+            return fetch('{{ route("cart.count") }}', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Actualizar contador en el header desktop
+                    const cartButton = document.querySelector('#cart-dropdown button');
+                    let cartBadge = document.querySelector('#cart-dropdown .bg-red-500');
+
+                    if (data.count > 0) {
+                        if (!cartBadge && cartButton) {
+                            cartBadge = document.createElement('span');
+                            cartBadge.className = 'absolute -top-0.5 -right-0.5 inline-flex items-center justify-center bg-red-500 text-white text-xs font-bold min-w-[18px] h-[18px] px-1 rounded-full border-2 border-white shadow-lg';
+                            cartButton.appendChild(cartBadge);
+                        }
+                        if (cartBadge) {
+                            cartBadge.textContent = data.count;
+                            cartBadge.style.display = 'inline-flex';
+                        }
+                    } else {
+                        if (cartBadge) {
+                            cartBadge.style.display = 'none';
+                        }
+                    }
+                    return data.count;
+                })
+                .catch(error => {
+                    console.error('Error updating cart count:', error);
+                    return 0;
+                });
+        }
+
+        // Función para actualizar el dropdown del carrito
+        function updateCartDropdown() {
+            const cartMenu = document.getElementById('cart-menu');
+            if (!cartMenu) return Promise.resolve();
+
+            return fetch('{{ route("cart.dropdown") }}', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                }
+            })
+                .then(response => response.text())
+                .then(html => {
+                    cartMenu.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error updating cart dropdown:', error);
+                });
+        }
+
         // Hacer funciones disponibles globalmente
         window.toggleCartDropdown = toggleCartDropdown;
         window.closeCartDropdown = closeCartDropdown;
+        window.updateCartCount = updateCartCount;
+        window.updateCartDropdown = updateCartDropdown;
         // Cerrar dropdowns al hacer clic fuera
         document.addEventListener('click', function (event) {
             // Desktop cart

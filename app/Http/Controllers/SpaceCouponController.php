@@ -15,11 +15,11 @@ class SpaceCouponController extends Controller
     private function getSpace($subdomain)
     {
         $space = Space::where('subdomain', $subdomain)->first();
-        
+
         if (!$space) {
             abort(404, 'Espacio no encontrado');
         }
-        
+
         return $space;
     }
 
@@ -84,6 +84,10 @@ class SpaceCouponController extends Controller
             ],
             'discount_percentage' => 'required|integer|min:1|max:100',
             'expires_at' => 'nullable|date|after:now',
+            'max_uses' => 'nullable|integer|min:1',
+            'max_uses_per_user' => 'nullable|integer|min:1',
+            'min_order_amount' => 'nullable|numeric|min:0',
+            'is_active' => 'boolean',
         ]);
 
         Coupon::create([
@@ -91,10 +95,14 @@ class SpaceCouponController extends Controller
             'discount_percentage' => $request->discount_percentage,
             'expires_at' => $request->expires_at,
             'spaces_id' => $space->id,
+            'max_uses' => $request->max_uses,
+            'max_uses_per_user' => $request->max_uses_per_user,
+            'min_order_amount' => $request->min_order_amount,
+            'is_active' => $request->has('is_active'),
         ]);
 
         return redirect()->route('spaces.coupons.index', $subdomain)
-                         ->with('success', 'Cupón creado correctamente.');
+            ->with('success', 'Cupón creado correctamente.');
     }
 
     /**
@@ -160,17 +168,25 @@ class SpaceCouponController extends Controller
                 },
             ],
             'discount_percentage' => 'required|integer|min:1|max:100',
-            'expires_at' => 'nullable|date|after:now',
+            'expires_at' => 'nullable|date',
+            'max_uses' => 'nullable|integer|min:1',
+            'max_uses_per_user' => 'nullable|integer|min:1',
+            'min_order_amount' => 'nullable|numeric|min:0',
+            'is_active' => 'boolean',
         ]);
 
         $coupon->update([
             'code' => strtoupper($request->code),
             'discount_percentage' => $request->discount_percentage,
             'expires_at' => $request->expires_at,
+            'max_uses' => $request->max_uses,
+            'max_uses_per_user' => $request->max_uses_per_user,
+            'min_order_amount' => $request->min_order_amount,
+            'is_active' => $request->has('is_active'),
         ]);
 
         return redirect()->route('spaces.coupons.index', $subdomain)
-                         ->with('success', 'Cupón actualizado correctamente.');
+            ->with('success', 'Cupón actualizado correctamente.');
     }
 
     /**
@@ -189,6 +205,6 @@ class SpaceCouponController extends Controller
         $coupon->delete();
 
         return redirect()->route('spaces.coupons.index', $subdomain)
-                         ->with('success', 'Cupón eliminado correctamente.');
+            ->with('success', 'Cupón eliminado correctamente.');
     }
 }

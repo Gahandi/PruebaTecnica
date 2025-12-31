@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Event;
 use App\Models\Space;
 use App\Models\Order;
+use App\Models\Payment;
+use App\Models\Ticket;
 
 class AdminEventController extends Controller
 {
@@ -46,12 +48,13 @@ class AdminEventController extends Controller
         ]);
 
         // Estadísticas del evento
+        $completedOrderIds = $event->orders()->where('status', 'completed')->pluck('id');
         $stats = [
             'total_orders' => $event->orders()->count(),
-            'completed_orders' => $event->orders()->where('status', 'completed')->count(),
+            'completed_orders' => $completedOrderIds->count(),
             'total_tickets' => $event->tickets()->count(),
-            'checked_in' => $event->tickets()->whereNotNull('checked_in_at')->count(),
-            'total_revenue' => $event->orders()->where('status', 'completed')->sum('total'),
+            'checked_in' => $event->tickets()->where('used', true)->count(),
+            'total_revenue' => Payment::whereIn('order_id', $completedOrderIds)->sum('total'),
         ];
 
         // Órdenes del evento paginadas
@@ -64,8 +67,10 @@ class AdminEventController extends Controller
         $ticketTypes = $event->tickets_events()
             ->with('ticket_type')
             ->get()
-            ->map(function ($te) {
-                $sold = $te->tickets()->count();
+            ->map(function ($te) use ($event) {
+                $sold = Ticket::where('ticket_types_id', $te->ticket_types_id)
+                    ->where('event_id', $event->id)
+                    ->count();
                 return [
                     'id' => $te->id,
                     'name' => $te->ticket_type->name ?? 'Sin tipo',
