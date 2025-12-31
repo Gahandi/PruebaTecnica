@@ -192,49 +192,80 @@
 </div>
 
 <!-- Invite User Modal -->
-<div id="inviteUserModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        <div class="p-6">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-bold text-gray-900">Invitar Usuario</h3>
-                <button onclick="closeInviteModal()" class="text-gray-400 hover:text-gray-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-            
-            <form id="inviteUserForm" onsubmit="inviteUser(event)">
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Email del Usuario</label>
-                        <input type="email" name="email" id="inviteEmail" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
-                               placeholder="usuario@ejemplo.com">
+<div id="inviteUserModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <!-- Backdrop with blur -->
+    <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity opacity-0" id="modalBackdrop"></div>
+
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <!-- Modal Panel -->
+            <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md opacity-0 scale-95" id="modalPanel">
+                
+                <!-- Decoración superior (gradiente) -->
+                <div class="h-2 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"></div>
+
+                <div class="px-6 py-6 sm:p-6">
+                    <div class="flex items-center justify-between mb-5">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900" id="modal-title">Invitar Colaborador</h3>
+                            <p class="text-sm text-gray-500 mt-1">Envía una invitación por correo electrónico.</p>
+                        </div>
+                        <div class="flex-shrink-0 bg-pink-50 rounded-full p-2 mx-auto sm:mx-0 sm:h-10 sm:w-10 flex items-center justify-center">
+                            <svg class="h-6 w-6 text-pink-500" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                            </svg>
+                        </div>
                     </div>
                     
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Rol</label>
-                        <select name="role_space_id" id="inviteRole" required
-                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500">
-                            @foreach($roleSpaces ?? [] as $roleSpace)
-                                <option value="{{ $roleSpace->id }}">{{ ucfirst($roleSpace->name) }} - {{ $roleSpace->description }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+                    <form id="inviteUserForm" onsubmit="inviteUser(event)">
+                        <div class="space-y-5">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email del Usuario</label>
+                                <div class="relative rounded-md shadow-sm">
+                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                        <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path d="M3 4a2 2 0 00-2 2v1.161l8.441 4.221a1.25 1.25 0 001.118 0L19 7.162V6a2 2 0 00-2-2H3z" />
+                                            <path d="M19 8.839l-7.77 3.885a2.75 2.75 0 01-2.46 0L1 8.839V14a2 2 0 002 2h14a2 2 0 002-2V8.839z" />
+                                        </svg>
+                                    </div>
+                                    <input type="email" name="email" id="inviteEmail" required
+                                        class="block w-full rounded-lg border-gray-300 pl-10 focus:border-pink-500 focus:ring-pink-500 sm:text-sm py-3"
+                                        placeholder="usuario@ejemplo.com">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Rol Asignado</label>
+                                <div class="relative">
+                                    <select name="role_space_id" id="inviteRole" required
+                                            class="block w-full appearance-none rounded-lg border border-gray-300 bg-white py-3 px-3 shadow-sm focus:border-pink-500 focus:outline-none focus:ring-1 focus:ring-pink-500 sm:text-sm">
+                                        @foreach($roleSpaces ?? [] as $roleSpace)
+                                            <option value="{{ $roleSpace->id }}">{{ ucfirst($roleSpace->name) }}</option>
+                                        @endforeach
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <p class="mt-2 text-xs text-gray-500" id="roleDescription">Selecciona los permisos que tendrá el usuario.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 flex flex-col-reverse sm:flex-row gap-3">
+                            <button type="button" onclick="closeInviteModal()"
+                                    class="inline-flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-3 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm transition-colors">
+                                Cancelar
+                            </button>
+                            <button type="submit" id="inviteSubmitBtn"
+                                    class="inline-flex w-full justify-center rounded-lg bg-pink-600 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+                                Enviar Invitación
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                
-                <div class="mt-6 flex gap-3">
-                    <button type="button" onclick="closeInviteModal()"
-                            class="flex-1 px-4 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors">
-                        Cancelar
-                    </button>
-                    <button type="submit" id="inviteSubmitBtn"
-                            class="flex-1 px-4 py-3 bg-gradient-to-r from-pink-500 to-pink-600 text-white font-semibold rounded-lg hover:from-pink-600 hover:to-pink-700 transition-all">
-                        Invitar
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
@@ -242,13 +273,41 @@
 <script>
 // User Management Functions
 function openInviteModal() {
-    document.getElementById('inviteUserModal').classList.remove('hidden');
+    const modal = document.getElementById('inviteUserModal');
+    const backdrop = document.getElementById('modalBackdrop');
+    const panel = document.getElementById('modalPanel');
+    
+    modal.classList.remove('hidden');
+    
+    // Small delay to allow display:block to apply before opacity transition
+    setTimeout(() => {
+        backdrop.classList.remove('opacity-0');
+        backdrop.classList.add('opacity-100');
+        
+        panel.classList.remove('opacity-0', 'scale-95');
+        panel.classList.add('opacity-100', 'scale-100');
+    }, 10);
+    
     document.getElementById('inviteEmail').focus();
 }
 
 function closeInviteModal() {
-    document.getElementById('inviteUserModal').classList.add('hidden');
-    document.getElementById('inviteUserForm').reset();
+    const modal = document.getElementById('inviteUserModal');
+    const backdrop = document.getElementById('modalBackdrop');
+    const panel = document.getElementById('modalPanel');
+    
+    // Start exit transition
+    backdrop.classList.remove('opacity-100');
+    backdrop.classList.add('opacity-0');
+    
+    panel.classList.remove('opacity-100', 'scale-100');
+    panel.classList.add('opacity-0', 'scale-95');
+    
+    // Wait for transition to finish before hiding
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        document.getElementById('inviteUserForm').reset();
+    }, 300); // Match duration-300
 }
 
 function inviteUser(event) {
@@ -258,8 +317,16 @@ function inviteUser(event) {
     const roleId = document.getElementById('inviteRole').value;
     const submitBtn = document.getElementById('inviteSubmitBtn');
     
+    // Change button state with spinner
+    const originalBtnContent = submitBtn.innerHTML;
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Invitando...';
+    submitBtn.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Enviando invitación...
+    `;
     
     fetch('/manage/users/invite', {
         method: 'POST',
@@ -277,21 +344,40 @@ function inviteUser(event) {
     .then(data => {
         if (data.success) {
             closeInviteModal();
-            // Show success message
+            // Show premium success animation
             Swal.fire({
+                title: '¡Invitación Enviada!',
+                text: `Se ha enviado un correo a ${email} con las instrucciones.`,
                 icon: 'success',
-                title: '¡Usuario invitado!',
-                text: data.message || 'El usuario ha sido agregado al espacio.',
-                confirmButtonColor: '#ec4899'
+                iconColor: '#ec4899', // Pink to match theme
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                background: '#ffffff',
+                customClass: {
+                    popup: 'rounded-2xl shadow-xl border border-gray-100',
+                    title: 'text-xl font-bold text-gray-900',
+                    htmlContainer: 'text-gray-600'
+                },
+                backdrop: `
+                    rgba(0,0,123,0.1)
+                    left top
+                    no-repeat
+                `
             }).then(() => {
+                // Optional: Reload only if user was added directly (not common with email invite flow)
+                // For now, reload to keep consistency if they were already registered
                 window.location.reload();
             });
         } else {
             Swal.fire({
                 icon: 'error',
-                title: 'Error',
-                text: data.message || 'No se pudo invitar al usuario.',
-                confirmButtonColor: '#ec4899'
+                title: 'No se pudo enviar',
+                text: data.message || 'Ocurrió un error inesperado.',
+                confirmButtonColor: '#ec4899',
+                customClass: {
+                    popup: 'rounded-2xl'
+                }
             });
         }
     })
@@ -299,14 +385,17 @@ function inviteUser(event) {
         console.error('Error:', error);
         Swal.fire({
             icon: 'error',
-            title: 'Error',
-            text: 'Ocurrió un error al procesar la solicitud.',
-            confirmButtonColor: '#ec4899'
+            title: 'Error de conexión',
+            text: 'Verifique su conexión a internet.',
+            confirmButtonColor: '#ec4899',
+            customClass: {
+                    popup: 'rounded-2xl'
+            }
         });
     })
     .finally(() => {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Invitar';
+        submitBtn.innerHTML = originalBtnContent;
     });
 }
 
