@@ -121,18 +121,22 @@ class ActivityLogController extends Controller
             $file = fopen('php://output', 'w');
 
             // Headers
-            fputcsv($file, ['ID', 'Usuario', 'Acción', 'Descripción', 'Modelo', 'ID Modelo', 'IP', 'Fecha']);
+            fputcsv($file, ['ID', 'Usuario', 'Email', 'Acción', 'Acción (Código)', 'Descripción', 'Modelo', 'ID Modelo', 'IP', 'País', 'Ciudad', 'Fecha']);
 
             // Data
             foreach ($logs as $log) {
                 fputcsv($file, [
                     $log->id,
                     $log->user ? $log->user->name : 'Sistema',
+                    $log->user ? $log->user->email : '',
+                    $log->action_translated,
                     $log->action,
                     $log->description,
-                    $log->model_type ?? '',
+                    $log->model_translated ?? '',
                     $log->model_id ?? '',
                     $log->ip_address ?? '',
+                    $log->country ?? '',
+                    $log->city ?? '',
                     $log->created_at->format('Y-m-d H:i:s'),
                 ]);
             }

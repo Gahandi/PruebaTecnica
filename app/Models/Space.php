@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\LogsActivity;
 
 class Space extends Model
 {
-    use SoftDeletes;
-    
+    use SoftDeletes, LogsActivity;
+
     protected $table = 'spaces';
 
     protected $fillable = [
@@ -35,8 +36,8 @@ class Space extends Model
     public function users()
     {
         return $this->belongsToMany(User::class, 'spaces_users')
-                    ->withPivot('id', 'role_space_id', 'deleted_at')
-                    ->withTimestamps();
+            ->withPivot('id', 'role_space_id', 'deleted_at')
+            ->withTimestamps();
     }
 
     public function events()

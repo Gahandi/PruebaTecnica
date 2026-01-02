@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use App\Traits\LogsActivity;
 
 /**
  * Class Order
@@ -35,9 +36,9 @@ use Illuminate\Support\Str;
  */
 class Order extends Model
 {
-	use SoftDeletes;
+	use SoftDeletes, LogsActivity;
 	protected $table = 'orders';
-    protected $keyType = 'string';
+	protected $keyType = 'string';
 	public $incrementing = false;
 
 	protected $casts = [
@@ -55,16 +56,16 @@ class Order extends Model
 		'status'
 	];
 
-    protected static function boot()
-    {
-        parent::boot();
+	protected static function boot()
+	{
+		parent::boot();
 
-        static::creating(function ($model) {
-            if (empty($model->id)) {
-                $model->id = Str::uuid();
-            }
-        });
-    }
+		static::creating(function ($model) {
+			if (empty($model->id)) {
+				$model->id = Str::uuid();
+			}
+		});
+	}
 	public function getEventAttribute()
 	{
 		if (!$this->event_id) {

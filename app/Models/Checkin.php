@@ -9,6 +9,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\LogsActivity;
 
 /**
  * Class Checkin
@@ -28,7 +29,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Checkin extends Model
 {
-	use SoftDeletes;
+	use SoftDeletes, LogsActivity;
 	protected $table = 'checkins';
 
 	protected $casts = [

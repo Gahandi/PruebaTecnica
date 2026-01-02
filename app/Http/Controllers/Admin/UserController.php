@@ -65,7 +65,7 @@ class UserController extends Controller
             'today' => User::whereDate('created_at', today())->count(),
         ];
 
-        ActivityLog::log('viewed', 'Viewed users list', 'User', null);
+        ActivityLog::log('viewed', 'Visualizó lista de usuarios', 'User', null);
 
         return view('admin.users.index', compact('users', 'stats'));
     }
@@ -127,9 +127,9 @@ class UserController extends Controller
 
             $extensions = [
                 'image/jpeg' => 'jpg',
-                'image/jpg'  => 'jpg',
-                'image/png'  => 'png',
-                'image/gif'  => 'gif',
+                'image/jpg' => 'jpg',
+                'image/png' => 'png',
+                'image/gif' => 'gif',
                 'image/webp' => 'webp',
             ];
 
@@ -199,7 +199,7 @@ class UserController extends Controller
             ->limit(10)
             ->get();
 
-        ActivityLog::log('viewed', "Viewed user profile: {$user->name}", 'User', $user->id);
+        ActivityLog::log('viewed', "Visualizó perfil de usuario: {$user->name}", 'User', $user->id);
 
         return view('admin.users.show', compact('user', 'stats', 'recentActivity'));
     }

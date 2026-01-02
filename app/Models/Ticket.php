@@ -10,8 +10,8 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\LogsActivity;
 
 
 
@@ -34,7 +34,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Ticket extends Model
 {
-	use SoftDeletes;
+	use SoftDeletes, LogsActivity;
 	protected $table = 'tickets';
 	public $incrementing = false;
 
@@ -52,16 +52,16 @@ class Ticket extends Model
 		'qr_url'
 	];
 
-    protected static function boot()
-    {
-        parent::boot();
+	protected static function boot()
+	{
+		parent::boot();
 
-        static::creating(function ($model) {
-            if (empty($model->id)) {
-                $model->id = Str::uuid();
-            }
-        });
-    }
+		static::creating(function ($model) {
+			if (empty($model->id)) {
+				$model->id = Str::uuid();
+			}
+		});
+	}
 
 	public function order()
 	{
@@ -73,7 +73,7 @@ class Ticket extends Model
 		return $this->belongsTo(TicketType::class, 'ticket_types_id');
 	}
 
-    public function event()
+	public function event()
 	{
 		return $this->belongsTo(Event::class, 'event_id');
 	}

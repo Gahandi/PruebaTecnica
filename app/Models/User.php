@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Spatie\Permission\Traits\HasRoles;
+use App\Traits\LogsActivity;
 
 class User extends Authenticatable
 {
-    use SoftDeletes, HasRoles;
+    use SoftDeletes, HasRoles, LogsActivity;
 
     protected $table = 'users';
 

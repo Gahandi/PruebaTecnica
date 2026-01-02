@@ -16,7 +16,7 @@ class SettingsController extends Controller
     {
         $settings = Setting::orderBy('group')->orderBy('key')->get()->groupBy('group');
 
-        ActivityLog::log('viewed', 'Viewed settings page');
+        ActivityLog::log('viewed', 'Visualizó página de configuración');
 
         return view('admin.settings.index', compact('settings'));
     }
@@ -41,7 +41,7 @@ class SettingsController extends Controller
             }
         }
 
-        ActivityLog::log('updated', 'Updated system settings', null, null, [
+        ActivityLog::log('updated', 'Actualizó configuraciones del sistema', null, null, [
             'settings_count' => count($validated['settings'])
         ]);
 
@@ -64,7 +64,7 @@ class SettingsController extends Controller
 
         Setting::create($validated);
 
-        ActivityLog::log('created', "Created setting: {$validated['key']}", 'Setting', null, $validated);
+        ActivityLog::log('created', "Creó configuración: {$validated['key']}", 'Setting', null, $validated);
 
         return redirect()->route('admin.settings.index')
             ->with('success', 'Configuración creada exitosamente.');
@@ -78,7 +78,7 @@ class SettingsController extends Controller
         $key = $setting->key;
         $setting->delete();
 
-        ActivityLog::log('deleted', "Deleted setting: {$key}", 'Setting', null);
+        ActivityLog::log('deleted', "Eliminó configuración: {$key}", 'Setting', null);
 
         return redirect()->route('admin.settings.index')
             ->with('success', 'Configuración eliminada exitosamente.');
@@ -118,7 +118,7 @@ class SettingsController extends Controller
             );
         }
 
-        ActivityLog::log('created', 'Initialized default settings', null, null, [
+        ActivityLog::log('created', 'Inicializó configuraciones por defecto', null, null, [
             'count' => count($defaults)
         ]);
 
@@ -156,7 +156,7 @@ class SettingsController extends Controller
 
         $setting->update($validated);
 
-        ActivityLog::log('updated', "Updated setting: {$setting->key}", 'Setting', $setting->id, $validated);
+        ActivityLog::log('updated', "Actualizó configuración: {$setting->key}", 'Setting', $setting->id, $validated);
 
         return redirect()->route('admin.settings.index')
             ->with('success', 'Configuración actualizada exitosamente.');

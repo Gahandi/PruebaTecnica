@@ -71,7 +71,9 @@
                                 <div>
                                     <label for="description"
                                         class="block text-sm font-medium text-gray-700 mb-3">Descripción</label>
-                                    <textarea name="description" id="description" rows="4" required
+                                    {{-- Nota: Se eliminó 'required' porque EasyMDE oculta el textarea y causa errores de
+                                    validación de navegador --}}
+                                    <textarea name="description" id="description" rows="4"
                                         class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 @error('description') border-red-500 @enderror"
                                         placeholder="Describe tu evento...">{{ old('description', $event->description ?? '') }}</textarea>
                                     @error('description')
@@ -113,9 +115,9 @@
                                         <div class="flex flex-col sm:flex-row gap-2">
                                             <select name="type_event_id" id="type_event_id" required
                                                 class="w-full sm:flex-1 border-2 border-pink-200 rounded-xl px-4 py-3
-                                                                                            focus:ring-2 focus:ring-pink-500 focus:border-pink-500
-                                                                                            transition-all duration-200
-                                                                                            @error('type_event_id') border-red-500 @enderror">
+                                                                                                focus:ring-2 focus:ring-pink-500 focus:border-pink-500
+                                                                                                transition-all duration-200
+                                                                                                @error('type_event_id') border-red-500 @enderror">
                                                 <option value="">Selecciona un tipo</option>
                                                 @foreach($typeEvents as $typeEvent)
                                                     <option value="{{ $typeEvent->id }}" {{ old('type_event_id', $event->type_events_id ?? '') == $typeEvent->id ? 'selected' : '' }}>
@@ -126,11 +128,11 @@
 
                                             <button type="button" onclick="openCategoryModal()"
                                                 class="w-full sm:w-auto
-                                                                                            bg-gradient-to-r from-pink-500 to-pink-400
-                                                                                            hover:from-pink-600 hover:to-pink-500
-                                                                                            text-white px-4 py-3 rounded-xl
-                                                                                            transition-all duration-300 shadow-md hover:shadow-lg
-                                                                                            flex items-center justify-center space-x-2" title="Crear nueva categoría">
+                                                                                                bg-gradient-to-r from-pink-500 to-pink-400
+                                                                                                hover:from-pink-600 hover:to-pink-500
+                                                                                                text-white px-4 py-3 rounded-xl
+                                                                                                transition-all duration-300 shadow-md hover:shadow-lg
+                                                                                                flex items-center justify-center space-x-2" title="Crear nueva categoría">
 
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -755,41 +757,41 @@
             const currentIndex = ticketTypeCount; // Capturar el índice actual
 
             newTicketType.innerHTML = `
-                                                        <div class="flex justify-between items-start mb-4">
-                                                            <h3 class="font-semibold text-gray-900 text-lg">Tipo de Boleto ${currentIndex + 1}</h3>
-                                                            <button type="button" onclick="removeTicketType(this)"
-                                                                    class="text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded-lg transition-all duration-200 absolute top-4 right-4">
-                                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                                </svg>
-                                                            </button>
-                                                        </div>
-                                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                            <div>
-                                                                <label class="block text-sm font-medium text-gray-700 mb-3">Nombre del Boleto</label>
-                                                                <select name="ticket_types[${currentIndex}][name]" data-index="${currentIndex}" class="ticket-name-select w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200" required>
-                                                                    <option value="">Selecciona un tipo</option>
-                                                                    @foreach($ticketTypes as $ticketType)
-                                                                        <option value="{{ $ticketType->id }}">{{ $ticketType->name }}</option>
-                                                                    @endforeach
-                                                                    <option value="other">Agregar otro tipo</option>
-                                                                </select>
-                                                                <input type="text" name="ticket_types[${currentIndex}][name_other]" class="ticket-name-input hidden w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200" placeholder="Escribe el nombre del boleto">
+                                                            <div class="flex justify-between items-start mb-4">
+                                                                <h3 class="font-semibold text-gray-900 text-lg">Tipo de Boleto ${currentIndex + 1}</h3>
+                                                                <button type="button" onclick="removeTicketType(this)"
+                                                                        class="text-red-600 hover:text-red-800 hover:bg-red-50 p-2 rounded-lg transition-all duration-200 absolute top-4 right-4">
+                                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                                    </svg>
+                                                                </button>
                                                             </div>
-                                                            <div>
-                                                                <label class="block text-sm font-medium text-gray-700 mb-3">Precio ($)</label>
-                                                                <input type="number" name="ticket_types[${currentIndex}][price]" step="0.01" min="0" required
-                                                                       class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
-                                                                       placeholder="0.00">
+                                                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                                <div>
+                                                                    <label class="block text-sm font-medium text-gray-700 mb-3">Nombre del Boleto</label>
+                                                                    <select name="ticket_types[${currentIndex}][name]" data-index="${currentIndex}" class="ticket-name-select w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200" required>
+                                                                        <option value="">Selecciona un tipo</option>
+                                                                        @foreach($ticketTypes as $ticketType)
+                                                                            <option value="{{ $ticketType->id }}">{{ $ticketType->name }}</option>
+                                                                        @endforeach
+                                                                        <option value="other">Agregar otro tipo</option>
+                                                                    </select>
+                                                                    <input type="text" name="ticket_types[${currentIndex}][name_other]" class="ticket-name-input hidden w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200" placeholder="Escribe el nombre del boleto">
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-sm font-medium text-gray-700 mb-3">Precio ($)</label>
+                                                                    <input type="number" name="ticket_types[${currentIndex}][price]" step="0.01" min="0" required
+                                                                           class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
+                                                                           placeholder="0.00">
+                                                                </div>
+                                                                <div>
+                                                                    <label class="block text-sm font-medium text-gray-700 mb-3">Cantidad</label>
+                                                                    <input type="number" name="ticket_types[${currentIndex}][quantity]" min="1" required
+                                                                           class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
+                                                                           placeholder="50">
+                                                                </div>
                                                             </div>
-                                                            <div>
-                                                                <label class="block text-sm font-medium text-gray-700 mb-3">Cantidad</label>
-                                                                <input type="number" name="ticket_types[${currentIndex}][quantity]" min="1" required
-                                                                       class="w-full border-2 border-pink-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200"
-                                                                       placeholder="50">
-                                                            </div>
-                                                        </div>
-                                                    `;
+                                                        `;
             container.appendChild(newTicketType);
 
             // Agregar event listener al nuevo select
@@ -852,11 +854,11 @@
                     const errorMessage = document.createElement('p');
                     errorMessage.className = 'mt-2 text-sm text-red-600 flex items-center date-validation-error';
                     errorMessage.innerHTML = `
-                                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                                                </svg>
-                                                                No se puede crear un evento con fecha anterior o igual a la de hoy.
-                                                            `;
+                                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                                    </svg>
+                                                                    No se puede crear un evento con fecha anterior o igual a la de hoy.
+                                                                `;
 
                     // Insertar el mensaje justo después del input de fecha
                     dateInput.parentNode.appendChild(errorMessage);
@@ -888,7 +890,7 @@
                         "{{ $tag->name }}"{{ !$loop->last ? ',' : '' }}
                     @endforeach
                 @endif
-                                                    ];
+                                                        ];
 
             function addTag(tagName) {
                 tagName = tagName.trim();
@@ -928,17 +930,17 @@
                     const tagElement = document.createElement('span');
                     tagElement.className = 'inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium bg-gradient-to-r from-pink-100 to-emerald-100 text-pink-800 border border-pink-300 shadow-sm hover:shadow-md transition-all duration-200 transform hover:scale-105';
                     tagElement.innerHTML = `
-                                                                <svg class="w-3 h-3 mr-1.5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                                                                </svg>
-                                                                ${tag}
-                                                                <button type="button" onclick="removeTagFromEvent('${tag.replace(/'/g, "\\'")}')" 
-                                                                        class="ml-2 text-pink-700 hover:text-red-600 hover:bg-red-50 rounded-full p-0.5 transition-all duration-200">
-                                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                                    <svg class="w-3 h-3 mr-1.5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                                                                     </svg>
-                                                                </button>
-                                                            `;
+                                                                    ${tag}
+                                                                    <button type="button" onclick="removeTagFromEvent('${tag.replace(/'/g, "\\'")}')" 
+                                                                            class="ml-2 text-pink-700 hover:text-red-600 hover:bg-red-50 rounded-full p-0.5 transition-all duration-200">
+                                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                                        </svg>
+                                                                    </button>
+                                                                `;
                     tagsContainer.appendChild(tagElement);
                 });
             }
@@ -1008,83 +1010,83 @@
 
             // CSS personalizado para que la previsualización coincida con la vista final
             const previewStyles = `
-                                                        .editor-preview, .EasyMDEContainer .editor-preview-side {
-                                                            font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
-                                                            padding: 1.5rem;
-                                                            background: linear-gradient(to bottom right, rgba(255,255,255,0.7), rgba(255,255,255,0.6), rgba(251,231,239,0.4));
-                                                            border-radius: 0.75rem;
-                                                            border: 1px solid rgba(236,72,153,0.2);
-                                                        }
-                                                        .editor-preview h1, .EasyMDEContainer .editor-preview-side h1 { 
-                                                            font-size: 2rem; font-weight: 700; color: #111827; margin-bottom: 1rem; 
-                                                            border-bottom: 2px solid #ec4899; padding-bottom: 0.5rem;
-                                                        }
-                                                        .editor-preview h2, .EasyMDEContainer .editor-preview-side h2 { 
-                                                            font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 0.75rem; 
-                                                        }
-                                                        .editor-preview h3, .EasyMDEContainer .editor-preview-side h3 { 
-                                                            font-size: 1.25rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem; 
-                                                        }
-                                                        .editor-preview p, .EasyMDEContainer .editor-preview-side p { 
-                                                            color: #374151; line-height: 1.75; margin-bottom: 1rem; 
-                                                        }
-                                                        .editor-preview strong, .EasyMDEContainer .editor-preview-side strong { 
-                                                            font-weight: 600; color: #111827; 
-                                                        }
-                                                        .editor-preview a, .EasyMDEContainer .editor-preview-side a { 
-                                                            color: #ec4899; text-decoration: underline; 
-                                                        }
-                                                        .editor-preview a:hover, .EasyMDEContainer .editor-preview-side a:hover { 
-                                                            color: #be185d; 
-                                                        }
-                                                        .editor-preview code, .EasyMDEContainer .editor-preview-side code {
-                                                            background: rgba(139,92,246,0.1); color: #7c3aed; 
-                                                            padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875rem;
-                                                        }
-                                                        .editor-preview pre, .EasyMDEContainer .editor-preview-side pre {
-                                                            background: #1f2937; color: #f3f4f6; padding: 1rem; 
-                                                            border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0;
-                                                        }
-                                                        .editor-preview pre code, .EasyMDEContainer .editor-preview-side pre code {
-                                                            background: transparent; color: inherit; padding: 0;
-                                                        }
-                                                        .editor-preview blockquote, .EasyMDEContainer .editor-preview-side blockquote {
-                                                            border-left: 4px solid #ec4899; background: rgba(251,231,239,0.5);
-                                                            padding: 0.75rem 1rem; margin: 1rem 0; color: #1f2937; font-style: italic;
-                                                        }
-                                                        .editor-preview ul, .EasyMDEContainer .editor-preview-side ul { 
-                                                            list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; color: #374151;
-                                                        }
-                                                        .editor-preview ol, .EasyMDEContainer .editor-preview-side ol { 
-                                                            list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; color: #374151;
-                                                        }
-                                                        .editor-preview li, .EasyMDEContainer .editor-preview-side li { 
-                                                            margin-bottom: 0.5rem; line-height: 1.75;
-                                                        }
-                                                        .editor-preview li::marker, .EasyMDEContainer .editor-preview-side li::marker {
-                                                            color: #ec4899;
-                                                        }
-                                                        .editor-preview table, .EasyMDEContainer .editor-preview-side table {
-                                                            width: 100%; border-collapse: collapse; margin: 1rem 0;
-                                                        }
-                                                        .editor-preview th, .EasyMDEContainer .editor-preview-side th {
-                                                            background: #fce7f3; color: #831843; padding: 0.75rem; 
-                                                            border: 1px solid #f9a8d4; text-align: left; font-weight: 600;
-                                                        }
-                                                        .editor-preview td, .EasyMDEContainer .editor-preview-side td {
-                                                            padding: 0.75rem; border: 1px solid #e5e7eb;
-                                                        }
-                                                        .editor-preview hr, .EasyMDEContainer .editor-preview-side hr {
-                                                            border: none; border-top: 2px solid #f9a8d4; margin: 1.5rem 0;
-                                                        }
-                                                        .editor-preview img, .EasyMDEContainer .editor-preview-side img {
-                                                            max-width: 100%; border-radius: 0.5rem; margin: 1rem 0;
-                                                        }
-                                                        /* Estilo para el checklist */
-                                                        .editor-preview input[type="checkbox"], .EasyMDEContainer .editor-preview-side input[type="checkbox"] {
-                                                            accent-color: #ec4899; margin-right: 0.5rem;
-                                                        }
-                                                    `;
+                                                            .editor-preview, .EasyMDEContainer .editor-preview-side {
+                                                                font-family: 'Figtree', ui-sans-serif, system-ui, sans-serif;
+                                                                padding: 1.5rem;
+                                                                background: linear-gradient(to bottom right, rgba(255,255,255,0.7), rgba(255,255,255,0.6), rgba(251,231,239,0.4));
+                                                                border-radius: 0.75rem;
+                                                                border: 1px solid rgba(236,72,153,0.2);
+                                                            }
+                                                            .editor-preview h1, .EasyMDEContainer .editor-preview-side h1 { 
+                                                                font-size: 2rem; font-weight: 700; color: #111827; margin-bottom: 1rem; 
+                                                                border-bottom: 2px solid #ec4899; padding-bottom: 0.5rem;
+                                                            }
+                                                            .editor-preview h2, .EasyMDEContainer .editor-preview-side h2 { 
+                                                                font-size: 1.5rem; font-weight: 600; color: #1f2937; margin-bottom: 0.75rem; 
+                                                            }
+                                                            .editor-preview h3, .EasyMDEContainer .editor-preview-side h3 { 
+                                                                font-size: 1.25rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem; 
+                                                            }
+                                                            .editor-preview p, .EasyMDEContainer .editor-preview-side p { 
+                                                                color: #374151; line-height: 1.75; margin-bottom: 1rem; 
+                                                            }
+                                                            .editor-preview strong, .EasyMDEContainer .editor-preview-side strong { 
+                                                                font-weight: 600; color: #111827; 
+                                                            }
+                                                            .editor-preview a, .EasyMDEContainer .editor-preview-side a { 
+                                                                color: #ec4899; text-decoration: underline; 
+                                                            }
+                                                            .editor-preview a:hover, .EasyMDEContainer .editor-preview-side a:hover { 
+                                                                color: #be185d; 
+                                                            }
+                                                            .editor-preview code, .EasyMDEContainer .editor-preview-side code {
+                                                                background: rgba(139,92,246,0.1); color: #7c3aed; 
+                                                                padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875rem;
+                                                            }
+                                                            .editor-preview pre, .EasyMDEContainer .editor-preview-side pre {
+                                                                background: #1f2937; color: #f3f4f6; padding: 1rem; 
+                                                                border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0;
+                                                            }
+                                                            .editor-preview pre code, .EasyMDEContainer .editor-preview-side pre code {
+                                                                background: transparent; color: inherit; padding: 0;
+                                                            }
+                                                            .editor-preview blockquote, .EasyMDEContainer .editor-preview-side blockquote {
+                                                                border-left: 4px solid #ec4899; background: rgba(251,231,239,0.5);
+                                                                padding: 0.75rem 1rem; margin: 1rem 0; color: #1f2937; font-style: italic;
+                                                            }
+                                                            .editor-preview ul, .EasyMDEContainer .editor-preview-side ul { 
+                                                                list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; color: #374151;
+                                                            }
+                                                            .editor-preview ol, .EasyMDEContainer .editor-preview-side ol { 
+                                                                list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; color: #374151;
+                                                            }
+                                                            .editor-preview li, .EasyMDEContainer .editor-preview-side li { 
+                                                                margin-bottom: 0.5rem; line-height: 1.75;
+                                                            }
+                                                            .editor-preview li::marker, .EasyMDEContainer .editor-preview-side li::marker {
+                                                                color: #ec4899;
+                                                            }
+                                                            .editor-preview table, .EasyMDEContainer .editor-preview-side table {
+                                                                width: 100%; border-collapse: collapse; margin: 1rem 0;
+                                                            }
+                                                            .editor-preview th, .EasyMDEContainer .editor-preview-side th {
+                                                                background: #fce7f3; color: #831843; padding: 0.75rem; 
+                                                                border: 1px solid #f9a8d4; text-align: left; font-weight: 600;
+                                                            }
+                                                            .editor-preview td, .EasyMDEContainer .editor-preview-side td {
+                                                                padding: 0.75rem; border: 1px solid #e5e7eb;
+                                                            }
+                                                            .editor-preview hr, .EasyMDEContainer .editor-preview-side hr {
+                                                                border: none; border-top: 2px solid #f9a8d4; margin: 1.5rem 0;
+                                                            }
+                                                            .editor-preview img, .EasyMDEContainer .editor-preview-side img {
+                                                                max-width: 100%; border-radius: 0.5rem; margin: 1rem 0;
+                                                            }
+                                                            /* Estilo para el checklist */
+                                                            .editor-preview input[type="checkbox"], .EasyMDEContainer .editor-preview-side input[type="checkbox"] {
+                                                                accent-color: #ec4899; margin-right: 0.5rem;
+                                                            }
+                                                        `;
 
             // Inyectar estilos personalizados
             const styleSheet = document.createElement("style");
@@ -1148,21 +1150,21 @@
                                     if (isValid) {
                                         p.className = 'text-sm flex items-center text-green-600';
                                         p.innerHTML = `
-                                                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                                                                    </svg>
-                                                                                    ✓ Proporción correcta (${config.name}) — ${width}×${height}px
-                                                                                `;
+                                                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                                                        </svg>
+                                                                                        ✓ Proporción correcta (${config.name}) — ${width}×${height}px
+                                                                                    `;
                                         input.classList.remove('border-red-500');
                                         input.classList.add('border-green-500');
                                     } else {
                                         p.className = 'text-sm flex items-center text-amber-600';
                                         p.innerHTML = `
-                                                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                                                                                    </svg>
-                                                                                    ⚠ Proporción diferente: detectada ${actualRatio}:1 (esperada ${config.name}) — ${width}×${height}px
-                                                                                `;
+                                                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                                                                        </svg>
+                                                                                        ⚠ Proporción diferente: detectada ${actualRatio}:1 (esperada ${config.name}) — ${width}×${height}px
+                                                                                    `;
                                         input.classList.remove('border-green-500');
                                         input.classList.add('border-amber-500');
                                     }
@@ -1401,7 +1403,15 @@
 
             // Fix para asegurar que el contenido se actualice en el textarea antes del envío
             // y limpiar el autosave cuando se envía correctamente
-            document.querySelector('form').addEventListener('submit', function () {
+            document.querySelector('form').addEventListener('submit', function (e) {
+                // Validación manual de descripción
+                if (!descriptionEditor.value().trim()) {
+                    e.preventDefault();
+                    alert('Por favor agrega una descripción para el evento.');
+                    // Intentar enfocar el editor (aunque EasyMDE es complejo de enfocar programáticamente a veces)
+                    descriptionEditor.codemirror.focus();
+                    return;
+                }
                 // Limpiar el autosave de EasyMDE para evitar que el contenido persista en futuros formularios
                 const descUniqueId = "event_description_{{ $space->id }}_{{ isset($event) ? $event->id : 'new' }}";
                 const agendaUniqueId = "event_agenda_{{ $space->id }}_{{ isset($event) ? $event->id : 'new' }}";
@@ -1546,12 +1556,12 @@
             // Show loading state
             submitBtn.disabled = true;
             submitBtn.innerHTML = `
-                                                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                    </svg>
-                                                    <span>Creando...</span>
-                                                `;
+                                                        <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                        </svg>
+                                                        <span>Creando...</span>
+                                                    `;
 
             try {
                 const formData = new FormData(this);
@@ -1599,11 +1609,11 @@
                 // Reset button
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = `
-                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                                        </svg>
-                                                        <span>Crear Categoría</span>
-                                                    `;
+                                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                            </svg>
+                                                            <span>Crear Categoría</span>
+                                                        `;
             }
         });
 

@@ -121,7 +121,7 @@ class ReportController extends Controller
 
         $growth = $previousPeriodSales > 0 ? (($stats['total_sales'] - $previousPeriodSales) / $previousPeriodSales) * 100 : 0;
 
-        ActivityLog::log('viewed', 'Viewed sales report', null, null, [
+        ActivityLog::log('viewed', 'Visualizó reporte de ventas', null, null, [
             'period' => $period,
             'start_date' => $startDate->format('Y-m-d'),
             'end_date' => $endDate->format('Y-m-d')
@@ -204,7 +204,7 @@ class ReportController extends Controller
             ->limit(10)
             ->get();
 
-        ActivityLog::log('viewed', 'Viewed users report', null, null, [
+        ActivityLog::log('viewed', 'Visualizó reporte de usuarios', null, null, [
             'period' => $period,
             'start_date' => $startDate->format('Y-m-d'),
             'end_date' => $endDate->format('Y-m-d')
@@ -292,7 +292,7 @@ class ReportController extends Controller
         // Get events for filter
         $events = Event::orderBy('name')->get();
 
-        ActivityLog::log('viewed', 'Viewed check-ins report', null, null, [
+        ActivityLog::log('viewed', 'Visualizó reporte de check-ins', null, null, [
             'period' => $period,
             'start_date' => $startDate->format('Y-m-d'),
             'end_date' => $endDate->format('Y-m-d'),

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UsersCode;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -43,11 +44,38 @@ class AuthController extends Controller
 
             // Redirigir a la URL previa o al dashboard si es admin, o a eventos si es usuario normal
             if ($user->hasRole('admin') || $user->hasRole('staff')) {
+                // Registrar login exitoso
+                ActivityLog::log(
+                    'login',
+                    "Inicio de sesión: {$user->name} {$user->last_name} ({$user->email})",
+                    User::class,
+                    $user->id,
+                    ['role' => $user->role, 'remember' => $remember]
+                );
                 return redirect()->intended(route('dashboard'));
             }
 
+            // Registrar login exitoso para usuarios normales
+            ActivityLog::log(
+                'login',
+                "Inicio de sesión: {$user->name} {$user->last_name} ({$user->email})",
+                User::class,
+                $user->id,
+                ['role' => $user->role, 'remember' => $remember]
+            );
+
             return redirect()->intended('/');
         }
+
+        // Registrar intento de login fallido
+        $failedUser = User::where('email', $request->email)->first();
+        ActivityLog::log(
+            'login_failed',
+            "Intento de inicio de sesión fallido para: {$request->email}",
+            User::class,
+            $failedUser?->id,
+            ['email_attempted' => $request->email]
+        );
 
         throw ValidationException::withMessages([
             'email' => 'Las credenciales proporcionadas no coinciden con nuestros registros.',
@@ -122,6 +150,18 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        $user = Auth::user();
+
+        // Registrar logout
+        if ($user) {
+            ActivityLog::log(
+                'logout',
+                "Cierre de sesión: {$user->name} {$user->last_name} ({$user->email})",
+                User::class,
+                $user->id
+            );
+        }
+
         Auth::logout();
 
         $request->session()->invalidate();

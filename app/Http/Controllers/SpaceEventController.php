@@ -310,12 +310,11 @@ class SpaceEventController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
 
-            // Mensaje amigable para el usuario
-            $errorMessage = 'Ocurrió un error al crear el evento. Por favor verifica los datos e intenta nuevamente.';
+            // Mensaje amigable pero con detalle técnico para debug
+            $errorMessage = 'Error: ' . $e->getMessage();
 
-            // Si es error de S3 u otro específico, podrías personalizarlo
-            if (strpos($e->getMessage(), 'S3') !== false) {
-                $errorMessage = 'Error al procesar las imágenes. Verifica tu conexión o configuración.';
+            if (strpos($e->getMessage(), 'S3') !== false || strpos($e->getMessage(), 'AWS') !== false) {
+                $errorMessage = 'Error de S3/AWS: ' . $e->getMessage();
             }
 
             return back()

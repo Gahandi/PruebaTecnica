@@ -70,8 +70,24 @@
                         @foreach($groupSettings as $setting)
                             <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                                 <div class="flex-1">
+                                    @php
+                                        $keyTranslations = [
+                                            'site_name' => 'Nombre del sitio',
+                                            'site_description' => 'Descripción del sitio',
+                                            'contact_email' => 'Email de contacto',
+                                            'timezone' => 'Zona horaria',
+                                            'email_notifications' => 'Notificaciones por email',
+                                            'order_confirmation_email' => 'Email de confirmación de orden',
+                                            'checkin_notification' => 'Notificación de check-in',
+                                            'maintenance_mode' => 'Modo mantenimiento',
+                                            'max_tickets_per_order' => 'Máximo de boletos por orden',
+                                            'session_timeout' => 'Tiempo de sesión (minutos)',
+                                            'service_charge_name' => 'Nombre del cargo por servicio',
+                                            'service_charge_percentage' => 'Porcentaje de cargo por servicio',
+                                        ];
+                                    @endphp
                                     <label class="block text-sm font-medium text-gray-900">
-                                        {{ ucwords(str_replace('_', ' ', $setting->key)) }}
+                                        {{ $keyTranslations[$setting->key] ?? ucwords(str_replace('_', ' ', $setting->key)) }}
                                     </label>
                                     @if($setting->description)
                                         <p class="text-xs text-gray-500 mt-1">{{ $setting->description }}</p>

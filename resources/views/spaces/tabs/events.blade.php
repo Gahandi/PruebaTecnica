@@ -79,46 +79,117 @@
             <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
             Próximos Eventos
         </h3>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             @foreach($upcomingEvents as $event)
-                <div
-                    class="group bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-pink-300">
-                    <div class="relative aspect-square overflow-hidden">
-                        @if($event->icon && $event->icon !== 'test.jpg')
-                            <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->icon) }}" alt="{{ $event->name }}"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                        @elseif($event->banner && $event->banner !== 'test.jpg')
+                @php
+                    $totalTickets = $event->ticketTypes->sum('pivot.quantity');
+                    $soldTickets = $event->tickets_count ?? $event->tickets->count();
+                    $percentage = $totalTickets > 0 ? ($soldTickets / $totalTickets) * 100 : 0;
+                    $daysRemaining = \Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::parse($event->date), false);
+                    $hoursRemaining = \Carbon\Carbon::now()->diffInHours(\Carbon\Carbon::parse($event->date), false);
+                    $isVeryClose = $daysRemaining < 2;
+                @endphp
+                <div class="group bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-pink-300 flex flex-col h-full">
+                    <!-- Image & Badge Container -->
+                    <div class="relative aspect-video overflow-hidden">
+                        @if($event->banner && $event->banner !== 'test.jpg')
                             <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}" alt="{{ $event->name }}"
-                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        @elseif($event->image && $event->image !== 'test.jpg')
+                            <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->image) }}" alt="{{ $event->name }}"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         @else
-                            <div class="w-full h-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center">
+                            <div class="w-full h-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center">
                                 <svg class="w-12 h-12 text-white/70" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
                                 </svg>
                             </div>
                         @endif
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                        <div class="absolute bottom-2 left-2 right-2">
-                            <div class="flex items-center justify-between">
-                                <span class="bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full text-xs font-semibold text-gray-900">
-                                    {{ \Carbon\Carbon::parse($event->date)->format('d M') }}
+                        
+                        <!-- Overlay Gradient -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
+                        
+                        <!-- Categoría Label -->
+                        @if($event->type_event)
+                            <div class="absolute top-3 left-3">
+                                <span class="px-2.5 py-1 bg-white/20 backdrop-blur-md border border-white/30 text-white text-xs font-bold rounded-lg uppercase tracking-wider">
+                                    {{ $event->type_event->name }}
                                 </span>
-                                @if($event->ticketTypes->count() > 0)
-                                    <span class="bg-green-500 text-white px-2 py-0.5 rounded-full text-xs font-bold">
-                                        ${{ number_format($event->ticketTypes->min('pivot.price'), 0) }}
-                                    </span>
-                                @endif
                             </div>
+                        @endif
+
+                        <!-- Countdown Badge -->
+                        <div class="absolute top-3 right-3">
+                            <span class="px-3 py-1 bg-{{ $isVeryClose ? 'red' : 'blue' }}-600/90 backdrop-blur-sm text-white text-xs font-bold rounded-full shadow-lg">
+                                @if($daysRemaining < 1)
+                                    ¡Hoy!
+                                @elseif($daysRemaining == 1)
+                                    Mañana
+                                @else
+                                    Faltan {{ round($daysRemaining) }} días
+                                @endif
+                            </span>
+                        </div>
+
+                        <!-- Date & Price on Image (Bottom) -->
+                        <div class="absolute bottom-3 left-3 right-3 flex justify-between items-end text-white">
+                            <div>
+                                <p class="text-xs text-white/80 font-medium uppercase tracking-wide">{{ \Carbon\Carbon::parse($event->date)->format('M') }}</p>
+                                <p class="text-2xl font-bold leading-none">{{ \Carbon\Carbon::parse($event->date)->format('d') }}</p>
+                                <p class="text-xs text-white/80">{{ \Carbon\Carbon::parse($event->date)->format('H:i') }} hrs</p>
+                            </div>
+                            @if($event->ticketTypes->count() > 0)
+                                <div class="text-right">
+                                    <p class="text-xs text-white/80">Desde</p>
+                                    <p class="text-lg font-bold text-green-400 drop-shadow-md">
+                                        ${{ number_format($event->ticketTypes->min('pivot.price'), 0) }}
+                                    </p>
+                                </div>
+                            @endif
                         </div>
                     </div>
-                    <div class="p-3">
-                        <h4 class="font-bold text-gray-900 text-sm mb-1 line-clamp-2 group-hover:text-pink-600 transition-colors">
-                            {{ $event->name }}
-                        </h4>
 
-                        <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}/{{ $event->slug }}"
-                            class="block w-full text-center px-3 py-1.5 bg-pink-600 hover:bg-pink-700 text-white text-xs font-medium rounded-lg transition-colors mt-2">
-                            Ver Evento
+                    <!-- Content Body -->
+                    <div class="p-4 flex-1 flex flex-col">
+                        <h4 class="font-bold text-gray-900 text-lg mb-2 line-clamp-1 group-hover:text-pink-600 transition-colors">
+                            <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}/{{ $event->slug }}">
+                                {{ $event->name }}
+                            </a>
+                        </h4>
+                        
+                        @if($event->description)
+                            <p class="text-gray-500 text-sm line-clamp-2 mb-4 flex-1">
+                                {{ Str::limit(strip_tags($event->description), 80) }}
+                            </p>
+                        @endif
+
+                        <!-- Progress Bar (Tickets) -->
+                        <div class="mt-auto pt-4 border-t border-gray-100">
+                            <div class="flex justify-between items-center text-xs text-gray-600 mb-1.5">
+                                <span class="font-medium">Boletos disponibles</span>
+                                <span>{{ $soldTickets }} / {{ $totalTickets }}</span>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden"> <!-- Gris más claro de fondo -->
+                                <div class="bg-gradient-to-r from-pink-500 to-purple-600 h-2 rounded-full transition-all duration-500" 
+                                     style="width: {{ $percentage }}%"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tags -->
+                        @if($event->tags->count() > 0)
+                            <div class="mt-3 flex flex-wrap gap-1">
+                                @foreach($event->tags->take(3) as $tag)
+                                    <span class="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full border border-gray-200">
+                                        #{{ $tag->name }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        @endif
+
+                        <!-- Action Button -->
+                         <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}/{{ $event->slug }}"
+                            class="mt-4 w-full block text-center py-2.5 rounded-xl bg-gray-50 text-gray-900 font-semibold text-sm hover:bg-pink-600 hover:text-white transition-all duration-300 border border-gray-200 hover:border-pink-600 hover:shadow-lg">
+                            Ver Detalles
                         </a>
                     </div>
                 </div>
