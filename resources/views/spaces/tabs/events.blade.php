@@ -81,111 +81,125 @@
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
             @foreach($upcomingEvents as $event)
-                <div
-                    class="group bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-pink-300">
-                    <div class="relative overflow-hidden">
-                        <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}" alt="{{ $event->name }}"
-                            class="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                        <div class="absolute bottom-3 left-3 right-3">
-                            <div class="flex items-center justify-between">
-                                <span
-                                    class="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-gray-900">
-                                    {{ \Carbon\Carbon::parse($event->date)->format('d M') }}
-                                </span>
-                                @if($event->ticketTypes->count() > 0)
-                                    <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                        ${{ number_format($event->ticketTypes->min('pivot.price'), 0) }}+
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-4">
-                        <h4 class="font-bold text-gray-900 mb-2 line-clamp-1 group-hover:text-pink-600 transition-colors">
-                            {{ $event->name }}
-                        </h4>
-                        <div class="flex items-center text-gray-500 text-sm mb-3">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                                </path>
-                            </svg>
-                            <span class="truncate">{{ $event->address }}</span>
-                        </div>
+            <div
+    class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-transparent hover:border-pink-200 group h-full flex flex-col">
 
-                        @if($event->ticketTypes->count() > 0)
-                            @php
-                                $totalTickets = $event->ticketTypes->sum('pivot.quantity');
-                                $soldTickets = \App\Models\Ticket::where('event_id', $event->id)->count();
-                                $availableTickets = $totalTickets - $soldTickets;
-                                $percentage = $totalTickets > 0 ? ($availableTickets / $totalTickets) * 100 : 0;
-                            @endphp
-                            <div class="mb-3">
-                                <div class="flex justify-between text-xs text-gray-500 mb-1">
-                                    <span>{{ $availableTickets }} disponibles</span>
-                                    <span>{{ round(100 - $percentage) }}% vendido</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-1.5">
-                                    <div class="bg-pink-500 h-1.5 rounded-full transition-all"
-                                        style="width: {{ 100 - $percentage }}%"></div>
-                                </div>
-                            </div>
-                        @endif
+    <div class="relative overflow-hidden flex-shrink-0">
+        <div class="aspect-square w-full">
+            <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}"
+                 alt="{{ $event->name }}"
+                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+        </div>
 
-                        <div class="flex items-center justify-between mt-4">
-                            @auth
-                                @if($isAdmin)
-                                    <div class="flex items-center gap-2">
-                                        @php
-                                            $daysUntil = now()->diffInDays($event->date, false);
-                                            $isLocked = $daysUntil < 4 && $event->date > now();
-                                        @endphp
+        <div class="absolute bottom-3 left-3 right-3">
+            <div class="flex items-center justify-between">
+                <span
+                    class="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-gray-900">
+                    {{ \Carbon\Carbon::parse($event->date)->format('d M') }}
+                </span>
 
-                                        @if($isLocked)
-                                            <span class="text-gray-400 text-xs flex items-center cursor-help"
-                                                title="Edición bloqueada: faltan menos de 4 días">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
-                                                    </path>
-                                                </svg>
-                                                Bloqueado
-                                            </span>
-                                        @else
-                                            <a href="{{ route('spaces.events.edit', ['subdomain' => $space->subdomain, 'event' => $event->slug]) }}"
-                                                class="text-gray-500 hover:text-gray-700 text-sm font-medium transition-colors">
-                                                Editar
-                                            </a>
-                                            <form action="{{ route('spaces.events.destroy', [$space->subdomain, $event->slug]) }}"
-                                                method="POST" class="inline-block"
-                                                onsubmit="return confirm('¿Estás seguro de eliminar este evento?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-400 hover:text-red-600 transition-colors pt-1"
-                                                    title="Eliminar">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                                        </path>
-                                                    </svg>
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </div>
-                                @else
-                                    <span></span>
-                                @endif
-                            @else
-                                <span></span>
-                            @endauth
-                            <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}/{{ $event->slug }}"
-                                class="inline-flex items-center px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white text-sm font-medium rounded-lg transition-colors">
-                                Ver Evento
-                            </a>
-                        </div>
-                    </div>
+                @if($event->ticketTypes->count() > 0)
+                    <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                        ${{ number_format($event->ticketTypes->min('pivot.price'), 0) }}+
+                    </span>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <div class="p-4 flex flex-col flex-1">
+        <h4
+            class="font-bold text-gray-900 mb-2 line-clamp-1 group-hover:text-pink-600 transition-colors">
+            {{ $event->name }}
+        </h4>
+
+        <div class="flex items-center text-gray-500 text-sm mb-3">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            </svg>
+            <span class="truncate">{{ $event->address }}</span>
+        </div>
+
+        @if($event->ticketTypes->count() > 0)
+            @php
+                $totalTickets = $event->ticketTypes->sum('pivot.quantity');
+                $soldTickets = \App\Models\Ticket::where('event_id', $event->id)->count();
+                $availableTickets = $totalTickets - $soldTickets;
+                $percentage = $totalTickets > 0 ? ($availableTickets / $totalTickets) * 100 : 0;
+            @endphp
+
+            <div class="mb-3">
+                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                    <span>{{ $availableTickets }} disponibles</span>
+                    <span>{{ round(100 - $percentage) }}% vendido</span>
                 </div>
+
+                <div class="w-full bg-gray-200 rounded-full h-1.5">
+                    <div class="bg-pink-500 h-1.5 rounded-full transition-all"
+                         style="width: {{ 100 - $percentage }}%"></div>
+                </div>
+            </div>
+        @endif
+
+        <div class="flex items-center justify-between mt-auto pt-4">
+            @auth
+                @if($isAdmin)
+                    <div class="flex items-center gap-2">
+                        @php
+                            $daysUntil = now()->diffInDays($event->date, false);
+                            $isLocked = $daysUntil < 4 && $event->date > now();
+                        @endphp
+
+                        @if($isLocked)
+                            <span class="text-gray-400 text-xs flex items-center cursor-help"
+                                  title="Edición bloqueada: faltan menos de 4 días">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                          stroke-width="2"
+                                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                                Bloqueado
+                            </span>
+                        @else
+                            <a href="{{ route('spaces.events.edit', ['subdomain' => $space->subdomain, 'event' => $event->slug]) }}"
+                               class="text-gray-500 hover:text-gray-700 text-sm font-medium transition-colors">
+                                Editar
+                            </a>
+
+                            <form
+                                action="{{ route('spaces.events.destroy', [$space->subdomain, $event->slug]) }}"
+                                method="POST"
+                                class="inline-block"
+                                onsubmit="return confirm('¿Estás seguro de eliminar este evento?');">
+                                @csrf
+                                @method('DELETE')
+
+                                <button type="submit"
+                                        class="text-red-400 hover:text-red-600 transition-colors pt-1"
+                                        title="Eliminar">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                         viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                              stroke-width="2"
+                                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </button>
+                            </form>
+                        @endif
+                    </div>
+                @endif
+            @endauth
+
+            <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}/{{ $event->slug }}"
+               class="inline-flex items-center px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white text-sm font-medium rounded-lg transition-colors">
+                Ver Evento
+            </a>
+        </div>
+    </div>
+</div>
+
             @endforeach
         </div>
     </div>
