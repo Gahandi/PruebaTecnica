@@ -79,111 +79,47 @@
             <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
             Próximos Eventos
         </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             @foreach($upcomingEvents as $event)
                 <div
                     class="group bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-pink-300">
-                    <div class="relative overflow-hidden">
-                        <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}" alt="{{ $event->name }}"
-                            class="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-300">
+                    <div class="relative aspect-square overflow-hidden">
+                        @if($event->icon && $event->icon !== 'test.jpg')
+                            <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->icon) }}" alt="{{ $event->name }}"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        @elseif($event->banner && $event->banner !== 'test.jpg')
+                            <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}" alt="{{ $event->name }}"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                        @else
+                            <div class="w-full h-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center">
+                                <svg class="w-12 h-12 text-white/70" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                        @endif
                         <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                        <div class="absolute bottom-3 left-3 right-3">
+                        <div class="absolute bottom-2 left-2 right-2">
                             <div class="flex items-center justify-between">
-                                <span
-                                    class="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-gray-900">
+                                <span class="bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full text-xs font-semibold text-gray-900">
                                     {{ \Carbon\Carbon::parse($event->date)->format('d M') }}
                                 </span>
                                 @if($event->ticketTypes->count() > 0)
-                                    <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                                        ${{ number_format($event->ticketTypes->min('pivot.price'), 0) }}+
+                                    <span class="bg-green-500 text-white px-2 py-0.5 rounded-full text-xs font-bold">
+                                        ${{ number_format($event->ticketTypes->min('pivot.price'), 0) }}
                                     </span>
                                 @endif
                             </div>
                         </div>
                     </div>
-                    <div class="p-4">
-                        <h4 class="font-bold text-gray-900 mb-2 line-clamp-1 group-hover:text-pink-600 transition-colors">
+                    <div class="p-3">
+                        <h4 class="font-bold text-gray-900 text-sm mb-1 line-clamp-2 group-hover:text-pink-600 transition-colors">
                             {{ $event->name }}
                         </h4>
-                        <div class="flex items-center text-gray-500 text-sm mb-3">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                                </path>
-                            </svg>
-                            <span class="truncate">{{ $event->address }}</span>
-                        </div>
 
-                        @if($event->ticketTypes->count() > 0)
-                            @php
-                                $totalTickets = $event->ticketTypes->sum('pivot.quantity');
-                                $soldTickets = \App\Models\Ticket::where('event_id', $event->id)->count();
-                                $availableTickets = $totalTickets - $soldTickets;
-                                $percentage = $totalTickets > 0 ? ($availableTickets / $totalTickets) * 100 : 0;
-                            @endphp
-                            <div class="mb-3">
-                                <div class="flex justify-between text-xs text-gray-500 mb-1">
-                                    <span>{{ $availableTickets }} disponibles</span>
-                                    <span>{{ round(100 - $percentage) }}% vendido</span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-1.5">
-                                    <div class="bg-pink-500 h-1.5 rounded-full transition-all"
-                                        style="width: {{ 100 - $percentage }}%"></div>
-                                </div>
-                            </div>
-                        @endif
-
-                        <div class="flex items-center justify-between mt-4">
-                            @auth
-                                @if($isAdmin)
-                                    <div class="flex items-center gap-2">
-                                        @php
-                                            $daysUntil = now()->diffInDays($event->date, false);
-                                            $isLocked = $daysUntil < 4 && $event->date > now();
-                                        @endphp
-
-                                        @if($isLocked)
-                                            <span class="text-gray-400 text-xs flex items-center cursor-help"
-                                                title="Edición bloqueada: faltan menos de 4 días">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
-                                                    </path>
-                                                </svg>
-                                                Bloqueado
-                                            </span>
-                                        @else
-                                            <a href="{{ route('spaces.events.edit', ['subdomain' => $space->subdomain, 'event' => $event->slug]) }}"
-                                                class="text-gray-500 hover:text-gray-700 text-sm font-medium transition-colors">
-                                                Editar
-                                            </a>
-                                            <form action="{{ route('spaces.events.destroy', [$space->subdomain, $event->slug]) }}"
-                                                method="POST" class="inline-block"
-                                                onsubmit="return confirm('¿Estás seguro de eliminar este evento?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-400 hover:text-red-600 transition-colors pt-1"
-                                                    title="Eliminar">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                                        </path>
-                                                    </svg>
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </div>
-                                @else
-                                    <span></span>
-                                @endif
-                            @else
-                                <span></span>
-                            @endauth
-                            <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}/{{ $event->slug }}"
-                                class="inline-flex items-center px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white text-sm font-medium rounded-lg transition-colors">
-                                Ver Evento
-                            </a>
-                        </div>
+                        <a href="{{ \App\Helpers\SubdomainHelper::getSubdomainUrl($space->subdomain) }}/{{ $event->slug }}"
+                            class="block w-full text-center px-3 py-1.5 bg-pink-600 hover:bg-pink-700 text-white text-xs font-medium rounded-lg transition-colors mt-2">
+                            Ver Evento
+                        </a>
                     </div>
                 </div>
             @endforeach
@@ -227,8 +163,21 @@
             @foreach($pastEvents as $event)
                 <div
                     class="flex bg-gray-50 rounded-lg overflow-hidden border border-gray-200 hover:bg-gray-100 transition-colors">
-                    <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}" alt="{{ $event->name }}"
-                        class="w-24 h-24 object-cover flex-shrink-0 grayscale opacity-75">
+                    <div class="w-24 h-24 flex-shrink-0 overflow-hidden">
+                        @if($event->icon && $event->icon !== 'test.jpg')
+                            <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->icon) }}" alt="{{ $event->name }}"
+                                class="w-full h-full object-cover grayscale opacity-75">
+                        @elseif($event->banner && $event->banner !== 'test.jpg')
+                            <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}" alt="{{ $event->name }}"
+                                class="w-full h-full object-cover grayscale opacity-75">
+                        @else
+                            <div class="w-full h-full bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center">
+                                <svg class="w-8 h-8 text-white/50" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                        @endif
+                    </div>
                     <div class="p-3 flex-1 min-w-0 flex flex-col justify-between">
                         <div>
                             <h4 class="font-medium text-gray-700 text-sm truncate" title="{{ $event->name }}">{{ $event->name }}

@@ -38,7 +38,7 @@ class SpaceEventController extends Controller
             return $event;
         });
 
-        return view('events.show', compact('space', 'events'));
+        return view('spaces.events.index', compact('space', 'events'));
     }
 
     public function show(Request $request, $subdomain, Event $event)
@@ -559,7 +559,7 @@ class SpaceEventController extends Controller
             $newEvent->name = 'Copia de ' . $event->name;
             $newEvent->slug = Str::slug($newEvent->name) . '-' . time(); // Slug único
             $newEvent->active = false; // Inactivo por defecto hasta que se configure
-            $newEvent->date = now()->addDay(); // Fecha temporal para evitar errores
+            $newEvent->date = now()->addDays(5); // Fecha temporal (5 días para evitar restricción de 4 días)
             $newEvent->created_at = now();
             $newEvent->updated_at = now();
             $newEvent->push(); // Guardar y cargar relaciones

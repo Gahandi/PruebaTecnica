@@ -40,9 +40,20 @@
                     @foreach($events as $event)
                         <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                             {{-- Imagen del evento --}}
-                            <div class="relative h-40">
-                                <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}" alt="{{ $event->name }}"
-                                    class="w-full h-full object-cover">
+                            <div class="relative aspect-square">
+                                @if($event->icon && $event->icon !== 'test.jpg')
+                                    <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->icon) }}" alt="{{ $event->name }}"
+                                        class="w-full h-full object-cover">
+                                @elseif($event->banner && $event->banner !== 'test.jpg')
+                                    <img src="{{ \App\Helpers\ImageHelper::getImageUrl($event->banner) }}" alt="{{ $event->name }}"
+                                        class="w-full h-full object-cover">
+                                @else
+                                    <div class="w-full h-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center">
+                                        <svg class="w-12 h-12 text-white/70" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </div>
+                                @endif
                                 <div class="absolute top-2 right-2">
                                     <span
                                         class="px-2 py-1 text-xs font-medium rounded-full {{ $event->active ? 'bg-green-500 text-white' : 'bg-gray-500 text-white' }}">
