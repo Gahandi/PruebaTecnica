@@ -226,6 +226,8 @@ class SpaceEventController extends Controller
             // Agregar URLs al array de datos para la creación
             $eventData['banner'] = $bannerUrl;
             $eventData['image'] = $imageUrl;
+            // Asignamos la misma imagen vertical para banner_app ya que es requerida y probablemente sea la misma visualización
+            $eventData['banner_app'] = $imageUrl;
             $eventData['icon'] = $iconUrl;
 
             // 4. Crear el evento con todos los datos INCLUYENDO LAS IMÁGENES
