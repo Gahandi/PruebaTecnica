@@ -380,4 +380,74 @@ class SpaceManagementController extends Controller
             'message' => 'Has dejado de seguir a ' . $space->name
         ]);
     }
+
+    /**
+     * Resend a pending invitation
+     */
+    public function resendInvitation(Request $request, $subdomain, $invitationId)
+    {
+        $space = Space::where('subdomain', $subdomain)->firstOrFail();
+
+        // Verify current user is admin of space
+        if (!auth()->user()->isAdminOfSpace($space->id)) {
+            return response()->json(['success' => false, 'message' => 'No tienes permisos para reenviar invitaciones'], 403);
+        }
+
+        $invitation = \App\Models\SpaceInvitation::where('id', $invitationId)
+            ->where('space_id', $space->id)
+            ->first();
+
+        if (!$invitation) {
+            return response()->json(['success' => false, 'message' => 'Invitación no encontrada'], 404);
+        }
+
+        // Generate new token and extend expiration
+        $invitation->update([
+            'token' => \Illuminate\Support\Str::random(32),
+            'expires_at' => now()->addDays(7),
+        ]);
+
+        // Resend email
+        try {
+            \Illuminate\Support\Facades\Mail::to($invitation->email)->send(new \App\Mail\SpaceInvitationMail($invitation, $space));
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al enviar el correo: ' . $e->getMessage()
+            ], 500);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Invitación reenviada exitosamente'
+        ]);
+    }
+
+    /**
+     * Cancel a pending invitation
+     */
+    public function cancelInvitation(Request $request, $subdomain, $invitationId)
+    {
+        $space = Space::where('subdomain', $subdomain)->firstOrFail();
+
+        // Verify current user is admin of space
+        if (!auth()->user()->isAdminOfSpace($space->id)) {
+            return response()->json(['success' => false, 'message' => 'No tienes permisos para cancelar invitaciones'], 403);
+        }
+
+        $invitation = \App\Models\SpaceInvitation::where('id', $invitationId)
+            ->where('space_id', $space->id)
+            ->first();
+
+        if (!$invitation) {
+            return response()->json(['success' => false, 'message' => 'Invitación no encontrada'], 404);
+        }
+
+        $invitation->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Invitación cancelada'
+        ]);
+    }
 }

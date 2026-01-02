@@ -15,11 +15,12 @@
     </div>
     
     <!-- Summary Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         @php
             $adminCount = collect($usersWithStats)->where('is_admin', true)->count();
             $staffCount = collect($usersWithStats)->where('role', 'staff')->count();
             $viewerCount = collect($usersWithStats)->count() - $adminCount - $staffCount;
+            $pendingCount = isset($pendingInvitations) ? $pendingInvitations->count() : 0;
         @endphp
         <div class="bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-xl p-4 text-white shadow-lg">
             <div class="flex items-center justify-between">
@@ -55,6 +56,19 @@
                 </svg>
             </div>
         </div>
+        @if($isAdmin)
+        <div class="bg-gradient-to-br from-orange-400 to-amber-500 rounded-xl p-4 text-white shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-orange-100 text-xs sm:text-sm font-medium">Pendientes</p>
+                    <p class="text-2xl sm:text-3xl font-bold">{{ $pendingCount }}</p>
+                </div>
+                <svg class="w-8 h-8 text-orange-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+        </div>
+        @endif
     </div>
     
     @if(count($usersWithStats) > 0)
@@ -188,6 +202,86 @@
             </button>
             @endif
         </div>
+    @endif
+
+    <!-- Pending Invitations Section -->
+    @if($isAdmin && isset($pendingInvitations) && $pendingInvitations->count() > 0)
+    <div class="mt-8">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-500 rounded-xl flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold text-gray-900">Invitaciones Pendientes</h3>
+                <p class="text-sm text-gray-500">Usuarios invitados que aún no se han registrado</p>
+            </div>
+            <span class="ml-auto bg-orange-100 text-orange-700 text-sm font-semibold px-3 py-1 rounded-full">
+                {{ $pendingInvitations->count() }} pendiente{{ $pendingInvitations->count() != 1 ? 's' : '' }}
+            </span>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg border border-orange-100 overflow-hidden">
+            <div class="divide-y divide-gray-100">
+                @foreach($pendingInvitations as $invitation)
+                <div class="p-4 sm:p-5 hover:bg-orange-50/50 transition-colors" id="invitation-{{ $invitation->id }}">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <!-- Invitation Info -->
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-orange-200 to-amber-300 flex items-center justify-center text-orange-700 font-bold text-lg">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900">{{ $invitation->email }}</p>
+                                <div class="flex flex-wrap items-center gap-2 mt-1">
+                                    <span class="text-xs px-2 py-0.5 rounded-full {{ $invitation->role_space_id == 1 ? 'bg-yellow-100 text-yellow-700' : ($invitation->role_space_id == 2 ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700') }}">
+                                        {{ $invitation->role->name ?? 'Sin rol' }}
+                                    </span>
+                                    <span class="text-xs text-gray-500">
+                                        Enviada {{ \Carbon\Carbon::parse($invitation->created_at)->diffForHumans() }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Expiration & Actions -->
+                        <div class="flex items-center gap-3">
+                            <div class="text-right hidden sm:block">
+                                @php
+                                    $expiresAt = \Carbon\Carbon::parse($invitation->expires_at);
+                                    $isExpiringSoon = $expiresAt->diffInHours(now()) < 24;
+                                @endphp
+                                <p class="text-xs {{ $isExpiringSoon ? 'text-red-500 font-semibold' : 'text-gray-500' }}">
+                                    Expira {{ $expiresAt->diffForHumans() }}
+                                </p>
+                            </div>
+
+                            <button onclick="resendInvitation('{{ $invitation->id }}')" 
+                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                                    title="Reenviar invitación">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                Reenviar
+                            </button>
+
+                            <button onclick="cancelInvitation('{{ $invitation->id }}')" 
+                                    class="inline-flex items-center p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                    title="Cancelar invitación">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
     @endif
 </div>
 
@@ -527,4 +621,131 @@ document.getElementById('inviteUserModal')?.addEventListener('click', function(e
         closeInviteModal();
     }
 });
+
+// Resend invitation function
+function resendInvitation(invitationId) {
+    const btn = event.target.closest('button');
+    const originalContent = btn.innerHTML;
+    
+    btn.disabled = true;
+    btn.innerHTML = `
+        <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+    `;
+
+    fetch(`/manage/invitations/${invitationId}/resend`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Invitación Reenviada!',
+                text: 'Se ha reenviado el correo de invitación.',
+                confirmButtonColor: '#ec4899',
+                timer: 3000,
+                timerProgressBar: true
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message || 'No se pudo reenviar la invitación.',
+                confirmButtonColor: '#ec4899'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Ocurrió un error al reenviar la invitación.',
+            confirmButtonColor: '#ec4899'
+        });
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = originalContent;
+    });
+}
+
+// Cancel invitation function
+function cancelInvitation(invitationId) {
+    Swal.fire({
+        title: '¿Cancelar invitación?',
+        text: '¿Estás seguro de que deseas cancelar esta invitación?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Sí, cancelar',
+        cancelButtonText: 'No, mantener'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/manage/invitations/${invitationId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Animate and remove the invitation row
+                    const row = document.getElementById(`invitation-${invitationId}`);
+                    if (row) {
+                        row.style.transition = 'all 0.3s ease';
+                        row.style.opacity = '0';
+                        row.style.transform = 'translateX(-100%)';
+                        setTimeout(() => {
+                            row.remove();
+                            // Check if there are any invitations left
+                            const container = document.querySelector('.divide-y.divide-gray-100');
+                            if (container && container.children.length === 0) {
+                                // Remove the entire pending invitations section
+                                container.closest('.mt-8')?.remove();
+                            }
+                        }, 300);
+                    }
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Invitación cancelada',
+                        text: 'La invitación ha sido cancelada.',
+                        confirmButtonColor: '#ec4899',
+                        timer: 2000,
+                        timerProgressBar: true
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'No se pudo cancelar la invitación.',
+                        confirmButtonColor: '#ec4899'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ocurrió un error al cancelar la invitación.',
+                    confirmButtonColor: '#ec4899'
+                });
+            });
+        }
+    });
+}
 </script>

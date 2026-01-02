@@ -96,6 +96,10 @@ Route::domain('{subdomain}.' . config('app.url'))
             Route::delete('/users/{user}', [SpaceManagementController::class, 'removeUser'])->name('users.remove');
             Route::post('/users/invite', [SpaceManagementController::class, 'inviteUser'])->name('users.invite');
             Route::put('/roles/{role}/permissions', [SpaceManagementController::class, 'updateRolePermissions'])->name('roles.update-permissions');
+
+            // Invitation management routes
+            Route::post('/invitations/{invitation}/resend', [SpaceManagementController::class, 'resendInvitation'])->name('invitations.resend');
+            Route::delete('/invitations/{invitation}', [SpaceManagementController::class, 'cancelInvitation'])->name('invitations.cancel');
         });
 
         // Rutas de seguir/dejar de seguir espacio

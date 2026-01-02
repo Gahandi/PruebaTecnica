@@ -278,6 +278,13 @@ class SpaceController extends Controller
         // Available Roles for user management
         $roleSpaces = \App\Models\RoleSpace::whereNull('deleted_at')->get();
 
+        // Pending Invitations for this space
+        $pendingInvitations = \App\Models\SpaceInvitation::where('space_id', $space->id)
+            ->where('expires_at', '>', now())
+            ->with('role')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         // All Permissions for role management
         $allPermissions = \App\Models\Permission::whereNull('deleted_at')->get();
 
@@ -357,6 +364,7 @@ class SpaceController extends Controller
             'averageTicketPrice',
             'dailySalesData',
             'roleSpaces',
+            'pendingInvitations',
             'allPermissions',
             // Orders Tab Data
             'spaceOrders',
