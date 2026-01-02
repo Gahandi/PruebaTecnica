@@ -186,71 +186,52 @@ class SpaceEventController extends Controller
                 'state_id' => 1,
             ];
 
-            // 3. Crear el evento primero para tener su ID (necesario para nombres de archivos)
-            // Sin embargo, las imágenes requieren el ID.
-            // Opción A: Usar una transacción y hacerlo en orden.
-            // Opción B (Usada aquí, mejorada): Generar un ID temporal o usar timestamp + rand si no queremos depender del ID autoincremental antes de insertar.
-            // PERO, tu lógica original usaba `$event->id` que no existe.
-            // MEJORA: Usaremos `boot` events o simplemente insertaremos primero sin imágenes y luego actualizaremos.
-            // O MEJOR AÚN: Usamos un identificador único basado en time() y space_id para las imágenes, independiente del ID del evento.
+            // 3. Generar un slug y un ID idealmente único para las imágenes
+            // Usaremos el ID del espacio + timestamp para agrupar.
+            $timestamp = time();
+            $tempId = $space->id . '_' . $timestamp;
 
-            // Insertamos el evento para obtener el ID real.
-            $event = Event::create($eventData);
-
-            // 4. Gestión de Archivos (Subir a S3 y actualizar el evento)
-            // Definimos la lógica de subida como una función anónima o helper local para no repetir código.
-
-            $uploadImage = function ($fileKey, $pathSegment, $dbField) use ($event, $request) {
+            // Función helper para subir imagen y retornar la URL FINAL
+            $handleUpload = function ($fileKey, $pathSegment, $defaultName) use ($request, $tempId) {
                 if ($request->hasFile($fileKey)) {
                     $file = $request->file($fileKey);
                     $fileContents = file_get_contents($file->getPathname());
 
-                    // Detectar extensión real
-                    $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                    $mimeType = finfo_buffer($finfo, $fileContents);
-                    finfo_close($finfo);
-                    $extensions = [
-                        'image/jpeg' => 'jpg',
-                        'image/jpg' => 'jpg',
-                        'image/png' => 'png',
-                        'image/gif' => 'gif',
-                        'image/webp' => 'webp',
-                    ];
-                    $extension = $extensions[$mimeType] ?? 'jpg';
+                    // Nombre base para S3
+                    $fileName = $defaultName . '_' . $tempId;
 
-                    // Generar nombre único: spaceID_timestamp.ext
-                    // Usamos el ID del espacio para agrupar o prefijar si se desea,
-                    // pero el Trait saveImages usa el 3er argumento como nombre de archivo SIN extensión (o eso parece, revisemos el Trait si es posible, pero asumiremos comportamiento estándar).
-                    // REVISIÓN IMPORTANTE: El trait saveImages($fileContents, $path, $productId)
-                    // En el código original de reference, $productId se usaba como nombre de archivo.
-                    // Vamos a construir un nombre único.
-                    $productId = $event->spaces_id . '_' . time();
+                    // Subir usando el trait
+                    // El trait S3ImageManager::saveImages($content, $path, $name)
+                    // NOTA: Si el trait agrega automáticamente '.jpg', la URL debe reflejar eso.
+                    $this->saveImages($fileContents, $pathSegment, $fileName);
 
-                    // Subir imagen
-                    $this->saveImages($fileContents, $pathSegment, $productId);
-
-                    // Actualizar campo en DB. El trait guarda como "$productId.jpg" (o la ext que detecte/fuerce).
-                    // Asumiremos que el trait maneja la extensión o nosotros debemos pasarla.
-                    // Viendo código anterior: $event->banner = env('S3_ENVIRONMENT').'/events/banners/'.$productId.'.jpg';
-                    // Esto asume jpg. Vamos a hacerlo dinámico si el trait lo permite, o forzar jpg/png.
-                    // Por seguridad y compatibilidad con tu código previo:
-                    $fileName = $productId . '.' . $extension;
-
-                    // NOTA: El trait saveImages internamente hace: Storage::disk('s3')->put($path . '/' . $name . '.jpg', $file);
-                    // Si el trait fuerza .jpg, debemos adaptarnos.
-                    // Si el trait permite extensión en el nombre, perfecto.
-                    // Asumiendo que el trait es "inteligente" o fuerza jpg.
-                    // Para evitar errores, usaremos la lógica estándar: subir y guardar URL.
-
-                    // Actualizamos el modelo
-                    $event->$dbField = env('S3_ENVIRONMENT') . '/' . $pathSegment . '/' . $fileName;
-                    $event->save();
+                    // Construir la URL
+                    // Asumiendo estandarización a .jpg como es común en estos traits
+                    return env('S3_ENVIRONMENT') . '/' . $pathSegment . '/' . $fileName . '.jpg';
                 }
+                return null;
             };
 
-            $uploadImage('banner', 'events/banners', 'banner');
-            $uploadImage('image', 'events/images', 'image');
-            $uploadImage('icon', 'events/icons', 'icon');
+            // Subir imágenes antes de crear el evento
+            $bannerUrl = $handleUpload('banner', 'events/banners', 'banner');
+            $imageUrl = $handleUpload('image', 'events/images', 'image');
+            $iconUrl = $handleUpload('icon', 'events/icons', 'icon');
+
+            // Validar que se hayan obtenido las URLs (requeridas por DB)
+            if (!$bannerUrl || !$imageUrl) {
+                // Si falla la subida pero pasó la validación de Laravel, es un error de S3 o algo interno.
+                throw new \Exception('Error al procesar las imágenes. No se pudieron subir a S3.');
+            }
+
+            // Agregar URLs al array de datos para la creación
+            $eventData['banner'] = $bannerUrl;
+            $eventData['image'] = $imageUrl;
+            $eventData['icon'] = $iconUrl;
+
+            // 4. Crear el evento con todos los datos INCLUYENDO LAS IMÁGENES
+            $event = Event::create($eventData);
+
+            // Ya no necesitamos el paso posterior de actualización de imágenes
 
 
             // 5. Crear y asociar tipos de boletos
