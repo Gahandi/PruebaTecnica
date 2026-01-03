@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,7 +24,7 @@
             background: white;
             border-radius: 18px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
         .logo-wrapper {
@@ -146,19 +147,19 @@
     </style>
 
 </head>
+
 <body>
     <div class="ticket">
-        
+
         <div class="logo-wrapper">
-            <img src="{{ public_path('images/logo/Logo_merrycolor.png') }}"
-                alt="Logo Merrycolor"
-                class="logo">
+            <img src="{{ public_path('images/logo/Logo_merrycolor.png') }}" alt="Logo Merrycolor" class="logo">
         </div>
 
         <!-- Header -->
         <div class="header">
             <h1>{{ $ticket->event->name }}</h1>
-            <p>{{ \Carbon\Carbon::parse($ticket->event->date)->format('l, d F Y \a \l\a\s H:i') }}</p>
+            <p>{{ \Carbon\Carbon::parse($ticket->event->date)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY [a las] HH:mm') }}
+            </p>
         </div>
 
         <!-- Content -->
@@ -174,17 +175,17 @@
                     <div class="info-label">Tipo de Boleto</div>
                     <div class="info-value">{{ $ticket->ticketType->name }}</div>
                 </div>
-                
+
                 <!-- <div class="info-item">
                     <div class="info-label">Precio</div>
                     <div class="info-value">${{ number_format($ticket->ticketType->price, 2) }}</div>
                 </div> -->
-                
+
                 <div class="info-item">
                     <div class="info-label">Ubicación</div>
                     <div class="info-value">{{ $ticket->event->address }}</div>
                 </div>
-                
+
                 <div class="info-item">
                     <div class="info-label">Estado</div>
                     <div class="info-value">
@@ -193,24 +194,24 @@
                         </span>
                     </div>
                 </div>
-                
+
                 @if($ticket->used)
-                <div class="info-item">
-                    <div class="info-label">Canjeado el</div>
-                    <div class="info-value">{{ $ticket->updated_at->format('d/m/Y H:i') }}</div>
-                </div>
+                    <div class="info-item">
+                        <div class="info-label">Canjeado el</div>
+                        <div class="info-value">{{ $ticket->updated_at->format('d/m/Y H:i') }}</div>
+                    </div>
                 @endif
-                
+
                 <div class="info-item">
                     <div class="info-label">Comprador</div>
                     <div class="info-value">{{ auth()->user()->name }}</div>
                 </div>
-                
+
                 <div class="info-item">
                     <div class="info-label">Correo</div>
                     <div class="info-value">{{ auth()->user()->email }}</div>
                 </div>
-                
+
                 <div class="info-item">
                     <div class="info-label">Fecha de Compra</div>
                     <div class="info-value">{{ \Carbon\Carbon::parse($ticket->created_at)->format('d/m/Y H:i') }}</div>
@@ -222,8 +223,7 @@
                 <h3 style="margin: 0 0 15px 0; color: #374151;">Código QR de Entrada</h3>
                 <div class="" style="text-align: center; margin-top: 20px;">
                     @if($ticket->qr_base64)
-                        <img src="{{ $ticket->qr_base64 }}" 
-                            alt="QR Code" 
+                        <img src="{{ $ticket->qr_base64 }}" alt="QR Code"
                             style="width: 180px; height: 180px; margin: 0 auto;">
                     @else
                         <div style="color: #9ca3af; font-size: 12px;">
@@ -256,4 +256,5 @@
         </div>
     </div>
 </body>
+
 </html>

@@ -590,9 +590,9 @@
                         <div>
                             <h3 class="font-semibold text-gray-900 mb-2">Fecha y Hora</h3>
                             <p class="text-gray-700 text-lg">
-                                {{ \Carbon\Carbon::parse($event->date)->format('l, d F Y \a \l\a\s H:i') }}
+                                {{ \Carbon\Carbon::parse($event->date)->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY [a las] HH:mm') }}
                             </p>
-                            <p class="text-sm text-gray-500 mt-1">{{ \Carbon\Carbon::parse($event->date)->diffForHumans() }}
+                            <p class="text-sm text-gray-500 mt-1">{{ \Carbon\Carbon::parse($event->date)->locale('es')->diffForHumans() }}
                             </p>
                         </div>
                     </div>

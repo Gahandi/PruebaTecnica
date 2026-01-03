@@ -89,7 +89,7 @@ class Ticket extends Model
 	public function getPrice()
 	{
 		$ticketEvent = \App\Models\TicketsEvent::where('ticket_types_id', $this->ticket_types_id)
-			->where('event_id', $this->order->event_id)
+			->where('event_id', $this->event_id)
 			->first();
 
 		return $ticketEvent ? $ticketEvent->price : 0;
